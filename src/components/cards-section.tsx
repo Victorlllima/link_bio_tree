@@ -33,8 +33,8 @@ const cardsData: CardData[] = [
     {
         id: "mentoria",
         title: "Mentoria RedPro",
-        subtitle: "Acelere sua carreira",
-        description: "Programa de mentoria exclusiva para quem quer atingir o próximo nível na carreira de desenvolvimento e IA.",
+        subtitle: "Acelere sua carreira e negócios com IA",
+        description: "Programa de mentoria exclusiva para quem quer atingir o próximo nível na carreira e negócios com IA.",
         image: "/images/mentoria-head-pro.png",
         badge: "EM BREVE",
         icon: "⏳",
@@ -91,18 +91,17 @@ export function CardsSection() {
                         <h2 className="text-2xl md:text-3xl font-bold text-white">Destaques</h2>
                     </div>
 
-                    {/* Cards Container (Horizontal Scroll - Side by Side - Expanded Left) */}
-                    {/* Added pl-4 md:pl-32 to align start with title/Hero button */}
-                    <div className="flex overflow-x-auto pt-10 pb-12 pl-4 md:pl-32 pr-4 gap-5 snap-x snap-mandatory scrollbar-hide w-full">
+                    {/* Cards Container - Maximized size, side-by-side, no scroll */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 pt-10 pb-12 pl-4 md:pl-32 pr-8 gap-6 w-full">
                         {cardsData.map((card, index) => (
                             <motion.div
                                 key={card.id}
-                                initial={{ opacity: 0, x: 50 }}
-                                whileInView={{ opacity: 1, x: 0 }}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: index * 0.1 }}
                                 viewport={{ once: true }}
-                                whileHover={{ scale: 1.02, zIndex: 10 }}
-                                className="group relative cursor-pointer min-w-[240px] w-[240px] md:min-w-[260px] md:w-[260px] snap-center flex-shrink-0"
+                                whileHover={{ scale: 1.05, zIndex: 10 }}
+                                className="group relative cursor-pointer w-full"
                             // onClick is now handled by GlowingShadow or bubbling
                             >
                                 <GlowingShadow borderRadius="0.75rem" onClick={() => setSelectedCard(card)}>
