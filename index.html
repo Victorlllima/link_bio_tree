@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <!-- SEO Meta Tags -->
+  <title>RedPro | Seu Hub de Desenvolvimento e Negócios Digitais</title>
+  <meta name="description" content="Descubra projetos prontos, contrate desenvolvedores certificados e aprenda a criar aplicações com IA. RedPro - Transformando ideias em realidade.">
+  <meta name="keywords" content="desenvolvimento, programação, vibe coding, método shark, cursos, projetos prontos, desenvolvedores">
+  <meta name="author" content="RedPro">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://redpro.com.br/">
+  <meta property="og:title" content="RedPro | Seu Hub de Desenvolvimento e Negócios Digitais">
+  <meta property="og:description" content="Descubra projetos prontos, contrate desenvolvedores certificados e aprenda a criar aplicações com IA.">
+  <meta property="og:image" content="images/og-image.jpg">
+  <meta property="og:locale" content="pt_BR">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://redpro.com.br/">
+  <meta name="twitter:title" content="RedPro | Seu Hub de Desenvolvimento e Negócios Digitais">
+  <meta name="twitter:description" content="Descubra projetos prontos, contrate desenvolvedores certificados e aprenda a criar aplicações com IA.">
+  <meta name="twitter:image" content="images/og-image.jpg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🦈%3C/text%3E%3C/svg%3E">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Preload das imagens críticas -->
+  <link rel="preload" as="image" href="images/card-redflix.webp">
+  
+  <!-- Meta Pixel (Facebook) - Placeholder para Fase 03 -->
+  <!-- 
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', 'SEU_PIXEL_ID');
+    fbq('track', 'PageView');
+  </script>
+  -->
+  
+  <!-- Google Analytics 4 - Placeholder para Fase 03 -->
+  <!--
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+  -->
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <h1 class="logo">RedPro</h1>
+      <p class="tagline">Seu Hub de Desenvolvimento e Negócios Digitais</p>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="container">
+      <!-- Cards Section -->
+      <section class="cards-section" aria-label="Nossos Serviços">
+        <h2 class="section-title">Destaques</h2>
+        <div class="cards-grid" id="cards-container">
+          <!-- Cards serão renderizados via JavaScript -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Modal de Detalhes -->
+  <div class="modal" id="detail-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content">
+      <div class="modal-image-container">
+        <img src="" alt="" class="modal-image" id="modal-image">
+        <div class="modal-image-overlay"></div>
+        <button class="modal-close" id="modal-close" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h2 class="modal-title" id="modal-title"></h2>
+        <p class="modal-description" id="modal-description"></p>
+        <a href="#" class="modal-cta" id="modal-cta" target="_blank" rel="noopener noreferrer">
+          Acessar
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p class="footer-text">
+        © 2026 <a href="https://redpro.com.br" class="footer-link">RedPro</a>. 
+        Todos os direitos reservados. 
+        Feito com 🦈 pelo Método S.H.A.R.K.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+</body>
+</html>
