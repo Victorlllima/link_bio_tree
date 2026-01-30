@@ -4,6 +4,15 @@ import { SplineScene } from "@/components/ui/spline";
 import { Card } from "@/components/ui/card";
 import { Spotlight } from "@/components/ui/spotlight";
 import IsoLevelWarp from "@/components/ui/isometric-wave-grid-background";
+import { MorphingText } from "@/components/ui/morphing-text";
+
+// Defined the formatted texts here
+const morphTexts = [
+    "<span class='text-red-500'>Red</span>Pro",
+    "AI <span class='bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-teal-400 to-indigo-500'>Academy</span>",
+    "<span class='text-red-500'>Red</span>Pro",
+    "AI <span class='bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-teal-400 to-indigo-500'>Academy</span>"
+];
 
 export function HeroSection() {
     return (
@@ -16,16 +25,23 @@ export function HeroSection() {
             />
 
             {/* Main Hero Content */}
-            <div className="relative z-10 w-full min-h-screen">
-                <Card className="w-full min-h-screen bg-transparent border-0 relative overflow-hidden">
+            <div className="relative z-10 w-full min-h-screen flex flex-col">
+
+                {/* Morphing Text at the top */}
+                <div className="w-full pt-12 md:pt-16 lg:pt-20 z-20">
+                    <MorphingText texts={morphTexts} className="leading-tight" />
+                </div>
+
+                <Card className="w-full flex-1 bg-transparent border-0 relative overflow-hidden mt-[-40px]">
                     <Spotlight
                         className="-top-40 left-0 md:left-60 md:-top-20"
                         fill="#E50914"
                     />
 
-                    <div className="flex flex-col lg:flex-row min-h-screen">
+                    <div className="flex flex-col lg:flex-row h-full">
                         {/* Left content - Text */}
-                        <div className="flex-1 p-8 lg:p-16 relative z-10 flex flex-col justify-center items-center lg:items-start text-center lg:text-left">
+                        <div className="flex-1 p-8 lg:p-16 relative z-10 flex flex-col justify-center items-center lg:items-start text-center lg:text-left mt-8 lg:-mt-16">
+
                             {/* Badge */}
                             <div className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/20 px-4 py-2 rounded-full mb-8">
                                 <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>

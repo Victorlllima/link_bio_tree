@@ -11,7 +11,7 @@ interface CardData {
     description: string;
     image: string;
     badge: string;
-    badgeIcon: string;
+    icon: string; // Changed from badgeIcon just to be cleaner
     url: string;
     color: string;
 }
@@ -19,23 +19,23 @@ interface CardData {
 const cardsData: CardData[] = [
     {
         id: "metodo",
-        title: "Método S.H.A.R.K.",
-        subtitle: "Desenvolva sites e apps com IA",
+        title: "Método S.H.A.R.K. de VibeCoding",
+        subtitle: "Aprenda a desenvolver apps e soluções com IA",
         description: "O curso que está revolucionando o mercado. Aprenda a criar aplicações completas usando Inteligência Artificial, mesmo sem saber programar.",
-        image: "/images/card-metodo.webp",
+        image: "/images/shark-team-robots2.png",
         badge: "🚀 CURSO",
-        badgeIcon: "🚀",
+        icon: "🚀",
         url: "https://metodoshark.redpro.com.br",
         color: "from-purple-500 to-pink-500"
     },
     {
         id: "redflix",
         title: "REDFLIX",
-        subtitle: "Projetos Prontos",
+        subtitle: "Projetos desenvolvidos por alunos",
         description: "Projetos prontos criados por mim e meus alunos. Escolha o seu e comece a faturar. São templates, automações e sistemas completos testados e aprovados pelo mercado.",
         image: "/images/card-redflix.webp",
-        badge: "🔥 POPULAR",
-        badgeIcon: "🔥",
+        badge: "",
+        icon: "",
         url: "https://redflix.redpro.com.br",
         color: "from-red-500 to-orange-500"
     },
@@ -44,9 +44,9 @@ const cardsData: CardData[] = [
         title: "Contrate um SHARK",
         subtitle: "VibeCoders certificados pela Redpro AI Academy",
         description: "Precisa de um desenvolvedor de confiança? Aqui você encontra VibeCoders certificados pela Redpro AI Academy, prontos para executar seu projeto com qualidade.",
-        image: "/images/card-contrate.webp",
-        badge: "⭐ DESTAQUE",
-        badgeIcon: "⭐",
+        image: "/images/contrate.png",
+        badge: "",
+        icon: "",
         url: "https://contrateumshark.redpro.com.br",
         color: "from-blue-500 to-cyan-500"
     },
@@ -56,8 +56,8 @@ const cardsData: CardData[] = [
         subtitle: "Fique por dentro de todas as novidades em IA",
         description: "Fique por dentro de todas as novidades em IA. Novos projetos, atualizações de cursos e conteúdos exclusivos do ecossistema RedPro.",
         image: "/images/card-news.webp",
-        badge: "📰 GRÁTIS",
-        badgeIcon: "📰",
+        badge: "",
+        icon: "",
         url: "https://news.redpro.com.br",
         color: "from-green-500 to-emerald-500"
     }
@@ -90,12 +90,14 @@ export function CardsSection() {
                                 onClick={() => setSelectedCard(card)}
                             >
                                 <div className="relative aspect-video rounded-xl overflow-hidden bg-neutral-900 border border-white/5 shadow-xl transition-all duration-300 group-hover:border-red-500/50 group-hover:shadow-red-500/20 group-hover:shadow-2xl">
-                                    {/* Badge */}
-                                    <div className="absolute top-3 right-3 z-10">
-                                        <span className={`px-3 py-1 text-xs font-bold rounded-full bg-gradient-to-r ${card.color} text-white shadow-lg`}>
-                                            {card.badge}
-                                        </span>
-                                    </div>
+                                    {/* Badge - Render ONLY IF badge string is not empty */}
+                                    {card.badge && card.badge.trim() !== "" && (
+                                        <div className="absolute top-3 right-3 z-10">
+                                            <span className={`px-3 py-1 text-xs font-bold rounded-full bg-gradient-to-r ${card.color} text-white shadow-lg`}>
+                                                {card.badge}
+                                            </span>
+                                        </div>
+                                    )}
 
                                     {/* Image */}
                                     <Image
@@ -110,7 +112,7 @@ export function CardsSection() {
 
                                     {/* Content */}
                                     <div className="absolute bottom-0 left-0 right-0 p-4">
-                                        <h3 className="text-lg font-bold text-white mb-1">{card.title}</h3>
+                                        <h3 className="text-lg font-bold text-white mb-1 uppercase tracking-wide">{card.title}</h3>
                                         <p className="text-sm text-neutral-400 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
                                             {card.subtitle}
                                         </p>
