@@ -8,9 +8,9 @@ export function Footer() {
                         href="https://redpro.com.br"
                         className="text-red-500 hover:text-red-400 transition-colors font-medium"
                     >
-                        RedPro
+                        RedPro AI Academy
                     </a>
-                    . Todos os direitos reservados. Feito com 🦈 pelo Método S.H.A.R.K.
+                    . Todos os direitos reservados. Desenvolvido com o Método S.H.A.R.K.
                 </p>
             </div>
         </footer>

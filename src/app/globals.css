@@ -15,7 +15,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - GENERAL (Visible on page) */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -31,6 +31,18 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #ff1a1a;
+}
+
+/* UTILITY: Hide Scrollbar (for cards container) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 /* Spotlight animation */

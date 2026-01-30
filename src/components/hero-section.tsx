@@ -2,50 +2,42 @@
 
 import { SplineScene } from "@/components/ui/spline";
 import { Card } from "@/components/ui/card";
-import { Spotlight } from "@/components/ui/spotlight";
-import IsoLevelWarp from "@/components/ui/isometric-wave-grid-background";
-import { MorphingText } from "@/components/ui/morphing-text";
-
-// Defined the formatted texts here
-const morphTexts = [
-    "<span class='text-red-500'>Red</span>Pro",
-    "AI <span class='bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-teal-400 to-indigo-500'>Academy</span>",
-    "<span class='text-red-500'>Red</span>Pro",
-    "AI <span class='bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-teal-400 to-indigo-500'>Academy</span>"
-];
+import { ParticleTextEffect } from "@/components/ui/particle-text-effect";
+import { EtherealShadow } from "@/components/ui/ethereal-shadow";
 
 export function HeroSection() {
     return (
-        <section className="relative w-full min-h-screen overflow-hidden">
-            {/* Background Wave Grid - Neon Red */}
-            <IsoLevelWarp
-                color="229, 9, 20"
-                density={45}
-                speed={1.2}
-            />
+        <section className="relative w-full min-h-screen overflow-hidden bg-black">
+            {/* Background Ethereal Shadow */}
+            <div className="absolute inset-0 z-0">
+                <EtherealShadow
+                    color="rgba(229, 9, 20, 0.4)"
+                    animation={{ scale: 80, speed: 40 }}
+                    noise={{ opacity: 0.2, scale: 1 }}
+                    sizing="fill"
+                    className="w-full h-full"
+                />
+            </div>
 
             {/* Main Hero Content */}
             <div className="relative z-10 w-full min-h-screen flex flex-col">
 
-                {/* Morphing Text at the top */}
-                <div className="w-full pt-12 md:pt-16 lg:pt-20 z-20">
-                    <MorphingText texts={morphTexts} className="leading-tight" />
+                {/* Particle Text Effect at the top */}
+                <div className="w-full pt-4 md:pt-8 lg:pt-12 z-20">
+                    <ParticleTextEffect words={["RedPro", "AI Academy", "RedPro AI Academy"]} />
                 </div>
 
-                <Card className="w-full flex-1 bg-transparent border-0 relative overflow-hidden mt-[-40px]">
-                    <Spotlight
-                        className="-top-40 left-0 md:left-60 md:-top-20"
-                        fill="#E50914"
-                    />
+                <Card className="w-full flex-1 bg-transparent border-0 relative overflow-hidden mt-[-20px] md:mt-[-40px]">
+                    {/* Removed Spotlight as requested */}
 
                     <div className="flex flex-col lg:flex-row h-full">
                         {/* Left content - Text */}
-                        <div className="flex-1 p-8 lg:p-16 relative z-10 flex flex-col justify-center items-center lg:items-start text-center lg:text-left mt-8 lg:-mt-16">
+                        <div className="flex-1 p-8 lg:p-16 relative z-10 flex flex-col justify-center items-center lg:items-start text-center lg:text-left mt-4 lg:-mt-16">
 
                             {/* Badge */}
                             <div className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/20 px-4 py-2 rounded-full mb-8">
                                 <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                                <span className="text-red-400 text-sm font-medium tracking-wide">Método S.H.A.R.K.</span>
+                                <span className="text-red-400 text-sm font-medium tracking-wide">RedPro AI Academy</span>
                             </div>
 
                             {/* Main Title */}
@@ -68,13 +60,13 @@ export function HeroSection() {
                                     href="#destaques"
                                     className="group px-8 py-4 bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold rounded-lg shadow-lg shadow-red-500/25 hover:shadow-red-500/40 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
                                 >
-                                    Explorar Catálogo
+                                    Explorar
                                     <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                     </svg>
                                 </a>
                                 <a
-                                    href="https://metodoshark.redpro.com.br"
+                                    href="https://vibecoding.redpro.com.br"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="px-8 py-4 border border-white/20 text-white font-semibold rounded-lg hover:border-red-500/50 hover:bg-red-500/10 transition-all duration-300 flex items-center justify-center gap-2"

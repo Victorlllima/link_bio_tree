@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { GlowingShadow } from "@/components/ui/glowing-shadow";
 
 interface CardData {
     id: string;
@@ -14,6 +15,7 @@ interface CardData {
     icon: string; // Changed from badgeIcon just to be cleaner
     url: string;
     color: string;
+    objectPosition?: string; // Optional property for image positioning
 }
 
 const cardsData: CardData[] = [
@@ -23,10 +25,21 @@ const cardsData: CardData[] = [
         subtitle: "Aprenda a desenvolver apps e soluções com IA",
         description: "O curso que está revolucionando o mercado. Aprenda a criar aplicações completas usando Inteligência Artificial, mesmo sem saber programar.",
         image: "/images/shark-team-robots2.png",
-        badge: "🚀 CURSO",
-        icon: "🚀",
-        url: "https://metodoshark.redpro.com.br",
+        badge: "EM BREVE",
+        icon: "⏳",
+        url: "https://vibecoding.redpro.com.br",
         color: "from-purple-500 to-pink-500"
+    },
+    {
+        id: "mentoria",
+        title: "Mentoria RedPro",
+        subtitle: "Acelere sua carreira",
+        description: "Programa de mentoria exclusiva para quem quer atingir o próximo nível na carreira de desenvolvimento e IA.",
+        image: "/images/mentoria-head-pro.png",
+        badge: "EM BREVE",
+        icon: "⏳",
+        url: "#",
+        color: "from-yellow-500 to-amber-500"
     },
     {
         id: "redflix",
@@ -34,8 +47,8 @@ const cardsData: CardData[] = [
         subtitle: "Projetos desenvolvidos por alunos",
         description: "Projetos prontos criados por mim e meus alunos. Escolha o seu e comece a faturar. São templates, automações e sistemas completos testados e aprovados pelo mercado.",
         image: "/images/card-redflix.webp",
-        badge: "",
-        icon: "",
+        badge: "EM BREVE",
+        icon: "⏳",
         url: "https://redflix.redpro.com.br",
         color: "from-red-500 to-orange-500"
     },
@@ -45,10 +58,11 @@ const cardsData: CardData[] = [
         subtitle: "VibeCoders certificados pela Redpro AI Academy",
         description: "Precisa de um desenvolvedor de confiança? Aqui você encontra VibeCoders certificados pela Redpro AI Academy, prontos para executar seu projeto com qualidade.",
         image: "/images/contrate.png",
-        badge: "",
-        icon: "",
+        badge: "EM BREVE",
+        icon: "⏳",
         url: "https://contrateumshark.redpro.com.br",
-        color: "from-blue-500 to-cyan-500"
+        color: "from-blue-500 to-cyan-500",
+        objectPosition: "center 20%"
     },
     {
         id: "newsletter",
@@ -56,8 +70,8 @@ const cardsData: CardData[] = [
         subtitle: "Fique por dentro de todas as novidades em IA",
         description: "Fique por dentro de todas as novidades em IA. Novos projetos, atualizações de cursos e conteúdos exclusivos do ecossistema RedPro.",
         image: "/images/card-news.webp",
-        badge: "",
-        icon: "",
+        badge: "EM BREVE",
+        icon: "⏳",
         url: "https://news.redpro.com.br",
         color: "from-green-500 to-emerald-500"
     }
@@ -68,59 +82,70 @@ export function CardsSection() {
 
     return (
         <>
-            <section id="destaques" className="relative py-20 px-4 bg-black">
-                <div className="max-w-7xl mx-auto">
-                    {/* Section Title */}
-                    <div className="flex items-center gap-3 mb-12">
+            <section id="destaques" className="relative py-20 bg-black overflow-hidden">
+                {/* Removed max-w-7xl mx-auto to allow full width expansion to the right */}
+                <div className="w-full">
+                    {/* Section Title - Aligned with Hero content (approx. ml-4 md:ml-32 depending on Hero) */}
+                    <div className="flex items-center gap-3 mb-8 pl-4 md:pl-32">
                         <div className="w-1 h-8 bg-red-500 rounded-full"></div>
                         <h2 className="text-2xl md:text-3xl font-bold text-white">Destaques</h2>
                     </div>
 
-                    {/* Cards Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* Cards Container (Horizontal Scroll - Side by Side - Expanded Left) */}
+                    {/* Added pl-4 md:pl-32 to align start with title/Hero button */}
+                    <div className="flex overflow-x-auto pt-10 pb-12 pl-4 md:pl-32 pr-4 gap-5 snap-x snap-mandatory scrollbar-hide w-full">
                         {cardsData.map((card, index) => (
                             <motion.div
                                 key={card.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
+                                initial={{ opacity: 0, x: 50 }}
+                                whileInView={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.5, delay: index * 0.1 }}
                                 viewport={{ once: true }}
-                                whileHover={{ scale: 1.05, zIndex: 10 }}
-                                className="group relative cursor-pointer"
-                                onClick={() => setSelectedCard(card)}
+                                whileHover={{ scale: 1.02, zIndex: 10 }}
+                                className="group relative cursor-pointer min-w-[240px] w-[240px] md:min-w-[260px] md:w-[260px] snap-center flex-shrink-0"
+                            // onClick is now handled by GlowingShadow or bubbling
                             >
-                                <div className="relative aspect-video rounded-xl overflow-hidden bg-neutral-900 border border-white/5 shadow-xl transition-all duration-300 group-hover:border-red-500/50 group-hover:shadow-red-500/20 group-hover:shadow-2xl">
-                                    {/* Badge - Render ONLY IF badge string is not empty */}
-                                    {card.badge && card.badge.trim() !== "" && (
-                                        <div className="absolute top-3 right-3 z-10">
-                                            <span className={`px-3 py-1 text-xs font-bold rounded-full bg-gradient-to-r ${card.color} text-white shadow-lg`}>
-                                                {card.badge}
-                                            </span>
+                                <GlowingShadow borderRadius="0.75rem" onClick={() => setSelectedCard(card)}>
+                                    <div className="relative w-full h-full aspect-video rounded-xl overflow-hidden bg-neutral-900 border border-white/5 shadow-xl transition-all duration-300">
+                                        {/* Badge - Render ONLY IF badge string is not empty */}
+                                        {card.badge && card.badge.trim() !== "" && (
+                                            <div className="absolute top-3 right-3 z-10">
+                                                <span className={`px-3 py-1 text-xs font-bold rounded-full bg-gradient-to-r ${card.color} text-white shadow-lg`}>
+                                                    {card.badge}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {/* Image */}
+                                        <Image
+                                            src={card.image}
+                                            alt={card.title}
+                                            fill
+                                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                            style={{ objectPosition: card.objectPosition || 'center' }}
+                                        />
+
+                                        {/* Overlay */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80"></div>
+
+                                        {/* Content Container */}
+                                        <div className="absolute inset-0 p-6 flex flex-col justify-end z-20">
+                                            <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                                                <h3 className="text-lg font-bold text-white mb-0 uppercase tracking-wide leading-tight">
+                                                    {card.title}
+                                                </h3>
+
+                                                <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-all duration-500 ease-out opacity-0 group-hover:opacity-100">
+                                                    <div className="overflow-hidden">
+                                                        <p className="text-sm text-neutral-400 mt-2 border-t border-white/10 pt-2 transition-all">
+                                                            {card.subtitle}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    )}
-
-                                    {/* Image */}
-                                    <Image
-                                        src={card.image}
-                                        alt={card.title}
-                                        fill
-                                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                    />
-
-                                    {/* Overlay */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80"></div>
-
-                                    {/* Content */}
-                                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                                        <h3 className="text-lg font-bold text-white mb-1 uppercase tracking-wide">{card.title}</h3>
-                                        <p className="text-sm text-neutral-400 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                                            {card.subtitle}
-                                        </p>
                                     </div>
-
-                                    {/* Hover Glow Border */}
-                                    <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-red-500/50 transition-colors duration-300 pointer-events-none"></div>
-                                </div>
+                                </GlowingShadow>
                             </motion.div>
                         ))}
                     </div>
