@@ -18,8 +18,19 @@ interface CardData {
 
 const cardsData: CardData[] = [
     {
+        id: "metodo",
+        title: "Método S.H.A.R.K.",
+        subtitle: "Desenvolva sites e apps com IA",
+        description: "O curso que está revolucionando o mercado. Aprenda a criar aplicações completas usando Inteligência Artificial, mesmo sem saber programar.",
+        image: "/images/card-metodo.webp",
+        badge: "🚀 CURSO",
+        badgeIcon: "🚀",
+        url: "https://metodoshark.redpro.com.br",
+        color: "from-purple-500 to-pink-500"
+    },
+    {
         id: "redflix",
-        title: "Redflix",
+        title: "REDFLIX",
         subtitle: "Projetos Prontos",
         description: "Projetos prontos criados por mim e meus alunos. Escolha o seu e comece a faturar. São templates, automações e sistemas completos testados e aprovados pelo mercado.",
         image: "/images/card-redflix.webp",
@@ -30,9 +41,9 @@ const cardsData: CardData[] = [
     },
     {
         id: "contrate",
-        title: "Contrate um Shark",
-        subtitle: "Desenvolvedores Certificados",
-        description: "Precisa de um desenvolvedor de confiança? Aqui você encontra alunos certificados pelo Método S.H.A.R.K., prontos para executar seu projeto com qualidade.",
+        title: "Contrate um SHARK",
+        subtitle: "VibeCoders certificados pela Redpro AI Academy",
+        description: "Precisa de um desenvolvedor de confiança? Aqui você encontra VibeCoders certificados pela Redpro AI Academy, prontos para executar seu projeto com qualidade.",
         image: "/images/card-contrate.webp",
         badge: "⭐ DESTAQUE",
         badgeIcon: "⭐",
@@ -40,21 +51,10 @@ const cardsData: CardData[] = [
         color: "from-blue-500 to-cyan-500"
     },
     {
-        id: "metodo",
-        title: "Método Shark",
-        subtitle: "Aprenda a Criar com IA",
-        description: "O curso que está revolucionando o mercado. Aprenda a criar aplicações completas usando Inteligência Artificial, mesmo sem saber programar.",
-        image: "/images/card-metodo.webp",
-        badge: "🚀 CURSO",
-        badgeIcon: "🚀",
-        url: "https://metodoshark.redpro.com.br",
-        color: "from-purple-500 to-pink-500"
-    },
-    {
-        id: "news",
-        title: "News",
-        subtitle: "Novidades e Atualizações",
-        description: "Fique por dentro de todas as novidades do ecossistema RedPro. Novos projetos, atualizações de cursos e conteúdos exclusivos.",
+        id: "newsletter",
+        title: "Newsletter",
+        subtitle: "Fique por dentro de todas as novidades em IA",
+        description: "Fique por dentro de todas as novidades em IA. Novos projetos, atualizações de cursos e conteúdos exclusivos do ecossistema RedPro.",
         image: "/images/card-news.webp",
         badge: "📰 GRÁTIS",
         badgeIcon: "📰",
