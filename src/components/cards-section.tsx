@@ -44,7 +44,11 @@ export const cardsData: CardData[] = [
     },
     {
         id: "incompany",
-        title: "RedPro In Company",
+        title: (
+            <>
+                RedPro <em className="italic not-italic">IN COMPANY</em>
+            </>
+        ) as any,
         subtitle: "Evolua seu time com o poder da IA",
         description: "Capacitação técnica e estratégica para empresas que buscam liderar a nova era digital.",
         image: "/images/redpro-in-company.jpg",
@@ -58,7 +62,7 @@ export const cardsData: CardData[] = [
         title: "Eventos e Palestras",
         subtitle: "O futuro em cena",
         description: "Conectando tecnologia e pessoas através de experiências imersivas.",
-        image: "/images/card-news.webp",
+        image: "/images/eventos-palestras.jpg",
         badge: "EM BREVE",
         icon: "⏳",
         url: "#",

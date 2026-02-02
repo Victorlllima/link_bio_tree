@@ -71,16 +71,7 @@ export function HeroSection() {
                                 O curso que está revolucionando o mercado.
                             </p>
 
-                            <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                                <a
-                                    href="https://vibecoding.redpro.com.br"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="px-8 py-4 border border-white/20 text-white font-semibold rounded-lg hover:border-red-500/50 hover:bg-red-500/10 transition-all duration-300 flex items-center justify-center gap-2 backdrop-blur-md bg-black/40"
-                                >
-                                    Conhecer o Curso
-                                </a>
-                            </div>
+
                         </div>
                     </div>
 
