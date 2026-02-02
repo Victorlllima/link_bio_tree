@@ -71,7 +71,7 @@ export const cardsData: CardData[] = [
     {
         id: "redflix",
         title: "RedFlix",
-        subtitle: "Vitrine de soluções criadas por vibecoders",
+        subtitle: "Vitrine de soluções criadas por nossos alunos",
         description: "Explore aplicações e automações desenvolvidas pelos alunos do Método SHARK. Contrate soluções prontas ou customize para o seu negócio.",
         image: "/images/redflix.jpg",
         badge: "EM BREVE",
