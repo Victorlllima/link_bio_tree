@@ -36,7 +36,7 @@ export const cardsData: CardData[] = [
         title: "Mentoria RedPro",
         subtitle: "Aceleração individual para sua transformação digital",
         description: "Mentoria personalizada para implementar IA e automação no seu negócio. Sessões individuais focadas nos seus desafios específicos e resultados práticos.",
-        image: "/images/mentoria-head-pro.png",
+        image: "/images/mentoria-redpro.jpg",
         badge: "EM BREVE",
         icon: "⏳",
         url: "#",
