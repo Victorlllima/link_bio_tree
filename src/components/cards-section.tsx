@@ -101,6 +101,17 @@ export const cardsData: CardData[] = [
         icon: "⏳",
         url: "https://news.redpro.com.br",
         color: "from-green-500 to-emerald-500"
+    },
+    {
+        id: "contato",
+        title: "Fale com o RedPro",
+        subtitle: "Vamos conversar sobre o seu projeto",
+        description: "Agende uma conversa direta para tirar dúvidas, entender qual solução se encaixa melhor no seu negócio e descobrir como a IA pode transformar seus resultados.",
+        image: "/images/fale-com-redpro.jpg",
+        badge: "EM BREVE",
+        icon: "⏳",
+        url: "#",
+        color: "from-cyan-500 to-blue-500"
     }
 ];
 
@@ -222,17 +233,14 @@ export function CardsSection() {
                                 <p className="text-neutral-400 text-lg leading-relaxed mb-6">
                                     {selectedCard.description}
                                 </p>
-                                <a
-                                    href={selectedCard.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={`inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r ${selectedCard.color} text-white font-semibold rounded-lg shadow-lg hover:scale-105 transition-transform`}
+                                <div
+                                    className={`inline-flex items-center gap-2 px-6 py-3 bg-neutral-800 text-neutral-500 font-semibold rounded-lg shadow-lg cursor-not-allowed opacity-50`}
                                 >
                                     Acessar
                                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                     </svg>
-                                </a>
+                                </div>
                             </div>
                         </motion.div>
                     </motion.div>
