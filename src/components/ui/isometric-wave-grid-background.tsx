@@ -1,12 +1,10 @@
-"use client";
-
 import React, { useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 interface IsoLevelWarpProps extends React.HTMLAttributes<HTMLDivElement> {
     /**
-     * Primary line color (RGB format without parentheses).
-     * Default: red neon
+     * Primary line color (Tailwind hex or rgb).
+     * Default: cyan/teal mix
      */
     color?: string;
     /**
@@ -23,7 +21,7 @@ interface IsoLevelWarpProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const IsoLevelWarp = ({
     className,
-    color = "229, 9, 20", // RGB for Netflix Red / Neon Red
+    color = "14, 165, 233", // RGB for Tailwind sky-500
     speed = 1,
     density = 40,
     ...props
@@ -45,7 +43,7 @@ const IsoLevelWarp = ({
 
         // Grid Configuration
         const gridGap = density;
-        const rows = Math.ceil(height / gridGap) + 5;
+        const rows = Math.ceil(height / gridGap) + 5; // Extra buffer
         const cols = Math.ceil(width / gridGap) + 5;
 
         // Mouse Interaction
@@ -72,13 +70,16 @@ const IsoLevelWarp = ({
             mouse.targetY = -1000;
         };
 
+        // Math Helper: Smoothstep
         const smoothMix = (a: number, b: number, t: number) => {
             return a + (b - a) * t;
         };
 
         const draw = () => {
+            // Clear Screen with trail effect (optional, simplified here for clarity)
             ctx.clearRect(0, 0, width, height);
 
+            // Smooth mouse movement
             mouse.x = smoothMix(mouse.x, mouse.targetX, 0.1);
             mouse.y = smoothMix(mouse.y, mouse.targetY, 0.1);
 
@@ -86,42 +87,55 @@ const IsoLevelWarp = ({
 
             ctx.beginPath();
 
+            // Calculate Grid Points
             for (let y = 0; y <= rows; y++) {
+                // We draw lines row by row
+                // To make it look 3D/Topographic, we offset Y based on noise/sine
+
                 let isFirst = true;
 
                 for (let x = 0; x <= cols; x++) {
                     const baseX = (x * gridGap) - (gridGap * 2);
                     const baseY = (y * gridGap) - (gridGap * 2);
 
+                    // DISTORTION LOGIC
+                    // 1. Ambient Wave (The "Breathing")
                     const wave = Math.sin(x * 0.2 + time) * Math.cos(y * 0.2 + time) * 15;
 
+                    // 2. Mouse Repulsion (The "Interaction")
                     const dx = baseX - mouse.x;
                     const dy = baseY - mouse.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     const maxDist = 300;
 
+                    // Calculate force: 0 at edge, 1 at center
                     const force = Math.max(0, (maxDist - dist) / maxDist);
-                    const interactionY = -(force * force) * 80;
+                    // Apply a "Z-push" effect by moving points UP (negative Y) based on proximity
+                    const interactionY = -(force * force) * 80; // Non-linear falloff
 
+                    // Final Coordinates
                     const finalX = baseX;
                     const finalY = baseY + wave + interactionY;
 
+                    // Draw the line
                     if (isFirst) {
                         ctx.moveTo(finalX, finalY);
                         isFirst = false;
                     } else {
+                        // Bezier smoothing for organic feel
+                        // We simplify to lineTo for performance in high density, 
+                        // but could use quadraticCurveTo for liquid feel
                         ctx.lineTo(finalX, finalY);
                     }
                 }
             }
 
-            // Gradient Stroke with neon red
+            // STYLING
+            // Gradient Stroke
             const gradient = ctx.createLinearGradient(0, 0, width, height);
-            gradient.addColorStop(0, `rgba(${color}, 0)`);
-            gradient.addColorStop(0.3, `rgba(${color}, 0.3)`);
-            gradient.addColorStop(0.5, `rgba(${color}, 0.6)`);
-            gradient.addColorStop(0.7, `rgba(${color}, 0.3)`);
-            gradient.addColorStop(1, `rgba(${color}, 0)`);
+            gradient.addColorStop(0, `rgba(${color}, 0)`); // Fade top-left
+            gradient.addColorStop(0.5, `rgba(${color}, 0.5)`); // Bright center
+            gradient.addColorStop(1, `rgba(${color}, 0)`); // Fade bottom-right
 
             ctx.strokeStyle = gradient;
             ctx.lineWidth = 1;
@@ -153,7 +167,7 @@ const IsoLevelWarp = ({
         >
             <canvas ref={canvasRef} className="block w-full h-full" />
 
-            {/* Vignette overlay for depth */}
+            {/* Optional: Vignette overlay for depth */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%)] opacity-80 pointer-events-none" />
         </div>
     );

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { GlowingShadow } from "@/components/ui/glowing-shadow";
 
-interface CardData {
+export interface CardData {
     id: string;
     title: string;
     subtitle: string;
@@ -18,7 +18,7 @@ interface CardData {
     objectPosition?: string; // Optional property for image positioning
 }
 
-const cardsData: CardData[] = [
+export const cardsData: CardData[] = [
     {
         id: "metodo",
         title: "Método S.H.A.R.K. de VibeCoding",
@@ -54,10 +54,10 @@ const cardsData: CardData[] = [
     },
     {
         id: "contrate",
-        title: "Contrate um SHARK",
-        subtitle: "VibeCoders certificados pela Redpro AI Academy",
-        description: "Precisa de um desenvolvedor de confiança? Aqui você encontra VibeCoders certificados pela Redpro AI Academy, prontos para executar seu projeto com qualidade.",
-        image: "/images/contrate.png",
+        title: "Contrate um Shark",
+        subtitle: "Desenvolvedores certificados para contratar",
+        description: "Contrate desenvolvedores certificados pelo Método S.H.A.R.K. Profissionais treinados e prontos para criar soluções com IA para o seu negócio.",
+        image: "/images/contrate-shark.jpg",
         badge: "EM BREVE",
         icon: "⏳",
         url: "https://contrateumshark.redpro.com.br",
