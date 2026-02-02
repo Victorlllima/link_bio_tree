@@ -18,11 +18,12 @@ export interface CardData {
     objectPosition?: string; // Optional property for image positioning
 }
 
+
 export const cardsData: CardData[] = [
     {
         id: "metodo",
         title: "Método S.H.A.R.K. de VibeCoding",
-        subtitle: "Aprenda a desenvolver apps e soluções com IA",
+        subtitle: "Aprenda a desenvolver Apps e soluções com IA",
         description: "O curso que está revolucionando o mercado. Aprenda a criar aplicações completas usando Inteligência Artificial, mesmo sem saber programar.",
         image: "/images/shark-team-robots2.png",
         badge: "EM BREVE",
@@ -33,8 +34,8 @@ export const cardsData: CardData[] = [
     {
         id: "mentoria",
         title: "Mentoria RedPro",
-        subtitle: "Acelere sua carreira e negócios com IA",
-        description: "Programa de mentoria exclusiva para quem quer atingir o próximo nível na carreira e negócios com IA.",
+        subtitle: "Aceleração individual para sua transformação digital",
+        description: "Mentoria personalizada para implementar IA e automação no seu negócio. Sessões individuais focadas nos seus desafios específicos e resultados práticos.",
         image: "/images/mentoria-head-pro.png",
         badge: "EM BREVE",
         icon: "⏳",
@@ -42,10 +43,32 @@ export const cardsData: CardData[] = [
         color: "from-yellow-500 to-amber-500"
     },
     {
+        id: "incompany",
+        title: "RedPro In Company",
+        subtitle: "Evolua seu time com o poder da IA",
+        description: "Capacitação técnica e estratégica para empresas que buscam liderar a nova era digital.",
+        image: "/images/card-redflix.webp",
+        badge: "EM BREVE",
+        icon: "⏳",
+        url: "#",
+        color: "from-indigo-500 to-purple-500"
+    },
+    {
+        id: "eventos",
+        title: "Eventos e Palestras",
+        subtitle: "O futuro em cena",
+        description: "Conectando tecnologia e pessoas através de experiências imersivas.",
+        image: "/images/card-news.webp",
+        badge: "EM BREVE",
+        icon: "⏳",
+        url: "#",
+        color: "from-orange-500 to-red-500"
+    },
+    {
         id: "redflix",
-        title: "REDFLIX",
-        subtitle: "Projetos desenvolvidos por alunos",
-        description: "Projetos prontos criados por mim e meus alunos. Escolha o seu e comece a faturar. São templates, automações e sistemas completos testados e aprovados pelo mercado.",
+        title: "RedFlix",
+        subtitle: "Vitrine de soluções criadas por vibecoders",
+        description: "Explore aplicações e automações desenvolvidas pelos alunos do Método SHARK. Contrate soluções prontas ou customize para o seu negócio.",
         image: "/images/card-redflix.webp",
         badge: "EM BREVE",
         icon: "⏳",
@@ -54,9 +77,9 @@ export const cardsData: CardData[] = [
     },
     {
         id: "contrate",
-        title: "Contrate um Shark",
-        subtitle: "Desenvolvedores certificados para contratar",
-        description: "Contrate desenvolvedores certificados pelo Método S.H.A.R.K. Profissionais treinados e prontos para criar soluções com IA para o seu negócio.",
+        title: "Contrate um SHARK",
+        subtitle: "Vibecoders certificados prontos para o seu projeto",
+        description: "Contrate vibecoders certificados pelo Método S.H.A.R.K. Profissionais treinados e prontos para criar soluções com IA para o seu negócio.",
         image: "/images/contrate-shark.jpg",
         badge: "EM BREVE",
         icon: "⏳",
@@ -67,8 +90,8 @@ export const cardsData: CardData[] = [
     {
         id: "newsletter",
         title: "Newsletter",
-        subtitle: "Fique por dentro de todas as novidades em IA",
-        description: "Fique por dentro de todas as novidades em IA. Novos projetos, atualizações de cursos e conteúdos exclusivos do ecossistema RedPro.",
+        subtitle: "Insights semanais direto na sua caixa de entrada",
+        description: "Receba conteúdos exclusivos, tendências de IA, cases de sucesso e dicas práticas. O essencial do mundo da IA e automação, sem enrolação.",
         image: "/images/card-news.webp",
         badge: "EM BREVE",
         icon: "⏳",

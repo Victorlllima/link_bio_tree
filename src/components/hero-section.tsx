@@ -36,20 +36,24 @@ export function HeroSection() {
                 />
             </div>
 
+            {/* Title Fade Overlay - Makes cards transition to transparent behind the title */}
+            <div className="fixed top-0 left-0 w-full h-[350px] bg-gradient-to-b from-black via-black/80 to-transparent z-[50] pointer-events-none" />
+
+            {/* 1. Header Title - Fixed Top - High Z-Index to stay above the fade overlay */}
+            <header className="fixed top-0 left-0 w-full flex justify-center pt-20 pb-12 pointer-events-auto z-[70] text-center bg-transparent">
+                <HeroFuturisticText
+                    title="RedPro AI Academy"
+                    subtitle="Você imagina, a IA constrói."
+                    className="drop-shadow-2xl"
+                />
+            </header>
+
             {/* Main Content Container - Allows page scrolling */}
             <div className="relative z-10 container mx-auto px-4 min-h-screen flex flex-col pointer-events-none">
 
-                {/* 1. Header Title - Top Center - Futuristic Text */}
-                <header className="w-full flex justify-center pt-20 pb-20 pointer-events-auto z-50 text-center">
-                    <HeroFuturisticText
-                        title="RedPro AI Academy"
-                        subtitle="Você imagina, a IA constrói."
-                        className="drop-shadow-2xl"
-                    />
-                </header>
-
                 {/* Grid Layout: 3 Columns (Text, Cards, Robot) */}
-                <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 mt-16 mb-20 pointer-events-none items-start">
+                {/* Added more top margin (mt-[400px]) to start the scrollable content below the fixed header */}
+                <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 mt-[400px] mb-20 pointer-events-none items-start">
 
                     {/* Left Column (Col 1-3) - Text Content - FIXED (NEVER SCROLLS) - Closer to cards and higher */}
                     <div className="lg:col-span-3 relative pointer-events-auto h-full">
