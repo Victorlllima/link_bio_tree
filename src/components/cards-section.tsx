@@ -46,7 +46,7 @@ export const cardsData: CardData[] = [
         id: "incompany",
         title: (
             <>
-                RedPro <em className="italic not-italic">IN COMPANY</em>
+                REDPRO <em className="italic">IN COMPANY</em>
             </>
         ) as any,
         subtitle: "Evolua seu time com o poder da IA",
@@ -73,7 +73,7 @@ export const cardsData: CardData[] = [
         title: "RedFlix",
         subtitle: "Vitrine de soluções criadas por vibecoders",
         description: "Explore aplicações e automações desenvolvidas pelos alunos do Método SHARK. Contrate soluções prontas ou customize para o seu negócio.",
-        image: "/images/card-redflix.webp",
+        image: "/images/redflix.jpg",
         badge: "EM BREVE",
         icon: "⏳",
         url: "https://redflix.redpro.com.br",
