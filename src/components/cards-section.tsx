@@ -47,7 +47,7 @@ export const cardsData: CardData[] = [
         title: "RedPro In Company",
         subtitle: "Evolua seu time com o poder da IA",
         description: "Capacitação técnica e estratégica para empresas que buscam liderar a nova era digital.",
-        image: "/images/card-redflix.webp",
+        image: "/images/redpro-in-company.jpg",
         badge: "EM BREVE",
         icon: "⏳",
         url: "#",
