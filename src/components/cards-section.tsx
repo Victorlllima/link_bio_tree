@@ -26,7 +26,7 @@ export const cardsData: CardData[] = [
         subtitle: "Aprenda a desenvolver Apps e soluções com IA",
         description: "O curso que está revolucionando o mercado. Aprenda a criar aplicações completas usando Inteligência Artificial, mesmo sem saber programar.",
         image: "/images/shark-team-robots2.png",
-        badge: "EM BREVE",
+        badge: "",
         icon: "⏳",
         url: "https://vibecoding.redpro.com.br",
         color: "from-purple-500 to-pink-500"
@@ -233,14 +233,28 @@ export function CardsSection() {
                                 <p className="text-neutral-400 text-lg leading-relaxed mb-6">
                                     {selectedCard.description}
                                 </p>
-                                <div
-                                    className={`inline-flex items-center gap-2 px-6 py-3 bg-neutral-800 text-neutral-500 font-semibold rounded-lg shadow-lg cursor-not-allowed opacity-50`}
-                                >
-                                    Acessar
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                    </svg>
-                                </div>
+                                {selectedCard.id === "metodo" ? (
+                                    <a
+                                        href={selectedCard.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r ${selectedCard.color} text-white font-semibold rounded-lg shadow-lg hover:scale-105 transition-transform`}
+                                    >
+                                        Acessar
+                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                        </svg>
+                                    </a>
+                                ) : (
+                                    <div
+                                        className={`inline-flex items-center gap-2 px-6 py-3 bg-neutral-800 text-neutral-500 font-semibold rounded-lg shadow-lg cursor-not-allowed opacity-50`}
+                                    >
+                                        Acessar
+                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                        </svg>
+                                    </div>
+                                )}
                             </div>
                         </motion.div>
                     </motion.div>
