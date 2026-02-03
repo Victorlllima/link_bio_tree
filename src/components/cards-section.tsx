@@ -16,6 +16,7 @@ export interface CardData {
     url: string;
     color: string;
     objectPosition?: string; // Optional property for image positioning
+    active?: boolean; // Optional property to enable the button
 }
 
 
@@ -29,7 +30,8 @@ export const cardsData: CardData[] = [
         badge: "",
         icon: "⏳",
         url: "https://vibecoding.redpro.com.br",
-        color: "from-purple-500 to-pink-500"
+        color: "from-purple-500 to-pink-500",
+        active: true
     },
     {
         id: "mentoria",
@@ -233,7 +235,7 @@ export function CardsSection() {
                                 <p className="text-neutral-400 text-lg leading-relaxed mb-6">
                                     {selectedCard.description}
                                 </p>
-                                {selectedCard.id === "metodo" ? (
+                                {selectedCard.active ? (
                                     <a
                                         href={selectedCard.url}
                                         target="_blank"
