@@ -235,7 +235,7 @@ export function CardsSection() {
                                 <p className="text-neutral-400 text-lg leading-relaxed mb-6">
                                     {selectedCard.description}
                                 </p>
-                                {selectedCard.active ? (
+                                {(selectedCard.active || selectedCard.id === "metodo") ? (
                                     <a
                                         href={selectedCard.url}
                                         target="_blank"
