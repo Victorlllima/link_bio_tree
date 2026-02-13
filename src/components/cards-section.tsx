@@ -39,9 +39,9 @@ export const cardsData: CardData[] = [
         subtitle: "Aceleração individual para sua transformação digital",
         description: "Mentoria personalizada para implementar IA e automação no seu negócio. Sessões individuais focadas nos seus desafios específicos e resultados práticos.",
         image: "/images/mentoria-redpro.jpg",
-        badge: "EM BREVE",
+        badge: "NOVO MÓDULO",
         icon: "⏳",
-        url: "#",
+        url: "/mentoria",
         color: "from-yellow-500 to-amber-500"
     },
     {
@@ -54,9 +54,9 @@ export const cardsData: CardData[] = [
         subtitle: "Evolua seu time com o poder da IA",
         description: "Capacitação técnica e estratégica para empresas que buscam liderar a nova era digital.",
         image: "/images/redpro-in-company.jpg",
-        badge: "EM BREVE",
+        badge: "ÚLTIMAS VAGAS",
         icon: "⏳",
-        url: "#",
+        url: "/in-company",
         color: "from-indigo-500 to-purple-500"
     },
     {
@@ -65,9 +65,9 @@ export const cardsData: CardData[] = [
         subtitle: "O futuro em cena",
         description: "Conectando tecnologia e pessoas através de experiências imersivas.",
         image: "/images/eventos-palestras.jpg",
-        badge: "EM BREVE",
+        badge: "CALENDÁRIO ABERTO",
         icon: "⏳",
-        url: "#",
+        url: "/eventos",
         color: "from-orange-500 to-red-500"
     },
     {
@@ -87,9 +87,9 @@ export const cardsData: CardData[] = [
         subtitle: "Vibecoders certificados prontos para o seu projeto",
         description: "Contrate vibecoders certificados pelo Método S.H.A.R.K. Profissionais treinados e prontos para criar soluções com IA para o seu negócio.",
         image: "/images/contrate-shark.jpg",
-        badge: "EM BREVE",
+        badge: "BUSINA",
         icon: "⏳",
-        url: "https://contrateumshark.redpro.com.br",
+        url: "/contrate",
         color: "from-blue-500 to-cyan-500",
         objectPosition: "center 20%"
     },
@@ -99,9 +99,9 @@ export const cardsData: CardData[] = [
         subtitle: "Insights semanais direto na sua caixa de entrada",
         description: "Receba conteúdos exclusivos, tendências de IA, cases de sucesso e dicas práticas. O essencial do mundo da IA e automação, sem enrolação.",
         image: "/images/card-news.webp",
-        badge: "EM BREVE",
+        badge: "NEWS",
         icon: "⏳",
-        url: "https://news.redpro.com.br",
+        url: "/newsletter",
         color: "from-green-500 to-emerald-500"
     },
     {
@@ -110,9 +110,9 @@ export const cardsData: CardData[] = [
         subtitle: "Vamos conversar sobre o seu projeto",
         description: "Agende uma conversa direta para tirar dúvidas, entender qual solução se encaixa melhor no seu negócio e descobrir como a IA pode transformar seus resultados.",
         image: "/images/fale-com-redpro.jpg",
-        badge: "EM BREVE",
+        badge: "ONLINE",
         icon: "⏳",
-        url: "#",
+        url: "/contato",
         color: "from-cyan-500 to-blue-500"
     }
 ];
