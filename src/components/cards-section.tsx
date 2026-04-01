@@ -42,7 +42,8 @@ export const cardsData: CardData[] = [
         badge: "NOVO MÓDULO",
         icon: "⏳",
         url: "/mentoria",
-        color: "from-yellow-500 to-amber-500"
+        color: "from-yellow-500 to-amber-500",
+        active: true
     },
     {
         id: "incompany",
@@ -57,7 +58,8 @@ export const cardsData: CardData[] = [
         badge: "ÚLTIMAS VAGAS",
         icon: "⏳",
         url: "/in-company",
-        color: "from-indigo-500 to-purple-500"
+        color: "from-indigo-500 to-purple-500",
+        active: true
     },
     {
         id: "eventos",
@@ -91,7 +93,8 @@ export const cardsData: CardData[] = [
         icon: "⏳",
         url: "/contrate",
         color: "from-blue-500 to-cyan-500",
-        objectPosition: "center 20%"
+        objectPosition: "center 20%",
+        active: true
     },
     {
         id: "newsletter",
@@ -102,7 +105,8 @@ export const cardsData: CardData[] = [
         badge: "NEWS",
         icon: "⏳",
         url: "/newsletter",
-        color: "from-green-500 to-emerald-500"
+        color: "from-green-500 to-emerald-500",
+        active: true
     },
     {
         id: "contato",
@@ -113,7 +117,8 @@ export const cardsData: CardData[] = [
         badge: "ONLINE",
         icon: "⏳",
         url: "/contato",
-        color: "from-cyan-500 to-blue-500"
+        color: "from-cyan-500 to-blue-500",
+        active: true
     }
 ];
 
@@ -235,10 +240,10 @@ export function CardsSection() {
                                 <p className="text-neutral-400 text-lg leading-relaxed mb-6">
                                     {selectedCard.description}
                                 </p>
-                                {(selectedCard.active || selectedCard.id === "metodo") ? (
+                                {selectedCard.active ? (
                                     <a
                                         href={selectedCard.url}
-                                        target="_blank"
+                                        target={selectedCard.url.startsWith("http") ? "_blank" : "_self"}
                                         rel="noopener noreferrer"
                                         className={`inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r ${selectedCard.color} text-white font-semibold rounded-lg shadow-lg hover:scale-105 transition-transform`}
                                     >
@@ -248,12 +253,10 @@ export function CardsSection() {
                                         </svg>
                                     </a>
                                 ) : (
-                                    <div
-                                        className={`inline-flex items-center gap-2 px-6 py-3 bg-neutral-800 text-neutral-500 font-semibold rounded-lg shadow-lg cursor-not-allowed opacity-50`}
-                                    >
-                                        Acessar
+                                    <div className="inline-flex items-center gap-2 px-6 py-3 bg-neutral-800 text-neutral-500 font-semibold rounded-lg shadow-lg cursor-not-allowed opacity-50">
+                                        Em breve
                                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                         </svg>
                                     </div>
                                 )}

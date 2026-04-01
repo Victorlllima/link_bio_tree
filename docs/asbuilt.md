@@ -19,20 +19,24 @@
 
 ---
 
-## Cards Configurados
+## Cards / Links do Hub
 
-| # | Título | URL | Status |
-|---|--------|-----|--------|
-| 1 | Redflix | redflix.redpro.com.br | ⏳ Aguardando |
-| 2 | Contrate um Shark | contrateumshark.redpro.com.br | ⏳ Aguardando |
-| 3 | Método Shark | metodoshark.redpro.com.br | ⏳ Aguardando |
-| 4 | News | news.redpro.com.br | ⏳ Aguardando |
+| # | Título | Rota | Landing Page |
+|---|--------|------|-------------|
+| 1 | Método S.H.A.R.K. | `/metodo` | ✅ Página existe |
+| 2 | Mentoria RedPro | `/mentoria` | 🔴 Pendente |
+| 3 | RedPro In Company | `/in-company` | 🔴 Pendente |
+| 4 | Fale com o RedPro | `/contato` | 🔴 Pendente |
+| 5 | Newsletter | `/newsletter` | 🔴 Pendente |
+| 6 | Contrate um Shark | `/contrate` | 🔴 Pendente |
+| 7 | Redflix | `/redflix` | 🔴 Pendente |
+| 8 | Eventos e Palestras | `/eventos` | 🔴 Pendente |
 
 ---
 
 ## Roadmap de Implementação
 
-### 🔵 FASE 01: FUNDAÇÃO
+### 🔵 FASE 01: FUNDAÇÃO (Hub Principal)
 
 **Status:** `✅ Completa`
 
@@ -55,9 +59,28 @@
 
 ---
 
-### 🟢 FASE 02: INTELIGÊNCIA
+### 🟢 FASE 02: LANDING PAGES
 
-**Status:** `⏳ Aguardando Fase 01`
+**Status:** `🔄 Em andamento`
+
+**Prioridade de desenvolvimento:**
+
+| Prioridade | Página | Rota | Status |
+|-----------|--------|------|--------|
+| ✅ 0 | Método S.H.A.R.K. | `/metodo` | ✅ Concluída |
+| ✅ 1 | Mentoria RedPro | `/mentoria` | ✅ Concluída |
+| ✅ 2 | RedPro In Company | `/in-company` | ✅ Concluída |
+| ✅ 3 | Fale com o RedPro | `/contato` | ✅ Concluída |
+| ✅ 4 | Newsletter | `/newsletter` | ✅ Concluída |
+| ✅ 5 | Contrate um Shark | `/contrate` | ✅ Concluída |
+| 🔴 6 | Redflix | `/redflix` | ⏳ Pendente |
+| — | Eventos e Palestras | `/eventos` | ⏳ Sem prioridade definida |
+
+---
+
+### 🟡 FASE 03: INTELIGÊNCIA (Analytics)
+
+**Status:** `⏳ Aguardando Fase 02`
 
 **Progresso:** 0/6 tarefas concluídas (0%)
 
@@ -71,9 +94,9 @@
 
 ---
 
-### 🟡 FASE 03: CONVERSÃO
+### 🟠 FASE 04: CONVERSÃO
 
-**Status:** `⏳ Aguardando Fase 02`
+**Status:** `⏳ Aguardando Fase 03`
 
 **Progresso:** 0/7 tarefas concluídas (0%)
 
@@ -88,9 +111,9 @@
 
 ---
 
-### 🔴 FASE 04: PRODUÇÃO
+### 🔴 FASE 05: PRODUÇÃO
 
-**Status:** `⏳ Aguardando Fase 03`
+**Status:** `⏳ Aguardando Fase 04`
 
 **Progresso:** 0/6 tarefas concluídas (0%)
 
