@@ -12,7 +12,7 @@ const CHANNELS = [
             </svg>
         ),
         label: "WhatsApp",
-        value: "+55 61 99297-8796",
+        value: "Resposta em até 4 horas",
         action: "Abrir conversa",
         href: "https://wa.me/5561992978796"
     },
