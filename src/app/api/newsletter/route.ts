@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { emailNewsletter } from "@/lib/email-templates";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const AUDIENCE_ID = "772bf76a-410e-49c0-8737-76f1c1279114";
 
 export async function POST(req: Request) {
     const { email } = await req.json();
@@ -11,7 +12,6 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Email obrigatório" }, { status: 400 });
     }
 
-    // Envia em paralelo: notificação para Red + boas-vindas para o lead
     const [notify, welcome] = await Promise.allSettled([
         resend.emails.send({
             from: "RedPro Site <noreply@redpro.com.br>",
@@ -26,6 +26,13 @@ export async function POST(req: Request) {
             html: emailNewsletter()
         })
     ]);
+
+    // Adicionar à Audience com tag de origem
+    await resend.contacts.create({
+        audienceId: AUDIENCE_ID,
+        email,
+        unsubscribed: false,
+    }).catch(() => null);
 
     if (notify.status === "rejected" && welcome.status === "rejected") {
         return NextResponse.json({ error: "Erro ao processar inscrição" }, { status: 500 });

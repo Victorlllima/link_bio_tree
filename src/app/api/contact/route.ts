@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { emailContato } from "@/lib/email-templates";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const AUDIENCE_ID = "772bf76a-410e-49c0-8737-76f1c1279114";
 
 export async function POST(req: Request) {
     const { name, email, topic, message } = await req.json();
@@ -34,6 +35,15 @@ export async function POST(req: Request) {
             html: emailContato(name)
         })
     ]);
+
+    // Adicionar à Audience com nome
+    await resend.contacts.create({
+        audienceId: AUDIENCE_ID,
+        email,
+        firstName: name.split(" ")[0],
+        lastName: name.split(" ").slice(1).join(" ") || undefined,
+        unsubscribed: false,
+    }).catch(() => null);
 
     if (notify.status === "rejected" && confirm.status === "rejected") {
         return NextResponse.json({ error: "Erro ao enviar" }, { status: 500 });
