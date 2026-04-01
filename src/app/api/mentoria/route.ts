@@ -1,13 +1,13 @@
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
-import { emailContato } from "@/lib/email-templates";
+import { emailMentoria } from "@/lib/email-templates";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
-    const { name, email, topic, message } = await req.json();
+    const { name, email, area, level, challenge } = await req.json();
 
-    if (!name || !email || !message) {
+    if (!name || !email) {
         return NextResponse.json({ error: "Campos obrigatórios ausentes" }, { status: 400 });
     }
 
@@ -16,22 +16,23 @@ export async function POST(req: Request) {
             from: "RedPro Site <noreply@redpro.com.br>",
             to: "contato@redpro.com.br",
             replyTo: email,
-            subject: `[Contato] ${topic || "Mensagem"} — ${name}`,
+            subject: `[Mentoria] Aplicação — ${name}`,
             html: `
-                <h2>Nova mensagem via Fale com o RedPro</h2>
+                <h2>Nova aplicação à Mentoria RedPro</h2>
                 <p><strong>Nome:</strong> ${name}</p>
                 <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Assunto:</strong> ${topic || "Não informado"}</p>
+                <p><strong>Área:</strong> ${area || "Não informado"}</p>
+                <p><strong>Nível:</strong> ${level || "Não informado"}</p>
                 <hr/>
-                <p><strong>Mensagem:</strong></p>
-                <p>${message.replace(/\n/g, "<br/>")}</p>
+                <p><strong>Maior obstáculo:</strong></p>
+                <p>${(challenge || "Não informado").replace(/\n/g, "<br/>")}</p>
             `
         }),
         resend.emails.send({
             from: "Red — RedPro AI Academy <noreply@redpro.com.br>",
             to: email,
-            subject: "Mensagem recebida.",
-            html: emailContato(name)
+            subject: "Aplicação recebida — próximos passos.",
+            html: emailMentoria(name)
         })
     ]);
 

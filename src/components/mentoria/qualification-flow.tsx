@@ -165,7 +165,15 @@ export function QualificationFlow({ onClose }: QualificationFlowProps) {
                             </div>
                         </div>
                         <button
-                            onClick={() => setStep("finish")}
+                            onClick={async () => {
+                                if (!formData.name.trim() || !formData.email.trim()) return;
+                                await fetch("/api/mentoria", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify(formData)
+                                });
+                                setStep("finish");
+                            }}
                             disabled={!formData.name.trim() || !formData.email.trim()}
                             className="w-full mt-6 py-4 bg-orange-500 hover:bg-orange-400 text-black font-bold rounded-xl text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                         >
