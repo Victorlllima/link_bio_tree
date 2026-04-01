@@ -383,9 +383,6 @@ export default function MentoriaPage() {
                                 </button>
                                 <div className="mb-6">
                                     <p className="font-mono text-xs tracking-widest text-orange-500 uppercase mb-2">Aplicação</p>
-                                    <h3 className="text-xl font-bold text-white" style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800 }}>
-                                        Vamos entender seu momento
-                                    </h3>
                                 </div>
                                 <QualificationFlow onClose={() => setModalOpen(false)} />
                             </motion.div>

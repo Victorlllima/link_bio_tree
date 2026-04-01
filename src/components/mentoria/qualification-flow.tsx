@@ -194,7 +194,7 @@ export function QualificationFlow({ onClose }: QualificationFlowProps) {
                             Aplicação Recebida
                         </h3>
                         <p className="text-[#a1a1aa] text-sm max-w-xs mx-auto mb-8 leading-relaxed">
-                            Analisamos seu perfil, {formData.name}. Se houver fit, entramos em contato em até 24 horas.
+                            Analisaremos seu perfil, {formData.name}. Se houver fit, entraremos em contato em até 24 horas.
                         </p>
                         <button onClick={onClose} className="text-sm text-orange-500 hover:text-orange-400 transition-colors">
                             ← Voltar para a página
