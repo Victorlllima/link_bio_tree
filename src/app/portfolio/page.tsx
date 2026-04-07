@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Footer } from "@/components/footer";
 import Link from "next/link";
+import Image from "next/image";
 
 const PROJECTS = [
     {
@@ -15,6 +16,7 @@ const PROJECTS = [
         category: "SaaS",
         color: "from-blue-500 to-cyan-500",
         accent: "#3b82f6",
+        image: "/images/portfolio/nossocrm.png",
     },
     {
         id: "bioete",
@@ -25,6 +27,7 @@ const PROJECTS = [
         category: "Automação",
         color: "from-green-500 to-emerald-500",
         accent: "#22c55e",
+        image: null,
     },
     {
         id: "openclaw",
@@ -35,6 +38,7 @@ const PROJECTS = [
         category: "P&D — RedPro AI Academy",
         color: "from-purple-500 to-violet-500",
         accent: "#a855f7",
+        image: "/images/portfolio/openclaw.png",
     },
     {
         id: "livelo",
@@ -45,6 +49,7 @@ const PROJECTS = [
         category: "Automação",
         color: "from-yellow-500 to-orange-500",
         accent: "#f59e0b",
+        image: "/images/portfolio/livelo.png",
     },
     {
         id: "redmeetpro",
@@ -55,6 +60,7 @@ const PROJECTS = [
         category: "Desktop",
         color: "from-red-500 to-rose-500",
         accent: "#ef4444",
+        image: null,
     },
     {
         id: "vibevoice",
@@ -65,6 +71,7 @@ const PROJECTS = [
         category: "Automação",
         color: "from-pink-500 to-fuchsia-500",
         accent: "#ec4899",
+        image: null,
     },
     {
         id: "cbf",
@@ -75,6 +82,7 @@ const PROJECTS = [
         category: "Enterprise",
         color: "from-emerald-500 to-teal-500",
         accent: "#10b981",
+        image: "/images/portfolio/cbf.png",
     },
     {
         id: "familycare",
@@ -85,6 +93,7 @@ const PROJECTS = [
         category: "SaaS",
         color: "from-sky-500 to-blue-500",
         accent: "#0ea5e9",
+        image: null,
     },
     {
         id: "youtubedigest",
@@ -95,6 +104,7 @@ const PROJECTS = [
         category: "Automação",
         color: "from-orange-500 to-amber-500",
         accent: "#f97316",
+        image: null,
     },
     {
         id: "nexus",
@@ -105,6 +115,7 @@ const PROJECTS = [
         category: "IA",
         color: "from-indigo-500 to-purple-500",
         accent: "#6366f1",
+        image: "/images/portfolio/nexus.png",
     },
     {
         id: "adminpanel",
@@ -115,6 +126,7 @@ const PROJECTS = [
         category: "Internal Tool",
         color: "from-neutral-500 to-zinc-600",
         accent: "#f97316",
+        image: "/images/portfolio/adminpanel.png",
     },
 ];
 
@@ -214,27 +226,32 @@ export default function PortfolioPage() {
                                 >
                                     {/* Thumb */}
                                     <div className="relative aspect-video overflow-hidden">
-                                        <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-15 group-hover:opacity-25 transition-opacity duration-300`} />
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                                            <div
-                                                className="w-16 h-16 rounded-2xl flex items-center justify-center"
-                                                style={{ background: `${project.accent}18`, border: `1px solid ${project.accent}30` }}
-                                            >
-                                                <span className="text-2xl font-black" style={{ color: project.accent, fontFamily: "'JetBrains Mono', monospace" }}>
-                                                    {project.name.slice(0, 2).toUpperCase()}
-                                                </span>
-                                            </div>
-                                            <span
-                                                className="font-mono text-[10px] tracking-[0.2em] uppercase"
-                                                style={{ color: `${project.accent}80` }}
-                                            >
-                                                {project.category}
-                                            </span>
-                                        </div>
-                                        {/* Placeholder label */}
-                                        <div className="absolute bottom-2 right-2">
-                                            <span className="font-mono text-[9px] text-[#3f3f46] tracking-widest uppercase">thumbnail</span>
-                                        </div>
+                                        {project.image ? (
+                                            <>
+                                                <Image src={project.image} alt={project.name} fill className="object-cover object-top transition-transform duration-500 group-hover:scale-105" />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-[#111113] via-transparent to-transparent opacity-60" />
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-15 group-hover:opacity-25 transition-opacity duration-300`} />
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                                                    <div
+                                                        className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                                                        style={{ background: `${project.accent}18`, border: `1px solid ${project.accent}30` }}
+                                                    >
+                                                        <span className="text-2xl font-black" style={{ color: project.accent, fontFamily: "'JetBrains Mono', monospace" }}>
+                                                            {project.name.slice(0, 2).toUpperCase()}
+                                                        </span>
+                                                    </div>
+                                                    <span className="font-mono text-[10px] tracking-[0.2em] uppercase" style={{ color: `${project.accent}80` }}>
+                                                        {project.category}
+                                                    </span>
+                                                </div>
+                                                <div className="absolute bottom-2 right-2">
+                                                    <span className="font-mono text-[9px] text-[#3f3f46] tracking-widest uppercase">em breve</span>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
 
                                     {/* Content */}
@@ -313,18 +330,27 @@ export default function PortfolioPage() {
 
                             {/* Thumb */}
                             <div className="relative aspect-video">
-                                <div className={`absolute inset-0 bg-gradient-to-br ${selected.color} opacity-20`} />
-                                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                                    <div
-                                        className="w-20 h-20 rounded-2xl flex items-center justify-center"
-                                        style={{ background: `${selected.accent}18`, border: `1px solid ${selected.accent}40` }}
-                                    >
-                                        <span className="text-3xl font-black" style={{ color: selected.accent, fontFamily: "'JetBrains Mono', monospace" }}>
-                                            {selected.name.slice(0, 2).toUpperCase()}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#111113] via-transparent to-transparent" />
+                                {selected.image ? (
+                                    <>
+                                        <Image src={selected.image} alt={selected.name} fill className="object-cover object-top" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#111113] via-transparent to-transparent" />
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className={`absolute inset-0 bg-gradient-to-br ${selected.color} opacity-20`} />
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                                            <div
+                                                className="w-20 h-20 rounded-2xl flex items-center justify-center"
+                                                style={{ background: `${selected.accent}18`, border: `1px solid ${selected.accent}40` }}
+                                            >
+                                                <span className="text-3xl font-black" style={{ color: selected.accent, fontFamily: "'JetBrains Mono', monospace" }}>
+                                                    {selected.name.slice(0, 2).toUpperCase()}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#111113] via-transparent to-transparent" />
+                                    </>
+                                )}
                             </div>
 
                             {/* Content */}
