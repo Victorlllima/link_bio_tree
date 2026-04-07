@@ -84,6 +84,18 @@ export const cardsData: CardData[] = [
         color: "from-red-500 to-orange-500"
     },
     {
+        id: "portfolio",
+        title: "Portfólio",
+        subtitle: "11 projetos reais em produção",
+        description: "CRMs, agentes de IA, automações, SaaS e ferramentas internas — todos desenvolvidos com o Método S.H.A.R.K. Explore os projetos e fale com Red.",
+        image: "/images/redflix.jpg",
+        badge: "PROJETOS REAIS",
+        icon: "⚡",
+        url: "/portfolio",
+        color: "from-orange-500 to-amber-500",
+        active: true
+    },
+    {
         id: "contrate",
         title: "Contrate um SHARK",
         subtitle: "Vibecoders certificados prontos para o seu projeto",
