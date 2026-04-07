@@ -60,7 +60,7 @@ const PROJECTS = [
         category: "Desktop",
         color: "from-red-500 to-rose-500",
         accent: "#ef4444",
-        image: null,
+        image: "/images/portfolio/redmeetpro.png",
     },
     {
         id: "vibevoice",
@@ -71,7 +71,7 @@ const PROJECTS = [
         category: "Automação",
         color: "from-pink-500 to-fuchsia-500",
         accent: "#ec4899",
-        image: null,
+        image: "/images/portfolio/vibevoice.png",
     },
     {
         id: "cbf",
@@ -104,7 +104,7 @@ const PROJECTS = [
         category: "Automação",
         color: "from-orange-500 to-amber-500",
         accent: "#f97316",
-        image: null,
+        image: "/images/portfolio/youtubedigest.png",
     },
     {
         id: "nexus",
