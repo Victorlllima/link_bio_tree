@@ -99,7 +99,7 @@ const PROJECTS = [
         id: "youtubedigest",
         name: "Youtube Digest",
         tagline: "Você para de perder tempo assistindo",
-        description: "Você para de perder tempo assistindo. O sistema assiste por você — filtra o que importa no YouTube e Reddit, pontua por relevância com LLM e entrega o digest no Telegram antes das 9h.",
+        description: "Enquanto você trabalha, o sistema assiste por você. Todo dia antes das 9h, coleta e analisa centenas de vídeos e posts do YouTube e Reddit, pontua cada um por relevância com LLM e entrega um digest com o Top 10 direto no Telegram — só o que realmente importa para o seu mercado.",
         stack: ["Node.js", "Reddit API", "YouTube Data API v3", "Telegram Bot", "Convex", "OpenClaw Gateway"],
         category: "Automação",
         color: "from-orange-500 to-amber-500",
