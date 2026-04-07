@@ -8,9 +8,9 @@ import Link from "next/link";
 const PROJECTS = [
     {
         id: "nossocrm",
-        name: "NossoCRM",
-        tagline: "CRM inteligente com assistente de IA integrado",
-        description: "CRM SaaS completo com pipeline Kanban, inbox inteligente e briefing diário gerado por IA. Inclui webhooks para automações, gestão de contatos e atividades. Pronto para produção com wizard de instalação automática.",
+        name: "RedPro CRM — Plataforma Whitelabel",
+        tagline: "CRM com IA nativa, pronto para usar com a sua marca",
+        description: "CRM com IA nativa, pronto para usar com a sua marca. Pipeline Kanban, briefing diário gerado por IA e webhooks de automação — tudo configurado em menos de uma hora.",
         stack: ["Next.js 16", "React 19", "Supabase", "AI SDK", "Google Gemini", "Claude", "TypeScript"],
         category: "SaaS",
         color: "from-blue-500 to-cyan-500",
@@ -18,9 +18,9 @@ const PROJECTS = [
     },
     {
         id: "bioete",
-        name: "Bioete",
-        tagline: "Automação comercial para tratamento de esgoto",
-        description: "Plataforma de automação comercial para Grupo MPF. Agente de IA no WhatsApp que qualifica leads, gera orçamentos em PDF e faz follow-up automatizado. Integração com ERP PDVX para notas fiscais automáticas.",
+        name: "CRM Connect — CRM + WhatsApp + ERP",
+        tagline: "Operação comercial integrada de ponta a ponta",
+        description: "Operação comercial integrada de ponta a ponta: leads chegam pelo WhatsApp, a IA qualifica, gera o orçamento em PDF e emite a nota fiscal no ERP — sem nenhuma intervenção humana.",
         stack: ["Supabase Self-Hosted", "Evolution API", "PostgreSQL", "Redis", "Traefik", "Hetzner"],
         category: "Automação",
         color: "from-green-500 to-emerald-500",
@@ -28,9 +28,9 @@ const PROJECTS = [
     },
     {
         id: "openclaw",
-        name: "OpenClaw Swarm",
-        tagline: "Constelação de 10 agentes de IA autônomos 24/7",
-        description: "Sistema multi-agente rodando em VPS Hetzner. O agente Constellation coordena pesquisa, conteúdo, SEO e análise via Mission Control. Pipelines diários de geração de conteúdo e debates estratégicos entre agentes.",
+        name: "Enterprise P&D — Agent Swarm",
+        tagline: "10 agentes autônomos rodando 24/7 em infraestrutura dedicada",
+        description: "10 agentes autônomos rodando 24/7: pesquisa, geração de conteúdo, SEO e análise estratégica em paralelo. A infraestrutura de inteligência que a RedPro AI Academy usa internamente para se manter na frente.",
         stack: ["Next.js 14", "Convex Cloud", "Claude Sonnet/Haiku", "Ollama", "Tailscale", "Hetzner VPS"],
         category: "P&D — RedPro AI Academy",
         color: "from-purple-500 to-violet-500",
@@ -38,9 +38,9 @@ const PROJECTS = [
     },
     {
         id: "livelo",
-        name: "Pontos Livelo Monitor",
-        tagline: "Monitor automatizado de promoções de pontos",
-        description: "Rastreia promoções de pontos Livelo em centenas de parceiros diariamente. Classifica Top 10, destaca favoritos e envia relatório visual por email com design responsivo.",
+        name: "Livelo Tracker",
+        tagline: "Nunca mais perca uma promoção de pontos",
+        description: "Nunca mais perca uma promoção de pontos. O sistema monitora centenas de parceiros diariamente, seleciona o Top 10 e entrega na sua caixa de entrada — antes que a promoção acabe.",
         stack: ["Python 3.11", "Playwright", "BeautifulSoup4", "Gmail API OAuth 2.0", "GitHub Actions"],
         category: "Automação",
         color: "from-yellow-500 to-orange-500",
@@ -49,8 +49,8 @@ const PROJECTS = [
     {
         id: "redmeetpro",
         name: "Red Meet Pro",
-        tagline: "Gravação e resumo de reuniões com IA local",
-        description: "App desktop que grava, transcreve e resume reuniões com total privacidade — processamento 100% local. Transcrição via Whisper, resumo via Ollama, envio automático por email. Histórico em SQLite.",
+        tagline: "Toda reunião virou um ativo",
+        description: "Toda reunião virou um ativo. Grava, transcreve e resume com Whisper + Ollama localmente — sem nada sair do seu computador. O resumo chega no seu email antes de você fechar o notebook.",
         stack: ["Tauri v2 (Rust)", "Next.js 14", "FastAPI", "Whisper.cpp", "Ollama", "SQLite"],
         category: "Desktop",
         color: "from-red-500 to-rose-500",
@@ -59,8 +59,8 @@ const PROJECTS = [
     {
         id: "vibevoice",
         name: "VibeVoice",
-        tagline: "Automação de desktop por comando de voz",
-        description: "Captura áudio do sistema e microfone, processa comandos de voz e executa automações de desktop com IA. Cria workflows por voz, integrado com OpenAI, Groq e Supabase.",
+        tagline: "Fale. O computador faz.",
+        description: "Fale. O computador faz. Comandos de voz que executam automações reais de desktop — sem clique, sem atalho, sem abrir nada. Você dita, o sistema executa.",
         stack: ["Python 3.11", "PyQt6", "pyautogui", "sounddevice", "OpenAI", "Groq", "Supabase"],
         category: "Automação",
         color: "from-pink-500 to-fuchsia-500",
@@ -68,9 +68,9 @@ const PROJECTS = [
     },
     {
         id: "cbf",
-        name: "CBF Manager",
-        tagline: "Gestão de base de dados para a CBF",
-        description: "Sistema de gerenciamento de estruturas de dados de futebol para a Confederação Brasileira de Futebol. Interface responsiva com design system completo e componentes reutilizáveis.",
+        name: "CBF Base Manager",
+        tagline: "Gestão e logística para a Copa do Mundo 2026",
+        description: "Interface moderna com design system próprio e componentes reutilizáveis. Desenvolvido para acompanhamento e organização da empresa de logística que acompanha a CBF na Copa do Mundo 2026.",
         stack: ["Vite", "React 18", "TypeScript", "shadcn/ui", "TailwindCSS", "Radix UI"],
         category: "Enterprise",
         color: "from-emerald-500 to-teal-500",
@@ -78,9 +78,9 @@ const PROJECTS = [
     },
     {
         id: "familycare",
-        name: "Family Care",
-        tagline: "SaaS de gestão operacional familiar",
-        description: "Plataforma completa com finanças, lista de compras colaborativa, agenda familiar, saúde infantil, sistema de pontos para crianças, documentos, refeições e integração Alexa. Arquitetura multi-tenant escalável.",
+        name: "FamilyOS",
+        tagline: "O sistema operacional da sua família",
+        description: "O sistema operacional da sua família. Finanças, agenda, saúde das crianças, lista de compras colaborativa e integração Alexa — tudo sincronizado em tempo real entre todos os membros.",
         stack: ["Next.js 14", "NestJS", "Prisma", "PostgreSQL", "Socket.io", "NextAuth v5", "Cloudflare R2", "Alexa Skills Kit"],
         category: "SaaS",
         color: "from-sky-500 to-blue-500",
@@ -89,8 +89,8 @@ const PROJECTS = [
     {
         id: "youtubedigest",
         name: "Youtube Digest",
-        tagline: "Curador inteligente de conteúdo diário",
-        description: "Coleta conteúdo relevante do Reddit e YouTube, filtra por relevância com LLM e envia digest com Top 10 via Telegram. Integrado ao OpenClaw Swarm (agentes Voyager, Zenith e Mercury).",
+        tagline: "Você para de perder tempo assistindo",
+        description: "Você para de perder tempo assistindo. O sistema assiste por você — filtra o que importa no YouTube e Reddit, pontua por relevância com LLM e entrega o digest no Telegram antes das 9h.",
         stack: ["Node.js", "Reddit API", "YouTube Data API v3", "Telegram Bot", "Convex", "OpenClaw Gateway"],
         category: "Automação",
         color: "from-orange-500 to-amber-500",
@@ -99,8 +99,8 @@ const PROJECTS = [
     {
         id: "nexus",
         name: "Nexus AI Agent",
-        tagline: "Agente IA multifuncional para processamento de dados",
-        description: "Processa documentos (PDF, Word), vídeos do YouTube, transcrições e arquivos em batch. Interface drag-and-drop para workflows com síntese de voz ElevenLabs e integração de pagamentos Stripe.",
+        tagline: "Plataforma de criação de agentes conversacionais com IA",
+        description: "Plataforma para criação de agentes conversacionais com IA. Conecte documentos, vídeos, áudios e fontes externas — o agente aprende, responde e age. Com síntese de voz, processamento em batch e Stripe integrado para monetizar desde o primeiro dia.",
         stack: ["Next.js 16", "React 19", "Mastra", "Claude", "ElevenLabs", "Supabase", "Stripe", "FFmpeg"],
         category: "IA",
         color: "from-indigo-500 to-purple-500",
@@ -108,9 +108,9 @@ const PROJECTS = [
     },
     {
         id: "adminpanel",
-        name: "Admin Panel — RedPro",
-        tagline: "Painel operacional interno da RedPro AI Solutions",
-        description: "Painel administrativo da RedPro AI Solutions para gestão de clientes, precificação com IA, geração de propostas e contratos via streaming (Claude), biblioteca de conteúdo para Instagram e calendário editorial.",
+        name: "RedPro Admin Panel",
+        tagline: "O sistema nervoso central da RedPro AI Solutions",
+        description: "O sistema nervoso central da RedPro AI Solutions. Gestão de clientes, geração de propostas e contratos via streaming com Claude, biblioteca de conteúdo e calendário editorial — tudo em um painel interno.",
         stack: ["Next.js 16", "TypeScript", "Tailwind CSS", "NextAuth v5", "Prisma v5", "PostgreSQL", "Claude (streaming)", "Docker Swarm", "Hetzner"],
         category: "Internal Tool",
         color: "from-neutral-500 to-zinc-600",
@@ -163,9 +163,9 @@ export default function PortfolioPage() {
                             className="text-5xl md:text-7xl font-black text-white mb-6 leading-none tracking-tight"
                             style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 900 }}
                         >
-                            O que a IA<br />
+                            O que nós<br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#f97316] to-[#fb923c]">
-                                já construiu.
+                                já construímos.
                             </span>
                         </h1>
                         <p className="text-[#71717a] text-lg max-w-xl" style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300 }}>
