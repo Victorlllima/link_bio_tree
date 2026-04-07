@@ -86,9 +86,9 @@ export const cardsData: CardData[] = [
     {
         id: "portfolio",
         title: "Portfólio",
-        subtitle: "11 projetos reais em produção",
+        subtitle: "Projetos reais em produção.",
         description: "CRMs, agentes de IA, automações, SaaS e ferramentas internas — todos desenvolvidos com o Método S.H.A.R.K. Explore os projetos e fale com Red.",
-        image: "/images/redflix.jpg",
+        image: "/images/portfolio-card.png",
         badge: "PROJETOS REAIS",
         icon: "⚡",
         url: "/portfolio",
