@@ -27,7 +27,7 @@ const PROJECTS = [
         category: "Automação",
         color: "from-green-500 to-emerald-500",
         accent: "#22c55e",
-        image: null,
+        image: "/images/portfolio/bioete.png",
     },
     {
         id: "openclaw",
@@ -93,7 +93,7 @@ const PROJECTS = [
         category: "SaaS",
         color: "from-sky-500 to-blue-500",
         accent: "#0ea5e9",
-        image: null,
+        image: "/images/portfolio/familycare.png",
     },
     {
         id: "youtubedigest",
