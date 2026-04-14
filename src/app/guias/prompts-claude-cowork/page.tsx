@@ -1,48 +1,44 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState } from "react"; // usado pelo CopyButton
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <button
+      onClick={handleCopy}
+      className="flex items-center gap-1.5 text-[11px] font-bold text-neutral-400 hover:text-[#f97316] transition-colors cursor-pointer"
+    >
+      {copied ? (
+        <>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5 text-green-500">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+          <span className="text-green-500">Copiado!</span>
+        </>
+      ) : (
+        <>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+          </svg>
+          Copiar
+        </>
+      )}
+    </button>
+  );
+}
 
 export default function GuiaPromptsClaudeCowork() {
-  const [downloading, setDownloading] = useState(false);
-
-  const handleDownload = async () => {
-    setDownloading(true);
-    const { default: html2pdf } = await import("html2pdf.js");
-    const element = document.getElementById("documento");
-    const options = {
-      margin: 0,
-      filename: "RedPro-Guia-5-Prompts-Claude-Cowork.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-    };
-    html2pdf().set(options).from(element).save().then(() => {
-      setDownloading(false);
-    });
-  };
-
   return (
     <>
-      {/* BARRA DE DOWNLOAD */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-3 bg-[#080808] border-b border-white/10">
-        <span className="text-sm text-neutral-400 hidden sm:block">
-          Guia RedPro — 5 Prompts Prontos para Automatizar sua Rotina com Claude Cowork
-        </span>
-        <button
-          onClick={handleDownload}
-          disabled={downloading}
-          className="flex items-center gap-2 bg-[#f97316] hover:opacity-85 transition-opacity text-white font-bold text-sm px-5 py-2.5 rounded-lg disabled:opacity-60 cursor-pointer"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-          </svg>
-          {downloading ? "Gerando..." : "Baixar PDF"}
-        </button>
-      </div>
-
       {/* DOCUMENTO */}
-      <div className="bg-neutral-100 min-h-screen pt-20 pb-16 px-4">
+      <div className="bg-neutral-100 min-h-screen py-12 px-4">
         <div id="documento" className="max-w-5xl mx-auto bg-white rounded-2xl overflow-hidden shadow-2xl">
 
           {/* CAPA */}
@@ -70,7 +66,7 @@ export default function GuiaPromptsClaudeCowork() {
                 <span className="text-[#f97316]">Claude Cowork</span>
               </h1>
               <p className="text-neutral-400 text-base leading-relaxed max-w-lg">
-                Descreva o que você quer. Saia da frente. Volte com o trabalho feito.
+                Descreva o que você quer. Saia da frente do computador. Volte com o trabalho feito.
               </p>
             </div>
           </div>
@@ -83,11 +79,29 @@ export default function GuiaPromptsClaudeCowork() {
               O <strong className="text-neutral-800">Claude Cowork</strong> é a versão do Claude que trabalha <strong className="text-neutral-800">por você</strong> — não só responde perguntas. Disponível no <strong className="text-neutral-800">Claude Desktop</strong> (Mac e Windows), ele acessa seus arquivos locais, executa tarefas em múltiplos passos e pode rodar automaticamente em horários programados.
             </p>
 
-            <div className="flex gap-4 bg-neutral-50 border border-neutral-200 rounded-xl p-5 mb-12">
+            <div className="flex gap-4 bg-neutral-50 border border-neutral-200 rounded-xl p-5 mb-4">
               <span className="text-xl flex-shrink-0">📌</span>
               <p className="text-[14px] text-neutral-600 leading-relaxed">
                 <strong className="text-neutral-800">Disponível nos planos:</strong> Pro, Max, Team e Enterprise. Para agendar tarefas automáticas, o computador precisa estar ligado e o Claude Desktop aberto.
               </p>
+            </div>
+
+            <div className="flex items-center justify-between gap-4 bg-[#080808] border border-white/10 rounded-xl px-6 py-4 mb-12">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">⬇️</span>
+                <p className="text-[14px] text-neutral-300 leading-relaxed">
+                  Ainda não tem o Claude Desktop?{" "}
+                  <strong className="text-white">Baixe gratuitamente para Mac e Windows.</strong>
+                </p>
+              </div>
+              <a
+                href="https://claude.com/download"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-shrink-0 bg-[#f97316] hover:opacity-85 transition-opacity text-white font-bold text-[13px] px-5 py-2.5 rounded-lg"
+              >
+                Baixar Claude Desktop →
+              </a>
             </div>
 
             {/* PROMPTS */}
@@ -102,7 +116,7 @@ export default function GuiaPromptsClaudeCowork() {
                 badgeColor="orange"
               >
                 <PromptBox label="Cole no Claude Cowork">
-                  <QuoteBox>{`Todo dia útil às 8h, execute esta tarefa:
+                  <QuoteBox copyText={`Todo dia útil às 8h, execute esta tarefa:\n\nVerifique meu Gmail em busca de e-mails não lidos das últimas 24 horas e identifique tudo que é urgente ou precisa de resposta.\n\nEm seguida, verifique meu Google Agenda com os eventos de hoje e qualquer conflito de horário.\n\nCompile tudo em um documento chamado "Briefing Diário — [data].md" e salve na minha Área de Trabalho.\n\nFormato:\n- Seção 1: E-mails Urgentes\n- Seção 2: Agenda de Hoje\n- Seção 3: Prioridades do Dia\n\nExecute automaticamente todo dia útil.`}>{`Todo dia útil às 8h, execute esta tarefa:
 
 Verifique meu Gmail em busca de e-mails não lidos das últimas 24 horas e identifique tudo que é urgente ou precisa de resposta.
 
@@ -118,7 +132,7 @@ Formato:
 Execute automaticamente todo dia útil.`}</QuoteBox>
                 </PromptBox>
                 <HowTo>
-                  No Claude Desktop, clique em <strong>Scheduled</strong> na barra lateral → <strong>New Scheduled Task</strong> → cole o prompt → defina o horário.
+                  No Claude Desktop, clique em <strong>Programado</strong> na barra lateral → <strong>+ Nova tarefa</strong> → cole o prompt → defina o horário. Veja o passo a passo completo abaixo.
                 </HowTo>
               </PromptSection>
 
@@ -129,7 +143,7 @@ Execute automaticamente todo dia útil.`}</QuoteBox>
                 description="Chega de pasta bagunçada. Cole o prompt, o Claude organiza tudo — renomeia, separa em subpastas e deleta lixo. Sem você mover um arquivo."
               >
                 <PromptBox label="Cole no Claude Cowork">
-                  <QuoteBox>{`Vou te dar acesso a uma pasta na minha Área de Trabalho chamada [NOME DA PASTA].
+                  <QuoteBox copyText={`Vou te dar acesso a uma pasta na minha Área de Trabalho chamada [NOME DA PASTA].\n\nPercorra todos os arquivos e faça o seguinte:\n\n1. Renomeie cada arquivo com este padrão:\n   [AAAA-MM-DD] — [Nome do Projeto] — [Tipo de Arquivo]\n\n2. Organize em subpastas por categoria:\n   Imagens / Documentos / Planilhas / Vídeos / Outros\n\n3. Delete arquivos duplicados e arquivos menores que 1KB que provavelmente são lixo\n\n4. Ao terminar, salve dentro da pasta um arquivo chamado "Relatório de Organização.txt" listando tudo que foi alterado`}>{`Vou te dar acesso a uma pasta na minha Área de Trabalho chamada [NOME DA PASTA].
 
 Percorra todos os arquivos e faça o seguinte:
 
@@ -157,7 +171,7 @@ Percorra todos os arquivos e faça o seguinte:
                 badgeColor="blue"
               >
                 <PromptBox label="Salve nas suas notas do celular">
-                  <QuoteBox>{`Estou te enviando uma tarefa pelo celular.
+                  <QuoteBox copyText={`Estou te enviando uma tarefa pelo celular.\n\nO que preciso: [descreva a tarefa — ex: "Pega o briefing do cliente chamado ProjetoX.pdf na minha pasta Downloads e transforma em um plano de projeto completo com etapas, prazos e responsáveis"]\n\nQuando terminar:\n- Salve o arquivo na minha Área de Trabalho dentro de uma pasta chamada "Pronto para Enviar"\n- Dê um nome claro para eu saber o que é quando chegar na mesa\n- Me avise quando estiver concluído`}>{`Estou te enviando uma tarefa pelo celular.
 
 O que preciso: [descreva a tarefa — ex: "Pega o briefing do cliente chamado ProjetoX.pdf na minha pasta Downloads e transforma em um plano de projeto completo com etapas, prazos e responsáveis"]
 
@@ -180,7 +194,7 @@ Quando terminar:
                 badgeColor="orange"
               >
                 <PromptBox label="Cole no Claude Cowork">
-                  <QuoteBox>{`Toda sexta-feira às 9h, execute esta tarefa:
+                  <QuoteBox copyText={`Toda sexta-feira às 9h, execute esta tarefa:\n\n1. Abra minha planilha de métricas salva em [CAMINHO DO ARQUIVO]\n\n2. Extraia os números desta semana para:\n   [especifique as métricas — ex: "visualizações, seguidores, faturamento, leads"]\n\n3. Abra meu template de relatório salvo em [CAMINHO DO TEMPLATE]\n\n4. Preencha o template com os dados desta semana\n\n5. Adicione um parágrafo de análise: o que os números significam e o que focar na próxima semana\n\n6. Salve na pasta "Relatórios" com o nome:\n   "Relatório Semanal — [data].docx"\n\nExecute automaticamente toda sexta-feira.`}>{`Toda sexta-feira às 9h, execute esta tarefa:
 
 1. Abra minha planilha de métricas salva em [CAMINHO DO ARQUIVO]
 
@@ -199,7 +213,7 @@ Quando terminar:
 Execute automaticamente toda sexta-feira.`}</QuoteBox>
                 </PromptBox>
                 <HowTo>
-                  Substitua os campos entre colchetes pelos caminhos reais dos seus arquivos antes de agendar.
+                  Substitua os campos entre colchetes pelos caminhos reais dos seus arquivos antes de agendar. Clique em <strong>Programado</strong> na barra lateral → <strong>+ Nova tarefa</strong>.
                 </HowTo>
               </PromptSection>
 
@@ -210,7 +224,7 @@ Execute automaticamente toda sexta-feira.`}</QuoteBox>
                 description="Faz a pesquisa na web e entrega uma apresentação pronta. Sem você abrir um único site, copiar nada ou montar slide algum."
               >
                 <PromptBox label="Cole no Claude Cowork">
-                  <QuoteBox>{`Pesquise a fundo a seguinte questão:
+                  <QuoteBox copyText={`Pesquise a fundo a seguinte questão:\n[insira sua pergunta — ex: "Quais são as 5 estratégias de monetização de newsletter que estão funcionando em 2026?"]\n\nPassos:\n1. Pesquise na web por informações atuais sobre o tema\n2. Analise e filtre o que é mais relevante e confiável\n3. Compile em uma apresentação profissional com os slides:\n   - Slide de título\n   - Resumo executivo\n   - Um slide por achado principal com dados de apoio\n   - Slide de recomendações\n\n4. Salve na minha Área de Trabalho como:\n   "[Tema] — Relatório de Pesquisa.pptx"\n\nDeixe limpo, profissional e pronto para apresentar.`}>{`Pesquise a fundo a seguinte questão:
 [insira sua pergunta — ex: "Quais são as 5 estratégias de monetização de newsletter que estão funcionando em 2026?"]
 
 Passos:
@@ -241,8 +255,8 @@ Deixe limpo, profissional e pronto para apresentar.`}</QuoteBox>
               <div className="flex flex-col gap-3">
                 {[
                   "Abra o Claude Desktop",
-                  "Clique em Scheduled na barra lateral esquerda",
-                  "Clique em New Scheduled Task",
+                  "Clique em Programado na barra lateral esquerda",
+                  "Clique em + Nova tarefa",
                   "Cole o prompt e defina a cadência (diária, semanal, mensal)",
                   "Pronto — o Claude executa sozinho no horário definido",
                 ].map((item, i) => (
@@ -363,10 +377,17 @@ function PromptBox({ label, children }: { label: string; children: React.ReactNo
   );
 }
 
-function QuoteBox({ children }: { children: React.ReactNode }) {
+function QuoteBox({ children, copyText }: { children: React.ReactNode; copyText?: string }) {
   return (
-    <div className="bg-white border border-neutral-200 rounded-md p-4 font-mono text-[13px] text-neutral-700 leading-relaxed whitespace-pre-wrap">
-      {children}
+    <div className="bg-white border border-neutral-200 rounded-md overflow-hidden">
+      {copyText && (
+        <div className="flex justify-end px-4 py-2 border-b border-neutral-100 bg-neutral-50">
+          <CopyButton text={copyText} />
+        </div>
+      )}
+      <div className="p-4 font-mono text-[13px] text-neutral-700 leading-relaxed whitespace-pre-wrap">
+        {children}
+      </div>
     </div>
   );
 }

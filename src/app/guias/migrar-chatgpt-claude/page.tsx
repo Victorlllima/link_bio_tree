@@ -1,48 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
 
 export default function GuiaMigrarChatGPTClaude() {
-  const [downloading, setDownloading] = useState(false);
-
-  const handleDownload = async () => {
-    setDownloading(true);
-    const { default: html2pdf } = await import("html2pdf.js");
-    const element = document.getElementById("documento");
-    const options = {
-      margin: 0,
-      filename: "RedPro-Guia-01-Migrar-ChatGPT-Claude.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-    };
-    html2pdf().set(options).from(element).save().then(() => {
-      setDownloading(false);
-    });
-  };
-
   return (
     <>
-      {/* BARRA DE DOWNLOAD */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-3 bg-[#080808] border-b border-white/10">
-        <span className="text-sm text-neutral-400 hidden sm:block">
-          Guia RedPro — Como Migrar do ChatGPT para o Claude
-        </span>
-        <button
-          onClick={handleDownload}
-          disabled={downloading}
-          className="flex items-center gap-2 bg-[#f97316] hover:opacity-85 transition-opacity text-white font-bold text-sm px-5 py-2.5 rounded-lg disabled:opacity-60 cursor-pointer"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-          </svg>
-          {downloading ? "Gerando..." : "Baixar PDF"}
-        </button>
-      </div>
-
       {/* DOCUMENTO */}
-      <div className="bg-neutral-100 min-h-screen pt-20 pb-16 px-4">
+      <div className="bg-neutral-100 min-h-screen py-12 px-4">
         <div id="documento" className="max-w-5xl mx-auto bg-white rounded-2xl overflow-hidden shadow-2xl">
 
           {/* CAPA */}
