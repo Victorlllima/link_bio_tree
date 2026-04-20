@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { GlowingShadow } from "@/components/ui/glowing-shadow";
 
-type Step = "welcome" | "area" | "level" | "challenge" | "capture" | "finish";
+type Step = "area" | "level" | "challenge" | "capture" | "finish";
 
-export function QualificationFlow() {
-    const [step, setStep] = useState<Step>("welcome");
+interface QualificationFlowProps {
+    onClose?: () => void;
+}
+
+export function QualificationFlow({ onClose }: QualificationFlowProps) {
+    const [step, setStep] = useState<Step>("area");
     const [formData, setFormData] = useState({
         area: "",
         level: "",
@@ -17,208 +20,185 @@ export function QualificationFlow() {
         whatsapp: ""
     });
 
-    const nextStep = (target: Step) => setStep(target);
-
-    // Variantes de animação
     const variants = {
-        enter: { x: 100, opacity: 0 },
+        enter: { x: 60, opacity: 0 },
         center: { x: 0, opacity: 1 },
-        exit: { x: -100, opacity: 0 }
+        exit: { x: -60, opacity: 0 }
     };
 
+    const steps: Step[] = ["area", "level", "challenge", "capture", "finish"];
+    const currentIndex = steps.indexOf(step);
+    const progress = ((currentIndex) / (steps.length - 1)) * 100;
+
     return (
-        <div className="w-full max-w-2xl mx-auto min-h-[500px] flex flex-col justify-center">
+        <div className="w-full max-w-xl mx-auto">
+            {/* Progress bar */}
+            {step !== "finish" && (
+                <div className="mb-8">
+                    <div className="h-px bg-white/10 rounded-full overflow-hidden">
+                        <motion.div
+                            className="h-full bg-orange-500"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progress}%` }}
+                            transition={{ duration: 0.4 }}
+                        />
+                    </div>
+                </div>
+            )}
+
             <AnimatePresence mode="wait">
 
-                {/* STEP 1: WELCOME */}
-                {step === "welcome" && (
-                    <motion.div
-                        key="welcome"
-                        variants={variants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{ duration: 0.4 }}
-                        className="text-center"
-                    >
-                        <h2 className="text-4xl font-bold text-white mb-6">Mentoria <span className="text-red-500">RedPro</span></h2>
-                        <p className="text-xl text-neutral-300 mb-8 leading-relaxed">
-                            Não é apenas sobre código. É sobre estratégia, carreira e visão de mercado.
-                            Vamos entender seu momento para desenhar o plano perfeito.
-                        </p>
-                        <div className="inline-block">
-                            <GlowingShadow borderRadius="9999px">
-                                <button
-                                    onClick={() => nextStep("area")}
-                                    className="px-10 py-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full transition-colors text-lg"
-                                >
-                                    Iniciar Qualificação
-                                </button>
-                            </GlowingShadow>
-                        </div>
-                    </motion.div>
-                )}
-
-                {/* STEP 2: ÁREA DE ATUAÇÃO */}
+                {/* STEP 1: ÁREA */}
                 {step === "area" && (
-                    <motion.div
-                        key="area"
-                        variants={variants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        className="space-y-6"
-                    >
-                        <h3 className="text-2xl font-bold text-white mb-8">Qual sua área principal de foco hoje?</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {["Desenvolvimento de Software", "Gestão/Produto", "Marketing/Growth", "Empreendedorismo", "Design/Criativo", "Dados/Analytics"].map((area) => (
+                    <motion.div key="area" variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3 }}>
+                        <p className="font-mono text-xs tracking-widest text-orange-500 uppercase mb-3">01 / 04</p>
+                        <h3 className="text-2xl font-bold text-white mb-8" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+                            Qual sua principal área de foco hoje?
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {["Empreendedorismo", "Gestão / Produto", "Marketing / Growth", "Desenvolvimento", "Design / Criativo", "Dados / Analytics"].map((area) => (
                                 <button
                                     key={area}
-                                    onClick={() => {
-                                        setFormData({ ...formData, area });
-                                        nextStep("level");
-                                    }}
-                                    className="p-4 rounded-xl border border-white/10 bg-neutral-900 hover:bg-neutral-800 hover:border-red-500/50 text-left transition-all group"
+                                    onClick={() => { setFormData({ ...formData, area }); setStep("level"); }}
+                                    className="p-4 rounded-xl border border-white/10 bg-[#111113] hover:border-orange-500/50 hover:bg-orange-500/5 text-left transition-all group"
                                 >
-                                    <span className="text-neutral-200 group-hover:text-white font-medium">{area}</span>
+                                    <span className="text-[#a1a1aa] group-hover:text-white font-medium text-sm transition-colors">{area}</span>
                                 </button>
                             ))}
                         </div>
                     </motion.div>
                 )}
 
-                {/* STEP 3: NÍVEL DE EXPERIÊNCIA */}
+                {/* STEP 2: NÍVEL */}
                 {step === "level" && (
-                    <motion.div
-                        key="level"
-                        variants={variants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        className="space-y-6"
-                    >
-                        <h3 className="text-2xl font-bold text-white mb-8">Como você classifica seu domínio em IA hoje?</h3>
-                        <div className="space-y-4">
+                    <motion.div key="level" variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3 }}>
+                        <p className="font-mono text-xs tracking-widest text-orange-500 uppercase mb-3">02 / 04</p>
+                        <h3 className="text-2xl font-bold text-white mb-8" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+                            Como você classifica seu domínio em IA hoje?
+                        </h3>
+                        <div className="space-y-3">
                             {[
                                 { label: "Explorador", desc: "Uso ChatGPT às vezes, mas sem método." },
-                                { label: "Praticante", desc: "Já uso ferramentas no dia a dia, mas quero automatizar." },
-                                { label: "Construtor", desc: "Já crio automações ou apps simples." },
-                                { label: "Visionário", desc: "Quero liderar a transformação no meu setor." }
+                                { label: "Praticante", desc: "Já uso ferramentas no dia a dia, mas quero automatizar mais." },
+                                { label: "Construtor", desc: "Já crio automações. Quero escalar." },
+                                { label: "Visionário", desc: "Quero liderar a transformação IA no meu setor." }
                             ].map((level) => (
                                 <button
                                     key={level.label}
-                                    onClick={() => {
-                                        setFormData({ ...formData, level: level.label });
-                                        nextStep("challenge");
-                                    }}
-                                    className="w-full p-5 rounded-xl border border-white/10 bg-neutral-900 hover:bg-neutral-800 hover:border-red-500/50 text-left transition-all group flex flex-col"
+                                    onClick={() => { setFormData({ ...formData, level: level.label }); setStep("challenge"); }}
+                                    className="w-full p-4 rounded-xl border border-white/10 bg-[#111113] hover:border-orange-500/50 hover:bg-orange-500/5 text-left transition-all group flex items-start gap-4"
                                 >
-                                    <span className="text-lg font-bold text-white group-hover:text-red-400 mb-1">{level.label}</span>
-                                    <span className="text-sm text-neutral-400">{level.desc}</span>
+                                    <div>
+                                        <p className="text-white font-semibold group-hover:text-orange-400 transition-colors text-sm mb-0.5">{level.label}</p>
+                                        <p className="text-[#71717a] text-xs">{level.desc}</p>
+                                    </div>
                                 </button>
                             ))}
                         </div>
                     </motion.div>
                 )}
 
-                {/* STEP 4: MAIOR DESAFIO */}
+                {/* STEP 3: DESAFIO */}
                 {step === "challenge" && (
-                    <motion.div
-                        key="challenge"
-                        variants={variants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        className="space-y-6"
-                    >
-                        <h3 className="text-2xl font-bold text-white mb-2">Qual o maior obstáculo no seu caminho?</h3>
-                        <p className="text-neutral-400 mb-6">Seja sincero. A mentoria ataca exatamente aqui.</p>
+                    <motion.div key="challenge" variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3 }}>
+                        <p className="font-mono text-xs tracking-widest text-orange-500 uppercase mb-3">03 / 04</p>
+                        <h3 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+                            Qual o maior obstáculo no seu caminho?
+                        </h3>
+                        <p className="text-[#71717a] text-sm mb-6">Seja direto. A mentoria ataca exatamente aqui.</p>
                         <textarea
-                            className="w-full h-32 bg-neutral-900 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-red-500 transition-colors resize-none"
-                            placeholder="Ex: Sinto que estou ficando para trás..."
+                            className="w-full h-32 bg-[#111113] border border-white/10 rounded-xl p-4 text-white text-sm focus:outline-none focus:border-orange-500/50 transition-colors resize-none placeholder:text-[#71717a]"
+                            placeholder="Ex: Tenho um negócio funcionando mas não consigo implementar IA sem depender de devs..."
                             value={formData.challenge}
                             onChange={(e) => setFormData({ ...formData, challenge: e.target.value })}
                         />
-                        <div className="flex justify-end">
+                        <div className="flex justify-end mt-4">
                             <button
-                                onClick={() => nextStep("capture")}
-                                disabled={!formData.challenge}
-                                className="px-8 py-3 bg-white text-black font-bold rounded-lg hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                onClick={() => setStep("capture")}
+                                disabled={!formData.challenge.trim()}
+                                className="px-8 py-3 bg-orange-500 hover:bg-orange-400 text-black font-bold rounded-lg text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                             >
-                                Continuar
+                                Continuar →
                             </button>
                         </div>
                     </motion.div>
                 )}
 
-                {/* STEP 5: CAPTURA */}
+                {/* STEP 4: CAPTURA */}
                 {step === "capture" && (
-                    <motion.div
-                        key="capture"
-                        variants={variants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        className="space-y-6"
-                    >
-                        <h3 className="text-2xl font-bold text-white mb-6">Último passo para sua evolução.</h3>
-                        <div className="space-y-4">
+                    <motion.div key="capture" variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3 }}>
+                        <p className="font-mono text-xs tracking-widest text-orange-500 uppercase mb-3">04 / 04</p>
+                        <h3 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+                            Último passo.
+                        </h3>
+                        <p className="text-[#71717a] text-sm mb-6">Analisamos seu perfil e entramos em contato em até 24h.</p>
+                        <div className="space-y-3">
                             <div>
-                                <label className="block text-sm text-neutral-400 mb-1">Seu Nome</label>
+                                <label className="block text-xs font-mono text-[#71717a] uppercase tracking-wider mb-1.5">Nome</label>
                                 <input
                                     type="text"
-                                    className="w-full bg-neutral-900 border border-white/10 rounded-lg p-3 text-white focus:border-red-500 outline-none"
+                                    className="w-full bg-[#111113] border border-white/10 rounded-lg p-3 text-white text-sm focus:border-orange-500/50 outline-none transition-colors"
+                                    placeholder="Seu nome completo"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm text-neutral-400 mb-1">Seu Melhor Email</label>
+                                <label className="block text-xs font-mono text-[#71717a] uppercase tracking-wider mb-1.5">Email</label>
                                 <input
                                     type="email"
-                                    className="w-full bg-neutral-900 border border-white/10 rounded-lg p-3 text-white focus:border-red-500 outline-none"
+                                    className="w-full bg-[#111113] border border-white/10 rounded-lg p-3 text-white text-sm focus:border-orange-500/50 outline-none transition-colors"
+                                    placeholder="seu@email.com"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm text-neutral-400 mb-1">WhatsApp (Opcional)</label>
+                                <label className="block text-xs font-mono text-[#71717a] uppercase tracking-wider mb-1.5">WhatsApp <span className="normal-case tracking-normal">(opcional)</span></label>
                                 <input
                                     type="tel"
-                                    className="w-full bg-neutral-900 border border-white/10 rounded-lg p-3 text-white focus:border-red-500 outline-none"
+                                    className="w-full bg-[#111113] border border-white/10 rounded-lg p-3 text-white text-sm focus:border-orange-500/50 outline-none transition-colors"
+                                    placeholder="(11) 99999-9999"
                                     value={formData.whatsapp}
                                     onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
                                 />
                             </div>
                         </div>
                         <button
-                            onClick={() => nextStep("finish")}
-                            className="w-full py-4 bg-gradient-to-r from-red-600 to-red-800 text-white font-bold rounded-xl mt-4 hover:shadow-lg hover:shadow-red-900/20 transition-all"
+                            onClick={async () => {
+                                if (!formData.name.trim() || !formData.email.trim()) return;
+                                await fetch("/api/mentoria", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify(formData)
+                                });
+                                setStep("finish");
+                            }}
+                            disabled={!formData.name.trim() || !formData.email.trim()}
+                            className="w-full mt-6 py-4 bg-orange-500 hover:bg-orange-400 text-black font-bold rounded-xl text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                         >
                             Solicitar Aplicação à Mentoria
                         </button>
                     </motion.div>
                 )}
 
-                {/* STEP 6: FINISH */}
+                {/* FINISH */}
                 {step === "finish" && (
-                    <motion.div
-                        key="finish"
-                        variants={variants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        className="text-center py-10"
-                    >
-                        <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-green-500/20">
-                            <span className="text-4xl">🚀</span>
+                    <motion.div key="finish" variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3 }} className="text-center py-8">
+                        <div className="w-16 h-16 rounded-full border border-[#22c55e]/30 bg-[#22c55e]/10 flex items-center justify-center mx-auto mb-6">
+                            <svg className="w-7 h-7 text-[#22c55e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
                         </div>
-                        <h3 className="text-3xl font-bold text-white mb-4">Aplicação Recebida!</h3>
-                        <p className="text-neutral-400 max-w-md mx-auto mb-8">
-                            Nossa equipe vai analisar seu perfil, {formData.name}.
-                            Se houver fit para a mentoria, entraremos em contato em até 24 horas.
+                        <h3 className="text-2xl font-bold text-white mb-3" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+                            Aplicação Recebida
+                        </h3>
+                        <p className="text-[#a1a1aa] text-sm max-w-xs mx-auto mb-8 leading-relaxed">
+                            Analisaremos seu perfil, {formData.name}. Se houver fit, entraremos em contato em até 24 horas.
                         </p>
-                        <a href="/" className="text-red-400 hover:text-red-300 underline">Voltar para Home</a>
+                        <button onClick={onClose} className="text-sm text-orange-500 hover:text-orange-400 transition-colors">
+                            ← Voltar para a página
+                        </button>
                     </motion.div>
                 )}
 
