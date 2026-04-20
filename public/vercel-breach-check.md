@@ -1,269 +1,328 @@
 # vercel-breach-check — Auditoria de Segurança Pós-Breach da Vercel
 
-Detecta tokens e credenciais potencialmente expostos no incidente de segurança da Vercel (abril/2026),
-orienta a rotação de cada serviço e gera um relatório `BREACH_CHECKLIST.md` no projeto atual.
-
-## Quando usar
-
-Ativar com `/vercel-breach-check` quando:
-- O aluno quer saber se seu projeto foi afetado pelo breach da Vercel de abril/2026
-- Precisa de orientação para rotacionar tokens e secrets
-- Quer verificar quais env vars não estavam protegidas (não-sensitive)
+Varre **todos os projetos da conta Vercel** do usuário via API, identifica environment variables
+não marcadas como "Sensitive" que podem ter sido expostas no breach de abril/2026,
+e gera um relatório `BREACH_CHECKLIST.md` com o passo a passo de rotação por serviço.
 
 ---
 
-## Contexto do Incidente (resumo para o agente)
+## Contexto do Incidente
 
-Em abril/2026, a Vercel confirmou um breach via supply chain: o Context.ai (ferramenta de IA usada
-por um funcionário) foi comprometido por Lumma Stealer, permitindo acesso ao Google Workspace da Vercel
-e a **environment variables não marcadas como "Sensitive"**. O grupo ShinyHunters está vendendo os dados.
+Em abril/2026, a Vercel confirmou um breach via supply chain: o Context.ai foi comprometido por
+Lumma Stealer, dando acesso ao Google Workspace de um funcionário e às **env vars não marcadas
+como "Sensitive"** de clientes. O grupo ShinyHunters está vendendo os dados por $2M.
 
-**O que foi exposto:**
-- Env vars NÃO marcadas como `Sensitive` (API keys, tokens, DB credentials, signing keys)
-- GitHub tokens vinculados a integrações Vercel
-- NPM tokens
-- Builds antigos ainda usam tokens velhos até novo redeploy
+**Exposto:** env vars não-sensitive (API keys, tokens, DB credentials, signing keys), GitHub tokens, NPM tokens.
+**Protegido:** env vars marcadas como `Sensitive` (criptografadas, inacessíveis).
 
-**O que estava protegido:**
-- Env vars marcadas como `Sensitive` (criptografadas, não acessíveis)
+Referência oficial: https://vercel.com/kb/bulletin/vercel-april-2026-security-incident
 
 ---
 
-## Fluxo de Execução
+## WIZARD — Fluxo Interativo no Terminal
 
-### FASE 1 — Detecção do ambiente
+Conduzir o usuário passo a passo com mensagens claras. Nunca executar tudo de uma vez silenciosamente.
 
-Verificar o que está disponível, sem assumir nada:
+---
 
-```bash
-# Verifica se Vercel CLI está instalado
-vercel --version 2>/dev/null || echo "VERCEL_CLI_NOT_FOUND"
+### PASSO 1 — Boas-vindas
 
-# Verifica se há .vault-context (projeto RedPro)
-cat .vault-context 2>/dev/null || echo "NO_VAULT_CONTEXT"
+Exibir:
+
+```
+╔══════════════════════════════════════════════════════════╗
+║         VERCEL BREACH CHECK — Abril 2026                 ║
+║  Vamos verificar se seus projetos foram afetados.        ║
+╚══════════════════════════════════════════════════════════╝
+
+Este wizard vai:
+  1. Conectar na sua conta Vercel via API
+  2. Varrer TODOS os seus projetos
+  3. Identificar env vars potencialmente expostas
+  4. Gerar um checklist de rotação por serviço
+
+Tempo estimado: 1-2 minutos.
 ```
 
-Informar ao usuário:
-- Se Vercel CLI disponível → vai listar env vars do projeto na Vercel
-- Se não → vai escanear apenas arquivos locais (igualmente útil)
-
 ---
 
-### FASE 2 — Scan de arquivos locais
+### PASSO 2 — Obter o Token da Vercel
 
-Buscar em todos os arquivos de env do projeto:
+Exibir:
 
-```bash
-# Listar arquivos de env encontrados
-ls -la .env* 2>/dev/null
-ls -la **/.env* 2>/dev/null
+```
+─────────────────────────────────────────────────────────
+PASSO 1/4 — Token da Vercel
+─────────────────────────────────────────────────────────
+
+Você precisa de um token de acesso pessoal da Vercel.
+
+Como gerar:
+  1. Acesse: https://vercel.com/account/tokens
+  2. Clique em "Create Token"
+  3. Nome sugerido: "breach-check" (pode deletar depois)
+  4. Escopo: Full Account
+  5. Copie o token gerado
+
+Cole o token aqui quando estiver pronto:
 ```
 
-Para cada arquivo encontrado, escanear padrões de tokens usando Grep:
-- `ghp_[A-Za-z0-9_]{36}` → GitHub Personal Access Token
-- `github_pat_[A-Za-z0-9_]{82}` → GitHub Fine-grained PAT
-- `npm_[A-Za-z0-9]{36}` → NPM Token
-- `sk-[A-Za-z0-9]{48}` → OpenAI API Key
-- `sk_live_[A-Za-z0-9]{24,}` → Stripe Secret Key (live)
-- `pk_live_[A-Za-z0-9]{24,}` → Stripe Publishable Key (live)
-- `sbp_[A-Za-z0-9]{40}` → Supabase PAT
-- `eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}` → JWT / Supabase Anon/Service Key
-- `AKIA[0-9A-Z]{16}` → AWS Access Key
-- `[sS]ecret[_-]?[kK]ey\s*=\s*.{8,}` → Generic secret key pattern
-- `[pP]assword\s*=\s*.{8,}` → Generic password pattern
-- `[dD]atabase[_-]?[uU]rl\s*=\s*.{8,}` → Database URL
+Aguardar o usuário fornecer o token. Armazenar na variável `VERCEL_TOKEN`.
 
-**Regra:** Para cada match, exibir o nome da variável mas NUNCA o valor completo — mostrar apenas os primeiros 6 chars + `****` para confirmar que há algo ali sem expor o secret.
-
----
-
-### FASE 3 — Verificação via Vercel CLI (se disponível)
-
-Se `vercel --version` retornou sucesso:
+**Validar o token imediatamente:**
 
 ```bash
-# Listar env vars do projeto linkado
-npx vercel env ls 2>/dev/null
+curl -s -H "Authorization: Bearer {VERCEL_TOKEN}" \
+  "https://api.vercel.com/v2/user" | grep -q '"username"'
 ```
 
-Analisar a saída para identificar:
-- Variáveis sem a marcação `[sensitive]` / `[encrypted]`
-- Quantas variáveis existem por ambiente (Production, Preview, Development)
+Se falhar → exibir:
+```
+❌ Token inválido ou sem permissão. Verifique e tente novamente.
+```
+Se ok → exibir:
+```
+✅ Token validado. Conectado como: {username}
+```
 
-Se o projeto não estiver linkado à Vercel:
+---
+
+### PASSO 3 — Listar todos os projetos
+
+Exibir:
+```
+─────────────────────────────────────────────────────────
+PASSO 2/4 — Buscando seus projetos na Vercel...
+─────────────────────────────────────────────────────────
+```
+
+Chamar a API paginada:
+
 ```bash
-# Verificar se há .vercel/project.json
-cat .vercel/project.json 2>/dev/null
+# Buscar todos os projetos (paginar até não ter mais)
+curl -s -H "Authorization: Bearer {VERCEL_TOKEN}" \
+  "https://api.vercel.com/v9/projects?limit=100" 
 ```
 
-Informar ao usuário se o projeto não está linkado — nesse caso, apenas o scan local se aplica.
+Se houver `pagination.next`, continuar buscando até ter todos.
+
+Exibir a lista encontrada:
+```
+✅ Encontrados N projetos:
+
+  • projeto-1
+  • projeto-2
+  • projeto-3
+  ...
+
+Iniciando varredura de env vars...
+```
 
 ---
 
-### FASE 4 — Classificação de risco
+### PASSO 4 — Varrer env vars de cada projeto
 
-Para cada token/secret encontrado, classificar:
+Exibir:
+```
+─────────────────────────────────────────────────────────
+PASSO 3/4 — Analisando environment variables...
+─────────────────────────────────────────────────────────
+```
 
-| Classificação | Critério |
-|---------------|----------|
-| 🔴 CRÍTICO | Token de produção (live), DB URL de produção, chave de signing |
-| 🟠 ALTO | GitHub token, NPM token, JWT de serviço |
-| 🟡 MÉDIO | Token de preview/staging, chave de API com escopo limitado |
-| 🟢 INFO | Variável suspeita mas provavelmente não secret (ex: NODE_ENV) |
+Para cada projeto, chamar:
+
+```bash
+curl -s -H "Authorization: Bearer {VERCEL_TOKEN}" \
+  "https://api.vercel.com/v10/projects/{projectId}/env"
+```
+
+A resposta retorna cada env var com o campo `type`:
+- `"type": "sensitive"` → **protegida** (não exposta)
+- `"type": "encrypted"` → **protegida** (não exposta)
+- `"type": "plain"` → **⚠️ potencialmente exposta**
+- `"type": "secret"` → verificar se vinculado a Vercel Secrets antigo
+
+Para cada variável `plain`, classificar pelo nome:
+
+| Padrão no nome | Serviço | Risco |
+|----------------|---------|-------|
+| `STRIPE_SECRET`, `sk_live` | Stripe | 🔴 Crítico |
+| `DATABASE_URL`, `POSTGRES`, `MYSQL`, `MONGODB` | Database | 🔴 Crítico |
+| `SUPABASE_SERVICE_ROLE`, `SERVICE_ROLE` | Supabase | 🔴 Crítico |
+| `ANTHROPIC`, `OPENAI`, `sk-` | IA | 🟠 Alto |
+| `GITHUB_TOKEN`, `GH_TOKEN`, `ghp_` | GitHub | 🟠 Alto |
+| `NPM_TOKEN`, `npm_` | NPM | 🟠 Alto |
+| `NEXTAUTH_SECRET`, `AUTH_SECRET`, `JWT_SECRET` | Auth/JWT | 🟡 Médio |
+| `WEBHOOK_SECRET`, `SIGNING_KEY` | Webhook | 🟡 Médio |
+| `AWS_SECRET`, `AKIA` | AWS | 🔴 Crítico |
+
+Exibir progresso por projeto:
+```
+  [1/N] projeto-alpha ............. 3 variáveis expostas ⚠️
+  [2/N] projeto-beta .............. 0 variáveis expostas ✅
+  [3/N] projeto-gamma ............. 7 variáveis expostas ⚠️
+  ...
+```
+
+**Nunca exibir o valor das variáveis** — a API retorna `value: null` para variáveis sensitive e o valor real para plain. Se o valor vier, mostrar apenas `sk-abcd****` (primeiros 8 chars + `****`).
 
 ---
 
-### FASE 5 — Geração do BREACH_CHECKLIST.md
+### PASSO 5 — Gerar o BREACH_CHECKLIST.md
 
-Criar o arquivo `BREACH_CHECKLIST.md` no diretório atual com:
+Exibir:
+```
+─────────────────────────────────────────────────────────
+PASSO 4/4 — Gerando checklist...
+─────────────────────────────────────────────────────────
+```
+
+Criar `BREACH_CHECKLIST.md` no diretório atual:
 
 ```markdown
 # Vercel Breach — Checklist de Segurança
 > Gerado em: [DATA/HORA]
-> Projeto: [nome do projeto]
+> Conta Vercel: [username]
+> Projetos auditados: N
 > Incidente: Vercel April 2026 Security Incident
+> Referência: https://vercel.com/kb/bulletin/vercel-april-2026-security-incident
 
-## Status Geral
-- [ ] Scan concluído
-- [ ] Tokens identificados
-- [ ] Rotações necessárias: N
+---
 
-## Tokens Encontrados
+## Resumo
 
-### 🔴 Crítico — Rotacionar AGORA
+| Risco | Quantidade |
+|-------|-----------|
+| 🔴 Crítico | X |
+| 🟠 Alto | Y |
+| 🟡 Médio | Z |
+| ✅ Protegidas (sensitive) | W |
 
-| Variável | Serviço | Arquivo | Ação |
-|----------|---------|---------|------|
-| EXEMPLO_KEY | OpenAI | .env.production | [Rotacionar →](https://platform.openai.com/api-keys) |
+---
 
-### 🟠 Alto
+## 🔴 Crítico — Rotacionar AGORA
 
-| Variável | Serviço | Arquivo | Ação |
-|----------|---------|---------|------|
+| Projeto | Variável | Serviço | Ambiente | Ação |
+|---------|----------|---------|----------|------|
+| meu-projeto | DATABASE_URL | Postgres | Production | [Rotacionar →](link) |
 
-### 🟡 Médio
+## 🟠 Alto
 
-| Variável | Serviço | Arquivo | Ação |
-|----------|---------|---------|------|
+| Projeto | Variável | Serviço | Ambiente | Ação |
+|---------|----------|---------|----------|------|
+
+## 🟡 Médio
+
+| Projeto | Variável | Serviço | Ambiente | Ação |
+|---------|----------|---------|----------|------|
+
+---
 
 ## Checklist de Rotação por Serviço
 
-### GitHub
-- [ ] Acessar: https://github.com/settings/tokens
-- [ ] Revogar tokens antigos vinculados à Vercel
-- [ ] Gerar novo token com escopo mínimo necessário
-- [ ] Atualizar na Vercel: Settings → Environment Variables
-- [ ] Marcar como **Sensitive** ao salvar
-- [ ] Fazer **redeploy** do projeto
-
-### NPM
-- [ ] Acessar: https://www.npmjs.com/settings/[username]/tokens
-- [ ] Revogar token exposto
-- [ ] Gerar novo Automation token (para CI/CD)
-- [ ] Atualizar na Vercel e marcar como Sensitive
-- [ ] Fazer redeploy
-
-### OpenAI
-- [ ] Acessar: https://platform.openai.com/api-keys
-- [ ] Deletar a key exposta
-- [ ] Criar nova key
-- [ ] Atualizar na Vercel e marcar como Sensitive
-- [ ] Fazer redeploy
-
-### Supabase
-- [ ] Acessar: https://supabase.com/dashboard/project/[project-id]/settings/api
-- [ ] Rotacionar o `service_role` secret
-- [ ] Atualizar JWT secret se necessário: Settings → General
-- [ ] Atualizar todas as env vars na Vercel e marcar como Sensitive
-- [ ] Fazer redeploy
+### Supabase (service_role)
+- [ ] https://supabase.com/dashboard → Settings → API → Rotate service_role key
+- [ ] Atualizar na Vercel → marcar como **Sensitive**
+- [ ] Redeploy obrigatório
 
 ### Stripe
-- [ ] Acessar: https://dashboard.stripe.com/apikeys
-- [ ] Rotacionar secret key (sk_live_*)
-- [ ] Atualizar webhook secret se houver
-- [ ] Atualizar na Vercel e marcar como Sensitive
-- [ ] Fazer redeploy
+- [ ] https://dashboard.stripe.com/apikeys → Rotacionar secret key
+- [ ] Rotacionar webhook signing secret se houver
+- [ ] Atualizar na Vercel → marcar como **Sensitive**
+- [ ] Redeploy obrigatório
 
-### AWS
-- [ ] Acessar: https://console.aws.amazon.com/iam/
-- [ ] Desativar access key exposta
-- [ ] Criar nova access key com política mínima
-- [ ] Atualizar na Vercel e marcar como Sensitive
-- [ ] Fazer redeploy
+### Anthropic / OpenAI
+- [ ] https://console.anthropic.com/settings/keys → Deletar key exposta → Criar nova
+- [ ] https://platform.openai.com/api-keys → Deletar key exposta → Criar nova
+- [ ] Atualizar na Vercel → marcar como **Sensitive**
+- [ ] Redeploy obrigatório
 
-### Database (Postgres/MySQL/MongoDB)
+### GitHub Tokens
+- [ ] https://github.com/settings/tokens → Revogar tokens vinculados à Vercel
+- [ ] Gerar novo token com escopo mínimo
+- [ ] Atualizar na Vercel → marcar como **Sensitive**
+- [ ] Redeploy obrigatório
+
+### Database (DATABASE_URL)
 - [ ] Rotacionar senha do usuário de banco
-- [ ] Atualizar DATABASE_URL / connection string
-- [ ] Marcar como Sensitive na Vercel
-- [ ] Fazer redeploy
-- [ ] Verificar logs de acesso por atividade suspeita
+- [ ] Atualizar connection string na Vercel → marcar como **Sensitive**
+- [ ] Verificar logs de acesso por queries suspeitas
+- [ ] Redeploy obrigatório
+
+### Auth/JWT Secrets
+- [ ] Gerar novo valor: `openssl rand -base64 32`
+- [ ] Atualizar na Vercel → marcar como **Sensitive**
+- [ ] ⚠️ Usuários serão deslogados após redeploy
+- [ ] Redeploy obrigatório
+
+---
 
 ## Como marcar como Sensitive na Vercel
 
-1. Acessar: https://vercel.com/[team]/[project]/settings/environment-variables
-2. Clicar no ícone de edição da variável
-3. Marcar o checkbox **"Sensitive"**
-4. Salvar — o valor será criptografado e não poderá mais ser lido pelo dashboard
+1. Acesse: https://vercel.com/[team]/[projeto]/settings/environment-variables
+2. Edite a variável
+3. Marque o checkbox **"Sensitive"**
+4. Salve — o valor fica criptografado e invisível no dashboard
 
-> ⚠️ Após rotacionar qualquer variável, é OBRIGATÓRIO fazer um novo deploy.
-> Builds antigos continuam usando as credenciais antigas até o redeploy.
-
-## Verificação de Activity Log
-
-Acessar: https://vercel.com/[team]/settings/audit-log
-
-Verificar por:
-- Acessos entre fevereiro e abril de 2026
-- IPs incomuns
-- Deploy triggers não autorizados
-- Leitura de environment variables
-
-## Próximos Passos
-
-- [ ] Rotacionar todos os itens marcados acima
-- [ ] Fazer redeploy após cada rotação
-- [ ] Configurar alertas de segurança no GitHub: Settings → Code security
-- [ ] Instalar GitGuardian ou similar para detecção contínua de secrets
+> ⚠️ IMPORTANTE: rotacionar sem fazer redeploy não resolve.
+> Builds antigos continuam usando as credenciais antigas.
 
 ---
-*Gerado por Claude Code — Skill vercel-breach-check*
+
+## Verificar Activity Log
+
+https://vercel.com/[team]/settings/audit-log
+
+Filtrar por: fevereiro–abril 2026 | IPs incomuns | leitura de env vars
+
+---
+
+*Gerado por vercel-breach-check*
 *Referência: https://vercel.com/kb/bulletin/vercel-april-2026-security-incident*
 ```
 
 ---
 
-### FASE 6 — Instruções finais ao usuário
-
-Após gerar o checklist, apresentar um resumo claro:
+### PASSO 6 — Resumo final no terminal
 
 ```
-✅ Scan concluído.
+╔══════════════════════════════════════════════════════════╗
+║                  SCAN CONCLUÍDO ✅                       ║
+╚══════════════════════════════════════════════════════════╝
+
+Projetos auditados : N
+Variáveis expostas : X
+  🔴 Crítico        : X1
+  🟠 Alto           : X2
+  🟡 Médio          : X3
+
 📄 Checklist salvo em: BREACH_CHECKLIST.md
 
-Encontrados: N tokens para rotacionar
-🔴 Crítico: X  |  🟠 Alto: Y  |  🟡 Médio: Z
+Próximo passo: abra o BREACH_CHECKLIST.md e comece
+pelos itens 🔴 Crítico.
 
-Próximo passo: comece pelos itens 🔴 Crítico.
-Cada item tem o link direto para rotacionar no serviço.
+⚠️  Após cada rotação, faça um novo deploy na Vercel.
+    Builds antigos continuam usando credenciais antigas.
 
-⚠️  Lembrete: após rotacionar, sempre faça um novo deploy na Vercel.
+Quer que eu te guie na rotação de algum serviço específico?
 ```
 
 ---
 
-## Regras do agente ao executar esta skill
+## Regras do agente
 
-1. **Nunca exibir o valor completo de um token** — mostrar apenas `NOME_DA_VAR=sk-abcd****`
-2. **Não rotacionar nada automaticamente** — a skill orienta, o usuário age
-3. **Se não encontrar nenhum arquivo .env** → informar que o scan local não encontrou arquivos, mas recomendar verificar o dashboard da Vercel manualmente
-4. **Se Vercel CLI não estiver disponível** → continuar normalmente com scan local, sem pedir para instalar
-5. **Ao final**, sempre perguntar: "Quer que eu te guie na rotação de algum serviço específico passo a passo?"
+1. **Wizard interativo** — exibir cada passo antes de executar, nunca rodar tudo silenciosamente
+2. **Nunca exibir valor completo** de token — mostrar apenas `VAR_NAME=sk-abcd****`
+3. **Não rotacionar nada automaticamente** — orientar, o usuário age
+4. **Token fornecido pelo usuário** → oferecer salvar no vault ao final: "Quer que eu salve esse token no vault para não precisar informar novamente?"
+5. **Se a API retornar erro 403** → token sem permissão suficiente, pedir novo token com escopo Full Account
+6. **Se não houver nenhuma variável exposta** → parabenizar e recomendar marcar todas as existentes como Sensitive por precaução
 
 ---
 
 ## Referências
 
 - [Vercel April 2026 Security Incident](https://vercel.com/kb/bulletin/vercel-april-2026-security-incident)
-- [Sensitive Environment Variables — Vercel Docs](https://vercel.com/docs/environment-variables/sensitive-environment-variables)
-- [Incident Response Playbook — GitHub](https://github.com/OpenSourceMalware/vercel-april2026-incident-response)
-- [BleepingComputer — Vercel confirms breach](https://www.bleepingcomputer.com/news/security/vercel-confirms-breach-as-hackers-claim-to-be-selling-stolen-data/)
+- [Vercel API — List Projects](https://vercel.com/docs/rest-api/endpoints/projects#list-all-projects)
+- [Vercel API — List Env Vars](https://vercel.com/docs/rest-api/endpoints/env-vars#list-environment-variables)
+- [Sensitive Environment Variables](https://vercel.com/docs/environment-variables/sensitive-environment-variables)
