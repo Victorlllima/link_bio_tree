@@ -52,7 +52,7 @@ const steps = [
                 <kbd className="bg-neutral-800 border border-neutral-600 text-neutral-300 px-2 py-0.5 rounded text-xs font-mono">
                     Enter
                 </kbd>
-                . A skill vai escanear todos os seus arquivos{" "}
+                . O Claude vai escanear todos os seus arquivos{" "}
                 <code className="bg-neutral-800 text-orange-400 px-1.5 py-0.5 rounded text-sm font-mono">
                     .env*
                 </code>{" "}
@@ -66,7 +66,7 @@ const steps = [
         title: "Siga o checklist gerado",
         description: (
             <>
-                A skill cria um arquivo{" "}
+                O Claude gera um arquivo{" "}
                 <code className="bg-neutral-800 text-orange-400 px-1.5 py-0.5 rounded text-sm font-mono">
                     BREACH_CHECKLIST.md
                 </code>{" "}
