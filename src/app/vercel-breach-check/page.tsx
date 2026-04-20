@@ -143,9 +143,10 @@ export default function VercelBreachCheckPage() {
                     </h1>
 
                     <p className="text-neutral-400 text-lg leading-relaxed max-w-xl mx-auto">
-                        Um funcionário deu mole com uma ferramenta de IA. O atacante entrou nos
-                        sistemas internos e leu todas as env vars não protegidas. Verifique agora
-                        em menos de 2 minutos.
+                        A Vercel foi comprometida via supply chain: uma ferramenta de IA usada
+                        internamente foi infectada por infostealer, expondo environment variables
+                        não marcadas como Sensitive. API keys, tokens de banco, chaves Stripe —
+                        potencialmente todos vazados.
                     </p>
                 </div>
 
