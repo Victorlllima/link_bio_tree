@@ -25,41 +25,45 @@ const steps = [
     },
     {
         number: "02",
-        title: "Mova para a pasta do Claude Code",
-        description: "Salve o arquivo no caminho correto do seu sistema:",
-        code: {
-            mac: "~/.claude/skills/vercel-breach-check.md",
-            windows: "C:\\Users\\[seu-nome]\\.claude\\skills\\vercel-breach-check.md",
-        },
-    },
-    {
-        number: "03",
-        title: "Abra o Claude Code no seu projeto",
+        title: "Abra o Claude Code",
         description: (
             <>
-                Abra o terminal na raiz do seu projeto e inicie o Claude Code.
-                Não precisa de MCP, não precisa de API da Vercel. Funciona com a instalação padrão.
+                Abra o Claude Code em qualquer diretório. Não precisa ser dentro de um projeto específico —
+                o wizard conecta direto na sua conta Vercel e varre todos os seus projetos de uma vez.
             </>
         ),
         terminal: "claude",
     },
     {
-        number: "04",
-        title: "Execute o comando",
+        number: "03",
+        title: "Adicione o arquivo via +",
         description: (
             <>
-                Digite o comando abaixo e pressione{" "}
+                Clique no botão{" "}
+                <kbd className="bg-neutral-800 border border-neutral-600 text-neutral-300 px-2 py-0.5 rounded text-xs font-mono">
+                    +
+                </kbd>
+                {" "}na interface do Claude Code e selecione o arquivo{" "}
+                <code className="bg-neutral-800 text-orange-400 px-1.5 py-0.5 rounded text-sm font-mono">
+                    vercel-breach-check.md
+                </code>
+                {" "}baixado. Sem instalação, sem configuração.
+            </>
+        ),
+    },
+    {
+        number: "04",
+        title: "Execute",
+        description: (
+            <>
+                Mande a mensagem abaixo e pressione{" "}
                 <kbd className="bg-neutral-800 border border-neutral-600 text-neutral-300 px-2 py-0.5 rounded text-xs font-mono">
                     Enter
                 </kbd>
-                . O Claude vai escanear todos os seus arquivos{" "}
-                <code className="bg-neutral-800 text-orange-400 px-1.5 py-0.5 rounded text-sm font-mono">
-                    .env*
-                </code>{" "}
-                automaticamente.
+                . O Claude inicia o wizard, pede seu token da Vercel e varre todos os seus projetos automaticamente.
             </>
         ),
-        terminal: "/vercel-breach-check",
+        terminal: "execute",
     },
     {
         number: "05",
@@ -69,9 +73,9 @@ const steps = [
                 O Claude gera um arquivo{" "}
                 <code className="bg-neutral-800 text-orange-400 px-1.5 py-0.5 rounded text-sm font-mono">
                     BREACH_CHECKLIST.md
-                </code>{" "}
-                na raiz do projeto com todos os tokens classificados por risco — com o link direto
-                pra rotacionar em cada serviço. Comece pelos{" "}
+                </code>
+                {" "}com todos os projetos auditados, variáveis classificadas por risco e link direto
+                para rotacionar em cada serviço. Comece pelos{" "}
                 <span className="text-red-400 font-semibold">🔴 Crítico</span>.
             </>
         ),
