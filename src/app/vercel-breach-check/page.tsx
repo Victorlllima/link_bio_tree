@@ -2,13 +2,13 @@ import { Footer } from "@/components/footer";
 
 export const metadata = {
     title: "Vercel Breach Check — RedPro AI Academy",
-    description: "Skill gratuita pro Claude Code que escaneia seu projeto e detecta tokens expostos no breach da Vercel de abril/2026.",
+    description: "Ferramenta gratuita pro Claude Code que escaneia seu projeto e detecta tokens expostos no breach da Vercel de abril/2026.",
 };
 
 const steps = [
     {
         number: "01",
-        title: "Baixe o arquivo da skill",
+        title: "Baixe o arquivo",
         description: (
             <>
                 Clique no botão abaixo para baixar o arquivo{" "}
@@ -25,8 +25,8 @@ const steps = [
     },
     {
         number: "02",
-        title: "Salve na pasta de skills do Claude Code",
-        description: "Mova o arquivo baixado para o caminho correto no seu sistema:",
+        title: "Mova para a pasta do Claude Code",
+        description: "Salve o arquivo no caminho correto do seu sistema:",
         code: {
             mac: "~/.claude/skills/vercel-breach-check.md",
             windows: "C:\\Users\\[seu-nome]\\.claude\\skills\\vercel-breach-check.md",
@@ -37,15 +37,15 @@ const steps = [
         title: "Abra o Claude Code no seu projeto",
         description: (
             <>
-                Abra o terminal na raiz do seu projeto e rode o Claude Code. Não precisa de MCP,
-                não precisa de API da Vercel. Funciona com a instalação padrão.
+                Abra o terminal na raiz do seu projeto e inicie o Claude Code.
+                Não precisa de MCP, não precisa de API da Vercel. Funciona com a instalação padrão.
             </>
         ),
         terminal: "claude",
     },
     {
         number: "04",
-        title: "Execute a skill",
+        title: "Execute o comando",
         description: (
             <>
                 Digite o comando abaixo e pressione{" "}
@@ -128,7 +128,7 @@ export default function VercelBreachCheckPage() {
                 <div className="mb-14 text-center">
                     <div className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 uppercase tracking-widest">
                         <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-                        Incidente ativo — Abril 2026
+                        Ferramenta gratuita — Incidente Vercel Abril 2026
                     </div>
 
                     <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 leading-tight">
@@ -233,7 +233,7 @@ export default function VercelBreachCheckPage() {
                 {/* Footer note */}
                 <div className="bg-neutral-900/40 border border-white/5 rounded-xl p-5 text-center">
                     <p className="text-neutral-500 text-sm leading-relaxed">
-                        A skill não rotaciona nada automaticamente — só escaneia e orienta.
+                        A ferramenta não rotaciona nada automaticamente — só escaneia e orienta.
                         Nenhum valor de token é exibido completo.{" "}
                         <a
                             href="https://vercel.com/kb/bulletin/vercel-april-2026-security-incident"
