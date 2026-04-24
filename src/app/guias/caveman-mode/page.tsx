@@ -3,12 +3,20 @@
 import Image from "next/image";
 import { useState } from "react";
 
+const skillOptions = [
+  { name: "caveman", recommended: true, desc: "O skill principal. Ativa o modo ultra-direto no Claude Code. Comece por aqui." },
+  { name: "caveman-compress", recommended: false, desc: "Comprime seu arquivo CLAUDE.md em caveman-speak — reduz tokens de leitura em ~46% por sessão." },
+  { name: "caveman-help", recommended: false, desc: "Adiciona o comando /caveman-help com referência rápida de todos os comandos disponíveis." },
+  { name: "caveman-review", recommended: false, desc: "Ativa modo comprimido para code review — respostas de revisão em formato telegráfico." },
+  { name: "compress", recommended: false, desc: "Ferramenta standalone de compressão de arquivos de memória. Independente do modo caveman." },
+];
+
 const steps = [
   {
     num: "01",
     title: "Instale o skill via terminal",
     command: "# Windows (CMD ou PowerShell):\nnpx skills add JuliusBrussee/caveman --copy\n\n# Mac / Linux:\nnpx skills add JuliusBrussee/caveman",
-    note: "Rode esse comando uma vez no terminal. A flag --copy é obrigatória no Windows — sem ela falha por limitação de symlinks.",
+    note: "Rode esse comando uma vez. A flag --copy é obrigatória no Windows — sem ela falha por limitação de symlinks.",
   },
   {
     num: "02",
@@ -143,6 +151,106 @@ export default function CavemanModePage() {
               </p>
             </div>
           ))}
+        </div>
+
+        {/* SELEÇÃO DE SKILLS */}
+        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-6 mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">🎛️</span>
+            <h2 className="text-white text-lg font-black tracking-tight">O que aparece na tela de instalação</h2>
+          </div>
+          <p className="text-[#888] text-sm leading-relaxed mb-5">
+            Ao rodar o comando, uma tela interativa aparece com 6 skills para instalar. Use <kbd className="bg-[#333] text-[#ccc] px-1.5 py-0.5 rounded text-xs font-mono">espaço</kbd> para marcar ou desmarcar cada um e <kbd className="bg-[#333] text-[#ccc] px-1.5 py-0.5 rounded text-xs font-mono">Enter</kbd> para confirmar. Pode instalar quantos quiser.
+          </p>
+          <div className="flex flex-col gap-3">
+            {skillOptions.map((skill) => (
+              <div key={skill.name} className={`flex items-start gap-3 rounded-xl p-4 border ${skill.recommended ? "bg-[#f97316]/5 border-[#f97316]/30" : "bg-[#080808] border-[#2a2a2a]"}`}>
+                <div className="shrink-0 mt-0.5">
+                  <span className={`font-mono text-xs px-2 py-0.5 rounded border ${skill.recommended ? "bg-[#f97316] text-black border-[#f97316] font-black" : "bg-[#1a1a1a] text-[#555] border-[#333]"}`}>
+                    {skill.recommended ? "[•]" : "[ ]"}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-white text-sm font-black font-mono">{skill.name}</span>
+                    {skill.recommended && (
+                      <span className="text-[#f97316] text-xs font-black uppercase tracking-widest">recomendado</span>
+                    )}
+                  </div>
+                  <p className="text-[#888] text-xs leading-relaxed">{skill.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-[#555] text-xs mt-4 border-l-2 border-[#333] pl-3">
+            Para começar: marque só o <span className="text-[#ccc] font-mono">caveman</span>. Adicione os outros depois conforme precisar.
+          </p>
+        </div>
+
+        {/* TELA 2 — SELEÇÃO DE AGENTE */}
+        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-6 mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">🤖</span>
+            <h2 className="text-white text-lg font-black tracking-tight">Tela 2 — Escolha o agente</h2>
+          </div>
+          <p className="text-[#888] text-sm leading-relaxed mb-4">
+            Depois de escolher os skills, o instalador pergunta em qual agente instalar. Use <kbd className="bg-[#333] text-[#ccc] px-1.5 py-0.5 rounded text-xs font-mono">↑↓</kbd> para navegar, <kbd className="bg-[#333] text-[#ccc] px-1.5 py-0.5 rounded text-xs font-mono">espaço</kbd> para selecionar e <kbd className="bg-[#333] text-[#ccc] px-1.5 py-0.5 rounded text-xs font-mono">Enter</kbd> para confirmar.
+          </p>
+          <div className="bg-[#080808] border border-[#333] rounded-xl p-4 font-mono text-xs mb-4">
+            <div className="text-[#555] mb-2">— Universal (.agents/skills) — always included —</div>
+            <div className="flex flex-col gap-1 mb-3">
+              {["Amp", "Antigravity", "Cline", "Codex", "Cursor", "Gemini CLI", "GitHub Copilot"].map((a) => (
+                <div key={a} className="flex items-center gap-2">
+                  <span className="text-green-500">•</span>
+                  <span className="text-[#ccc]">{a}</span>
+                </div>
+              ))}
+            </div>
+            <div className="text-[#555] mb-2">— Additional agents —</div>
+            <div className="flex flex-col gap-1">
+              {[
+                { name: "Claude Code", path: "(.claude/skills)", highlight: true },
+                { name: "OpenClaw", path: "(skills)" },
+                { name: "IBM Bob", path: "(.bob/skills)" },
+                { name: "Cursor", path: "(.codebuddy/skills)" },
+              ].map((a) => (
+                <div key={a.name} className={`flex items-center gap-2 px-2 py-0.5 rounded ${a.highlight ? "bg-[#f97316]/10" : ""}`}>
+                  <span className={a.highlight ? "text-[#f97316]" : "text-[#555]"}>○</span>
+                  <span className={a.highlight ? "text-[#f97316] font-black" : "text-[#ccc]"}>{a.name}</span>
+                  <span className="text-[#555]">{a.path}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <p className="text-[#888] text-xs border-l-2 border-[#f97316] pl-3">
+            Selecione <span className="text-white font-black">Claude Code</span> — é o agente que você usa. Os da lista Universal são instalados automaticamente em todos.
+          </p>
+        </div>
+
+        {/* TELA 3 — LOCAL OU GLOBAL */}
+        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-6 mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">📍</span>
+            <h2 className="text-white text-lg font-black tracking-tight">Tela 3 — Local ou Global?</h2>
+          </div>
+          <p className="text-[#888] text-sm leading-relaxed mb-4">
+            Por último, o instalador pergunta onde instalar o skill:
+          </p>
+          <div className="grid sm:grid-cols-2 gap-3 mb-4">
+            <div className="bg-[#080808] border border-[#333] rounded-xl p-4">
+              <div className="text-[#555] text-xs font-black uppercase tracking-widest mb-2">Local</div>
+              <p className="text-[#888] text-xs leading-relaxed">Instala só no projeto atual. O skill some quando você mudar de pasta.</p>
+              <div className="mt-2 text-[#555] text-xs font-mono">.claude/skills/</div>
+            </div>
+            <div className="bg-[#080808] border border-[#f97316]/40 rounded-xl p-4">
+              <div className="text-[#f97316] text-xs font-black uppercase tracking-widest mb-2">Global ← escolha esse</div>
+              <p className="text-[#888] text-xs leading-relaxed">Instala para todos os projetos. O skill fica disponível em qualquer sessão do Claude Code.</p>
+              <div className="mt-2 text-[#f97316] text-xs font-mono">~/.claude/skills/</div>
+            </div>
+          </div>
+          <p className="text-[#555] text-xs border-l-2 border-[#333] pl-3">
+            Escolha <span className="text-white font-bold">Global</span> — você vai querer o Caveman disponível em todos os seus projetos, não só no atual.
+          </p>
         </div>
 
         {/* INSTALL CTA */}
