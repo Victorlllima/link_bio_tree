@@ -1,3 +1,4 @@
+import React from "react";
 import { Footer } from "@/components/footer";
 
 export const metadata = {
@@ -5,7 +6,16 @@ export const metadata = {
     description: "Ferramenta gratuita pro Claude Code que escaneia seu projeto e detecta tokens expostos no breach da Vercel de abril/2026.",
 };
 
-const steps = [
+type Step = {
+    number: string;
+    title: string;
+    description: React.ReactNode;
+    action?: { label: string; href: string; download: boolean };
+    terminal?: string;
+    code?: { mac: string; windows: string };
+};
+
+const steps: Step[] = [
     {
         number: "01",
         title: "Baixe o arquivo",
