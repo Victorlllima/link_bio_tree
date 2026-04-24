@@ -7,8 +7,8 @@ const steps = [
   {
     num: "01",
     title: "Instale o skill via terminal",
-    command: "claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman",
-    note: "Rode esse comando uma vez. O skill fica instalado para sempre no seu Claude Code — não precisa repetir.",
+    command: "# Windows (CMD ou PowerShell):\nnpx skills add JuliusBrussee/caveman --copy\n\n# Mac / Linux:\nnpx skills add JuliusBrussee/caveman",
+    note: "Rode esse comando uma vez no terminal. A flag --copy é obrigatória no Windows — sem ela falha por limitação de symlinks.",
   },
   {
     num: "02",
@@ -57,7 +57,7 @@ function CopyButton({ text }: { text: string }) {
 }
 
 export default function CavemanModePage() {
-  const installCmd = "claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman";
+  const installCmd = "npx skills add JuliusBrussee/caveman --copy";
   const [copiedInstall, setCopiedInstall] = useState(false);
 
   function copyInstall() {
