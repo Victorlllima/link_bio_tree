@@ -66,18 +66,18 @@ const PLANS = [
         name: "Mentoria Individual",
         label: "1:1 COM RED",
         price: "4.997",
-        sessions: "8 sessões",
+        sessions: "6 sessões",
         duration: "30 dias",
-        features: ["8 sessões individuais com Red", "Diagnóstico completo do negócio", "Implementação assistida ao vivo", "Suporte por WhatsApp 30 dias"],
+        features: ["6 sessões individuais com Red", "Diagnóstico completo do negócio", "Implementação assistida ao vivo", "Suporte por WhatsApp 30 dias"],
         highlight: true
     },
     {
         name: "Intensiva",
         label: "TRANSFORMAÇÃO TOTAL",
         price: "9.997",
-        sessions: "12 sessões",
+        sessions: "8 sessões",
         duration: "60 dias",
-        features: ["12 sessões individuais", "Dedicação exclusiva de Red", "3 agentes implementados garantidos", "Suporte 60 dias + revisão 90 dias"],
+        features: ["8 sessões individuais", "Dedicação exclusiva de Red", "3 agentes implementados garantidos", "Suporte 60 dias + revisão 90 dias"],
         highlight: false
     }
 ];
