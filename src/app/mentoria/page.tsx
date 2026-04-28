@@ -633,7 +633,9 @@ export default function MentoriaPage() {
                                 {plan.highlight && (
                                     <p className="font-mono text-xs text-orange-500 uppercase tracking-widest mb-4">Mais escolhido</p>
                                 )}
-                                <p className="font-mono text-xs text-[#71717a] uppercase tracking-widest mb-2">{plan.label}</p>
+                                {plan.label !== "1:1 COM RED" && (
+                                    <p className="font-mono text-xs text-[#71717a] uppercase tracking-widest mb-2">{plan.label}</p>
+                                )}
                                 <h3 className="text-white font-bold text-lg mb-4" style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800 }}>{plan.name}</h3>
                                 <div className="mb-6">
                                     {/* badge 50% OFF + preço original riscado */}
@@ -650,6 +652,9 @@ export default function MentoriaPage() {
                                         {plan.perPerson && <span className="text-[#71717a] text-xs ml-1">/ por pessoa</span>}
                                     </div>
                                     <p className="text-[#71717a] text-xs mt-1">{plan.sessions} · {plan.duration}</p>
+                                    {plan.label === "1:1 COM RED" && (
+                                        <p className="text-orange-500 text-xs font-mono font-bold uppercase tracking-widest mt-1">{plan.label}</p>
+                                    )}
                                 </div>
                                 <ul className="space-y-2.5 mb-8 flex-1">
                                     {plan.features.map((f, j) => (
