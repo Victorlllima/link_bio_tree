@@ -139,7 +139,7 @@ const FAQ = [
     },
     {
         q: "O que acontece depois que eu clico em 'Garantir minha vaga agora'?",
-        a: "Você vai direto para o checkout seguro na Hotmart. Depois de confirmado o pagamento, você recebe acesso e uma ficha de onboarding para Red entender o seu negócio antes do primeiro encontro."
+        a: "Você vai direto para o checkout seguro via Stripe. Depois de confirmado o pagamento, você recebe uma ficha de onboarding para Red entender o seu negócio antes do primeiro encontro."
     },
     {
         q: "Quando começam os encontros?",
@@ -151,7 +151,7 @@ const FAQ = [
     },
     {
         q: "Posso parcelar?",
-        a: "Sim. O checkout na Hotmart aceita parcelamento em até 12x no cartão de crédito."
+        a: "Sim. O checkout aceita parcelamento em até 12x no cartão de crédito."
     }
 ];
 
@@ -298,7 +298,7 @@ export default function MentoriaPage() {
                             >
                                 Garantir minha vaga agora
                             </motion.a>
-                            <p className="text-xs text-[#52525b] mt-3">Vagas limitadas por ciclo · Checkout seguro via Hotmart</p>
+                            <p className="text-xs text-[#52525b] mt-3">Vagas limitadas por ciclo · Parcele em até 12x no cartão</p>
                         </motion.div>
 
                         {/* RIGHT — foto */}
@@ -679,6 +679,7 @@ export default function MentoriaPage() {
                                 >
                                     Garantir minha vaga agora
                                 </a>
+                                <p className="text-center text-[11px] text-[#52525b] mt-2">Parcele em até 12x no cartão</p>
                             </motion.div>
                         ))}
                     </div>
@@ -789,7 +790,7 @@ export default function MentoriaPage() {
                             </div>
                         )}
 
-                        <p className="text-[#a1a1aa] text-sm mb-8">Vagas limitadas por ciclo · Checkout seguro via Hotmart.</p>
+                        <p className="text-[#a1a1aa] text-sm mb-8">Vagas limitadas por ciclo · Parcele em até 12x no cartão.</p>
                         <motion.a
                             href={HOTMART.individual}
                             target="_blank"
