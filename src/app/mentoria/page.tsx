@@ -290,6 +290,7 @@ export default function MentoriaPage() {
                                 href={HOTMART.individual}
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                onClick={() => (window as any).fbq?.('track', 'InitiateCheckout')}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 className="inline-block w-full sm:w-auto px-10 py-4 bg-orange-500 hover:bg-orange-400 text-black font-bold rounded-xl text-sm uppercase tracking-wide transition-colors text-center"
@@ -670,6 +671,7 @@ export default function MentoriaPage() {
                                     href={plan.link}
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    onClick={() => (window as any).fbq?.('track', 'InitiateCheckout', { content_name: plan.name, value: plan.price, currency: 'BRL' })}
                                     className={`w-full py-3 rounded-xl text-sm font-bold transition-colors text-center block ${plan.highlight
                                         ? "bg-orange-500 hover:bg-orange-400 text-black"
                                         : "bg-white/5 hover:bg-white/10 text-white border border-white/10"
@@ -792,6 +794,7 @@ export default function MentoriaPage() {
                             href={HOTMART.individual}
                             target="_blank"
                             rel="noopener noreferrer"
+                            onClick={() => (window as any).fbq?.('track', 'InitiateCheckout')}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             className="inline-block px-12 py-4 bg-orange-500 hover:bg-orange-400 text-black font-bold rounded-xl text-sm transition-colors"
