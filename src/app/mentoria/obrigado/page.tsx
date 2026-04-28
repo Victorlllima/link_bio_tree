@@ -1,8 +1,13 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 
 export default function MentoriaObrigadoPage() {
+    useEffect(() => {
+        (window as any).fbq?.('track', 'Purchase', { currency: 'BRL', value: 0 });
+    }, []);
+
     return (
         <>
             <style>{`
