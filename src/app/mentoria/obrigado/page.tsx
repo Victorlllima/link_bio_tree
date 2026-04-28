@@ -54,10 +54,10 @@ export default function MentoriaObrigadoPage() {
                         </h1>
 
                         <p className="text-[#a1a1aa] text-base leading-relaxed mb-4" style={{ fontWeight: 300 }}>
-                            Red vai entrar em contato em breve para agendar os encontros e alinhar o diagnóstico do seu negócio.
+                            Iremos entrar em contato em breve para agendar os encontros e alinhar o diagnóstico do seu negócio.
                         </p>
                         <p className="text-[#71717a] text-sm mb-10">
-                            Enquanto isso, preencha a ficha de onboarding — leva menos de 5 minutos e ajuda Red a preparar a sessão especificamente para você.
+                            Enquanto isso, preencha a ficha de onboarding — leva menos de 5 minutos e nos ajuda a preparar a sessão especificamente para você.
                         </p>
 
                         {/* CTA principal */}
