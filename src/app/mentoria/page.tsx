@@ -636,11 +636,17 @@ export default function MentoriaPage() {
                                 <p className="font-mono text-xs text-[#71717a] uppercase tracking-widest mb-2">{plan.label}</p>
                                 <h3 className="text-white font-bold text-lg mb-4" style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800 }}>{plan.name}</h3>
                                 <div className="mb-6">
-                                    {/* preço original riscado */}
-                                    <p className="text-[#52525b] text-xs line-through mb-0.5">de R$ {plan.originalPrice}</p>
+                                    {/* badge 50% OFF + preço original riscado */}
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                        <span className="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold uppercase tracking-wide"
+                                            style={{ background: "rgba(249,115,22,0.18)", color: "#f97316" }}>
+                                            50% OFF
+                                        </span>
+                                        <span className="text-[#71717a] text-sm line-through">R$ {plan.originalPrice}</span>
+                                    </div>
                                     <div className="flex items-baseline gap-1">
-                                        <span className="text-[#71717a] text-sm">R$ </span>
-                                        <span className="text-3xl font-bold text-white" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>{plan.price}</span>
+                                        <span className="text-[#a1a1aa] text-base">R$</span>
+                                        <span className="font-black text-white" style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: "clamp(36px, 4vw, 48px)", letterSpacing: "-0.02em", lineHeight: 1 }}>{plan.price}</span>
                                         {plan.perPerson && <span className="text-[#71717a] text-xs ml-1">/ por pessoa</span>}
                                     </div>
                                     <p className="text-[#71717a] text-xs mt-1">{plan.sessions} · {plan.duration}</p>
