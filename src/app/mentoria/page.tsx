@@ -25,12 +25,19 @@ function useCountdown() {
     return timeLeft;
 }
 
-/* ─── HOTMART LINKS (placeholder — Red substitui) ─── */
-const HOTMART = {
+/* ─── STRIPE LINKS ─── */
+const LINKS_OFERTA = {
     grupo: "https://buy.stripe.com/cNibJ1eAZ1x174M6dhgbm00",
     individual: "https://buy.stripe.com/6oU14n9gFejNfBifNRgbm01",
     intensiva: "https://buy.stripe.com/bJe4gz0K93F974MgRVgbm02",
 };
+const LINKS_CHEIO = {
+    grupo: "https://buy.stripe.com/8x2dR92Sh1x174McBFgbm03",
+    individual: "https://buy.stripe.com/28EeVd64tdfJgFmgRVgbm04",
+    intensiva: "https://buy.stripe.com/8x29ATcsRfnRcp6atxgbm05",
+};
+// Mantido por compatibilidade com o restante do código
+const HOTMART = LINKS_OFERTA;
 
 /* ─── DADOS ─── */
 const BENEFITS = [
@@ -205,6 +212,15 @@ function TimerBadge({ h, m, s }: { h: number; m: number; s: number }) {
 export default function MentoriaPage() {
     const { h, m, s, expired } = useCountdown();
 
+    const links = expired ? LINKS_CHEIO : LINKS_OFERTA;
+    const plans = PLANS.map(p => ({
+        ...p,
+        price: expired ? p.originalPrice : p.price,
+        link: p.name === "Mentoria em Grupo" ? links.grupo
+            : p.name === "Mentoria Individual" ? links.individual
+            : links.intensiva,
+    }));
+
     return (
         <>
             {/* FONTS */}
@@ -287,7 +303,7 @@ export default function MentoriaPage() {
                             </p>
 
                             <motion.a
-                                href={HOTMART.individual}
+                                href={links.individual}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={() => (window as any).fbq?.('track', 'InitiateCheckout')}
@@ -619,7 +635,7 @@ export default function MentoriaPage() {
                         )}
                     </motion.div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {PLANS.map((plan, i) => (
+                        {plans.map((plan, i) => (
                             <motion.div
                                 key={i}
                                 initial={{ opacity: 0, y: 20 }}
@@ -639,14 +655,16 @@ export default function MentoriaPage() {
                                 )}
                                 <h3 className="text-white font-bold text-lg mb-4" style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800 }}>{plan.name}</h3>
                                 <div className="mb-6">
-                                    {/* badge 50% OFF + preço original riscado */}
-                                    <div className="flex items-center gap-2 mb-1.5">
-                                        <span className="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold uppercase tracking-wide"
-                                            style={{ background: "rgba(249,115,22,0.18)", color: "#f97316" }}>
-                                            50% OFF
-                                        </span>
-                                        <span className="text-[#71717a] text-sm line-through">R$ {plan.originalPrice}</span>
-                                    </div>
+                                    {/* badge 50% OFF + preço original riscado — some quando oferta expira */}
+                                    {!expired && (
+                                        <div className="flex items-center gap-2 mb-1.5">
+                                            <span className="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold uppercase tracking-wide"
+                                                style={{ background: "rgba(249,115,22,0.18)", color: "#f97316" }}>
+                                                50% OFF
+                                            </span>
+                                            <span className="text-[#71717a] text-sm line-through">R$ {plan.originalPrice}</span>
+                                        </div>
+                                    )}
                                     <div className="flex items-baseline gap-1">
                                         <span className="text-[#a1a1aa] text-base">R$</span>
                                         <span className="font-black text-white" style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: "clamp(36px, 4vw, 48px)", letterSpacing: "-0.02em", lineHeight: 1 }}>{plan.price}</span>
@@ -792,7 +810,7 @@ export default function MentoriaPage() {
 
                         <p className="text-[#a1a1aa] text-sm mb-8">Vagas limitadas por ciclo · Parcele em até 12x no cartão.</p>
                         <motion.a
-                            href={HOTMART.individual}
+                            href={links.individual}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={() => (window as any).fbq?.('track', 'InitiateCheckout')}
