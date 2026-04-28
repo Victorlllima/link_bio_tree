@@ -36,7 +36,7 @@ const HOTMART = {
 const BENEFITS = [
     { icon: "01", title: "Diagnóstico real do seu negócio", desc: "Mapeamos onde a IA pode gerar mais impacto imediato — sem teoria, sem hype." },
     { icon: "02", title: "Implementação assistida", desc: "Você não aprende sobre IA. Você constrói com IA, ao vivo, com Red do seu lado." },
-    { icon: "03", title: "Primeiro agente no ar em 30 dias", desc: "Saída concreta: um processo automatizado rodando no seu negócio." },
+    { icon: "03", title: "Primeiro agente no ar em 30 dias", desc: "Entrega concreta: um processo automatizado rodando no seu negócio." },
     { icon: "04", title: "Mentalidade AI First", desc: "Você sai sabendo como identificar, priorizar e implementar IA continuamente." }
 ];
 
@@ -349,7 +349,7 @@ export default function MentoriaPage() {
                                         <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
                                         <span className="text-[#52525b] text-[10px] font-mono tracking-wide">semana 2 da mentoria</span>
                                     </div>
-                                    <p className="text-white text-xs font-bold leading-snug mb-0.5">+R$ 50k economizados 💸</p>
+                                    <p className="text-white text-xs font-bold leading-snug mb-0.5">+R$ 100k economizados 💸</p>
                                     <p className="text-[#71717a] text-[11px]">Empresas cortaram custos com IA na mentoria</p>
                                 </motion.div>
 
@@ -383,7 +383,7 @@ export default function MentoriaPage() {
                         {[
                             { label: "Consultoria avulsa de IA", price: "R$ 5.000–15.000", detail: "1 a 3 reuniões. Diagnóstico genérico. Você sai com um deck, sem nada implementado.", bad: true },
                             { label: "Agência de automação", price: "R$ 3.000–8.000/mês", detail: "Você terceiriza, cria dependência. Qualquer mudança custa mais. Você não aprende nada.", bad: true },
-                            { label: "Mentoria RedPro", price: "de R$ 4.997 por R$ 2.498", detail: "6 sessões 1:1. Agente implementado ao vivo. Você sai autônomo, sabendo fazer sozinho.", bad: false },
+                            { label: "Mentoria Individual RedPro", price: "de R$ 4.997 por R$ 2.498", detail: "6 sessões 1:1. Agente implementado ao vivo. Você sai autônomo, sabendo fazer sozinho.", bad: false },
                         ].map((item, i) => (
                             <motion.div
                                 key={i}
@@ -762,9 +762,17 @@ export default function MentoriaPage() {
                         </h2>
 
                         {!expired && (
-                            <div className="flex items-center justify-center gap-2 mb-4 text-sm">
-                                <span className="text-[#a1a1aa]">Oferta de 50% OFF expira em</span>
-                                <TimerBadge h={h} m={m} s={s} />
+                            <div
+                                className="inline-flex flex-col sm:flex-row items-center gap-3 px-6 py-4 rounded-2xl mb-8"
+                                style={{ background: "rgba(249,115,22,0.1)", border: "1px solid rgba(249,115,22,0.35)" }}
+                            >
+                                <span className="text-orange-400 text-sm font-semibold">🔥 Oferta de 50% OFF expira em</span>
+                                <span
+                                    className="font-mono font-black tabular-nums text-white"
+                                    style={{ fontSize: "clamp(28px, 4vw, 40px)", letterSpacing: "0.04em" }}
+                                >
+                                    {String(h).padStart(2, "0")}:{String(m).padStart(2, "0")}:{String(s).padStart(2, "0")}
+                                </span>
                             </div>
                         )}
 
