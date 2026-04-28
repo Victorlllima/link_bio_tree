@@ -15,7 +15,7 @@ const STEPS = [
         id: "negocio",
         label: "02 — Seu negócio",
         title: "Como é sua operação hoje?",
-        sub: "Sem julgamento. Red precisa do estado real para ajudar de verdade."
+        sub: "Sem julgamento. Precisamos do estado real para ajudar de verdade."
     },
     {
         id: "ia",
@@ -131,11 +131,8 @@ export default function FichaPage() {
                         <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 900, fontSize: "clamp(28px, 4vw, 44px)", letterSpacing: "-0.03em" }} className="text-white mb-4">
                             Ficha recebida!
                         </h2>
-                        <p className="text-[#a1a1aa] text-sm leading-relaxed mb-3">
-                            Red vai revisar antes do primeiro encontro e vai chegar no seu WhatsApp para confirmar o agendamento.
-                        </p>
-                        <p className="text-[#71717a] text-sm mb-8">
-                            Se quiser agendar diretamente, acesse o Calendly pelo botão abaixo.
+                        <p className="text-[#a1a1aa] text-sm leading-relaxed mb-8">
+                            Iremos revisá-la antes do nosso primeiro encontro.
                         </p>
                         <a
                             href="https://calendly.com/academy-redpro/mentoria-encontro-1"
@@ -143,9 +140,9 @@ export default function FichaPage() {
                             rel="noopener noreferrer"
                             className="inline-block px-10 py-4 bg-orange-500 hover:bg-orange-400 text-black font-bold rounded-xl text-sm uppercase tracking-wide transition-colors"
                         >
-                            Agendar no Calendly
+                            Quero agendar o primeiro encontro
                         </a>
-                        <p className="text-xs text-[#52525b] mt-6">Dúvidas? (61) 99297-8796</p>
+                        <p className="text-xs text-[#52525b] mt-6">Dúvidas? suporte@redpro.com.br</p>
                     </motion.div>
                 </main>
             </>
@@ -392,7 +389,7 @@ export default function FichaPage() {
                                     <div>
                                         <Label>Quer já agendar o primeiro encontro agora?</Label>
                                         <div className="flex flex-col sm:flex-row gap-3 mt-2">
-                                            {["Sim, quero agendar pelo Calendly", "Prefiro que Red entre em contato pelo WhatsApp"].map(opt => (
+                                            {["Sim, quero agendar agora a minha primeira sessão", "Prefiro que a equipe entre em contato comigo no WhatsApp"].map(opt => (
                                                 <button
                                                     key={opt}
                                                     type="button"
