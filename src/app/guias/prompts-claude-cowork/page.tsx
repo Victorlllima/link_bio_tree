@@ -42,7 +42,7 @@ export default function GuiaPromptsClaudeCowork() {
         <div id="documento" className="max-w-5xl mx-auto bg-white rounded-2xl overflow-hidden shadow-2xl">
 
           {/* CAPA */}
-          <div className="relative bg-[#080808] px-16 pb-12 overflow-hidden">
+          <div className="relative bg-[#080808] px-6 sm:px-16 pb-12 overflow-hidden">
             <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-[#f97316] opacity-[0.08]" />
             <div className="absolute -bottom-10 left-[40%] w-44 h-44 rounded-full bg-[#f97316] opacity-[0.05]" />
 
@@ -52,7 +52,7 @@ export default function GuiaPromptsClaudeCowork() {
                 alt="RedPro AI Academy"
                 width={420}
                 height={280}
-                className="-mt-14 -mb-10"
+                className="-mt-8 sm:-mt-14 -mb-6 sm:-mb-10 w-48 sm:w-auto"
                 priority
               />
             </div>
@@ -61,7 +61,7 @@ export default function GuiaPromptsClaudeCowork() {
               <span className="inline-block bg-[#f97316] text-white text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded mb-5">
                 Guia Prático
               </span>
-              <h1 className="text-4xl font-extrabold text-white leading-tight max-w-2xl mb-4">
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-white leading-tight max-w-2xl mb-4">
                 5 Prompts Prontos para Automatizar sua Rotina com{" "}
                 <span className="text-[#f97316]">Claude Cowork</span>
               </h1>
@@ -72,7 +72,7 @@ export default function GuiaPromptsClaudeCowork() {
           </div>
 
           {/* CORPO */}
-          <div className="px-16 py-14">
+          <div className="px-5 sm:px-16 py-8 sm:py-14">
 
             {/* INTRO */}
             <p className="text-[17px] text-neutral-500 leading-relaxed border-l-[3px] border-[#f97316] pl-5 mb-6">
@@ -86,7 +86,7 @@ export default function GuiaPromptsClaudeCowork() {
               </p>
             </div>
 
-            <div className="flex items-center justify-between gap-4 bg-[#080808] border border-white/10 rounded-xl px-6 py-4 mb-12">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[#080808] border border-white/10 rounded-xl px-6 py-4 mb-12">
               <div className="flex items-center gap-3">
                 <span className="text-xl">⬇️</span>
                 <p className="text-[14px] text-neutral-300 leading-relaxed">
@@ -98,7 +98,7 @@ export default function GuiaPromptsClaudeCowork() {
                 href="https://claude.com/download"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-shrink-0 bg-[#f97316] hover:opacity-85 transition-opacity text-white font-bold text-[13px] px-5 py-2.5 rounded-lg"
+                className="w-full sm:w-auto flex-shrink-0 text-center bg-[#f97316] hover:opacity-85 transition-opacity text-white font-bold text-[13px] px-5 py-2.5 rounded-lg"
               >
                 Baixar Claude Desktop →
               </a>
@@ -271,7 +271,8 @@ Deixe limpo, profissional e pronto para apresentar.`}</QuoteBox>
             {/* TABELA RESUMO */}
             <div className="mb-14">
               <p className="text-xl font-extrabold text-[#080808] mb-5">Resumo dos 5 prompts</p>
-              <table className="w-full border-collapse text-sm">
+              <div className="overflow-x-auto -mx-5 sm:mx-0 px-5 sm:px-0">
+              <table className="w-full min-w-[560px] border-collapse text-sm">
                 <thead>
                   <tr className="bg-[#080808] text-white">
                     <th className="text-left px-4 py-3 text-xs font-bold tracking-widest uppercase">Prompt</th>
@@ -296,10 +297,11 @@ Deixe limpo, profissional e pronto para apresentar.`}</QuoteBox>
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
 
             {/* CTA */}
-            <div className="relative bg-[#080808] rounded-2xl px-12 py-10 overflow-hidden">
+            <div className="relative bg-[#080808] rounded-2xl px-6 sm:px-12 py-8 sm:py-10 overflow-hidden">
               <div className="absolute -top-14 -right-14 w-56 h-56 rounded-full bg-[#f97316] opacity-[0.07]" />
               <p className="text-xs font-bold tracking-widest uppercase text-[#f97316] mb-3">Próximo passo</p>
               <h3 className="text-2xl font-extrabold text-white leading-snug max-w-md mb-6 relative z-10">
@@ -309,7 +311,7 @@ Deixe limpo, profissional e pronto para apresentar.`}</QuoteBox>
                 href="https://redpro.com.br"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative z-10 inline-block bg-[#f97316] hover:opacity-85 transition-opacity text-white font-bold text-[15px] px-7 py-3 rounded-lg"
+                className="relative z-10 inline-block w-full sm:w-auto text-center bg-[#f97316] hover:opacity-85 transition-opacity text-white font-bold text-[15px] px-7 py-3 rounded-lg"
               >
                 Conheça a RedPro AI Academy →
               </a>
@@ -318,7 +320,7 @@ Deixe limpo, profissional e pronto para apresentar.`}</QuoteBox>
           </div>
 
           {/* RODAPÉ */}
-          <div className="flex items-center justify-between px-16 py-6 border-t border-neutral-100">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 px-5 sm:px-16 py-5 sm:py-6 border-t border-neutral-100">
             <span className="text-xs text-neutral-400">
               © 2026 <strong className="text-[#f97316]">RedPro AI Academy</strong> — redpro.com.br
             </span>
@@ -348,13 +350,13 @@ function PromptSection({
     : "bg-orange-100 text-[#f97316]";
 
   return (
-    <div className="grid grid-cols-[48px_1fr] gap-x-6">
-      <div className="w-12 h-12 rounded-xl bg-[#080808] text-[#f97316] font-mono font-bold text-lg flex items-center justify-center mt-0.5 flex-shrink-0">
+    <div className="grid grid-cols-[40px_1fr] sm:grid-cols-[48px_1fr] gap-x-4 sm:gap-x-6">
+      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#080808] text-[#f97316] font-mono font-bold text-base sm:text-lg flex items-center justify-center mt-0.5 flex-shrink-0">
         {number}
       </div>
       <div>
-        <div className="flex items-center gap-3 mb-2">
-          <h2 className="text-[22px] font-extrabold text-[#080808] leading-snug">{title}</h2>
+        <div className="flex flex-wrap items-center gap-3 mb-2">
+          <h2 className="text-lg sm:text-[22px] font-extrabold text-[#080808] leading-snug">{title}</h2>
           {badge && (
             <span className={`text-[10px] font-bold tracking-widest uppercase px-2 py-1 rounded ${badgeClass}`}>
               {badge}

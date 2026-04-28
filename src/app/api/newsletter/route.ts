@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { emailNewsletter } from "@/lib/email-templates";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const AUDIENCE_ID = "772bf76a-410e-49c0-8737-76f1c1279114";
+const AUDIENCE_ID = "b058a789-c95f-417b-9239-4a31dadba69f"; // Newsletter
 
 export async function POST(req: Request) {
     const { email } = await req.json();

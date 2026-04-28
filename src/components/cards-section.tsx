@@ -22,6 +22,42 @@ export interface CardData {
 
 export const cardsData: CardData[] = [
     {
+        id: "diagnostico",
+        title: "Diagnóstico Gratuito",
+        subtitle: "Descubra quanto você perde por mês sem IA",
+        description: "Responda 8 perguntas e veja em tempo real quanto seu negócio perde por mês em dependências que a IA já resolve hoje. Gratuito, sem cadastro prévio.",
+        image: "/images/card-news.webp",
+        badge: "GRÁTIS",
+        icon: "🔍",
+        url: "https://tally.so/r/diagnostico-redpro",
+        color: "from-green-500 to-emerald-500",
+        active: true
+    },
+    {
+        id: "workshop",
+        title: "Workshop: Automatize Seu Negócio em 1 Dia",
+        subtitle: "O playbook completo — sem código, sem dev",
+        description: "Acesse o workshop gravado e veja ao vivo como um engenheiro de telecom (sem código) montou agentes de IA que substituíram R$3.000/mês em freelas. Você tem 48h de acesso após o pagamento.",
+        image: "/images/mentoria-redpro.jpg",
+        badge: "R$47",
+        icon: "⚡",
+        url: "https://pay.hotmart.com/workshop-redpro",
+        color: "from-orange-500 to-red-500",
+        active: true
+    },
+    {
+        id: "claude-para-negocios",
+        title: "Claude para Negócios",
+        subtitle: "Web · Projects · Cowork — seu sócio digital",
+        description: "Em 4 horas você configura o Claude como o sócio digital do seu negócio. Ele pesquisa, organiza, escreve e executa tarefas reais no seu computador — sem código, sem dev, sem API.",
+        image: "/images/redpro-in-company.jpg",
+        badge: "R$297",
+        icon: "🤝",
+        url: "https://pay.hotmart.com/claude-para-negocios-redpro",
+        color: "from-blue-500 to-cyan-500",
+        active: true
+    },
+    {
         id: "metodo",
         title: "Método S.H.A.R.K. de VibeCoding",
         subtitle: "Aprenda a desenvolver Apps e soluções com IA",
