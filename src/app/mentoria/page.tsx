@@ -27,7 +27,7 @@ function useCountdown() {
 
 /* ─── HOTMART LINKS (placeholder — Red substitui) ─── */
 const HOTMART = {
-    grupo: "https://pay.hotmart.com/GRUPO_PLACEHOLDER",
+    grupo: "https://victorlllima.hotmart.host/mentoria-em-grupo-5b7a1865-aa85-4955-bb3d-aa9692bf8e31",
     individual: "https://pay.hotmart.com/INDIVIDUAL_PLACEHOLDER",
     intensiva: "https://pay.hotmart.com/INTENSIVA_PLACEHOLDER",
 };
