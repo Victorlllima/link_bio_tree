@@ -138,7 +138,7 @@ export default function FichaPage() {
                             Se quiser agendar diretamente, acesse o Calendly pelo botão abaixo.
                         </p>
                         <a
-                            href="https://calendly.com/redproai"
+                            href="https://calendly.com/academy-redpro/mentoria-encontro-1"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-block px-10 py-4 bg-orange-500 hover:bg-orange-400 text-black font-bold rounded-xl text-sm uppercase tracking-wide transition-colors"
