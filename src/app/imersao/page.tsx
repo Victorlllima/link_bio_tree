@@ -31,6 +31,7 @@ function CTAButton({ className = "" }: { className?: string }) {
 
     async function handleClick() {
         setLoading(true);
+        (window as any).fbq?.("track", "InitiateCheckout", { content_name: "Imersão RedPro 23/05", value: 44, currency: "BRL" });
         try {
             const res = await fetch("/api/imersao/checkout", { method: "POST" });
             const data = await res.json();
