@@ -37,20 +37,31 @@ export async function POST(req: NextRequest) {
             `📅 *Data:* ${new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}`,
         ].join("\n");
 
-        const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-        const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+        const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ?? "";
+        const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID ?? "";
 
-        if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
-            await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        await Promise.allSettled([
+            TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID
+                ? fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: "Markdown" }),
+                })
+                : Promise.resolve(),
+
+            fetch(`${process.env.NEXT_PUBLIC_URL ?? "https://redpro.com.br"}/api/meta-capi`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID,
-                    text: msg,
-                    parse_mode: "Markdown",
+                    event_name: "Purchase",
+                    email: session.customer_details?.email ?? undefined,
+                    name: session.customer_details?.name ?? undefined,
+                    value: session.amount_total ? session.amount_total / 100 : 44,
+                    currency: "BRL",
+                    event_id: `stripe-${session.id}`,
                 }),
-            });
-        }
+            }),
+        ]);
     }
 
     return NextResponse.json({ received: true });
