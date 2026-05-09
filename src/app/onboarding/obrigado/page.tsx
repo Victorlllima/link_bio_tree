@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 export const metadata = {
-  title: "Matrícula Confirmada — RedPro AI Academy",
+  title: "Ficha Recebida — RedPro AI Academy",
   robots: { index: false },
 };
 
@@ -26,9 +26,9 @@ export default function ObrigadoPage() {
           <Image
             src="/logo-academy.png"
             alt="RedPro AI Academy"
-            width={160}
-            height={48}
-            className="h-12 w-auto object-contain"
+            width={640}
+            height={192}
+            className="h-48 w-auto object-contain"
             priority
           />
         </div>
@@ -40,32 +40,12 @@ export default function ObrigadoPage() {
         </div>
 
         <h1 className="text-white font-bold text-2xl sm:text-3xl mb-3">
-          Matrícula confirmada!
+          Ficha recebida!
         </h1>
         <p className="text-zinc-400 text-sm leading-relaxed mb-8">
-          Bem-vindo à RedPro AI Academy.<br className="hidden sm:block" />
-          Você vai receber um e-mail com os próximos passos em instantes.
+          Obrigado por preencher. Agora pode fechar essa página<br className="hidden sm:block" />
+          e continuar assistindo o curso de onde parou.
         </p>
-
-        <div className="bg-zinc-900/40 border border-zinc-800/60 rounded-2xl p-6 text-left mb-8 backdrop-blur-sm">
-          <p className="text-orange-500 text-xs font-semibold tracking-widest uppercase mb-4">
-            O que acontece agora
-          </p>
-          <ul className="space-y-3">
-            {[
-              "Verifique seu e-mail — te enviamos o acesso",
-              "Entre no grupo do WhatsApp pelo link no e-mail",
-              "A Live de boas-vindas começa em breve — fique de olho",
-            ].map((item, i) => (
-              <li key={i} className="flex items-start gap-3 text-sm text-zinc-300">
-                <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-orange-500 text-xs font-bold">
-                  {i + 1}
-                </span>
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
 
         <a
           href="https://instagram.com/redpro.ia"
@@ -75,13 +55,6 @@ export default function ObrigadoPage() {
         >
           Seguir @redpro.ia no Instagram →
         </a>
-
-        <p className="text-zinc-700 text-xs mt-8">
-          Dúvidas? Fale no WhatsApp:{" "}
-          <a href="https://wa.me/5561910896022" className="text-zinc-500 hover:text-orange-500 transition-colors underline underline-offset-2">
-            (61) 9108-9602
-          </a>
-        </p>
       </div>
     </main>
   );

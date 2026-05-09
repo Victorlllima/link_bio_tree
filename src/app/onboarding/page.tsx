@@ -7,57 +7,65 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 type FormData = {
+  // Bloco 1 — Sobre você
   email: string;
   whatsapp: string;
   instagram: string;
+  // Bloco 2 — Seu Negócio
   segmento: string;
+  produto_servico: string;
   faturamento: string;
-  maior_dor: string;
-  nivel_ia: string;
-  ja_usou: string;
+  tempo_mercado: string;
+  // Bloco 3 — Sua Experiência
+  maior_obstaculo: string;
+  ja_tentou_ia: string;
   objetivo: string;
 };
 
 const SEGMENTOS = [
   "Consultoria / Mentoria",
   "Saúde e Bem-estar",
-  "Educação / Cursos",
-  "E-commerce / Loja",
+  "Educação / Cursos online",
+  "E-commerce / Produtos físicos",
   "Serviços B2B",
-  "Agência / Marketing",
+  "Agência / Marketing digital",
   "Imóveis",
   "Jurídico / Contabilidade",
+  "Profissional liberal (médico, dentista, arquiteto...)",
+  "Ainda não tenho negócio",
   "Outro",
 ];
 
 const FATURAMENTOS = [
   "Ainda não faturando",
   "Até R$5.000/mês",
-  "R$5.001 a R$20.000/mês",
-  "R$20.001 a R$50.000/mês",
+  "R$5.001 a R$15.000/mês",
+  "R$15.001 a R$50.000/mês",
   "Acima de R$50.000/mês",
 ];
 
-const DORES = [
-  "Falta de tempo para o operacional",
-  "Dificuldade em atrair clientes",
-  "Não consigo escalar sem contratar mais",
-  "Atendimento lento ou inconsistente",
-  "Conteúdo — não sei o que postar",
-  "Processos bagunçados / sem automação",
+const TEMPO_MERCADO = [
+  "Menos de 6 meses",
+  "6 meses a 2 anos",
+  "2 a 5 anos",
+  "Mais de 5 anos",
 ];
 
-const NIVEIS_IA = [
-  "Nunca usei IA de forma consistente",
-  "Uso ChatGPT às vezes, mas sem método",
-  "Uso IA diariamente no negócio",
-  "Já tenho automações rodando",
+const OBSTACULOS = [
+  "Falta de tempo — faço tudo sozinho e não consigo parar",
+  "Não consigo escalar sem contratar mais gente",
+  "Atendimento lento — perco clientes por demora",
+  "Processos bagunçados — cada dia faço de um jeito",
+  "Não sei o que postar — conteúdo é um caos",
+  "Dificuldade em converter leads em clientes",
+  "Custo operacional alto — muita gente para pouca entrega",
 ];
 
-const JA_USOU = [
-  "Não, é minha primeira vez",
-  "Sim, já comprei outros cursos sobre IA",
-  "Sim, já tenho agentes rodando",
+const JA_TENTOU = [
+  "Não, sou iniciante em IA",
+  "Já usei ChatGPT mas sem método — não aplicou no negócio",
+  "Já tentei outras ferramentas de IA e não funcionou para mim",
+  "Já tenho algumas automações rodando mas quero ir mais fundo",
 ];
 
 const BLOCS = [
@@ -86,7 +94,7 @@ export default function OnboardingPage() {
     const fields =
       bloc === 1
         ? (["email", "whatsapp", "instagram"] as const)
-        : (["segmento", "faturamento", "maior_dor"] as const);
+        : (["segmento", "produto_servico", "faturamento", "tempo_mercado"] as const);
     const valid = await trigger(fields);
     if (valid) setBloc(bloc + 1);
   };
@@ -100,7 +108,7 @@ export default function OnboardingPage() {
         body: JSON.stringify(data),
       });
     } catch {
-      // falha silenciosa — não bloqueia o lead
+      // falha silenciosa
     }
     router.push("/onboarding/obrigado");
   };
@@ -129,14 +137,14 @@ export default function OnboardingPage() {
       />
 
       <div className="relative w-full max-w-lg">
-        {/* Logo */}
+        {/* Logo — 4x maior */}
         <div className="flex justify-center mb-8">
           <Image
             src="/logo-academy.png"
             alt="RedPro AI Academy"
-            width={160}
-            height={48}
-            className="h-12 w-auto object-contain"
+            width={640}
+            height={192}
+            className="h-48 w-auto object-contain"
             priority
           />
         </div>
@@ -196,7 +204,8 @@ export default function OnboardingPage() {
         <div className="bg-zinc-900/40 border border-zinc-800/60 rounded-2xl p-6 sm:p-8 backdrop-blur-sm">
           <form onSubmit={handleSubmit(onSubmit)}>
             <AnimatePresence mode="wait">
-              {/* BLOCO 1 */}
+
+              {/* BLOCO 1 — Sobre você */}
               {bloc === 1 && (
                 <motion.div
                   key="b1"
@@ -251,7 +260,7 @@ export default function OnboardingPage() {
                 </motion.div>
               )}
 
-              {/* BLOCO 2 */}
+              {/* BLOCO 2 — Seu Negócio */}
               {bloc === 2 && (
                 <motion.div
                   key="b2"
@@ -263,7 +272,7 @@ export default function OnboardingPage() {
                 >
                   <div>
                     <h2 className="text-white font-semibold text-lg mb-1">Seu Negócio</h2>
-                    <p className="text-zinc-600 text-xs">Conta sobre o que você faz para personalizarmos sua jornada.</p>
+                    <p className="text-zinc-600 text-xs">Conta o que você faz para personalizarmos sua jornada.</p>
                   </div>
 
                   <div>
@@ -283,7 +292,17 @@ export default function OnboardingPage() {
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">Faturamento mensal *</label>
+                    <label className="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">O que você vende ou entrega? *</label>
+                    <input
+                      {...register("produto_servico", { required: "Descreva o que você vende" })}
+                      placeholder="Ex: mentoria de vendas, clínica de estética, loja de roupas..."
+                      className={inputCls(!!errors.produto_servico)}
+                    />
+                    {errors.produto_servico && <p className="text-red-400 text-xs mt-1.5">{errors.produto_servico.message}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">Faturamento mensal atual *</label>
                     <div className="relative">
                       <select
                         {...register("faturamento", { required: "Selecione sua faixa" })}
@@ -299,24 +318,24 @@ export default function OnboardingPage() {
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">Maior dor hoje *</label>
+                    <label className="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">Há quanto tempo está no mercado? *</label>
                     <div className="relative">
                       <select
-                        {...register("maior_dor", { required: "Selecione uma opção" })}
+                        {...register("tempo_mercado", { required: "Selecione uma opção" })}
                         defaultValue=""
-                        className={selectCls(!!errors.maior_dor)}
+                        className={selectCls(!!errors.tempo_mercado)}
                       >
-                        <option value="" disabled>A que mais te incomoda</option>
-                        {DORES.map((d) => <option key={d} value={d}>{d}</option>)}
+                        <option value="" disabled>Selecione</option>
+                        {TEMPO_MERCADO.map((t) => <option key={t} value={t}>{t}</option>)}
                       </select>
                       <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs">▾</span>
                     </div>
-                    {errors.maior_dor && <p className="text-red-400 text-xs mt-1.5">{errors.maior_dor.message}</p>}
+                    {errors.tempo_mercado && <p className="text-red-400 text-xs mt-1.5">{errors.tempo_mercado.message}</p>}
                   </div>
                 </motion.div>
               )}
 
-              {/* BLOCO 3 */}
+              {/* BLOCO 3 — Sua Experiência */}
               {bloc === 3 && (
                 <motion.div
                   key="b3"
@@ -328,55 +347,55 @@ export default function OnboardingPage() {
                 >
                   <div>
                     <h2 className="text-white font-semibold text-lg mb-1">Sua Experiência</h2>
-                    <p className="text-zinc-600 text-xs">Onde você está com IA agora para personalizarmos o início.</p>
+                    <p className="text-zinc-600 text-xs">Onde você está agora com IA.</p>
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">Nível atual com IA *</label>
+                    <label className="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">Qual é o seu maior obstáculo hoje? *</label>
                     <div className="space-y-2">
-                      {NIVEIS_IA.map((n) => (
+                      {OBSTACULOS.map((o) => (
                         <label
-                          key={n}
-                          className="flex items-center gap-3 p-3 rounded-xl border border-zinc-800 cursor-pointer hover:border-orange-500/40 hover:bg-orange-500/5 transition-all"
+                          key={o}
+                          className="flex items-start gap-3 p-3 rounded-xl border border-zinc-800 cursor-pointer hover:border-orange-500/40 hover:bg-orange-500/5 transition-all"
                         >
                           <input
-                            {...register("nivel_ia", { required: "Selecione seu nível" })}
+                            {...register("maior_obstaculo", { required: "Selecione seu maior obstáculo" })}
                             type="radio"
-                            value={n}
-                            className="accent-orange-500 w-4 h-4 flex-shrink-0"
+                            value={o}
+                            className="accent-orange-500 w-4 h-4 flex-shrink-0 mt-0.5"
                           />
-                          <span className="text-sm text-zinc-300">{n}</span>
+                          <span className="text-sm text-zinc-300 leading-snug">{o}</span>
                         </label>
                       ))}
                     </div>
-                    {errors.nivel_ia && <p className="text-red-400 text-xs mt-1.5">{errors.nivel_ia.message}</p>}
+                    {errors.maior_obstaculo && <p className="text-red-400 text-xs mt-1.5">{errors.maior_obstaculo.message}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">Já fez curso de IA antes? *</label>
+                    <label className="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">Qual é a sua relação com IA hoje? *</label>
                     <div className="relative">
                       <select
-                        {...register("ja_usou", { required: "Selecione uma opção" })}
+                        {...register("ja_tentou_ia", { required: "Selecione uma opção" })}
                         defaultValue=""
-                        className={selectCls(!!errors.ja_usou)}
+                        className={selectCls(!!errors.ja_tentou_ia)}
                       >
-                        <option value="" disabled>Selecione uma opção</option>
-                        {JA_USOU.map((j) => <option key={j} value={j}>{j}</option>)}
+                        <option value="" disabled>Selecione</option>
+                        {JA_TENTOU.map((j) => <option key={j} value={j}>{j}</option>)}
                       </select>
                       <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs">▾</span>
                     </div>
-                    {errors.ja_usou && <p className="text-red-400 text-xs mt-1.5">{errors.ja_usou.message}</p>}
+                    {errors.ja_tentou_ia && <p className="text-red-400 text-xs mt-1.5">{errors.ja_tentou_ia.message}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">O que quer conquistar aqui? *</label>
+                    <label className="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">O que você quer conquistar aqui? *</label>
                     <textarea
                       {...register("objetivo", {
                         required: "Descreva seu objetivo",
-                        minLength: { value: 10, message: "Seja mais específico" },
+                        minLength: { value: 10, message: "Seja um pouco mais específico" },
                       })}
                       rows={3}
-                      placeholder="Ex: automatizar meu atendimento e liberar 3h por dia..."
+                      placeholder="Ex: quero automatizar meu atendimento e liberar 3h por dia..."
                       className={cn(inputCls(!!errors.objetivo), "resize-none leading-relaxed")}
                     />
                     {errors.objetivo && <p className="text-red-400 text-xs mt-1.5">{errors.objetivo.message}</p>}
