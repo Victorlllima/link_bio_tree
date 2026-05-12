@@ -17,7 +17,7 @@ type FormData = {
   faturamento: string;
   tempo_mercado: string;
   // Bloco 3 — Sua Experiência
-  maior_obstaculo: string;
+  maior_obstaculo: string[];
   ja_tentou_ia: string;
   objetivo: string;
 };
@@ -62,9 +62,9 @@ const OBSTACULOS = [
 ];
 
 const JA_TENTOU = [
-  "Não, sou iniciante em IA",
-  "Já usei ChatGPT mas sem método — não aplicou no negócio",
-  "Já tentei outras ferramentas de IA e não funcionou para mim",
+  "Sou iniciante em IA",
+  "Já usei ChatGPT mas sem método",
+  "Já tentei outras ferramentas de IA mas não consegui extrair muito delas",
   "Já tenho algumas automações rodando mas quero ir mais fundo",
 ];
 
@@ -101,15 +101,22 @@ export default function OnboardingPage() {
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
-    try {
-      await fetch("/api/onboarding", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-    } catch {
-      // falha silenciosa
-    }
+    const payload = {
+      ...data,
+      maior_obstaculo: Array.isArray(data.maior_obstaculo)
+        ? data.maior_obstaculo.join(" | ")
+        : data.maior_obstaculo,
+    };
+    // Disparo em background — não bloqueia o redirect
+    fetch("/api/onboarding", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      keepalive: true,
+    }).catch(() => {
+      // falha silenciosa — o submit não trava
+    });
+    // Redirect imediato
     router.push("/onboarding/obrigado");
   };
 
@@ -351,7 +358,7 @@ export default function OnboardingPage() {
                   </div>
 
                   <div>
-                    <label className="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">Qual é o seu maior obstáculo hoje? *</label>
+                    <label className="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">Quais são seus maiores obstáculos hoje? * <span className="text-zinc-600 normal-case">(marque todos que se aplicam)</span></label>
                     <div className="space-y-2">
                       {OBSTACULOS.map((o) => (
                         <label
@@ -359,8 +366,11 @@ export default function OnboardingPage() {
                           className="flex items-start gap-3 p-3 rounded-xl border border-zinc-800 cursor-pointer hover:border-orange-500/40 hover:bg-orange-500/5 transition-all"
                         >
                           <input
-                            {...register("maior_obstaculo", { required: "Selecione seu maior obstáculo" })}
-                            type="radio"
+                            {...register("maior_obstaculo", {
+                              validate: (v) =>
+                                (Array.isArray(v) && v.length > 0) || "Selecione pelo menos um obstáculo",
+                            })}
+                            type="checkbox"
                             value={o}
                             className="accent-orange-500 w-4 h-4 flex-shrink-0 mt-0.5"
                           />
@@ -368,7 +378,7 @@ export default function OnboardingPage() {
                         </label>
                       ))}
                     </div>
-                    {errors.maior_obstaculo && <p className="text-red-400 text-xs mt-1.5">{errors.maior_obstaculo.message}</p>}
+                    {errors.maior_obstaculo && <p className="text-red-400 text-xs mt-1.5">{(errors.maior_obstaculo as { message?: string }).message}</p>}
                   </div>
 
                   <div>
