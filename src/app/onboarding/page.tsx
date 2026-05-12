@@ -37,7 +37,7 @@ const SEGMENTOS = [
 ];
 
 const FATURAMENTOS = [
-  "Ainda não faturando",
+  "Ainda não estou faturando",
   "Até R$5.000/mês",
   "R$5.001 a R$15.000/mês",
   "R$15.001 a R$50.000/mês",
@@ -402,7 +402,6 @@ export default function OnboardingPage() {
                     <textarea
                       {...register("objetivo", {
                         required: "Descreva seu objetivo",
-                        minLength: { value: 10, message: "Seja um pouco mais específico" },
                       })}
                       rows={3}
                       placeholder="Ex: quero automatizar meu atendimento e liberar 3h por dia..."
