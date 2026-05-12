@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 
+const CHECKOUT_URL = "https://pay.hotmart.com/V105607171C?checkoutMode=10";
+
 export const metadata: Metadata = {
   title: "Claude for Business — RedPro AI Academy",
   description:
-    "8 aulas práticas para configurar o Claude como um sócio que conhece seu negócio, executa seus processos e trabalha enquanto você dorme — sem escrever uma linha de código.",
+    "8 aulas para sair com um sistema de IA configurado nos seus processos. Não teoria, não lista de prompts. Sistema rodando.",
   openGraph: {
     type: "website",
     url: "https://redpro.com.br/claude-for-business",
     title: "Claude for Business — RedPro AI Academy",
     description:
-      "8 aulas práticas para configurar o Claude como um sócio que conhece seu negócio, executa seus processos e trabalha enquanto você dorme.",
+      "8 aulas para sair com um sistema de IA configurado nos seus processos. Não teoria, não lista de prompts. Sistema rodando.",
     locale: "pt_BR",
   },
 };
@@ -17,27 +19,73 @@ export const metadata: Metadata = {
 const html = `
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@200;400;700;800;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@200;400;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
 <style>
-  .cfb-root *, .cfb-root *::before, .cfb-root *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cfb-root, .cfb-root *, .cfb-root *::before, .cfb-root *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   .cfb-root {
-    --laranja: #f97316;
-    --laranja-dim: #c2500e;
+    --laranja: #F97316;
+    --laranja-dim: #C2500E;
+    --laranja-glow: rgba(249,115,22,.18);
+    --acid: #D6FF3A;
     --preto: #080808;
-    --cinza-escuro: #111111;
-    --cinza-medio: #1c1c1c;
-    --cinza-texto: #8a8a8a;
-    --branco: #f5f5f5;
+    --grafite: #111111;
+    --aco: #1C2530;
+    --linha: #1F1F1F;
+    --texto-mid: #8A8A8A;
+    --texto-soft: #B8B8B8;
+    --branco: #F5F5F5;
+
     background: var(--preto);
     color: var(--branco);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 17px;
-    line-height: 1.6;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 16px;
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
   }
 
+  /* Tipografia base */
+  .cfb-root h1, .cfb-root h2, .cfb-root h3, .cfb-root .display {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 900;
+    letter-spacing: -.02em;
+    line-height: 1.0;
+  }
+
+  .cfb-root h2 { font-size: clamp(30px, 5vw, 52px); margin-bottom: 12px; }
+  .cfb-root h3 { font-size: clamp(20px, 2.4vw, 26px); font-weight: 800; line-height: 1.15; }
+
+  .cfb-root em.lj {
+    font-style: normal;
+    color: var(--laranja);
+  }
+
+  .cfb-root .section-label {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--laranja);
+    margin-bottom: 18px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(249,115,22,.3);
+  }
+
+  .cfb-root .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .cfb-root .narrow { max-width: 760px; margin: 0 auto; }
+
+  .cfb-root section { padding: 80px 0; position: relative; }
+
+  /* HERO */
   .cfb-root .hero {
     min-height: 100svh;
     display: flex;
@@ -52,12 +100,14 @@ const html = `
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 70% 50% at 50% -10%, rgba(249,115,22,.18) 0%, transparent 70%);
+    background:
+      radial-gradient(ellipse 70% 50% at 50% -10%, var(--laranja-glow) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 20% 90%, rgba(249,115,22,.06) 0%, transparent 70%);
     pointer-events: none;
   }
 
   .cfb-root .hero-inner {
-    max-width: 760px;
+    max-width: 820px;
     margin: 0 auto;
     text-align: center;
     position: relative;
@@ -65,675 +115,974 @@ const html = `
   }
 
   .cfb-root .badge {
-    display: inline-block;
-    background: rgba(249,115,22,.12);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(249,115,22,.08);
     border: 1px solid rgba(249,115,22,.3);
     color: var(--laranja);
-    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
     font-weight: 500;
-    letter-spacing: .06em;
+    letter-spacing: .12em;
     text-transform: uppercase;
-    padding: 6px 16px;
+    padding: 8px 18px;
     border-radius: 100px;
-    margin-bottom: 32px;
+    margin-bottom: 36px;
+  }
+
+  .cfb-root .badge .dot-pulse {
+    width: 6px; height: 6px;
+    background: var(--laranja);
+    border-radius: 50%;
+    animation: cfb-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes cfb-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .3; }
   }
 
   .cfb-root h1 {
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-size: clamp(36px, 7vw, 72px);
+    font-size: clamp(38px, 7.5vw, 84px);
     font-weight: 900;
-    line-height: 1.0;
-    letter-spacing: -.02em;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
   }
 
-  .cfb-root h1 em {
-    font-style: normal;
-    color: var(--laranja);
+  .cfb-root h1 .thin {
+    display: block;
+    font-weight: 200;
+    font-size: .55em;
+    color: var(--texto-soft);
+    margin-top: 10px;
+    letter-spacing: -.01em;
   }
 
   .cfb-root .subheadline {
-    font-size: clamp(17px, 2.2vw, 21px);
-    font-weight: 300;
-    color: #c0c0c0;
-    max-width: 540px;
-    margin: 0 auto 40px;
-    line-height: 1.5;
+    font-size: clamp(16px, 1.8vw, 19px);
+    font-weight: 400;
+    color: var(--texto-soft);
+    max-width: 580px;
+    margin: 0 auto 42px;
+    line-height: 1.55;
   }
 
   .cfb-root .proof-strip {
     display: flex;
     justify-content: center;
-    gap: 24px;
+    gap: 28px;
     flex-wrap: wrap;
-    margin-bottom: 40px;
+    margin-bottom: 42px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--texto-mid);
   }
 
   .cfb-root .proof-item {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 14px;
-    color: #999;
   }
 
-  .cfb-root .proof-item span.dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
+  .cfb-root .proof-item .ic {
+    width: 5px; height: 5px;
     background: var(--laranja);
+    border-radius: 50%;
     flex-shrink: 0;
   }
 
-  .cfb-root .cta-btn {
+  /* Botões */
+  .cfb-root .btn {
     display: inline-block;
     background: var(--laranja);
-    color: #000;
+    color: var(--preto);
     font-family: 'Bricolage Grotesque', sans-serif;
     font-weight: 800;
     font-size: 18px;
-    padding: 18px 48px;
+    letter-spacing: -.01em;
+    padding: 18px 40px;
     border-radius: 8px;
     text-decoration: none;
-    transition: background .2s, transform .15s;
-    letter-spacing: -.01em;
+    transition: all .2s ease;
+    border: 2px solid var(--laranja);
+    cursor: pointer;
   }
 
-  .cfb-root .cta-btn:hover {
-    background: #ff8533;
+  .cfb-root .btn:hover {
+    background: transparent;
+    color: var(--laranja);
     transform: translateY(-2px);
   }
 
+  .cfb-root .btn-large {
+    font-size: 20px;
+    padding: 22px 56px;
+  }
+
   .cfb-root .cta-note {
+    font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
-    color: #666;
-    margin-top: 14px;
+    color: var(--texto-mid);
+    margin-top: 18px;
+    letter-spacing: .02em;
   }
 
-  .cfb-root .section {
-    padding: 80px 24px;
+  /* Sinais */
+  .cfb-root .sinais {
+    background: linear-gradient(180deg, var(--preto) 0%, #060606 100%);
+    border-top: 1px solid var(--linha);
   }
 
-  .cfb-root .section-inner {
-    max-width: 720px;
-    margin: 0 auto;
-  }
-
-  .cfb-root .section-label {
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--laranja);
-    margin-bottom: 20px;
-  }
-
-  .cfb-root h2 {
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-size: clamp(28px, 4vw, 46px);
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -.02em;
-    margin-bottom: 24px;
-  }
-
-  .cfb-root .problema-lista {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-top: 32px;
-  }
-
-  .cfb-root .problema-lista li {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    font-size: 16px;
-    color: #c0c0c0;
-    line-height: 1.5;
-  }
-
-  .cfb-root .problema-lista li::before {
-    content: '→';
-    color: var(--laranja);
-    flex-shrink: 0;
-    margin-top: 2px;
-    font-weight: 700;
-  }
-
-  .cfb-root .divider {
-    width: 48px;
-    height: 3px;
-    background: var(--laranja);
-    margin: 0 auto 48px;
-    border-radius: 2px;
-  }
-
-  .cfb-root .blocos {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+  .cfb-root .sinal-list {
+    display: grid;
+    gap: 24px;
     margin-top: 48px;
   }
 
-  .cfb-root .bloco {
-    background: var(--cinza-escuro);
-    border-left: 3px solid var(--laranja);
-    padding: 28px 32px;
-    border-radius: 0 8px 8px 0;
+  .cfb-root .sinal-item {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 24px;
+    align-items: start;
+    padding: 28px 0;
+    border-top: 1px solid var(--linha);
   }
 
-  .cfb-root .bloco-num {
+  .cfb-root .sinal-item:last-child { border-bottom: 1px solid var(--linha); }
+
+  .cfb-root .sinal-num {
     font-family: 'Bricolage Grotesque', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: .1em;
-    text-transform: uppercase;
+    font-size: 48px;
+    font-weight: 200;
     color: var(--laranja);
+    line-height: 1;
+  }
+
+  .cfb-root .sinal-titulo {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
     margin-bottom: 8px;
   }
 
-  .cfb-root .bloco h3 {
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-size: 22px;
-    font-weight: 800;
-    margin-bottom: 10px;
-    letter-spacing: -.01em;
+  .cfb-root .sinal-texto { color: var(--texto-soft); }
+
+  /* Pilares */
+  .cfb-root .pilares {
+    background: #050505;
+    border-top: 1px solid var(--linha);
   }
 
-  .cfb-root .bloco p {
-    font-size: 15px;
-    color: #999;
-    line-height: 1.6;
-  }
-
-  .cfb-root .aulas-grid {
+  .cfb-root .pilar-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 12px;
-    margin-top: 40px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--linha);
+    border: 1px solid var(--linha);
+    margin-top: 56px;
   }
 
-  .cfb-root .aula-card {
-    background: var(--cinza-escuro);
-    border: 1px solid #1f1f1f;
-    border-radius: 8px;
-    padding: 20px 24px;
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
+  .cfb-root .pilar {
+    background: var(--preto);
+    padding: 40px 32px;
+    transition: background .25s ease;
   }
 
-  .cfb-root .aula-num {
-    font-family: 'Bricolage Grotesque', sans-serif;
+  .cfb-root .pilar:hover { background: #0E0E0E; }
+
+  .cfb-root .pilar-num {
+    font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
-    font-weight: 900;
     color: var(--laranja);
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-
-  .cfb-root .aula-info strong {
-    display: block;
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 4px;
-    color: var(--branco);
-  }
-
-  .cfb-root .aula-info span {
-    font-size: 13px;
-    color: #777;
-    line-height: 1.4;
-  }
-
-  .cfb-root .testimonials {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-top: 40px;
-  }
-
-  .cfb-root .testimonial {
-    background: var(--cinza-escuro);
-    border: 1px solid #1f1f1f;
-    border-radius: 10px;
-    padding: 24px 28px;
-  }
-
-  .cfb-root .testimonial p {
-    font-size: 16px;
-    color: #d0d0d0;
-    line-height: 1.6;
+    letter-spacing: .15em;
     margin-bottom: 16px;
   }
 
-  .cfb-root .testimonial-author {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  .cfb-root .pilar-nome {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 900;
+    font-size: 32px;
+    margin-bottom: 16px;
+    letter-spacing: -.02em;
   }
 
-  .cfb-root .testimonial-avatar {
-    width: 40px;
-    height: 40px;
+  .cfb-root .pilar-desc {
+    color: var(--texto-soft);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* Blocos */
+  .cfb-root .blocos {
+    background: var(--preto);
+    border-top: 1px solid var(--linha);
+  }
+
+  .cfb-root .bloco-list {
+    display: grid;
+    gap: 32px;
+    margin-top: 56px;
+  }
+
+  .cfb-root .bloco-card {
+    background: #0A0A0A;
+    border: 1px solid var(--linha);
+    border-radius: 12px;
+    padding: 40px 36px;
+    transition: border-color .25s ease, transform .2s ease;
+    position: relative;
+  }
+
+  .cfb-root .bloco-card:hover {
+    border-color: rgba(249,115,22,.4);
+    transform: translateY(-2px);
+  }
+
+  .cfb-root .bloco-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--linha);
+  }
+
+  .cfb-root .bloco-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--laranja);
+    letter-spacing: .18em;
+    text-transform: uppercase;
+  }
+
+  .cfb-root .bloco-nome {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--branco);
+    letter-spacing: -.02em;
+    line-height: 1;
+  }
+
+  .cfb-root .bloco-card h3 {
+    color: var(--laranja);
+    font-size: 22px;
+    margin-bottom: 14px;
+  }
+
+  .cfb-root .bloco-card p { color: var(--texto-soft); font-size: 15px; line-height: 1.65; }
+
+  /* Jornada */
+  .cfb-root .jornada {
+    background: #050505;
+    border-top: 1px solid var(--linha);
+  }
+
+  .cfb-root .aula-list {
+    margin-top: 56px;
+    border-top: 1px solid var(--linha);
+  }
+
+  .cfb-root .aula-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--linha);
+    align-items: baseline;
+    transition: padding-left .2s ease;
+  }
+
+  .cfb-root .aula-row:hover { padding-left: 12px; }
+
+  .cfb-root .aula-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--laranja);
+    letter-spacing: .1em;
+  }
+
+  .cfb-root .aula-titulo {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 19px;
+  }
+
+  .cfb-root .aula-desc {
+    color: var(--texto-mid);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Depoimentos */
+  .cfb-root .depoimentos {
+    background: var(--preto);
+    border-top: 1px solid var(--linha);
+  }
+
+  .cfb-root .depo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 56px;
+  }
+
+  .cfb-root .depo-card {
+    background: #0C0C0C;
+    border: 1px solid var(--linha);
+    border-radius: 12px;
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    transition: border-color .25s ease, transform .2s ease;
+  }
+
+  .cfb-root .depo-card:hover {
+    border-color: rgba(249,115,22,.4);
+    transform: translateY(-3px);
+  }
+
+  .cfb-root .depo-quote {
+    color: var(--branco);
+    font-size: 15px;
+    line-height: 1.65;
+    margin-bottom: 24px;
+    flex-grow: 1;
+  }
+
+  .cfb-root .depo-quote::before {
+    content: '"';
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 56px;
+    font-weight: 900;
+    color: var(--laranja);
+    line-height: 0;
+    vertical-align: -10px;
+    margin-right: 4px;
+  }
+
+  .cfb-root .depo-autor {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-top: 20px;
+    border-top: 1px solid var(--linha);
+  }
+
+  .cfb-root .depo-avatar {
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    background: var(--cinza-medio);
-    border: 2px solid #333;
+    background: var(--aco);
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'Bricolage Grotesque', sans-serif;
     font-weight: 800;
-    font-size: 15px;
+    font-size: 18px;
     color: var(--laranja);
-  }
-
-  .cfb-root .testimonial-name strong {
-    display: block;
-    font-size: 14px;
-    font-weight: 600;
-  }
-
-  .cfb-root .testimonial-name span {
-    font-size: 12px;
-    color: #666;
-  }
-
-  .cfb-root .preco-box {
-    background: var(--cinza-escuro);
-    border: 1px solid #2a2a2a;
-    border-radius: 12px;
-    padding: 40px 40px;
-    max-width: 480px;
-    margin: 40px auto 0;
-    text-align: center;
-  }
-
-  .cfb-root .preco-anchor {
-    font-size: 14px;
-    color: #666;
-    text-decoration: line-through;
-    margin-bottom: 8px;
-  }
-
-  .cfb-root .preco-atual {
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-size: 64px;
-    font-weight: 900;
-    line-height: 1;
-    color: var(--branco);
-    margin-bottom: 8px;
-  }
-
-  .cfb-root .preco-atual sup {
-    font-size: 28px;
-    vertical-align: super;
-    color: var(--laranja);
-  }
-
-  .cfb-root .preco-label {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 32px;
-  }
-
-  .cfb-root .garantia {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-size: 14px;
-    color: #888;
-    margin-top: 20px;
-  }
-
-  .cfb-root .garantia::before {
-    content: '🔒';
-    font-size: 16px;
-  }
-
-  .cfb-root .faq-lista {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin-top: 40px;
-  }
-
-  .cfb-root .faq-item {
-    background: var(--cinza-escuro);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  .cfb-root .faq-item details summary {
-    padding: 20px 24px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 16px;
-    list-style: none;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .cfb-root .faq-item details summary::after {
-    content: '+';
-    font-size: 22px;
-    color: var(--laranja);
+    border: 1px solid rgba(249,115,22,.3);
     flex-shrink: 0;
+  }
+
+  .cfb-root .depo-info strong {
+    display: block;
     font-family: 'Bricolage Grotesque', sans-serif;
-    font-weight: 300;
+    font-size: 16px;
+    font-weight: 800;
   }
 
-  .cfb-root .faq-item details[open] summary::after {
-    content: '−';
+  .cfb-root .depo-info span {
+    color: var(--texto-mid);
+    font-size: 13px;
   }
 
-  .cfb-root .faq-item details .faq-body {
-    padding: 0 24px 20px;
-    font-size: 15px;
-    color: #999;
-    line-height: 1.6;
-  }
-
-  .cfb-root .final-cta {
-    padding: 80px 24px;
+  /* Preço */
+  .cfb-root .preco {
+    background: linear-gradient(180deg, #050505 0%, var(--preto) 100%);
+    border-top: 1px solid var(--linha);
     text-align: center;
-    position: relative;
-    overflow: hidden;
   }
 
-  .cfb-root .final-cta::before {
+  .cfb-root .preco-card {
+    max-width: 580px;
+    margin: 56px auto 0;
+    background: var(--preto);
+    border: 1px solid rgba(249,115,22,.3);
+    border-radius: 16px;
+    padding: 48px 36px;
+    position: relative;
+  }
+
+  .cfb-root .preco-card::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(249,115,22,.12) 0%, transparent 70%);
+    border-radius: 16px;
+    background: radial-gradient(ellipse at 50% 0%, var(--laranja-glow) 0%, transparent 60%);
     pointer-events: none;
   }
 
-  .cfb-root .final-cta .section-inner { position: relative; z-index: 1; }
-
-  .cfb-root .sep {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #2a2a2a, transparent);
-    max-width: 720px;
-    margin: 0 auto;
+  .cfb-root .preco-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--laranja);
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
   }
 
-  @media (max-width: 600px) {
-    .cfb-root .hero { padding: 60px 20px 48px; min-height: auto; padding-top: 80px; }
-    .cfb-root h1 { font-size: clamp(30px, 10vw, 48px); }
-    .cfb-root .proof-strip { flex-direction: column; align-items: center; gap: 10px; }
-    .cfb-root .aulas-grid { grid-template-columns: 1fr; }
-    .cfb-root .preco-box { padding: 28px 20px; }
-    .cfb-root .preco-atual { font-size: 52px; }
-    .cfb-root .bloco { padding: 20px; }
-    .cfb-root .section { padding: 56px 20px; }
+  .cfb-root .preco-comparacao {
+    font-size: 14px;
+    color: var(--texto-mid);
+    margin-bottom: 8px;
+  }
+
+  .cfb-root .preco-comparacao s { opacity: .6; }
+
+  .cfb-root .preco-valor {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 88px;
+    font-weight: 900;
+    color: var(--branco);
+    line-height: 1;
+    margin: 14px 0 6px;
+    letter-spacing: -.04em;
+  }
+
+  .cfb-root .preco-valor .moeda {
+    font-size: 36px;
+    font-weight: 200;
+    color: var(--laranja);
+    vertical-align: 30px;
+    margin-right: 4px;
+  }
+
+  .cfb-root .preco-vs {
+    font-size: 14px;
+    color: var(--texto-soft);
+    margin: 18px 0 32px;
+    line-height: 1.6;
+  }
+
+  .cfb-root .preco-vs strong { color: var(--laranja); }
+
+  .cfb-root .garantia {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--texto-mid);
+    margin-top: 22px;
+    letter-spacing: .02em;
+  }
+
+  .cfb-root .garantia strong { color: var(--branco); font-weight: 500; }
+
+  /* Combinados */
+  .cfb-root .combinados {
+    background: var(--preto);
+    border-top: 1px solid var(--linha);
+  }
+
+  .cfb-root .combinados-intro {
+    color: var(--texto-soft);
+    max-width: 620px;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* FAQ */
+  .cfb-root .faq { background: #050505; border-top: 1px solid var(--linha); }
+
+  .cfb-root .faq-list { margin-top: 48px; }
+
+  .cfb-root details {
+    border-bottom: 1px solid var(--linha);
+    padding: 22px 0;
+  }
+
+  .cfb-root details:first-child { border-top: 1px solid var(--linha); }
+
+  .cfb-root summary {
+    list-style: none;
+    cursor: pointer;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .cfb-root summary::-webkit-details-marker { display: none; }
+
+  .cfb-root summary::after {
+    content: '+';
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 28px;
+    font-weight: 200;
+    color: var(--laranja);
+    flex-shrink: 0;
+    transition: transform .2s ease;
+  }
+
+  .cfb-root details[open] summary::after {
+    content: '−';
+    transform: rotate(0deg);
+  }
+
+  .cfb-root .faq-body {
+    margin-top: 14px;
+    color: var(--texto-soft);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* CTA final */
+  .cfb-root .cta-final {
+    background: linear-gradient(180deg, var(--preto) 0%, #050505 100%);
+    border-top: 1px solid var(--linha);
+    text-align: center;
+  }
+
+  .cfb-root .cta-final h2 { max-width: 720px; margin: 0 auto 18px; }
+
+  /* Assinatura */
+  .cfb-root .assinatura {
+    padding: 32px 24px;
+    text-align: center;
+    border-top: 1px solid var(--linha);
+    color: var(--texto-mid);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+
+  .cfb-root .assinatura strong { color: var(--branco); }
+
+  /* Responsivo */
+  @media (max-width: 820px) {
+    .cfb-root section { padding: 64px 0; }
+
+    .cfb-root .pilar-grid { grid-template-columns: 1fr; }
+    .cfb-root .depo-grid { grid-template-columns: 1fr; }
+
+    .cfb-root .bloco-card { padding: 28px 24px; }
+    .cfb-root .bloco-nome { font-size: 26px; }
+
+    .cfb-root .aula-row {
+      grid-template-columns: 56px 1fr;
+      row-gap: 6px;
+    }
+
+    .cfb-root .aula-desc {
+      grid-column: 2;
+      margin-top: 4px;
+    }
+
+    .cfb-root .sinal-item {
+      grid-template-columns: 44px 1fr;
+      gap: 16px;
+    }
+
+    .cfb-root .sinal-num { font-size: 36px; }
+
+    .cfb-root .preco-valor { font-size: 64px; }
+    .cfb-root .preco-valor .moeda { font-size: 28px; vertical-align: 22px; }
+
+    .cfb-root .btn-large { font-size: 17px; padding: 18px 36px; }
   }
 </style>
 
 <div class="cfb-root">
 
+  <!-- HERO -->
   <section class="hero">
     <div class="hero-inner">
-      <div class="badge">RedPro AI Academy</div>
 
-      <h1>Pare de usar IA.<br>Comece a ter <em>IA trabalhando</em><br>pelo seu negócio.</h1>
+      <div class="badge">
+        <span class="dot-pulse"></span>
+        Claude for Business · RedPro AI Academy
+      </div>
+
+      <h1>
+        Pare de usar IA <em class="lj">como assistente.</em>
+        <span class="thin">Comece a configurar IA que trabalha pelo seu negócio.</span>
+      </h1>
 
       <p class="subheadline">
-        8 aulas práticas para configurar o Claude como um sócio que conhece seu negócio, executa seus processos e trabalha enquanto você dorme — sem escrever uma linha de código.
+        8 aulas. Cada uma com uma tarefa. Você sai com um sistema configurado nos seus processos — não com uma lista de prompts pra copiar e colar.
       </p>
 
       <div class="proof-strip">
-        <div class="proof-item"><span class="dot"></span>8 aulas + tarefas práticas</div>
-        <div class="proof-item"><span class="dot"></span>Resultado na primeira semana</div>
-        <div class="proof-item"><span class="dot"></span>Acesso vitalício com os combinados</div>
+        <div class="proof-item"><span class="ic"></span>3 blocos: Chat · Cowork · Code</div>
+        <div class="proof-item"><span class="ic"></span>Sistema rodando na primeira semana</div>
+        <div class="proof-item"><span class="ic"></span>Acesso vitalício com os combinados</div>
       </div>
 
-      <a href="https://pay.hotmart.com/V105607171C?checkoutMode=10" class="cta-btn">
-        Quero começar agora — R$17
-      </a>
-      <p class="cta-note">Acesso imediato após o pagamento · 7 dias de garantia</p>
+      <a href="${CHECKOUT_URL}" class="btn btn-large">Quero o sistema rodando — R$17</a>
+      <p class="cta-note">Acesso imediato após o pagamento · Garantia incondicional</p>
+
     </div>
   </section>
 
-  <div class="sep"></div>
 
-  <section class="section">
-    <div class="section-inner">
-      <div class="section-label">O problema real</div>
-      <h2>Você usa IA.<br>Mas o negócio ainda depende de você.</h2>
+  <!-- OS 3 SINAIS -->
+  <section class="sinais">
+    <div class="container narrow">
 
-      <p style="color:#999; margin-top:8px;">Se você se reconhece em alguma dessas situações, essa aula foi feita para você:</p>
-
-      <ul class="problema-lista">
-        <li>Você explica quem você é toda vez que abre o Claude — do zero, como se ele nunca tivesse te visto.</li>
-        <li>Usa IA para tarefas soltas, mas o processo continua manual. Semana que vem você pede a mesma coisa de novo.</li>
-        <li>Quando você para, o negócio para. Não tem atendimento, não tem proposta, não tem relatório sem você estar lá.</li>
-        <li>Já tentou automatizar algo e travou antes de sair do papel — porque parecia coisa de programador.</li>
-      </ul>
-    </div>
-  </section>
-
-  <div class="sep"></div>
-
-  <section class="section">
-    <div class="section-inner">
-      <div class="section-label">A solução</div>
-      <h2>Um sócio que não esquece, não falta e executa exatamente o que você ensinou.</h2>
-
-      <p style="color:#999; margin-top:8px;">O curso está dividido em 3 blocos que constroem um sistema real, aula por aula:</p>
-
-      <div class="blocos">
-        <div class="bloco">
-          <div class="bloco-num">Bloco 1 — Chat</div>
-          <h3>O Claude aprende o seu negócio</h3>
-          <p>Você configura memória permanente, instala Skills que rodam sem precisar pedir, e cria Artifacts — entregáveis reais que usa no dia seguinte. Uma vez. Para sempre.</p>
-        </div>
-        <div class="bloco">
-          <div class="bloco-num">Bloco 2 — Cowork</div>
-          <h3>O Claude sai da janela de conversa</h3>
-          <p>Ele acessa seus arquivos, lê seus documentos, roda tarefas em horários que você define — mesmo quando você está dormindo ou no celular, longe do computador.</p>
-        </div>
-        <div class="bloco">
-          <div class="bloco-num">Bloco 3 — Code</div>
-          <h3>O Claude constrói o que você descreve</h3>
-          <p>Você descreve em português o que quer automatizar. Ele gera o código. Você vê o resultado funcionando — sem escrever uma linha.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="sep"></div>
-
-  <section class="section">
-    <div class="section-inner">
-      <div class="section-label">O que você vai aprender</div>
-      <h2>8 aulas. Cada uma com uma tarefa real.</h2>
-
-      <div class="aulas-grid">
-        <div class="aula-card">
-          <span class="aula-num">00</span>
-          <div class="aula-info">
-            <strong>Os Combinados</strong>
-            <span>O contrato que garante acesso vitalício — e por que ele existe.</span>
-          </div>
-        </div>
-        <div class="aula-card">
-          <span class="aula-num">01</span>
-          <div class="aula-info">
-            <strong>Mentalidade AI Business</strong>
-            <span>Por que você ainda faz tudo na mão — e como mudar isso hoje.</span>
-          </div>
-        </div>
-        <div class="aula-card">
-          <span class="aula-num">02</span>
-          <div class="aula-info">
-            <strong>Seu Novo Sócio</strong>
-            <span>Instalar o Claude Desktop, configurar Project e criar a primeira Skill.</span>
-          </div>
-        </div>
-        <div class="aula-card">
-          <span class="aula-num">03</span>
-          <div class="aula-info">
-            <strong>A Memória do Negócio</strong>
-            <span>Ensinar o negócio para o Claude de uma vez, para sempre.</span>
-          </div>
-        </div>
-        <div class="aula-card">
-          <span class="aula-num">04</span>
-          <div class="aula-info">
-            <strong>Seu Primeiro Ativo</strong>
-            <span>Criar algo concreto que você usa no dia seguinte — não teoria.</span>
-          </div>
-        </div>
-        <div class="aula-card">
-          <span class="aula-num">05</span>
-          <div class="aula-info">
-            <strong>Claude Fora do Computador</strong>
-            <span>Cowork, Scheduled e Dispatch — o Claude rodando sem você.</span>
-          </div>
-        </div>
-        <div class="aula-card">
-          <span class="aula-num">06</span>
-          <div class="aula-info">
-            <strong>Piloto Automático</strong>
-            <span>O Claude Code construindo um app de delivery do zero, ao vivo.</span>
-          </div>
-        </div>
-        <div class="aula-card">
-          <span class="aula-num">07</span>
-          <div class="aula-info">
-            <strong>Onde Você Vai a Partir Daqui</strong>
-            <span>O que esse curso entrega — e o teto honesto do que vem depois.</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="sep"></div>
-
-  <section class="section">
-    <div class="section-inner">
-      <div class="section-label">Quem já aplicou</div>
-      <h2>Resultados reais de quem saiu da teoria.</h2>
-
-      <div class="testimonials">
-        <div class="testimonial">
-          <p>"Primeiro dia configurando o Project — o Claude respondeu um cliente no meu tom, com as informações certas, sem eu precisar revisar. Nunca tinha acontecido antes."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-avatar">M</div>
-            <div class="testimonial-name">
-              <strong>Marcela Rodrigues</strong>
-              <span>Consultora de marketing digital</span>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial">
-          <p>"Criei uma Skill de análise de proposta. Agora jogo qualquer briefing e ele me devolve a estrutura do projeto em 30 segundos. Economizo 2 horas por semana só nisso."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-avatar">T</div>
-            <div class="testimonial-name">
-              <strong>Thiago Almeida</strong>
-              <span>Agência de design</span>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial">
-          <p>"Achei que era coisa de programador. Não é. Na Aula 2 já tinha o Project configurado com as regras do meu escritório. Na Aula 3 ele já sabia responder perguntas dos meus clientes."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-avatar">C</div>
-            <div class="testimonial-name">
-              <strong>Cristiane Barros</strong>
-              <span>Advogada previdenciária</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="sep"></div>
-
-  <section class="section">
-    <div class="section-inner" style="text-align:center;">
-      <div class="section-label">Investimento</div>
-      <h2>Menos que um almoço.<br>Resultado que dura.</h2>
-
-      <div class="preco-box">
-        <p class="preco-anchor">De R$47</p>
-        <div class="preco-atual"><sup>R$</sup>17</div>
-        <p class="preco-label">Preço de lançamento · Acesso imediato</p>
-
-        <a href="https://pay.hotmart.com/V105607171C?checkoutMode=10" class="cta-btn" style="display:block; width:100%; text-align:center;">
-          Começar agora por R$17
-        </a>
-
-        <p class="garantia">7 dias de garantia — sem perguntas</p>
-      </div>
-
-      <p style="font-size:14px; color:#555; margin-top:24px; max-width:420px; margin-left:auto; margin-right:auto; line-height:1.6;">
-        Quem fizer os combinados — seguir o @redpro.ia, preencher a ficha de matrícula e postar resultado — tem acesso vitalício com todas as atualizações futuras.
+      <span class="section-label">Diagnóstico</span>
+      <h2>Você usa IA há meses<br>e o negócio ainda depende de você.</h2>
+      <p style="color:var(--texto-soft); margin-top:14px;">
+        Tem três sinais de que você está no modelo antigo. Se você se reconhecer em pelo menos um, esse curso foi feito pra você:
       </p>
-    </div>
-  </section>
 
-  <div class="sep"></div>
+      <div class="sinal-list">
 
-  <section class="section">
-    <div class="section-inner">
-      <div class="section-label">Perguntas frequentes</div>
-      <h2>Antes de decidir.</h2>
+        <div class="sinal-item">
+          <div class="sinal-num">01</div>
+          <div>
+            <div class="sinal-titulo">Você explica quem você é toda vez que abre o Claude.</div>
+            <p class="sinal-texto">Abre uma conversa nova: "eu tenho uma empresa de…, meu cliente é…, meu tom é…". Toda vez. Do zero. Como se ele nunca tivesse te visto. Porque realmente nunca viu — você nunca deu memória pra ele.</p>
+          </div>
+        </div>
 
-      <div class="faq-lista">
-        <div class="faq-item">
-          <details>
-            <summary>Preciso saber programar?</summary>
-            <div class="faq-body">Não. O curso foi feito exatamente para quem não sabe. O Victor — que criou o método — é ex-servidor público sem formação técnica. Tudo que você vai fazer é configurar, escrever em português e testar.</div>
-          </details>
+        <div class="sinal-item">
+          <div class="sinal-num">02</div>
+          <div>
+            <div class="sinal-titulo">Você usa IA para tarefas, não para processos.</div>
+            <p class="sinal-texto">Pede uma coisa, ele entrega, acabou. Na semana que vem você pede de novo. E explica tudo de novo. Você não ensinou o processo — só pediu o resultado.</p>
+          </div>
         </div>
-        <div class="faq-item">
-          <details>
-            <summary>Precisa ter o Claude pago?</summary>
-            <div class="faq-body">O plano gratuito do Claude funciona para começar as primeiras aulas. Para as aulas de Cowork e Code, o plano Pro (R$100/mês) é necessário. O curso vai te mostrar exatamente quando isso importa.</div>
-          </details>
+
+        <div class="sinal-item">
+          <div class="sinal-num">03</div>
+          <div>
+            <div class="sinal-titulo">Quando você para, o negócio para.</div>
+            <p class="sinal-texto">Se você não está lá respondendo, não tem atendimento. Se você não está lá escrevendo, não tem proposta. Se você não está lá analisando, não tem relatório. O negócio é você. E você está esgotado.</p>
+          </div>
         </div>
-        <div class="faq-item">
-          <details>
-            <summary>Quanto tempo por dia preciso dedicar?</summary>
-            <div class="faq-body">Cada aula tem entre 12 e 20 minutos. A tarefa leva mais 20 a 40 minutos. Você pode fazer no seu ritmo — mas quem faz uma aula por dia termina em uma semana com o sistema funcionando.</div>
-          </details>
-        </div>
-        <div class="faq-item">
-          <details>
-            <summary>O acesso vitalício é garantido automaticamente?</summary>
-            <div class="faq-body">Não. Tem uma condição: seguir o @redpro.ia, preencher a ficha de matrícula e postar resultado quando tiver. Quem faz isso fica com acesso vitalício e todas as atualizações. Quem não faz tem 3 meses.</div>
-          </details>
-        </div>
-        <div class="faq-item">
-          <details>
-            <summary>E se eu não gostar?</summary>
-            <div class="faq-body">7 dias de garantia total. Pede reembolso, devolvemos 100% sem perguntas. Mas vai ser difícil — a maioria das pessoas tem resultado na segunda aula.</div>
-          </details>
-        </div>
+
       </div>
+
     </div>
   </section>
 
-  <section class="final-cta">
-    <div class="section-inner">
-      <h2 style="margin-bottom:16px;">Seu negócio não precisa de mais uma ferramenta.<br>Precisa de um sistema.</h2>
-      <p class="subheadline" style="margin-bottom:36px;">Comece hoje. O sistema estará rodando antes do final da semana.</p>
-      <a href="https://pay.hotmart.com/V105607171C?checkoutMode=10" class="cta-btn">
-        Quero meu sistema — R$17
-      </a>
-      <p class="cta-note">Acesso imediato · 7 dias de garantia · Sem precisar programar</p>
+
+  <!-- OS 3 PILARES -->
+  <section class="pilares">
+    <div class="container">
+
+      <div class="narrow" style="text-align:center;">
+        <span class="section-label">O mecanismo</span>
+        <h2>Quem tem resultado<br>parou de pedir <em class="lj">e começou a configurar.</em></h2>
+        <p style="color:var(--texto-soft); margin-top:14px;">Tudo que você vai construir no curso roda em cima de três pilares. Eles aparecem em todas as aulas:</p>
+      </div>
+
+      <div class="pilar-grid">
+
+        <div class="pilar">
+          <div class="pilar-num">PILAR 01</div>
+          <div class="pilar-nome">Contexto</div>
+          <p class="pilar-desc">O Claude precisa conhecer o seu negócio — não negócio em geral. Quem é você, o que vende, pra quem, em que tom, com quais regras. Você configura uma vez. Nunca mais explica.</p>
+        </div>
+
+        <div class="pilar">
+          <div class="pilar-num">PILAR 02</div>
+          <div class="pilar-nome">Comando</div>
+          <p class="pilar-desc">A qualidade da instrução determina a qualidade do resultado. Comando vago, resultado vago. Comando específico, com exemplo e formato definido, gera algo que você usa na hora.</p>
+        </div>
+
+        <div class="pilar">
+          <div class="pilar-num">PILAR 03</div>
+          <div class="pilar-nome">Processos</div>
+          <p class="pilar-desc">Antes de pedir pro Claude executar, você precisa saber o que sua empresa faz. Como atende. Como cobra. Como entrega. Quem automatiza caos, só torna o caos mais rápido. Quem tem processo claro ensina uma vez — e o Claude executa pra sempre.</p>
+        </div>
+
+      </div>
+
     </div>
   </section>
+
+
+  <!-- OS 3 BLOCOS -->
+  <section class="blocos">
+    <div class="container">
+
+      <div class="narrow">
+        <span class="section-label">A jornada</span>
+        <h2>Um sistema que aprende, executa e constrói<br>— em três blocos.</h2>
+      </div>
+
+      <div class="bloco-list">
+
+        <div class="bloco-card">
+          <div class="bloco-header">
+            <span class="bloco-tag">Bloco 01</span>
+            <span class="bloco-nome">Chat</span>
+          </div>
+          <h3>O Claude aprende o seu negócio.</h3>
+          <p>Você dá memória permanente pro Claude. Ele passa a conhecer o seu tom, suas regras, seus processos. Cria Skills que ativam sozinhas quando a situação pede. Gera Artifacts — entregáveis reais que você usa no dia seguinte.</p>
+        </div>
+
+        <div class="bloco-card">
+          <div class="bloco-header">
+            <span class="bloco-tag">Bloco 02</span>
+            <span class="bloco-nome">Cowork</span>
+          </div>
+          <h3>O Claude sai da janela de conversa.</h3>
+          <p>Acessa seus arquivos locais. Lê suas planilhas. Roda tarefas em horários que você define — Schedule rodando às 6h da manhã, briefing pronto antes de você abrir o computador. Dispatch executando ordens que você manda do celular enquanto está longe.</p>
+        </div>
+
+        <div class="bloco-card">
+          <div class="bloco-header">
+            <span class="bloco-tag">Bloco 03</span>
+            <span class="bloco-nome">Code</span>
+          </div>
+          <h3>O Claude constrói o que você descreve.</h3>
+          <p>Você descreve em português o que quer automatizar. Ele gera o código. Você vê funcionando. Sem desenvolvedor. Sem agência. Sem 4 meses de prazo. Na Aula 6 você vai ver um app de delivery completo nascer ao vivo.</p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- AS 8 AULAS -->
+  <section class="jornada">
+    <div class="container narrow">
+
+      <span class="section-label">As 8 aulas</span>
+      <h2>Cada aula tem uma tarefa.<br>Não é opcional.</h2>
+
+      <div class="aula-list">
+
+        <div class="aula-row">
+          <div class="aula-num">AULA 0</div>
+          <div class="aula-titulo">Os Combinados</div>
+          <div class="aula-desc">O contrato que garante acesso vitalício — e por que ele existe.</div>
+        </div>
+
+        <div class="aula-row">
+          <div class="aula-num">AULA 1</div>
+          <div class="aula-titulo">Mentalidade AI Business</div>
+          <div class="aula-desc">Por que você ainda faz tudo na mão — e a pergunta que muda o jogo.</div>
+        </div>
+
+        <div class="aula-row">
+          <div class="aula-num">AULA 2</div>
+          <div class="aula-titulo">Seu Novo Sócio</div>
+          <div class="aula-desc">Instalar o Claude Desktop. Criar o Project. Configurar a primeira Skill.</div>
+        </div>
+
+        <div class="aula-row">
+          <div class="aula-num">AULA 3</div>
+          <div class="aula-titulo">A Memória do Negócio</div>
+          <div class="aula-desc">Ensinar o negócio para o Claude. Conectar Drive. Caso real do escritório jurídico Silva &amp; Advogados.</div>
+        </div>
+
+        <div class="aula-row">
+          <div class="aula-num">AULA 4</div>
+          <div class="aula-titulo">Seu Primeiro Ativo</div>
+          <div class="aula-desc">Resposta vs. ativo. Criar Artifact que vira template. Caso real do Studio Força &amp; Saúde.</div>
+        </div>
+
+        <div class="aula-row">
+          <div class="aula-num">AULA 5</div>
+          <div class="aula-titulo">Claude Fora do Computador</div>
+          <div class="aula-desc">Cowork, Schedule e Dispatch. Caso real da Imobiliária Horizonte rodando sem o corretor.</div>
+        </div>
+
+        <div class="aula-row">
+          <div class="aula-num">AULA 6</div>
+          <div class="aula-titulo">Piloto Automático</div>
+          <div class="aula-desc">Claude Code construindo um app de delivery completo a partir de uma instrução em português.</div>
+        </div>
+
+        <div class="aula-row">
+          <div class="aula-num">AULA 7</div>
+          <div class="aula-titulo">Onde Você Vai a Partir Daqui</div>
+          <div class="aula-desc">O que esse curso entrega — e o teto honesto do que vem depois.</div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- DEPOIMENTOS -->
+  <section class="depoimentos">
+    <div class="container">
+
+      <div class="narrow">
+        <span class="section-label">Quem já fez</span>
+        <h2>Mensagens que chegaram no meu direct<br>depois das aulas.</h2>
+      </div>
+
+      <div class="depo-grid">
+
+        <div class="depo-card">
+          <p class="depo-quote">cara, eu tava até 1h da manhã respondendo orçamento no zap toda noite. fiz o Project ontem com tudo que você mandou na aula 2 — joguei lá o tom da clínica, os procedimentos, os valores. hoje testei. mandei ele escrever um orçamento de harmonização e cara, saiu IGUAL eu escrevo. até o "amorzinho" no final ele pôs. eu chorei.</p>
+          <div class="depo-autor">
+            <div class="depo-avatar">M</div>
+            <div class="depo-info">
+              <strong>Marianna</strong>
+              <span>Dona de clínica de estética</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="depo-card">
+          <p class="depo-quote">Victor, bom dia. cara, eu configurei o Schedule segunda. todo dia 6h ele puxa as movimentações do Drive e me manda um resumo do que cada cliente movimentou no dia anterior. faz 4 dias rodando.</p>
+          <div class="depo-autor">
+            <div class="depo-avatar">B</div>
+            <div class="depo-info">
+              <strong>Bruno</strong>
+              <span>Contador · escritório com 60 clientes</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="depo-card">
+          <p class="depo-quote">Red, eu segui a aula 6 ontem à noite. copiei o prompt que você passou e mandei no Claude Code pra fazer um sisteminha de ordem de serviço pra oficina. cara. em 40 minutos tava rodando. 40 MINUTOS. o cara me cobrou 1800 e sumiu 3 meses atrás. eu fiz sozinho num sábado à noite. sei nem o que falar.</p>
+          <div class="depo-autor">
+            <div class="depo-avatar">D</div>
+            <div class="depo-info">
+              <strong>Délcio</strong>
+              <span>Dono de oficina mecânica</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- PREÇO -->
+  <section class="preco" id="preco">
+    <div class="container">
+
+      <div class="narrow">
+        <span class="section-label">A oferta</span>
+        <h2>Menos que um almoço.<br>Sistema que dura para sempre.</h2>
+      </div>
+
+      <div class="preco-card">
+        <div class="preco-tag">Acesso imediato após pagamento</div>
+
+        <p class="preco-comparacao">Você paga <s>R$100/mês</s> de Claude Pro e ainda usa errado.</p>
+
+        <div class="preco-valor"><span class="moeda">R$</span>17</div>
+        <p class="preco-comparacao">uma vez · não é assinatura</p>
+
+        <p class="preco-vs">
+          <strong>R$17 uma vez</strong> pra aprender a configurar — vs. R$100/mês pra continuar usando como Google melhorado.
+        </p>
+
+        <a href="${CHECKOUT_URL}" class="btn btn-large" id="btn-checkout">Quero entrar agora</a>
+
+        <p class="garantia">
+          <strong>Garantia incondicional.</strong><br>
+          Não gostou? Manda direct. Devolvo 100% — mesmo fora do prazo da Hotmart. Sem perguntas.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- COMBINADOS -->
+  <section class="combinados">
+    <div class="container narrow" style="text-align:center;">
+
+      <span class="section-label">Acesso vitalício</span>
+      <h2>Esse curso cresce<br>com quem age.</h2>
+
+      <p class="combinados-intro" style="margin: 22px auto 0;">
+        Toda vez que a Anthropic lança uma feature nova pra negócios, eu atualizo o curso. Nova ferramenta, nova aula. Você não tá comprando um curso estático — tá comprando acesso a um produto que cresce junto com o Claude.
+      </p>
+
+      <p class="combinados-intro" style="margin: 22px auto 0;">
+        Mas o acesso vitalício tem condição. Tem alguns combinados — explicados na Aula 0 — e quem cumpre fica aqui pra sempre, com todas as atualizações. Quem não cumpre tem 3 meses. É filtro, não punição. Esse curso é pra quem age, não pra quem assiste.
+      </p>
+
+    </div>
+  </section>
+
+
+  <!-- FAQ -->
+  <section class="faq">
+    <div class="container narrow">
+
+      <span class="section-label">Antes de decidir</span>
+      <h2>O que costuma travar a decisão.</h2>
+
+      <div class="faq-list">
+
+        <details>
+          <summary>Preciso saber programar?</summary>
+          <div class="faq-body">Não. O curso foi feito exatamente pra quem não sabe. Eu sou ex-servidor público sem formação técnica — construí tudo isso configurando, escrevendo em português e testando. É o mesmo caminho que você vai fazer.</div>
+        </details>
+
+        <details>
+          <summary>Preciso ter o Claude pago?</summary>
+          <div class="faq-body">O plano gratuito do Claude funciona pras primeiras aulas. Pras aulas de Cowork e Code, o plano Pro (R$100/mês) é necessário. O curso te avisa exatamente quando isso importa — você não vai gastar antes da hora.</div>
+        </details>
+
+        <details>
+          <summary>Quanto tempo por dia preciso dedicar?</summary>
+          <div class="faq-body">Cada aula tem entre 12 e 20 minutos. A tarefa leva mais 20 a 40 minutos. Quem faz uma aula por dia termina em uma semana com o sistema funcionando. Quem prefere maratonar no fim de semana, faz tudo num sábado.</div>
+        </details>
+
+        <details>
+          <summary>O acesso vitalício é garantido automaticamente?</summary>
+          <div class="faq-body">Não. Tem condição: seguir o @redpro.ia, preencher a ficha de matrícula e postar resultado quando tiver. Quem faz isso fica vitalício e recebe todas as atualizações. Quem não faz tem 3 meses. É filtro de quem age — não punição.</div>
+        </details>
+
+        <details>
+          <summary>E se eu não gostar?</summary>
+          <div class="faq-body">Manda direct e devolvo 100%. Sem perguntas. Sem prazo. Mesmo fora dos 7 dias da Hotmart. A garantia é incondicional porque eu confio no que eu construí — e você não deveria pagar por algo que não te serviu.</div>
+        </details>
+
+        <details>
+          <summary>Esse curso é só o Claude ou serve pra qualquer IA?</summary>
+          <div class="faq-body">É focado no Claude porque é a ferramenta que entrega o que esse curso promete: Project, Skill, Cowork, Schedule, Dispatch, Code. Outras IAs não têm essas peças hoje. Os três pilares (Contexto · Comando · Consistência) servem pra qualquer IA — mas a execução prática é no Claude.</div>
+        </details>
+
+        <details>
+          <summary>Quanto tempo até eu ter resultado?</summary>
+          <div class="faq-body">Na Aula 2 você já configura o primeiro Project e a primeira Skill. Na Aula 4 você cria um Artifact que vai usar no dia seguinte. Quem segue o ritmo de uma aula por dia tem resultado prático na primeira semana.</div>
+        </details>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- CTA FINAL -->
+  <section class="cta-final">
+    <div class="container narrow">
+
+      <h2>Seu negócio não precisa<br>de mais uma ferramenta.<br><em class="lj">Precisa de um sistema.</em></h2>
+      <p style="color:var(--texto-soft); max-width:540px; margin:18px auto 36px;">
+        Comece hoje. O sistema vai estar rodando antes do final da semana.
+      </p>
+
+      <a href="${CHECKOUT_URL}" class="btn btn-large">Entrar no Claude for Business — R$17</a>
+      <p class="cta-note">Acesso imediato · Garantia incondicional · Sem precisar programar</p>
+
+    </div>
+  </section>
+
+
+  <!-- ASSINATURA -->
+  <footer class="assinatura">
+    <strong>RedPro AI Academy</strong> · @redpro.ia
+  </footer>
 
 </div>
 `;
