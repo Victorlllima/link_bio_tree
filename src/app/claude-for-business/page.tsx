@@ -107,11 +107,47 @@ const html = `
   }
 
   .cfb-root .hero-inner {
-    max-width: 820px;
+    max-width: 1180px;
     margin: 0 auto;
-    text-align: center;
     position: relative;
     z-index: 1;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .cfb-root .hero-text { text-align: left; }
+
+  .cfb-root .hero-foto-wrap {
+    position: relative;
+    max-width: 480px;
+    width: 100%;
+    justify-self: end;
+  }
+
+  .cfb-root .hero-foto {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 20%, transparent 85%);
+            mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 20%, transparent 85%);
+  }
+
+  @media (max-width: 760px) {
+    .cfb-root .hero-inner {
+      grid-template-columns: 1fr;
+      gap: 48px;
+      max-width: 820px;
+    }
+    .cfb-root .hero-foto-wrap {
+      max-width: 320px;
+      justify-self: start;
+      order: 2;
+    }
+    .cfb-root .hero-text { order: 1; }
   }
 
   .cfb-root .badge {
@@ -144,7 +180,7 @@ const html = `
   }
 
   .cfb-root h1 {
-    font-size: clamp(38px, 7.5vw, 84px);
+    font-size: clamp(38px, 5.5vw, 68px);
     font-weight: 900;
     margin-bottom: 28px;
   }
@@ -163,13 +199,13 @@ const html = `
     font-weight: 400;
     color: var(--texto-soft);
     max-width: 580px;
-    margin: 0 auto 42px;
+    margin: 0 0 42px;
     line-height: 1.55;
   }
 
   .cfb-root .proof-strip {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 28px;
     flex-wrap: wrap;
     margin-bottom: 42px;
@@ -233,11 +269,7 @@ const html = `
     border-top: 1px solid var(--linha);
   }
 
-  .cfb-root .sinal-list {
-    display: grid;
-    gap: 24px;
-    margin-top: 48px;
-  }
+  .cfb-root .sinal-list { display: grid; gap: 24px; margin-top: 48px; }
 
   .cfb-root .sinal-item {
     display: grid;
@@ -306,23 +338,12 @@ const html = `
     letter-spacing: -.02em;
   }
 
-  .cfb-root .pilar-desc {
-    color: var(--texto-soft);
-    font-size: 15px;
-    line-height: 1.6;
-  }
+  .cfb-root .pilar-desc { color: var(--texto-soft); font-size: 15px; line-height: 1.6; }
 
   /* Blocos */
-  .cfb-root .blocos {
-    background: var(--preto);
-    border-top: 1px solid var(--linha);
-  }
+  .cfb-root .blocos { background: var(--preto); border-top: 1px solid var(--linha); }
 
-  .cfb-root .bloco-list {
-    display: grid;
-    gap: 32px;
-    margin-top: 56px;
-  }
+  .cfb-root .bloco-list { display: grid; gap: 32px; margin-top: 56px; }
 
   .cfb-root .bloco-card {
     background: #0A0A0A;
@@ -364,24 +385,13 @@ const html = `
     line-height: 1;
   }
 
-  .cfb-root .bloco-card h3 {
-    color: var(--laranja);
-    font-size: 22px;
-    margin-bottom: 14px;
-  }
-
+  .cfb-root .bloco-card h3 { color: var(--laranja); font-size: 22px; margin-bottom: 14px; }
   .cfb-root .bloco-card p { color: var(--texto-soft); font-size: 15px; line-height: 1.65; }
 
   /* Jornada */
-  .cfb-root .jornada {
-    background: #050505;
-    border-top: 1px solid var(--linha);
-  }
+  .cfb-root .jornada { background: #050505; border-top: 1px solid var(--linha); }
 
-  .cfb-root .aula-list {
-    margin-top: 56px;
-    border-top: 1px solid var(--linha);
-  }
+  .cfb-root .aula-list { margin-top: 56px; border-top: 1px solid var(--linha); }
 
   .cfb-root .aula-row {
     display: grid;
@@ -408,17 +418,78 @@ const html = `
     font-size: 19px;
   }
 
-  .cfb-root .aula-desc {
-    color: var(--texto-mid);
-    font-size: 14px;
-    line-height: 1.5;
+  .cfb-root .aula-desc { color: var(--texto-mid); font-size: 14px; line-height: 1.5; }
+
+  /* Sobre */
+  .cfb-root .sobre {
+    background: linear-gradient(180deg, var(--preto) 0%, rgba(28,37,48,0.08) 100%);
+    border-top: 1px solid var(--linha);
+  }
+
+  .cfb-root .sobre-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 96px;
+    align-items: center;
+  }
+
+  .cfb-root .sobre-foto-wrap {
+    position: relative;
+    max-width: 440px;
+    width: 100%;
+  }
+
+  .cfb-root .sobre-foto {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 20%, transparent 85%);
+            mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 20%, transparent 85%);
+  }
+
+  .cfb-root .sobre-bio p {
+    color: var(--texto-soft);
+    margin-top: 18px;
+    line-height: 1.7;
+  }
+
+  .cfb-root .sobre-bullets {
+    list-style: none;
+    margin-top: 28px;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--texto-soft);
+  }
+
+  .cfb-root .sobre-bullets li {
+    display: grid;
+    grid-template-columns: 14px 1fr;
+    gap: 12px;
+    align-items: start;
+    padding-top: 12px;
+    border-top: 1px solid var(--linha);
+  }
+
+  .cfb-root .sobre-bullets li::before {
+    content: "//";
+    color: var(--laranja);
+    font-weight: 700;
+  }
+
+  @media (max-width: 820px) {
+    .cfb-root .sobre-grid {
+      grid-template-columns: 1fr;
+      gap: 56px;
+    }
+    .cfb-root .sobre-foto-wrap { max-width: 280px; }
   }
 
   /* Depoimentos */
-  .cfb-root .depoimentos {
-    background: var(--preto);
-    border-top: 1px solid var(--linha);
-  }
+  .cfb-root .depoimentos { background: var(--preto); border-top: 1px solid var(--linha); }
 
   .cfb-root .depo-grid {
     display: grid;
@@ -492,10 +563,7 @@ const html = `
     font-weight: 800;
   }
 
-  .cfb-root .depo-info span {
-    color: var(--texto-mid);
-    font-size: 13px;
-  }
+  .cfb-root .depo-info span { color: var(--texto-mid); font-size: 13px; }
 
   /* Preço */
   .cfb-root .preco {
@@ -578,10 +646,7 @@ const html = `
   .cfb-root .garantia strong { color: var(--branco); font-weight: 500; }
 
   /* Combinados */
-  .cfb-root .combinados {
-    background: var(--preto);
-    border-top: 1px solid var(--linha);
-  }
+  .cfb-root .combinados { background: var(--preto); border-top: 1px solid var(--linha); }
 
   .cfb-root .combinados-intro {
     color: var(--texto-soft);
@@ -662,10 +727,8 @@ const html = `
   /* Responsivo */
   @media (max-width: 820px) {
     .cfb-root section { padding: 64px 0; }
-
     .cfb-root .pilar-grid { grid-template-columns: 1fr; }
     .cfb-root .depo-grid { grid-template-columns: 1fr; }
-
     .cfb-root .bloco-card { padding: 28px 24px; }
     .cfb-root .bloco-nome { font-size: 26px; }
 
@@ -685,10 +748,8 @@ const html = `
     }
 
     .cfb-root .sinal-num { font-size: 36px; }
-
     .cfb-root .preco-valor { font-size: 64px; }
     .cfb-root .preco-valor .moeda { font-size: 28px; vertical-align: 22px; }
-
     .cfb-root .btn-large { font-size: 17px; padding: 18px 36px; }
   }
 </style>
@@ -699,28 +760,34 @@ const html = `
   <section class="hero">
     <div class="hero-inner">
 
-      <div class="badge">
-        <span class="dot-pulse"></span>
-        Claude for Business · RedPro AI Academy
+      <div class="hero-text">
+        <div class="badge">
+          <span class="dot-pulse"></span>
+          Claude for Business · RedPro AI Academy
+        </div>
+
+        <h1>
+          Pare de usar IA <em class="lj">como assistente.</em>
+          <span class="thin">Comece a configurar IA que trabalha pelo seu negócio.</span>
+        </h1>
+
+        <p class="subheadline">
+          8 aulas. Cada uma com uma tarefa. Você sai com um sistema configurado nos seus processos — não com uma lista de prompts pra copiar e colar.
+        </p>
+
+        <div class="proof-strip">
+          <div class="proof-item"><span class="ic"></span>3 blocos: Chat · Cowork · Code</div>
+          <div class="proof-item"><span class="ic"></span>Sistema rodando na primeira semana</div>
+          <div class="proof-item"><span class="ic"></span>Acesso vitalício com os combinados</div>
+        </div>
+
+        <a href="${CHECKOUT_URL}" class="btn btn-large">Quero o sistema rodando — R$17</a>
+        <p class="cta-note">Acesso imediato após o pagamento · Garantia incondicional</p>
       </div>
 
-      <h1>
-        Pare de usar IA <em class="lj">como assistente.</em>
-        <span class="thin">Comece a configurar IA que trabalha pelo seu negócio.</span>
-      </h1>
-
-      <p class="subheadline">
-        8 aulas. Cada uma com uma tarefa. Você sai com um sistema configurado nos seus processos — não com uma lista de prompts pra copiar e colar.
-      </p>
-
-      <div class="proof-strip">
-        <div class="proof-item"><span class="ic"></span>3 blocos: Chat · Cowork · Code</div>
-        <div class="proof-item"><span class="ic"></span>Sistema rodando na primeira semana</div>
-        <div class="proof-item"><span class="ic"></span>Acesso vitalício com os combinados</div>
+      <div class="hero-foto-wrap">
+        <img class="hero-foto" src="/cfb/lp_hero.png" alt="Red, fundador da RedPro AI Academy, em escritório com vista urbana">
       </div>
-
-      <a href="${CHECKOUT_URL}" class="btn btn-large">Quero o sistema rodando — R$17</a>
-      <p class="cta-note">Acesso imediato após o pagamento · Garantia incondicional</p>
 
     </div>
   </section>
@@ -911,6 +978,39 @@ const html = `
   </section>
 
 
+  <!-- SOBRE -->
+  <section class="sobre">
+    <div class="container">
+
+      <div class="sobre-grid">
+
+        <div class="sobre-foto-wrap">
+          <img class="sobre-foto" src="/cfb/notion_estilo4_ceo_desk.png" alt="Red, criador do método e fundador da RedPro AI Academy">
+        </div>
+
+        <div class="sobre-bio">
+          <span class="section-label">Quem construiu</span>
+          <h2>Engenharia, segurança e 10 anos de TI federal<br><em class="lj">— transformados em método.</em></h2>
+          <p>
+            Engenheiro de telecomunicações, pós-graduado em segurança da informação, MBA em IA para negócios. 10 anos gerindo TI no setor público federal — vi de dentro o que trava operação grande. Larguei a estabilidade pra construir o que ensino aqui.
+          </p>
+          <p>
+            O curso é o método que uso pra rodar a RedPro AI Academy todo dia. Cada bloco — Chat, Cowork, Code — está em produção na operação. Você não vai aprender a usar IA. Vai aprender a configurar IA pro seu negócio com a cabeça de quem entende infraestrutura, segurança e processo.
+          </p>
+          <ul class="sobre-bullets">
+            <li>Engenheiro de telecomunicações · pós em segurança da informação · MBA em IA para negócios</li>
+            <li>10 anos de gestão de TI no setor público federal</li>
+            <li>Criador da RedPro AI Academy e do Método S.H.A.R.K. — pipeline de 5 agentes em produção</li>
+            <li>Empresário, marido e pai — construindo um negócio de IA que não depende de mim</li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
   <!-- DEPOIMENTOS -->
   <section class="depoimentos">
     <div class="container">
@@ -1049,7 +1149,7 @@ const html = `
 
         <details>
           <summary>Esse curso é só o Claude ou serve pra qualquer IA?</summary>
-          <div class="faq-body">É focado no Claude porque é a ferramenta que entrega o que esse curso promete: Project, Skill, Cowork, Schedule, Dispatch, Code. Outras IAs não têm essas peças hoje. Os três pilares (Contexto · Comando · Consistência) servem pra qualquer IA — mas a execução prática é no Claude.</div>
+          <div class="faq-body">É focado no Claude porque é a ferramenta que entrega o que esse curso promete: Project, Skill, Cowork, Schedule, Dispatch, Code. Outras IAs não têm essas peças hoje. Os três pilares (Contexto · Comando · Processos) servem pra qualquer IA — mas a execução prática é no Claude.</div>
         </details>
 
         <details>
