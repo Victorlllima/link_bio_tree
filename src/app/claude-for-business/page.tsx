@@ -786,7 +786,7 @@ const html = `
       </div>
 
       <div class="hero-foto-wrap">
-        <img class="hero-foto" src="/cfb/lp_hero.png" alt="Red, fundador da RedPro AI Academy, em escritório com vista urbana">
+        <img class="hero-foto" src="/cfb/lp_hero_v2.png" alt="Red, fundador da RedPro AI Academy, sorrindo de blazer e camisa social num escritório de loft com janelas amplas e parede de tijolinho">
       </div>
 
     </div>
@@ -985,7 +985,7 @@ const html = `
       <div class="sobre-grid">
 
         <div class="sobre-foto-wrap">
-          <img class="sobre-foto" src="/cfb/notion_estilo4_ceo_desk.png" alt="Red, criador do método e fundador da RedPro AI Academy">
+          <img class="sobre-foto" src="/cfb/lp_sobre_v2.png" alt="Red, criador do método e fundador da RedPro AI Academy, apontando diretamente para a câmera num ambiente claro com janelas amplas">
         </div>
 
         <div class="sobre-bio">
