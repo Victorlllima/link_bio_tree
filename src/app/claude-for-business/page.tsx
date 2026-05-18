@@ -990,6 +990,7 @@ const html = `
 
         <div class="sobre-bio">
           <span class="section-label">Quem construiu</span>
+          <p style="font-size:18px; color:#fff; font-weight:600; margin:8px 0 16px; letter-spacing:-0.01em;">Victor Lima · Criador da RedPro AI Academy</p>
           <h2>Engenharia, segurança e 10 anos de TI federal<br><em class="lj">— transformados em método.</em></h2>
           <p>
             Engenheiro de telecomunicações, pós-graduado em segurança da informação, MBA em IA para negócios. 10 anos gerindo TI no setor público federal — vi de dentro o que trava operação grande. Larguei a estabilidade pra construir o que ensino aqui.
