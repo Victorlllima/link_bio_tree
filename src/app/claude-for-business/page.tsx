@@ -781,7 +781,7 @@ const html = `
           <div class="proof-item"><span class="ic"></span>Acesso vitalício com os combinados</div>
         </div>
 
-        <a href="${CHECKOUT_URL}" class="btn btn-large">Quero o sistema rodando — R$17</a>
+        <a href="${CHECKOUT_URL}" class="btn btn-large">Quero o sistema rodando — R$47</a>
         <p class="cta-note">Acesso imediato após o pagamento · Garantia incondicional</p>
       </div>
 
@@ -1068,7 +1068,7 @@ const html = `
 
       <div class="narrow">
         <span class="section-label">A oferta</span>
-        <h2>Menos que um almoço.<br>Sistema que dura para sempre.</h2>
+        <h2>R$47 uma vez.<br>Menos do que um freela cobra só pra te ouvir — e esse não some depois.</h2>
       </div>
 
       <div class="preco-card">
@@ -1076,11 +1076,11 @@ const html = `
 
         <p class="preco-comparacao">Você paga <s>R$100/mês</s> de Claude Pro e ainda usa errado.</p>
 
-        <div class="preco-valor"><span class="moeda">R$</span>17</div>
+        <div class="preco-valor"><span class="moeda">R$</span>47</div>
         <p class="preco-comparacao">uma vez · não é assinatura</p>
 
         <p class="preco-vs">
-          <strong>R$17 uma vez</strong> pra aprender a configurar — vs. R$100/mês pra continuar usando como Google melhorado.
+          <strong>R$47 uma vez</strong> pra aprender a configurar — vs. R$100/mês pra continuar usando como Google melhorado.
         </p>
 
         <a href="${CHECKOUT_URL}" class="btn btn-large" id="btn-checkout">Quero entrar agora</a>
@@ -1173,7 +1173,7 @@ const html = `
         Comece hoje. O sistema vai estar rodando antes do final da semana.
       </p>
 
-      <a href="${CHECKOUT_URL}" class="btn btn-large">Entrar no Claude for Business — R$17</a>
+      <a href="${CHECKOUT_URL}" class="btn btn-large">Entrar no Claude for Business — R$47</a>
       <p class="cta-note">Acesso imediato · Garantia incondicional · Sem precisar programar</p>
 
     </div>
@@ -1195,7 +1195,7 @@ export default function ClaudeForBusinessPage() {
         content_name: 'Claude for Business',
         content_ids: ['V105607171C'],
         content_type: 'product',
-        value: 17.00,
+        value: 47.00,
         currency: 'BRL'
       });
     }
