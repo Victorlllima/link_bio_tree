@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
-// TODO: substituir [CHECKOUT_CODE] pelo código real após Red confirmar
-const CHECKOUT_URL = "https://pay.hotmart.com/[CHECKOUT_CODE]?checkoutMode=10";
+const CHECKOUT_URL = "https://pay.hotmart.com/T106558618V?checkoutMode=10";
 
 export const metadata: Metadata = {
   title: "Introdução à Automação — RedPro AI Academy",
