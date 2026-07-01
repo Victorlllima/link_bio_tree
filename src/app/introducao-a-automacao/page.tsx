@@ -126,26 +126,16 @@ const html = `
 
   .ia-root .hero-text { text-align: left; }
 
-  .ia-root .hero-image-placeholder {
-    position: relative;
+  .ia-root .hero-foto {
     max-width: 480px;
     width: 100%;
     justify-self: end;
     aspect-ratio: 4 / 5;
-    background: linear-gradient(135deg, #0e0e0e 0%, #1a1a1a 100%);
-    border: 1px solid var(--linha);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .ia-root .hero-image-placeholder::after {
-    content: 'Imagem do Red';
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: var(--texto-mid);
-    letter-spacing: .1em;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 20%, transparent 85%);
+            mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 20%, transparent 85%);
   }
 
   @media (max-width: 760px) {
@@ -154,7 +144,7 @@ const html = `
       gap: 48px;
       max-width: 820px;
     }
-    .ia-root .hero-image-placeholder {
+    .ia-root .hero-foto {
       max-width: 320px;
       justify-self: start;
       order: 2;
@@ -689,7 +679,11 @@ const html = `
         <p class="cta-note">Acesso imediato após o pagamento · 7 dias de garantia</p>
       </div>
 
-      <div class="hero-image-placeholder"></div>
+      <img
+        class="hero-foto"
+        src="/introducao-a-automacao/hero.png"
+        alt="Red, fundador da RedPro AI Academy, apresentando o curso Introdução à Automação"
+      />
 
     </div>
   </section>
