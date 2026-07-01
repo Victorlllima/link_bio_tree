@@ -460,24 +460,16 @@ const html = `
     align-items: center;
   }
 
-  .ia-root .sobre-image-placeholder {
+  .ia-root .sobre-foto {
     max-width: 440px;
     width: 100%;
     aspect-ratio: 1 / 1;
-    background: linear-gradient(135deg, #0e0e0e 0%, #1a1a1a 100%);
-    border: 1px solid var(--linha);
+    object-fit: cover;
+    object-position: center top;
+    display: block;
     border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .ia-root .sobre-image-placeholder::after {
-    content: 'Foto do Red';
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: var(--texto-mid);
-    letter-spacing: .1em;
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 20%, transparent 85%);
+            mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 20%, transparent 85%);
   }
 
   .ia-root .sobre-bio p {
@@ -517,7 +509,7 @@ const html = `
       grid-template-columns: 1fr;
       gap: 56px;
     }
-    .ia-root .sobre-image-placeholder { max-width: 280px; }
+    .ia-root .sobre-foto { max-width: 280px; }
   }
 
   /* ─── PREÇO ─── */
@@ -878,7 +870,11 @@ const html = `
 
       <div class="sobre-grid">
 
-        <div class="sobre-image-placeholder"></div>
+        <img
+          class="sobre-foto"
+          src="/introducao-a-automacao/sobre-red.png"
+          alt="Red, fundador da RedPro AI Academy e criador do Método S.H.A.R.K."
+        />
 
         <div class="sobre-bio">
           <span class="section-label">Quem construiu</span>
