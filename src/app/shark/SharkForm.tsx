@@ -156,7 +156,7 @@ export default function SharkForm() {
 
     setState("loading");
     try {
-      const res = await fetch("/api/shark-waitlist", {
+      const res = await fetch("/api/shark", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
