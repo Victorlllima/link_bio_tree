@@ -164,6 +164,68 @@ export function emailMentoria(name: string) {
 </html>`;
 }
 
+export function emailSharkListaEspera(nome: string) {
+    return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Você está na lista — Formação S.H.A.R.K.</title>
+</head>
+<body style="margin:0;padding:0;background:#09090b;font-family:'DM Sans',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#09090b;padding:40px 16px;">
+  <tr><td align="center">
+    <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;">
+
+      <!-- HEADER -->
+      <tr><td style="background:#111113;border:1px solid #1f1f23;border-bottom:none;border-radius:16px 16px 0 0;padding:28px 36px;">
+        <span style="font-family:Arial,sans-serif;font-weight:900;font-size:20px;color:#fff;letter-spacing:-0.02em;">
+          <span style="color:#f97316;">Red</span>Pro AI Academy
+        </span>
+      </td></tr>
+
+      <!-- BODY -->
+      <tr><td style="background:#09090b;border:1px solid #1f1f23;border-top:none;border-bottom:none;padding:40px 36px;">
+        <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#f97316;margin:0 0 18px;">Formação S.H.A.R.K. · Lista de Espera</p>
+        <h1 style="font-family:Arial,sans-serif;font-weight:900;font-size:28px;line-height:1.1;letter-spacing:-0.02em;color:#fff;margin:0 0 24px;">Você está na lista.</h1>
+        <p style="font-size:15px;line-height:1.75;color:#a1a1aa;font-weight:300;margin:0 0 16px;">Oi ${nome}, obrigado por entrar na lista de espera da Formação S.H.A.R.K.</p>
+        <p style="font-size:15px;line-height:1.75;color:#a1a1aa;font-weight:300;margin:0 0 16px;">O carrinho abre em <strong style="color:#fafafa;font-weight:500;">23 de julho</strong>. Você vai ser avisado em primeira mão com condição especial para quem estava esperando.</p>
+        <p style="font-size:15px;line-height:1.75;color:#a1a1aa;font-weight:300;margin:0 0 32px;">Enquanto isso, acompanhe o <strong style="color:#fafafa;font-weight:500;">@redpro.ia</strong> no Instagram para não perder nenhuma atualização.</p>
+
+        <!-- CTA -->
+        <table cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
+          <tr><td style="background:#f97316;border-radius:8px;">
+            <a href="https://instagram.com/redpro.ia" style="display:inline-block;padding:14px 28px;font-family:Arial,sans-serif;font-weight:700;font-size:14px;color:#fff;text-decoration:none;letter-spacing:0.01em;">Seguir @redpro.ia</a>
+          </td></tr>
+        </table>
+
+        <!-- SIGNATURE -->
+        <table cellpadding="0" cellspacing="0" style="margin-top:32px;border-top:1px solid #1f1f23;padding-top:24px;width:100%;">
+          <tr><td>
+            <p style="font-size:14px;color:#71717a;margin:0 0 6px;font-weight:300;">Com atenção,</p>
+            <p style="font-family:Arial,sans-serif;font-weight:900;font-size:22px;color:#fff;margin:0;letter-spacing:-0.02em;">— <span style="color:#f97316;">Red</span></p>
+            <p style="font-size:13px;color:#52525b;margin:6px 0 0;font-weight:300;">RedPro AI Academy</p>
+          </td></tr>
+        </table>
+      </td></tr>
+
+      <!-- FOOTER -->
+      <tr><td style="background:#0a0a0c;border:1px solid #1f1f23;border-top:none;border-radius:0 0 16px 16px;padding:20px 36px;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td><p style="font-family:'Courier New',monospace;font-size:11px;color:#3f3f46;margin:0;">© 2026 RedPro AI Academy</p></td>
+            <td align="right"><a href="https://www.redpro.com.br" style="font-family:'Courier New',monospace;font-size:11px;color:#52525b;text-decoration:none;">redpro.com.br</a></td>
+          </tr>
+        </table>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`;
+}
+
 export function emailInCompany(name: string, company: string) {
     return `<!DOCTYPE html>
 <html lang="pt-BR">
