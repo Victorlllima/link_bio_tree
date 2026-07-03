@@ -1125,7 +1125,7 @@ const html = `
 
         <details>
           <summary>Preciso saber programar?</summary>
-          <div class="faq-body">Não. O curso foi feito exatamente pra quem não sabe. Eu sou ex-servidor público sem formação técnica — construí tudo isso configurando, escrevendo em português e testando. É o mesmo caminho que você vai fazer.</div>
+          <div class="faq-body">Não. O curso foi feito exatamente pra quem não tem formação técnica. Você vai configurar, escrever em português e testar — sem código. É o mesmo método que eu uso nos meus próprios projetos.</div>
         </details>
 
         <details>
