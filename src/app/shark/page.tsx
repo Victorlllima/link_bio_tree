@@ -156,12 +156,20 @@ const staticStyles = `
 
   .sk-root h1 {
     font-family: 'Cormorant Garant', serif;
-    font-size: clamp(40px, 6.5vw, 72px);
+    font-size: clamp(44px, 7vw, 80px);
     font-weight: 700;
     letter-spacing: -0.03em;
     line-height: 1.0;
     margin-bottom: 28px;
     text-wrap: balance;
+    text-shadow: 0 0 80px rgba(232,213,183,0.15), 0 4px 24px rgba(0,0,0,0.8);
+  }
+
+  .sk-root h1 .accent {
+    text-shadow:
+      0 0 30px rgba(232,213,183,0.6),
+      0 0 60px rgba(232,213,183,0.3),
+      0 4px 16px rgba(0,0,0,1);
   }
 
   .sk-root .hero-sub {
@@ -428,6 +436,87 @@ const staticStyles = `
     text-transform: uppercase;
   }
 
+  /* AUTORIDADE */
+  .sk-root .autoridade {
+    background: #050505;
+    border-top: 1px solid var(--linha);
+    border-bottom: 1px solid var(--linha);
+  }
+
+  .sk-root .autoridade-texto {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .sk-root .autoridade-texto p {
+    font-size: clamp(15px, 1.9vw, 18px);
+    font-weight: 300;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  .sk-root .autoridade-texto em {
+    font-style: normal;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .sk-root .autoridade-provas {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-top: 48px;
+    padding-top: 40px;
+    border-top: 1px solid var(--linha);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .sk-root .prova-item {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .sk-root .prova-num {
+    font-family: 'Cormorant Garant', serif;
+    font-size: clamp(40px, 6vw, 64px);
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .sk-root .prova-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    opacity: 0.55;
+    margin-top: 8px;
+  }
+
+  .sk-root .prova-sep {
+    width: 1px;
+    height: 60px;
+    background: var(--linha);
+    flex-shrink: 0;
+    margin: 0 24px;
+  }
+
+  @media (max-width: 640px) {
+    .sk-root .autoridade-provas {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 24px;
+    }
+    .sk-root .prova-sep { display: none; }
+  }
+
   /* FOOTER */
   .sk-root .footer {
     padding: 36px 24px;
@@ -543,8 +632,8 @@ export default function SharkPage() {
             <span className="section-label">O método</span>
             <h2>
               Um método. Cinco agentes.{" "}
-              <span className="accent">Uma equipe de IA</span>{" "}
-              trabalhando pela empresa do seu cliente.
+              <span className="accent">A equipe de IA</span>{" "}
+              que você opera para atender qualquer empresa.
             </h2>
           </div>
 
@@ -620,6 +709,43 @@ export default function SharkPage() {
                 Você aprende a operar os cinco.{" "}
                 <em>O cliente vê resultado.</em>
               </p>
+            </div>
+          </div>
+        </section>
+
+
+        {/* AUTORIDADE */}
+        <section className="autoridade">
+          <div className="container narrow">
+            <span className="section-label">Quem ensina</span>
+            <h2>Eu uso o que<br /><span className="accent">eu ensino.</span></h2>
+
+            <div className="autoridade-texto">
+              <p>
+                A HubTech atende empresas com o mesmo método S.H.A.R.K. que você vai aprender.
+                Cada projeto entregue valida ainda mais o método.
+              </p>
+              <p>
+                Cada turma da Formação recebe o que está funcionando <em>agora</em>{" "}
+                — não o que funcionou no ano passado.
+              </p>
+            </div>
+
+            <div className="autoridade-provas">
+              <div className="prova-item">
+                <span className="prova-num">5</span>
+                <span className="prova-label">agentes em operação real</span>
+              </div>
+              <div className="prova-sep" />
+              <div className="prova-item">
+                <span className="prova-num">27</span>
+                <span className="prova-label">alunos formados</span>
+              </div>
+              <div className="prova-sep" />
+              <div className="prova-item">
+                <span className="prova-num">B2B</span>
+                <span className="prova-label">clientes ativos via Solutions</span>
+              </div>
             </div>
           </div>
         </section>
