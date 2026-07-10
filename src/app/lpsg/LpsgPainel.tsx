@@ -164,20 +164,15 @@ export default function LpsgPainel() {
             A máquina roda toda semana. Cada fase alimenta a próxima: capta a lista, aquece,
             entrega valor no evento, faz a oferta e abre o carrinho.
           </p>
-          <div style={s.fluxoScroll}>
-            <div style={s.fluxo}>
-              {FASES_TABARI.map((f, i) => (
-                <div key={f.num} style={s.fluxoItemWrap}>
-                  <div style={{ ...s.fluxoCard, borderTopColor: f.cor }}>
-                    <div style={{ ...s.fluxoNum, background: f.cor }}>{f.num}</div>
-                    <div style={s.fluxoData}>{f.data}</div>
-                    <div style={s.fluxoTitulo}>{f.titulo}</div>
-                    <div style={s.fluxoDesc}>{f.descricao}</div>
-                  </div>
-                  {i < FASES_TABARI.length - 1 && <div style={s.fluxoSeta}>→</div>}
-                </div>
-              ))}
-            </div>
+          <div className="lpsg-fluxo">
+            {FASES_TABARI.map((f) => (
+              <div key={f.num} style={{ ...s.fluxoCard, borderTopColor: f.cor }}>
+                <div style={{ ...s.fluxoNum, background: f.cor }}>{f.num}</div>
+                <div style={s.fluxoData}>{f.data}</div>
+                <div style={s.fluxoTitulo}>{f.titulo}</div>
+                <div style={s.fluxoDesc}>{f.descricao}</div>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -318,15 +313,11 @@ const s: Record<string, React.CSSProperties> = {
   fluxoSection: { marginBottom: 44 },
   h2: { fontSize: 20, fontWeight: 700, margin: "0 0 6px", letterSpacing: "-0.01em" },
   fluxoIntro: { color: TXT2, fontSize: 14, margin: "0 0 20px", maxWidth: 640, lineHeight: 1.5 },
-  fluxoScroll: { overflowX: "auto", paddingBottom: 8 },
-  fluxo: { display: "flex", alignItems: "stretch", gap: 0, minWidth: "min-content" },
-  fluxoItemWrap: { display: "flex", alignItems: "center" },
-  fluxoCard: { width: 200, minWidth: 200, background: CARD, border: `1px solid ${BORDER}`, borderTop: "3px solid", borderRadius: 14, padding: "18px 16px", display: "flex", flexDirection: "column", gap: 8, minHeight: 190 },
-  fluxoNum: { width: 30, height: 30, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 15, color: "#fff" },
-  fluxoData: { fontSize: 12, fontWeight: 700, color: ACCENT, letterSpacing: "0.02em", textTransform: "uppercase" },
-  fluxoTitulo: { fontSize: 15, fontWeight: 700, lineHeight: 1.25 },
-  fluxoDesc: { fontSize: 12.5, color: TXT2, lineHeight: 1.45 },
-  fluxoSeta: { color: TXT3, fontSize: 22, padding: "0 8px", flexShrink: 0 },
+  fluxoCard: { background: CARD, border: `1px solid ${BORDER}`, borderTop: "3px solid", borderRadius: 12, padding: "14px 12px", display: "flex", flexDirection: "column", gap: 6, minWidth: 0 },
+  fluxoNum: { width: 26, height: 26, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, color: "#fff" },
+  fluxoData: { fontSize: 10.5, fontWeight: 700, color: ACCENT, letterSpacing: "0.02em", textTransform: "uppercase" },
+  fluxoTitulo: { fontSize: 13.5, fontWeight: 700, lineHeight: 1.2 },
+  fluxoDesc: { fontSize: 11.5, color: TXT2, lineHeight: 1.4 },
 
   abas: { display: "flex", gap: 8, marginBottom: 24, borderBottom: `1px solid ${BORDER}`, flexWrap: "wrap" },
   aba: { display: "flex", alignItems: "center", gap: 8, background: "transparent", border: "none", borderBottom: "2px solid transparent", color: TXT2, fontSize: 15, fontWeight: 600, padding: "10px 14px", cursor: "pointer", marginBottom: -1, fontFamily: "inherit" },
