@@ -6,24 +6,27 @@ import {
   FRENTES,
   FASES_TABARI,
   type Responsavel,
+  type TutorialPasso,
 } from "./tasks";
 
 type EstadoItem = { task_id: string; responsavel: Responsavel; done: boolean };
 type EstadoMap = Record<string, { responsavel: Responsavel; done: boolean }>;
 
-type Aba = "geral" | "victor" | "gleyce";
+type Nivel = "estrategico" | "tatico" | "operacional";
+type Pessoa = "todos" | "victor" | "gleyce";
 
-const NOME = { victor: "Victor", gleyce: "Gleyce" } as const;
+const NOME = { victor: "Victor", gleyce: "Gleyce", ambos: "Ambos" } as const;
 
 export default function LpsgPainel() {
   const [autorizado, setAutorizado] = useState<boolean | null>(null);
   const [senha, setSenha] = useState("");
   const [erroSenha, setErroSenha] = useState(false);
   const [estado, setEstado] = useState<EstadoMap>({});
-  const [aba, setAba] = useState<Aba>("geral");
+  const [nivel, setNivel] = useState<Nivel>("operacional");
+  const [pessoa, setPessoa] = useState<Pessoa>("todos");
   const [carregando, setCarregando] = useState(true);
+  const [tutorial, setTutorial] = useState<TutorialPasso | null>(null);
 
-  // tenta carregar o estado — se 401, pede senha
   useEffect(() => {
     carregarEstado();
   }, []);
@@ -58,18 +61,13 @@ export default function LpsgPainel() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ password: senha }),
     });
-    if (res.ok) {
-      await carregarEstado();
-    } else {
-      setErroSenha(true);
-    }
+    if (res.ok) await carregarEstado();
+    else setErroSenha(true);
   }
 
-  // resolve o responsável efetivo: estado salvo OU sugestão da task
   function responsavelDe(taskId: string): Responsavel {
     const salvo = estado[taskId]?.responsavel;
-    if (salvo !== undefined && salvo !== null) return salvo;
-    if (salvo === null) return null;
+    if (salvo !== undefined) return salvo;
     return TASKS.find((t) => t.id === taskId)?.sugestao ?? null;
   }
   function doneDe(taskId: string): boolean {
@@ -77,7 +75,6 @@ export default function LpsgPainel() {
   }
 
   async function salvar(taskId: string, patch: Partial<{ responsavel: Responsavel; done: boolean }>) {
-    // otimista
     setEstado((prev) => ({
       ...prev,
       [taskId]: {
@@ -92,15 +89,21 @@ export default function LpsgPainel() {
     });
   }
 
+  // uma tarefa "pertence" à pessoa se for dela OU "ambos"
+  function pertence(taskId: string, p: Pessoa): boolean {
+    if (p === "todos") return true;
+    const r = responsavelDe(taskId);
+    return r === p || r === "ambos";
+  }
+
   const progresso = useMemo(() => {
     const total = TASKS.length;
     const feitas = TASKS.filter((t) => doneDe(t.id)).length;
-    const porPessoa = (p: "victor" | "gleyce") => {
-      const list = TASKS.filter((t) => responsavelDe(t.id) === p);
-      const done = list.filter((t) => doneDe(t.id)).length;
-      return { total: list.length, done };
+    const contaPessoa = (p: "victor" | "gleyce") => {
+      const list = TASKS.filter((t) => pertence(t.id, p));
+      return { total: list.length, done: list.filter((t) => doneDe(t.id)).length };
     };
-    return { total, feitas, victor: porPessoa("victor"), gleyce: porPessoa("gleyce") };
+    return { total, feitas, victor: contaPessoa("victor"), gleyce: contaPessoa("gleyce") };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [estado]);
 
@@ -112,34 +115,20 @@ export default function LpsgPainel() {
           <div style={s.gateEmoji}>🚀</div>
           <h1 style={s.gateTitle}>Painel LPSG</h1>
           <p style={s.gateSub}>Acompanhamento do lançamento · acesso restrito</p>
-          <input
-            type="password"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            placeholder="Senha"
-            style={s.gateInput}
-            autoFocus
-          />
+          <input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="Senha" style={s.gateInput} autoFocus />
           {erroSenha && <p style={s.gateErro}>Senha incorreta.</p>}
           <button type="submit" style={s.gateBtn}>Entrar</button>
         </form>
       </div>
     );
   }
-
   if (autorizado === null || carregando) {
-    return (
-      <div style={s.gate}>
-        <div style={{ color: "#a3a3a3", fontFamily: "system-ui" }}>Carregando…</div>
-      </div>
-    );
+    return <div style={s.gate}><div style={{ color: "#a3a3a3", fontFamily: "system-ui" }}>Carregando…</div></div>;
   }
 
-  // ---------- PAINEL ----------
-  const tasksFiltradas =
-    aba === "geral"
-      ? TASKS
-      : TASKS.filter((t) => responsavelDe(t.id) === aba);
+  const frentesComTarefas = FRENTES.filter((f) =>
+    TASKS.some((t) => t.frente === f.id && pertence(t.id, pessoa))
+  );
 
   return (
     <div style={s.page}>
@@ -147,9 +136,7 @@ export default function LpsgPainel() {
         <header style={s.header}>
           <div>
             <h1 style={s.h1}>Lançamento LPSG · 1º Ciclo</h1>
-            <p style={s.subtitle}>
-              &ldquo;Como Construir um CRM Customizado em 5 Dias&rdquo; · evento 20-27/jul
-            </p>
+            <p style={s.subtitle}>&ldquo;Como Construir um CRM Customizado em 5 Dias&rdquo; · evento 20-27/jul · aulas 7h</p>
           </div>
           <div style={s.progressBadge}>
             <span style={s.progressNum}>{progresso.feitas}/{progresso.total}</span>
@@ -160,10 +147,7 @@ export default function LpsgPainel() {
         {/* ---------- FLUXO TABARI HORIZONTAL ---------- */}
         <section style={s.fluxoSection}>
           <h2 style={s.h2}>O Método Tabari — as 5 fases</h2>
-          <p style={s.fluxoIntro}>
-            A máquina roda toda semana. Cada fase alimenta a próxima: capta a lista, aquece,
-            entrega valor no evento, faz a oferta e abre o carrinho.
-          </p>
+          <p style={s.fluxoIntro}>A máquina roda toda semana. Cada fase alimenta a próxima: capta a lista, aquece, entrega valor no evento, faz a oferta e abre o carrinho.</p>
           <div className="lpsg-fluxo">
             {FASES_TABARI.map((f) => (
               <div key={f.num} style={{ ...s.fluxoCard, borderTopColor: f.cor }}>
@@ -176,79 +160,89 @@ export default function LpsgPainel() {
           </div>
         </section>
 
-        {/* ---------- ABAS ---------- */}
+        {/* ---------- ABAS DE NÍVEL (topo) ---------- */}
         <nav style={s.abas}>
-          <button
-            onClick={() => setAba("geral")}
-            style={{ ...s.aba, ...(aba === "geral" ? s.abaAtiva : {}) }}
-          >
-            Visão Geral
-            <span style={s.abaCount}>{progresso.total}</span>
-          </button>
-          <button
-            onClick={() => setAba("victor")}
-            style={{ ...s.aba, ...(aba === "victor" ? s.abaAtiva : {}) }}
-          >
-            Victor
-            <span style={s.abaCount}>
-              {progresso.victor.done}/{progresso.victor.total}
-            </span>
-          </button>
-          <button
-            onClick={() => setAba("gleyce")}
-            style={{ ...s.aba, ...(aba === "gleyce" ? s.abaAtiva : {}) }}
-          >
-            Gleyce
-            <span style={s.abaCount}>
-              {progresso.gleyce.done}/{progresso.gleyce.total}
-            </span>
-          </button>
+          {([
+            ["estrategico", "🎯 Estratégico"],
+            ["tatico", "🎛️ Tático"],
+            ["operacional", "✅ Operacional"],
+          ] as [Nivel, string][]).map(([n, label]) => (
+            <button key={n} onClick={() => setNivel(n)} style={{ ...s.aba, ...(nivel === n ? s.abaAtiva : {}) }}>
+              {label}
+            </button>
+          ))}
         </nav>
 
-        {/* ---------- CHECKLIST POR FRENTE ---------- */}
+        {/* ---------- SUB-FILTRO DE PESSOA ---------- */}
+        <div style={s.subfiltro}>
+          {([
+            ["todos", "Todos"],
+            ["victor", `Victor · ${progresso.victor.done}/${progresso.victor.total}`],
+            ["gleyce", `Gleyce · ${progresso.gleyce.done}/${progresso.gleyce.total}`],
+          ] as [Pessoa, string][]).map(([p, label]) => (
+            <button key={p} onClick={() => setPessoa(p)} style={{ ...s.subBtn, ...(pessoa === p ? s.subAtivo : {}) }}>
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* ---------- CONTEÚDO POR FRENTE ---------- */}
         <div style={s.checklist}>
-          {FRENTES.map((frente) => {
-            const items = tasksFiltradas.filter((t) => t.frente === frente.id);
-            if (items.length === 0) return null;
+          {frentesComTarefas.map((frente) => {
+            const items = TASKS
+              .filter((t) => t.frente === frente.id && pertence(t.id, pessoa))
+              .sort((a, b) => (a.ordem ?? 99) - (b.ordem ?? 99));
             return (
               <section key={frente.id} style={s.frenteBloco}>
-                <div style={s.frenteHead}>
-                  <h3 style={s.frenteTitulo}>{frente.titulo}</h3>
-                  <p style={s.frenteDesc}>{frente.descricao}</p>
-                </div>
-                <div style={s.tasks}>
-                  {items.map((t) => {
-                    const done = doneDe(t.id);
-                    const resp = responsavelDe(t.id);
-                    return (
-                      <div key={t.id} style={{ ...s.task, ...(done ? s.taskDone : {}) }}>
-                        <button
-                          onClick={() => salvar(t.id, { done: !done })}
-                          style={{ ...s.check, ...(done ? s.checkDone : {}) }}
-                          aria-label="concluir"
-                        >
-                          {done ? "✓" : ""}
-                        </button>
-                        <div style={s.taskBody}>
-                          <div style={{ ...s.taskLabel, ...(done ? s.taskLabelDone : {}) }}>
-                            {t.label}
+                <h3 style={s.frenteTitulo}>{frente.titulo}</h3>
+
+                {/* ESTRATÉGICO — só texto */}
+                {nivel === "estrategico" && (
+                  <div style={s.nivelBox}>
+                    <span style={s.nivelTag}>🎯 Estratégico</span>
+                    <p style={s.nivelTexto}>{frente.estrategico}</p>
+                  </div>
+                )}
+
+                {/* TÁTICO — só texto */}
+                {nivel === "tatico" && (
+                  <div style={s.nivelBox}>
+                    <span style={s.nivelTag}>🎛️ Tático</span>
+                    <p style={s.nivelTexto}>{frente.tatico}</p>
+                  </div>
+                )}
+
+                {/* OPERACIONAL — checklist */}
+                {nivel === "operacional" && (
+                  <div style={s.tasks}>
+                    {items.map((t) => {
+                      const done = doneDe(t.id);
+                      const resp = responsavelDe(t.id);
+                      return (
+                        <div key={t.id} style={{ ...s.task, ...(done ? s.taskDone : {}), ...(t.pendencia && !done ? s.taskPendencia : {}) }}>
+                          <button onClick={() => salvar(t.id, { done: !done })} style={{ ...s.check, ...(done ? s.checkDone : {}) }} aria-label="concluir">
+                            {done ? "✓" : ""}
+                          </button>
+                          <div style={s.taskBody}>
+                            <div style={{ ...s.taskLabel, ...(done ? s.taskLabelDone : {}) }}>
+                              {t.ordem ? <span style={s.ordem}>{t.ordem}</span> : null}
+                              {t.label}
+                              {t.pendencia && <span style={s.pendBadge}>pendência</span>}
+                              {t.tutorial && (
+                                <button onClick={() => setTutorial(t.tutorial!)} style={s.tutBtn} title="ver passo a passo">📖 passo a passo</button>
+                              )}
+                            </div>
+                            {t.detalhe && <div style={s.taskDetalhe}>{t.detalhe}</div>}
                           </div>
-                          {t.detalhe && <div style={s.taskDetalhe}>{t.detalhe}</div>}
-                        </div>
-                        {aba === "geral" && (
                           <div style={s.segmented}>
-                            {(["victor", "gleyce"] as const).map((p) => (
+                            {(["victor", "gleyce", "ambos"] as const).map((p) => (
                               <button
                                 key={p}
-                                onClick={() =>
-                                  salvar(t.id, { responsavel: resp === p ? null : p })
-                                }
+                                onClick={() => salvar(t.id, { responsavel: resp === p ? null : p })}
                                 style={{
                                   ...s.segBtn,
                                   ...(resp === p
-                                    ? p === "victor"
-                                      ? s.segVictor
-                                      : s.segGleyce
+                                    ? p === "victor" ? s.segVictor : p === "gleyce" ? s.segGleyce : s.segAmbos
                                     : {}),
                                 }}
                               >
@@ -256,33 +250,39 @@ export default function LpsgPainel() {
                               </button>
                             ))}
                           </div>
-                        )}
-                        {aba !== "geral" && (
-                          <span
-                            style={{
-                              ...s.tag,
-                              ...(resp === "victor" ? s.tagVictor : s.tagGleyce),
-                            }}
-                          >
-                            {resp ? NOME[resp] : "—"}
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </section>
             );
           })}
-          {tasksFiltradas.length === 0 && (
-            <p style={s.vazio}>Nenhuma tarefa atribuída a {NOME[aba as "victor" | "gleyce"]} ainda.</p>
+          {frentesComTarefas.length === 0 && (
+            <p style={s.vazio}>Nenhuma tarefa para esse filtro.</p>
           )}
         </div>
 
-        <footer style={s.footer}>
-          RedPro AI Academy · Painel interno · alterações salvas automaticamente
-        </footer>
+        <footer style={s.footer}>RedPro AI Academy · Painel interno · alterações salvas automaticamente</footer>
       </div>
+
+      {/* ---------- MODAL DE TUTORIAL ---------- */}
+      {tutorial && (
+        <div style={s.modalOverlay} onClick={() => setTutorial(null)}>
+          <div style={s.modal} onClick={(e) => e.stopPropagation()}>
+            <div style={s.modalHead}>
+              <span style={s.modalTag}>📖 Passo a passo</span>
+              <button onClick={() => setTutorial(null)} style={s.modalClose} aria-label="fechar">✕</button>
+            </div>
+            <h3 style={s.modalTitulo}>{tutorial.titulo}</h3>
+            <ol style={s.modalLista}>
+              {tutorial.passos.map((p, i) => (
+                <li key={i} style={s.modalPasso}>{p}</li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -298,6 +298,8 @@ const TXT2 = "#a3a3a3";
 const TXT3 = "#6b6b6b";
 const VICTOR = "#3b82f6";
 const GLEYCE = "#10b981";
+const AMBOS = "#a855f7";
+const PEND = "#f59e0b";
 
 const s: Record<string, React.CSSProperties> = {
   page: { minHeight: "100vh", background: BG, color: TXT, fontFamily: "'DM Sans', system-ui, sans-serif", padding: "clamp(16px,4vw,48px) 0" },
@@ -310,7 +312,7 @@ const s: Record<string, React.CSSProperties> = {
   progressNum: { fontSize: 26, fontWeight: 800, color: ACCENT, lineHeight: 1 },
   progressLabel: { fontSize: 12, color: TXT3, marginTop: 2 },
 
-  fluxoSection: { marginBottom: 44 },
+  fluxoSection: { marginBottom: 36 },
   h2: { fontSize: 20, fontWeight: 700, margin: "0 0 6px", letterSpacing: "-0.01em" },
   fluxoIntro: { color: TXT2, fontSize: 14, margin: "0 0 20px", maxWidth: 640, lineHeight: 1.5 },
   fluxoCard: { background: CARD, border: `1px solid ${BORDER}`, borderTop: "3px solid", borderRadius: 12, padding: "14px 12px", display: "flex", flexDirection: "column", gap: 6, minWidth: 0 },
@@ -319,37 +321,54 @@ const s: Record<string, React.CSSProperties> = {
   fluxoTitulo: { fontSize: 13.5, fontWeight: 700, lineHeight: 1.2 },
   fluxoDesc: { fontSize: 11.5, color: TXT2, lineHeight: 1.4 },
 
-  abas: { display: "flex", gap: 8, marginBottom: 24, borderBottom: `1px solid ${BORDER}`, flexWrap: "wrap" },
-  aba: { display: "flex", alignItems: "center", gap: 8, background: "transparent", border: "none", borderBottom: "2px solid transparent", color: TXT2, fontSize: 15, fontWeight: 600, padding: "10px 14px", cursor: "pointer", marginBottom: -1, fontFamily: "inherit" },
+  abas: { display: "flex", gap: 8, marginBottom: 14, borderBottom: `1px solid ${BORDER}`, flexWrap: "wrap" },
+  aba: { background: "transparent", border: "none", borderBottom: "2px solid transparent", color: TXT2, fontSize: 15, fontWeight: 600, padding: "10px 14px", cursor: "pointer", marginBottom: -1, fontFamily: "inherit" },
   abaAtiva: { color: TXT, borderBottomColor: ACCENT },
-  abaCount: { fontSize: 12, fontWeight: 700, color: TXT3, background: SURFACE, borderRadius: 20, padding: "2px 8px" },
 
-  checklist: { display: "flex", flexDirection: "column", gap: 28 },
+  subfiltro: { display: "flex", gap: 6, marginBottom: 24, background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 10, padding: 4, width: "fit-content", flexWrap: "wrap" },
+  subBtn: { background: "transparent", border: "none", color: TXT2, fontSize: 13, fontWeight: 600, padding: "6px 14px", borderRadius: 7, cursor: "pointer", fontFamily: "inherit" },
+  subAtivo: { background: BG, color: TXT },
+
+  checklist: { display: "flex", flexDirection: "column", gap: 24 },
   frenteBloco: {},
-  frenteHead: { marginBottom: 12 },
-  frenteTitulo: { fontSize: 16, fontWeight: 700, margin: 0 },
-  frenteDesc: { fontSize: 13, color: TXT3, margin: "3px 0 0" },
+  frenteTitulo: { fontSize: 16, fontWeight: 700, margin: "0 0 10px" },
+
+  nivelBox: { background: SURFACE, border: `1px solid ${BORDER}`, borderLeft: `3px solid ${ACCENT}`, borderRadius: 10, padding: "14px 16px" },
+  nivelTag: { fontSize: 11.5, fontWeight: 700, color: ACCENT, textTransform: "uppercase", letterSpacing: "0.03em" },
+  nivelTexto: { fontSize: 14, color: TXT2, lineHeight: 1.6, margin: "6px 0 0" },
+
   tasks: { display: "flex", flexDirection: "column", gap: 8 },
   task: { display: "flex", alignItems: "center", gap: 12, background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "12px 14px" },
   taskDone: { opacity: 0.55 },
+  taskPendencia: { borderColor: "rgba(245,158,11,0.4)", background: "rgba(245,158,11,0.05)" },
   check: { width: 24, height: 24, minWidth: 24, borderRadius: 7, border: `1.5px solid ${TXT3}`, background: "transparent", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700 },
   checkDone: { background: ACCENT, borderColor: ACCENT },
   taskBody: { flex: 1, minWidth: 0 },
-  taskLabel: { fontSize: 14.5, fontWeight: 600, lineHeight: 1.3 },
+  taskLabel: { fontSize: 14.5, fontWeight: 600, lineHeight: 1.35, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" },
   taskLabelDone: { textDecoration: "line-through" },
-  taskDetalhe: { fontSize: 12.5, color: TXT3, marginTop: 2, lineHeight: 1.4 },
+  taskDetalhe: { fontSize: 12.5, color: TXT3, marginTop: 3, lineHeight: 1.4 },
+  ordem: { width: 20, height: 20, minWidth: 20, borderRadius: 6, background: ACCENT, color: "#fff", fontSize: 11.5, fontWeight: 800, display: "inline-flex", alignItems: "center", justifyContent: "center" },
+  pendBadge: { fontSize: 10.5, fontWeight: 700, color: PEND, background: "rgba(245,158,11,0.15)", padding: "2px 8px", borderRadius: 20, textTransform: "uppercase", letterSpacing: "0.02em" },
+  tutBtn: { fontSize: 11.5, fontWeight: 600, color: ACCENT, background: "rgba(249,115,22,0.12)", border: "none", padding: "3px 9px", borderRadius: 6, cursor: "pointer", fontFamily: "inherit" },
 
   segmented: { display: "flex", gap: 4, background: BG, borderRadius: 9, padding: 3, border: `1px solid ${BORDER}`, flexShrink: 0 },
-  segBtn: { border: "none", background: "transparent", color: TXT2, fontSize: 12.5, fontWeight: 600, padding: "5px 11px", borderRadius: 6, cursor: "pointer", fontFamily: "inherit" },
+  segBtn: { border: "none", background: "transparent", color: TXT2, fontSize: 12, fontWeight: 600, padding: "5px 9px", borderRadius: 6, cursor: "pointer", fontFamily: "inherit" },
   segVictor: { background: VICTOR, color: "#fff" },
   segGleyce: { background: GLEYCE, color: "#fff" },
-
-  tag: { fontSize: 12, fontWeight: 700, padding: "4px 10px", borderRadius: 20, flexShrink: 0 },
-  tagVictor: { background: "rgba(59,130,246,0.15)", color: "#93c5fd" },
-  tagGleyce: { background: "rgba(16,185,129,0.15)", color: "#6ee7b7" },
+  segAmbos: { background: AMBOS, color: "#fff" },
 
   vazio: { color: TXT3, textAlign: "center", padding: 40, fontSize: 14 },
   footer: { marginTop: 48, paddingTop: 20, borderTop: `1px solid ${BORDER}`, color: TXT3, fontSize: 12.5, textAlign: "center" },
+
+  // modal
+  modalOverlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, zIndex: 100 },
+  modal: { background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 16, padding: 24, maxWidth: 520, width: "100%", maxHeight: "85vh", overflowY: "auto" },
+  modalHead: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
+  modalTag: { fontSize: 11.5, fontWeight: 700, color: ACCENT, textTransform: "uppercase", letterSpacing: "0.03em" },
+  modalClose: { background: "transparent", border: "none", color: TXT2, fontSize: 18, cursor: "pointer", lineHeight: 1 },
+  modalTitulo: { fontSize: 19, fontWeight: 700, margin: "0 0 16px" },
+  modalLista: { margin: 0, paddingLeft: 22, display: "flex", flexDirection: "column", gap: 10 },
+  modalPasso: { fontSize: 14, color: TXT2, lineHeight: 1.5 },
 
   // gate
   gate: { minHeight: "100vh", background: BG, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, fontFamily: "'DM Sans', system-ui, sans-serif" },
