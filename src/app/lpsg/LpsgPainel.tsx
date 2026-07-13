@@ -142,7 +142,7 @@ export default function LpsgPainel() {
         <header style={s.header}>
           <div>
             <h1 style={s.h1}>Lançamento LPSG · 1º Ciclo</h1>
-            <p style={s.subtitle}>&ldquo;Como Construir um CRM Customizado em 5 Dias&rdquo; · evento 20-27/jul · aulas 7h</p>
+            <p style={s.subtitle}>&ldquo;Como Construir um CRM Customizado em 5 Dias&rdquo; · evento 27/jul-3/ago · aulas 7h</p>
           </div>
           <div style={s.progressBadge}>
             <span style={s.progressNum}>{progresso.feitas}/{progresso.total}</span>
