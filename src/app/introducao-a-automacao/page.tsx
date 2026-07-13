@@ -554,6 +554,28 @@ const html = `
     margin-right: 4px;
   }
 
+  .ia-root .preco-de {
+    font-size: 34px;
+    font-weight: 400;
+    color: var(--texto-mid);
+    text-decoration: line-through;
+    text-decoration-color: var(--laranja);
+    letter-spacing: -.02em;
+    margin-right: 16px;
+    vertical-align: 18px;
+  }
+  .ia-root .preco-de .moeda-de {
+    font-size: 18px;
+    font-weight: 300;
+    vertical-align: 6px;
+    margin-right: 2px;
+  }
+
+  @media (max-width: 640px) {
+    .ia-root .preco-de { font-size: 26px; vertical-align: 14px; margin-right: 10px; }
+    .ia-root .preco-de .moeda-de { font-size: 14px; }
+  }
+
   .ia-root .preco-descricao {
     font-size: 14px;
     color: var(--texto-mid);
@@ -674,7 +696,7 @@ const html = `
           <div class="proof-item"><span class="ic"></span>Acesso imediato e permanente</div>
         </div>
 
-        <a href="${CHECKOUT_URL}" class="btn btn-large ia-cta" data-cta="hero">Quero construir agora — R$97</a>
+        <a href="${CHECKOUT_URL}" class="btn btn-large ia-cta" data-cta="hero">Quero construir agora — R$17</a>
         <p class="cta-note">Acesso imediato após o pagamento · 7 dias de garantia</p>
       </div>
 
@@ -899,16 +921,16 @@ const html = `
 
       <div class="narrow">
         <span class="section-label">A oferta</span>
-        <h2>R$97 uma vez.<br><em class="lj">Você nunca mais vai olhar para<br>uma automação sem entender.</em></h2>
+        <h2>R$17 uma vez.<br><em class="lj">Você nunca mais vai olhar para<br>uma automação sem entender.</em></h2>
       </div>
 
       <div class="preco-card">
         <div class="preco-tag">Acesso imediato após pagamento</div>
 
-        <div class="preco-valor"><span class="moeda">R$</span>97</div>
+        <div class="preco-valor"><span class="preco-de"><span class="moeda-de">R$</span>97</span><span class="moeda">R$</span>17</div>
         <p class="preco-descricao">pagamento único · não é assinatura</p>
 
-        <a href="${CHECKOUT_URL}" class="btn btn-large ia-cta" id="btn-checkout" data-cta="preco">Entrar no curso agora — R$97</a>
+        <a href="${CHECKOUT_URL}" class="btn btn-large ia-cta" id="btn-checkout" data-cta="preco">Entrar no curso agora — R$17</a>
 
         <p class="garantia">
           <strong>7 dias de garantia.</strong><br>
@@ -969,12 +991,12 @@ const html = `
   <section class="cta-final">
     <div class="container narrow">
 
-      <h2>R$97 uma vez.<br>Você nunca mais vai olhar para uma automação<br><em class="lj">sem entender o que está acontecendo.</em></h2>
+      <h2>R$17 uma vez.<br>Você nunca mais vai olhar para uma automação<br><em class="lj">sem entender o que está acontecendo.</em></h2>
       <p style="color:var(--texto-soft); max-width:540px; margin:18px auto 36px; font-size:16px; line-height:1.6;">
         Acesso imediato · Sem prazo pra assistir · Pagamento único
       </p>
 
-      <a href="${CHECKOUT_URL}" class="btn btn-large ia-cta" data-cta="cta-final">Entrar no curso agora — R$97</a>
+      <a href="${CHECKOUT_URL}" class="btn btn-large ia-cta" data-cta="cta-final">Entrar no curso agora — R$17</a>
       <p class="cta-note">7 dias de garantia · Sem precisar programar · n8n Cloud gratuito</p>
 
     </div>
