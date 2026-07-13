@@ -60,7 +60,7 @@ export const FRENTES: Frente[] = [
     estrategico:
       "É o terceiro dominó da operação. Criar os produtos no Hotmart destrava e-mails, checkout e automações. Se atrasa, tudo atrasa. Cada tarefa tem um tutorial passo a passo para a Gleyce executar sem erro.",
     tatico:
-      "6 tarefas operacionais da Gleyce + 1 pendência do Victor (prova social). Ordem importa: reprecificar e criar o ingresso antes das páginas; criar a Formação antes do carrinho de 27/jul.",
+      "6 tarefas operacionais da Gleyce + 1 pendência do Victor (prova social). Ordem importa: reprecificar e criar o ingresso antes das páginas; criar a Formação antes do carrinho de 3/ago.",
   },
   {
     id: "paginas",
@@ -131,7 +131,7 @@ export const TASKS: Task[] = [
   { id: "grav-criativos", frente: "gravacao", ordem: 2, sugestao: "victor", recorrencia: "unica", label: "Produzir criativos do curso de entrada (IAA)", detalhe: "Reel 'quanto cobrar' + UGC casual — desbloqueia o tráfego" },
   { id: "grav-5aulas", frente: "gravacao", ordem: 3, sugestao: "victor", recorrencia: "unica", label: "Gravar as 5 aulas do evento", detalhe: "CRM ao vivo com Claude Code, 40-50min cada. Gravado uma vez — as aulas são reusadas em todos os ciclos (o L do LPSG é 'Gravado')" },
   { id: "grav-pitch", frente: "gravacao", ordem: 4, sugestao: "victor", recorrencia: "unica", label: "Escrever o pitch de domingo (Aula 6)", detalhe: "Vende a Formação S.H.A.R.K. R$998" },
-  { id: "grav-aula4-avisos", frente: "gravacao", ordem: 5, sugestao: "victor", recorrencia: "unica", label: "Garantir os 3 avisos obrigatórios na Aula 4 (pré-pitch)", detalhe: "Coreografia sagrada do ebook Tabari. A Aula 4 (qui 23/jul) é 100% produto, cria desejo, SEM preço/bônus. Deve conter: (1) apresenta o produto + abre a ficha de interesse; (2) avisa que segunda quem preencheu a ficha entra 6h50 com bônus único, geral às 7h; (3) avisa que domingo 20h tem a revelação de preço e bônus. Preço/bônus SÓ no domingo." },
+  { id: "grav-aula4-avisos", frente: "gravacao", ordem: 5, sugestao: "victor", recorrencia: "unica", label: "Garantir os 3 avisos obrigatórios na Aula 4 (pré-pitch)", detalhe: "Coreografia sagrada do ebook Tabari. A Aula 4 (qui 30/jul) é 100% produto, cria desejo, SEM preço/bônus. Deve conter: (1) apresenta o produto + abre a ficha de interesse; (2) avisa que segunda quem preencheu a ficha entra 6h50 com bônus único, geral às 7h; (3) avisa que domingo 20h tem a revelação de preço e bônus. Preço/bônus SÓ no domingo." },
   { id: "grav-foto-expert", frente: "gravacao", ordem: 6, sugestao: "victor", recorrencia: "unica", label: "Produzir a foto profissional do expert (para as páginas)", detalhe: "Ebook Fase 5: a página de venda precisa da foto profissional do Red. Usar os estilos aprovados de foto (LUA/LoRA)." },
   { id: "grav-depoimentos", frente: "gravacao", ordem: 7, sugestao: "victor", pendencia: true, recorrencia: "unica", label: "Colher 6 depoimentos reais como estudo de caso (nome+idade+contexto+obstáculo+resultado)", detalhe: "Ebook Fase 5: depoimento solto não converte — cada um vira estudo de caso narrativo. São os 5 nomes travados (Neto, Wilson, Marcos Flávio, Rafael, Henrique) + 1. Com autorização de uso. PENDÊNCIA — só o Victor tem os casos." },
 
@@ -180,7 +180,7 @@ export const TASKS: Task[] = [
   },
   {
     id: "hot-formacao", frente: "hotmart", sugestao: "gleyce", recorrencia: "unica", ordem: 4,
-    label: "Criar produto Formação S.H.A.R.K. R$998", detalhe: "12x R$83,17 · carrinho abre 27/jul",
+    label: "Criar produto Formação S.H.A.R.K. R$998", detalhe: "12x R$83,17 · carrinho abre 3/ago",
     tutorial: {
       titulo: "Criar o produto da Formação S.H.A.R.K.",
       passos: [
@@ -189,7 +189,7 @@ export const TASKS: Task[] = [
         "Precificação: R$998 à vista + parcelamento em 12x de R$83,17 (Parcelado com taxas, até 12x).",
         "Configurar 'Parcelado' para exibir 12x como padrão no checkout (parâmetro ?split=12).",
         "Garantia: configurar 7 dias (a garantia condicional de 90+90 dias é tratada por fora, no atendimento).",
-        "NÃO abrir o carrinho ainda — deixar pronto para ativar em 27/jul às 6h50.",
+        "NÃO abrir o carrinho ainda — deixar pronto para ativar em 3/ago às 6h50.",
         "Anotar o ID do produto e o código de checkout.",
       ],
     },
@@ -206,7 +206,7 @@ export const TASKS: Task[] = [
         "Definir a porcentagem de comissão: 20%.",
         "Definir a vigência do contrato de coprodução (data de início e, se aplicável, término).",
         "Enviar o convite — a Gleyce precisa aceitar na conta Hotmart dela.",
-        "Confirmar que o split aparece corretamente antes de abrir o carrinho em 27/jul.",
+        "Confirmar que o split aparece corretamente antes de abrir o carrinho em 3/ago.",
       ],
     },
   },
@@ -239,10 +239,10 @@ export const TASKS: Task[] = [
 
   // ---------- FRENTE 3 — PÁGINAS E AUTOMAÇÃO (Victor) ----------
   { id: "pag-ingresso", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Página de checkout do ingresso (sem página de venda tradicional)", detalhe: "Método Tabari: o ingresso é vendido DENTRO do grupo (ver grp-tpl-revelacao), a página aqui é só o checkout do Hotmart pra onde o link do grupo aponta — sem formulário/pop-up/narrativa de venda extra" },
-  { id: "pag-formacao", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Página de venda da Formação S.H.A.R.K.", detalhe: "Para o carrinho de 27/jul" },
+  { id: "pag-formacao", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Página de venda da Formação S.H.A.R.K.", detalhe: "Para o carrinho de 3/ago" },
   { id: "pag-obrigado", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Página de obrigado do ingresso (pós-compra)", detalhe: "Reforça que a pessoa já está no grupo (ela entrou antes de comprar) — não é aqui que o link do grupo é entregue pela primeira vez, isso já aconteceu na Aula 12" },
   { id: "aut-liberacao", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Automação que libera o acesso às aulas do evento pós-compra do ingresso", detalhe: "Distinta da entrada no grupo (que já é automática via grp-op-automacao) — essa é só a liberação da área de membros" },
-  { id: "aut-ficha", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Ficha de interesse (abre na aula de quinta, 23/jul)", detalhe: "Spec pronta" },
+  { id: "aut-ficha", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Ficha de interesse (abre na aula de quinta, 30/jul)", detalhe: "Spec pronta" },
   { id: "aut-emails", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Programar a sequência de e-mails", detalhe: "12 e-mails já escritos" },
   { id: "aut-lista", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Criar a lista de e-mail dos inscritos" },
   { id: "aut-recuperacao", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Automação de recuperação de carrinho abandonado", detalhe: "3 mensagens prontas. Ebook: a recuperação dos indecisos é 1 a 1 pelo time de vendas, não disparo em massa." },
