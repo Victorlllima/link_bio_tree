@@ -2,10 +2,12 @@ import { Resend } from "resend";
 import { NextResponse } from "next/server";
 import { emailNewsletter } from "@/lib/email-templates";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+export const dynamic = "force-dynamic";
+
 const AUDIENCE_ID = "b058a789-c95f-417b-9239-4a31dadba69f"; // Newsletter
 
 export async function POST(req: Request) {
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const { email } = await req.json();
 
     if (!email) {

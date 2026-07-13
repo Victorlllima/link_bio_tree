@@ -2,10 +2,12 @@ import { Resend } from "resend";
 import { NextResponse } from "next/server";
 import { emailMentoria } from "@/lib/email-templates";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+export const dynamic = "force-dynamic";
+
 const AUDIENCE_ID = "772bf76a-410e-49c0-8737-76f1c1279114";
 
 export async function POST(req: Request) {
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const { name, email, area, level, challenge } = await req.json();
 
     if (!name || !email) {

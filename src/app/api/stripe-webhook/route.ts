@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2026-04-22.dahlia" });
+export const dynamic = "force-dynamic";
+
 
 const PLAN_NAMES: Record<string, string> = {
     "https://buy.stripe.com/cNibJ1eAZ1x174M6dhgbm00": "Mentoria em Grupo",
@@ -10,6 +11,7 @@ const PLAN_NAMES: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2026-04-22.dahlia" });
     const body = await req.text();
     const sig = req.headers.get("stripe-signature") ?? "";
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;

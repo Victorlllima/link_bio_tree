@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2026-04-22.dahlia" });
+export const dynamic = "force-dynamic";
+
 
 export async function POST() {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2026-04-22.dahlia" });
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: [
