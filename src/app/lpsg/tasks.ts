@@ -139,7 +139,7 @@ export const TASKS: Task[] = [
         "Salvar e publicar. Anotar o ID numérico do produto e o código de checkout (aparece ao lado do nome).",
       ],
     } },
-  { id: "hot-reprecificar", frente: "hotmart", ordem: 2, sugestao: "gleyce", recorrencia: "unica", label: "Reajustar preços do IAA e dos bumps", detalhe: "IAA R$97→R$17 · Bump 1 R$37→R$26 · Bump 2 R$27→R$35 (soma 8)", tutorial: {
+  { id: "hot-reprecificar", frente: "hotmart", ordem: 2, sugestao: "gleyce", pendencia: true, recorrencia: "unica", label: "Reajustar preços do IAA e dos bumps", detalhe: "IAA R$97→R$17 · Bump 1 R$37→R$26 · Bump 2 R$27→R$35 (soma 8). ⚠️ A PÁGINA do IAA (redpro.com.br/introducao-a-automacao) JÁ mostra R$17 — o checkout T106558618V precisa acompanhar.", tutorial: {
       titulo: "Reajustar preços (clube da soma 8)",
       passos: [
         "Produtos → Sou Produtor(a) → 'Introdução à Automação' (ID 8039631) → Precificação e Ofertas.",
@@ -149,7 +149,8 @@ export const TASKS: Task[] = [
         "Salvar cada um. ⚠️ Preço em produção — confirmar com o Victor antes de aplicar (approval gate).",
       ],
     } },
-  { id: "hot-capas", frente: "hotmart", ordem: 3, sugestao: "gleyce", recorrencia: "unica", label: "Trocar as capas dos bumps após reajustar", tutorial: {
+  { id: "hot-retificar-cfb", frente: "hotmart", ordem: 3, sugestao: "gleyce", pendencia: true, recorrencia: "unica", label: "Retificar preço do Claude for Business (upsell): R$47 → R$62", detalhe: "⚠️ A PÁGINA do CFB (redpro.com.br/claude-for-business) JÁ mostra R$62 (ancorado em R$179). O checkout V105607171C ainda cobra R$47 — reprecificar a oferta pra R$62 (6+2=8, soma 8) no Hotmart antes de divulgar." },
+  { id: "hot-capas", frente: "hotmart", ordem: 4, sugestao: "gleyce", recorrencia: "unica", label: "Trocar as capas dos bumps após reajustar", tutorial: {
       titulo: "Trocar as capas dos bumps",
       passos: [
         "Gerar as novas capas com os preços atualizados (script bumps/capas/gerar-curso.js, se disponível — senão pedir ao Victor).",
@@ -157,7 +158,7 @@ export const TASKS: Task[] = [
         "Salvar e conferir no checkout se a capa nova aparece.",
       ],
     } },
-  { id: "hot-formacao", frente: "hotmart", ordem: 4, sugestao: "gleyce", recorrencia: "unica", label: "Criar produto Formação S.H.A.R.K. R$998", detalhe: "12x R$83,17 · carrinho abre 3/ago", tutorial: {
+  { id: "hot-formacao", frente: "hotmart", ordem: 5, sugestao: "gleyce", recorrencia: "unica", label: "Criar produto Formação S.H.A.R.K. R$998", detalhe: "12x R$83,17 · carrinho abre 3/ago", tutorial: {
       titulo: "Criar o produto da Formação S.H.A.R.K.",
       passos: [
         "Produtos → Novo Produto → tipo 'Curso Online / Área de Membros'.",
@@ -169,7 +170,7 @@ export const TASKS: Task[] = [
         "Anotar o ID do produto e o código de checkout.",
       ],
     } },
-  { id: "hot-coparticipacao-gleyce", frente: "hotmart", ordem: 5, sugestao: "gleyce", recorrencia: "unica", label: "Alterar a coparticipação da Gleyce para 20% na Formação S.H.A.R.K.", detalhe: "Configurar a divisão de comissão (coprodução) da Formação S.H.A.R.K. com 20% para a Gleyce. Fazer depois que o produto hot-formacao estiver criado.", tutorial: {
+  { id: "hot-coparticipacao-gleyce", frente: "hotmart", ordem: 6, sugestao: "gleyce", recorrencia: "unica", label: "Alterar a coparticipação da Gleyce para 20% na Formação S.H.A.R.K.", detalhe: "Configurar a divisão de comissão (coprodução) da Formação S.H.A.R.K. com 20% para a Gleyce. Fazer depois que o produto hot-formacao estiver criado.", tutorial: {
       titulo: "Configurar coprodução 20% na Formação",
       passos: [
         "Produtos → 'Formação S.H.A.R.K.' → menu lateral → Coprodução (ou Colaboradores).",
@@ -180,7 +181,7 @@ export const TASKS: Task[] = [
         "Confirmar que o split aparece corretamente antes de abrir o carrinho em 3/ago.",
       ],
     } },
-  { id: "hot-checkout", frente: "hotmart", ordem: 6, sugestao: "gleyce", recorrencia: "unica", label: "Configurar checkout do ingresso + área de entrega", detalhe: "Onde as aulas gravadas ficam disponíveis", tutorial: {
+  { id: "hot-checkout", frente: "hotmart", ordem: 7, sugestao: "gleyce", recorrencia: "unica", label: "Configurar checkout do ingresso + área de entrega", detalhe: "Onde as aulas gravadas ficam disponíveis", tutorial: {
       titulo: "Checkout do ingresso + área de membros",
       passos: [
         "Produtos → Área de Membros → área do 'Ingresso' → Conteúdo → Criar módulo (uma aula por dia do evento).",
@@ -189,7 +190,7 @@ export const TASKS: Task[] = [
         "Testar o fluxo com cupom de ~99% (deixa em R$1,00) — comprar e conferir se o acesso libera.",
       ],
     } },
-  { id: "hot-limpar", frente: "hotmart", ordem: 7, sugestao: "gleyce", recorrencia: "unica", label: "Limpar o Hotmart deixando só a RedPro AI Academy", tutorial: {
+  { id: "hot-limpar", frente: "hotmart", ordem: 8, sugestao: "gleyce", recorrencia: "unica", label: "Limpar o Hotmart deixando só a RedPro AI Academy", tutorial: {
       titulo: "Limpar o Club",
       passos: [
         "Produtos → Área de Membros: revisar quais áreas/produtos ainda estão ativos.",
@@ -197,7 +198,7 @@ export const TASKS: Task[] = [
         "Confirmar com o Victor antes de remover qualquer produto com vendas.",
       ],
     } },
-  { id: "hot-provasocial", frente: "hotmart", ordem: 8, sugestao: "victor", pendencia: true, recorrencia: "unica", label: "Fornecer prova social real (nome + resultado)", detalhe: "Depoimentos para os e-mails e o carrinho — só o Victor tem os casos. PENDÊNCIA." },
+  { id: "hot-provasocial", frente: "hotmart", ordem: 9, sugestao: "victor", pendencia: true, recorrencia: "unica", label: "Fornecer prova social real (nome + resultado)", detalhe: "Depoimentos para os e-mails e o carrinho — só o Victor tem os casos. PENDÊNCIA." },
   { id: "pag-ingresso", frente: "paginas", ordem: 1, sugestao: "victor", recorrencia: "unica", label: "Página de checkout do ingresso (sem página de venda tradicional)", detalhe: "Método Tabari: o ingresso é vendido DENTRO do grupo (ver grp-tpl-revelacao), a página aqui é só o checkout do Hotmart pra onde o link do grupo aponta — sem formulário/pop-up/narrativa de venda extra" },
   { id: "pag-formacao", frente: "paginas", ordem: 2, sugestao: "victor", recorrencia: "unica", label: "Página de venda da Formação S.H.A.R.K.", detalhe: "Para o carrinho de 3/ago" },
   { id: "pag-obrigado", frente: "paginas", ordem: 3, sugestao: "victor", recorrencia: "unica", label: "Página de obrigado do ingresso (pós-compra)", detalhe: "Reforça que a pessoa já está no grupo (ela entrou antes de comprar) — não é aqui que o link do grupo é entregue pela primeira vez, isso já aconteceu na Aula 12" },
