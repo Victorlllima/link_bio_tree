@@ -199,7 +199,10 @@ export default function LpsgPainel() {
         {nivel === "drive" && (
           <div style={s.driveWrap}>
             <p style={s.driveIntro}>
-              Repositório do material do lançamento. Cada item leva ao arquivo no Drive. Itens sem link ainda estão pendentes de upload.
+              Repositório do material do lançamento. Cada item leva ao arquivo no Drive. Itens sem link ainda estão pendentes de upload.{" "}
+              <a href="https://drive.google.com/drive/folders/1or08rla9IGvOgzMrbCNCK8T3f3z63t7E" target="_blank" rel="noopener noreferrer" style={s.driveFolderLink}>
+                📁 Abrir a pasta no Drive ↗
+              </a>
             </p>
             {DRIVE.map((cat) => (
               <section key={cat.id} style={s.driveCat}>
@@ -421,6 +424,7 @@ const s: Record<string, React.CSSProperties> = {
   // drive de conteúdo
   driveWrap: { display: "flex", flexDirection: "column", gap: 28 },
   driveIntro: { color: TXT2, fontSize: 13.5, lineHeight: 1.5, margin: "0 0 4px", maxWidth: 680 },
+  driveFolderLink: { color: ACCENT, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" },
   driveCat: {},
   driveCatTitulo: { fontSize: 15, fontWeight: 700, margin: "0 0 12px", display: "flex", alignItems: "center", gap: 8 },
   driveCatEmoji: { fontSize: 17 },

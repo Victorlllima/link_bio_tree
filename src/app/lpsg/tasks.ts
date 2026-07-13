@@ -283,8 +283,8 @@ export const DRIVE: DriveCategoria[] = [
     titulo: "Pesquisa & Briefing",
     emoji: "🧠",
     itens: [
-      { nome: "Pesquisa de Mercado", descricao: "Público, dores, concorrentes, gap e linguagem do avatar", tipo: "doc", url: "" },
-      { nome: "Briefing Completo (13 seções)", descricao: "Big Idea, promessa, mecanismos, avatar, dores, desejos, objeções", tipo: "doc", url: "" },
+      { nome: "Pesquisa de Mercado", descricao: "Público, dores, concorrentes, gap e linguagem do avatar", tipo: "doc", url: "https://docs.google.com/document/d/1FWQNU7oS9I_tqwGWVcri-Vzh_Gn1vK07VfErL-ReAq8/edit" },
+      { nome: "Briefing Completo (13 seções)", descricao: "Big Idea, promessa, mecanismos, avatar, dores, desejos, objeções", tipo: "doc", url: "https://docs.google.com/document/d/1CKUdPkiJlgqLtefNuCq-Fxj0bm4tXwhM3c7R6056NfA/edit" },
       { nome: "Briefing Estratégico (10 seções)", descricao: "Documento de validação com o expert — oferta, funil, metas, cronograma", tipo: "doc", url: "" },
     ],
   },
@@ -304,7 +304,7 @@ export const DRIVE: DriveCategoria[] = [
     titulo: "Estrutura do Lançamento",
     emoji: "🗺️",
     itens: [
-      { nome: "Estrutura do Lançamento", descricao: "Nome do evento, 5 aulas, pitch e calendário", tipo: "doc", url: "" },
+      { nome: "Estrutura do Lançamento", descricao: "Nome do evento, 5 aulas, pitch e calendário", tipo: "doc", url: "https://docs.google.com/document/d/1mW7UnoyKQhOdZlXkuWRAoEuJDvr08gy_SOfU4Id9s1M/edit" },
       { nome: "Estrutura das 5 Aulas (v3)", descricao: "Roteiro psicológico + técnico, aula por aula", tipo: "doc", url: "" },
       { nome: "Pitch de Domingo (14 partes)", descricao: "Roteiro completo da Aula 6", tipo: "doc", url: "" },
     ],
