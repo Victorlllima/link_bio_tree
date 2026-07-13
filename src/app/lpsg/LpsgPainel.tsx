@@ -5,14 +5,20 @@ import {
   TASKS,
   FRENTES,
   FASES_TABARI,
+  DRIVE,
   type Responsavel,
   type TutorialPasso,
+  type DriveTipo,
 } from "./tasks";
 
 type EstadoItem = { task_id: string; responsavel: Responsavel; done: boolean };
 type EstadoMap = Record<string, { responsavel: Responsavel; done: boolean }>;
 
-type Nivel = "estrategico" | "tatico" | "operacional";
+type Nivel = "estrategico" | "tatico" | "operacional" | "drive";
+
+const DRIVE_ICON: Record<DriveTipo, string> = {
+  doc: "📄", pdf: "📕", html: "🌐", img: "🖼️", planilha: "📊", video: "🎬", pasta: "📁", link: "🔗",
+};
 type Pessoa = "todos" | "victor" | "gleyce";
 
 const NOME = { victor: "Victor", gleyce: "Gleyce", ambos: "Ambos" } as const;
@@ -166,6 +172,7 @@ export default function LpsgPainel() {
             ["estrategico", "🎯 Estratégico"],
             ["tatico", "🎛️ Tático"],
             ["operacional", "✅ Operacional"],
+            ["drive", "📁 Drive de Conteúdo"],
           ] as [Nivel, string][]).map(([n, label]) => (
             <button key={n} onClick={() => setNivel(n)} style={{ ...s.aba, ...(nivel === n ? s.abaAtiva : {}) }}>
               {label}
@@ -173,20 +180,70 @@ export default function LpsgPainel() {
           ))}
         </nav>
 
-        {/* ---------- SUB-FILTRO DE PESSOA ---------- */}
-        <div style={s.subfiltro}>
-          {([
-            ["todos", "Todos"],
-            ["victor", `Victor · ${progresso.victor.done}/${progresso.victor.total}`],
-            ["gleyce", `Gleyce · ${progresso.gleyce.done}/${progresso.gleyce.total}`],
-          ] as [Pessoa, string][]).map(([p, label]) => (
-            <button key={p} onClick={() => setPessoa(p)} style={{ ...s.subBtn, ...(pessoa === p ? s.subAtivo : {}) }}>
-              {label}
-            </button>
-          ))}
-        </div>
+        {/* ---------- SUB-FILTRO DE PESSOA (não aparece no Drive) ---------- */}
+        {nivel !== "drive" && (
+          <div style={s.subfiltro}>
+            {([
+              ["todos", "Todos"],
+              ["victor", `Victor · ${progresso.victor.done}/${progresso.victor.total}`],
+              ["gleyce", `Gleyce · ${progresso.gleyce.done}/${progresso.gleyce.total}`],
+            ] as [Pessoa, string][]).map(([p, label]) => (
+              <button key={p} onClick={() => setPessoa(p)} style={{ ...s.subBtn, ...(pessoa === p ? s.subAtivo : {}) }}>
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* ---------- DRIVE DE CONTEÚDO ---------- */}
+        {nivel === "drive" && (
+          <div style={s.driveWrap}>
+            <p style={s.driveIntro}>
+              Repositório do material do lançamento. Cada item leva ao arquivo no Drive. Itens sem link ainda estão pendentes de upload.
+            </p>
+            {DRIVE.map((cat) => (
+              <section key={cat.id} style={s.driveCat}>
+                <h3 style={s.driveCatTitulo}>
+                  <span style={s.driveCatEmoji}>{cat.emoji}</span> {cat.titulo}
+                  <span style={s.driveCatCount}>
+                    {cat.itens.filter((i) => i.url).length}/{cat.itens.length}
+                  </span>
+                </h3>
+                <div style={s.driveGrid}>
+                  {cat.itens.map((item) => {
+                    const pronto = !!item.url;
+                    const Card = (
+                      <>
+                        <div style={s.driveIconWrap}>
+                          <span style={s.driveIcon}>{DRIVE_ICON[item.tipo]}</span>
+                        </div>
+                        <div style={s.driveBody}>
+                          <div style={s.driveNome}>{item.nome}</div>
+                          <div style={s.driveDesc}>{item.descricao}</div>
+                        </div>
+                        <span style={{ ...s.driveStatus, ...(pronto ? s.driveStatusOk : s.driveStatusPend) }}>
+                          {pronto ? "abrir ↗" : "adicionar link"}
+                        </span>
+                      </>
+                    );
+                    return pronto ? (
+                      <a key={item.nome} href={item.url} target="_blank" rel="noopener noreferrer" style={{ ...s.driveItem, ...s.driveItemOk }}>
+                        {Card}
+                      </a>
+                    ) : (
+                      <div key={item.nome} style={{ ...s.driveItem, ...s.driveItemPend }}>
+                        {Card}
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
 
         {/* ---------- CONTEÚDO POR FRENTE ---------- */}
+        {nivel !== "drive" && (
         <div style={s.checklist}>
           {frentesComTarefas.map((frente) => {
             const items = TASKS
@@ -262,6 +319,7 @@ export default function LpsgPainel() {
             <p style={s.vazio}>Nenhuma tarefa para esse filtro.</p>
           )}
         </div>
+        )}
 
         <footer style={s.footer}>RedPro AI Academy · Painel interno · alterações salvas automaticamente</footer>
       </div>
@@ -322,7 +380,7 @@ const s: Record<string, React.CSSProperties> = {
   fluxoDesc: { fontSize: 11.5, color: TXT2, lineHeight: 1.4 },
 
   abas: { display: "flex", gap: 8, marginBottom: 14, borderBottom: `1px solid ${BORDER}`, flexWrap: "wrap" },
-  aba: { background: "transparent", border: "none", borderBottom: "2px solid transparent", color: TXT2, fontSize: 15, fontWeight: 600, padding: "10px 14px", cursor: "pointer", marginBottom: -1, fontFamily: "inherit" },
+  aba: { background: "transparent", border: "none", borderBottomWidth: 2, borderBottomStyle: "solid", borderBottomColor: "transparent", color: TXT2, fontSize: 15, fontWeight: 600, padding: "10px 14px", cursor: "pointer", marginBottom: -1, fontFamily: "inherit" },
   abaAtiva: { color: TXT, borderBottomColor: ACCENT },
 
   subfiltro: { display: "flex", gap: 6, marginBottom: 24, background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 10, padding: 4, width: "fit-content", flexWrap: "wrap" },
@@ -359,6 +417,26 @@ const s: Record<string, React.CSSProperties> = {
 
   vazio: { color: TXT3, textAlign: "center", padding: 40, fontSize: 14 },
   footer: { marginTop: 48, paddingTop: 20, borderTop: `1px solid ${BORDER}`, color: TXT3, fontSize: 12.5, textAlign: "center" },
+
+  // drive de conteúdo
+  driveWrap: { display: "flex", flexDirection: "column", gap: 28 },
+  driveIntro: { color: TXT2, fontSize: 13.5, lineHeight: 1.5, margin: "0 0 4px", maxWidth: 680 },
+  driveCat: {},
+  driveCatTitulo: { fontSize: 15, fontWeight: 700, margin: "0 0 12px", display: "flex", alignItems: "center", gap: 8 },
+  driveCatEmoji: { fontSize: 17 },
+  driveCatCount: { fontSize: 11.5, fontWeight: 700, color: TXT3, background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 20, padding: "2px 9px", marginLeft: 2 },
+  driveGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 10 },
+  driveItem: { display: "flex", alignItems: "center", gap: 12, background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "12px 14px", textDecoration: "none", color: "inherit" },
+  driveItemOk: { cursor: "pointer" },
+  driveItemPend: { opacity: 0.62, borderStyle: "dashed" },
+  driveIconWrap: { width: 38, height: 38, minWidth: 38, borderRadius: 9, background: BG, border: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "center" },
+  driveIcon: { fontSize: 18 },
+  driveBody: { flex: 1, minWidth: 0 },
+  driveNome: { fontSize: 14, fontWeight: 700, lineHeight: 1.3 },
+  driveDesc: { fontSize: 12, color: TXT3, marginTop: 2, lineHeight: 1.4 },
+  driveStatus: { fontSize: 11, fontWeight: 700, padding: "4px 9px", borderRadius: 20, whiteSpace: "nowrap", flexShrink: 0 },
+  driveStatusOk: { color: ACCENT, background: "rgba(249,115,22,0.12)" },
+  driveStatusPend: { color: TXT3, background: "rgba(255,255,255,0.04)", border: `1px dashed ${BORDER}` },
 
   // modal
   modalOverlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, zIndex: 100 },
