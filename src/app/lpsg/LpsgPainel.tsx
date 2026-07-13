@@ -14,7 +14,7 @@ import {
 type EstadoItem = { task_id: string; responsavel: Responsavel; done: boolean };
 type EstadoMap = Record<string, { responsavel: Responsavel; done: boolean }>;
 
-type Nivel = "estrategico" | "tatico" | "operacional" | "drive";
+type Nivel = "operacional" | "drive";
 
 const DRIVE_ICON: Record<DriveTipo, string> = {
   doc: "📄", pdf: "📕", html: "🌐", img: "🖼️", planilha: "📊", video: "🎬", pasta: "📁", link: "🔗",
@@ -169,9 +169,7 @@ export default function LpsgPainel() {
         {/* ---------- ABAS DE NÍVEL (topo) ---------- */}
         <nav style={s.abas}>
           {([
-            ["estrategico", "🎯 Estratégico"],
-            ["tatico", "🎛️ Tático"],
-            ["operacional", "✅ Operacional"],
+            ["operacional", "✅ Checklist Operacional"],
             ["drive", "📁 Drive de Conteúdo"],
           ] as [Nivel, string][]).map(([n, label]) => (
             <button key={n} onClick={() => setNivel(n)} style={{ ...s.aba, ...(nivel === n ? s.abaAtiva : {}) }}>
@@ -248,6 +246,10 @@ export default function LpsgPainel() {
         {/* ---------- CONTEÚDO POR FRENTE ---------- */}
         {nivel !== "drive" && (
         <div style={s.checklist}>
+          <div style={s.legenda}>
+            <span style={s.legendaItem}><span style={s.recUnica}>1× só</span> feito uma vez, serve pra todos os ciclos</span>
+            <span style={s.legendaItem}><span style={s.recSemanal}>♻️ toda semana</span> repete a cada novo ciclo do LPSG</span>
+          </div>
           {frentesComTarefas.map((frente) => {
             const items = TASKS
               .filter((t) => t.frente === frente.id && pertence(t.id, pessoa))
@@ -256,23 +258,7 @@ export default function LpsgPainel() {
               <section key={frente.id} style={s.frenteBloco}>
                 <h3 style={s.frenteTitulo}>{frente.titulo}</h3>
 
-                {/* ESTRATÉGICO — só texto */}
-                {nivel === "estrategico" && (
-                  <div style={s.nivelBox}>
-                    <span style={s.nivelTag}>🎯 Estratégico</span>
-                    <p style={s.nivelTexto}>{frente.estrategico}</p>
-                  </div>
-                )}
-
-                {/* TÁTICO — só texto */}
-                {nivel === "tatico" && (
-                  <div style={s.nivelBox}>
-                    <span style={s.nivelTag}>🎛️ Tático</span>
-                    <p style={s.nivelTexto}>{frente.tatico}</p>
-                  </div>
-                )}
-
-                {/* OPERACIONAL — checklist */}
+                {/* CHECKLIST OPERACIONAL */}
                 {nivel === "operacional" && (
                   <div style={s.tasks}>
                     {items.map((t) => {
@@ -287,6 +273,12 @@ export default function LpsgPainel() {
                             <div style={{ ...s.taskLabel, ...(done ? s.taskLabelDone : {}) }}>
                               {t.ordem ? <span style={s.ordem}>{t.ordem}</span> : null}
                               {t.label}
+                              {t.recorrencia === "semanal" && (
+                                <span style={s.recSemanal} title="Repete a cada ciclo semanal do LPSG">♻️ toda semana</span>
+                              )}
+                              {t.recorrencia === "unica" && (
+                                <span style={s.recUnica} title="Feito uma vez — serve para todos os ciclos">1× só</span>
+                              )}
                               {t.pendencia && <span style={s.pendBadge}>pendência</span>}
                               {t.tutorial && (
                                 <button onClick={() => setTutorial(t.tutorial!)} style={s.tutBtn} title="ver passo a passo">📖 passo a passo</button>
@@ -391,6 +383,8 @@ const s: Record<string, React.CSSProperties> = {
   subAtivo: { background: BG, color: TXT },
 
   checklist: { display: "flex", flexDirection: "column", gap: 24 },
+  legenda: { display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "10px 14px" },
+  legendaItem: { display: "flex", alignItems: "center", gap: 7, fontSize: 12.5, color: TXT2 },
   frenteBloco: {},
   frenteTitulo: { fontSize: 16, fontWeight: 700, margin: "0 0 10px" },
 
@@ -410,6 +404,8 @@ const s: Record<string, React.CSSProperties> = {
   taskDetalhe: { fontSize: 12.5, color: TXT3, marginTop: 3, lineHeight: 1.4 },
   ordem: { width: 20, height: 20, minWidth: 20, borderRadius: 6, background: ACCENT, color: "#fff", fontSize: 11.5, fontWeight: 800, display: "inline-flex", alignItems: "center", justifyContent: "center" },
   pendBadge: { fontSize: 10.5, fontWeight: 700, color: PEND, background: "rgba(245,158,11,0.15)", padding: "2px 8px", borderRadius: 20, textTransform: "uppercase", letterSpacing: "0.02em" },
+  recSemanal: { fontSize: 10.5, fontWeight: 700, color: "#38bdf8", background: "rgba(56,189,248,0.14)", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.01em", whiteSpace: "nowrap" },
+  recUnica: { fontSize: 10.5, fontWeight: 700, color: TXT2, background: "rgba(255,255,255,0.06)", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.01em", whiteSpace: "nowrap" },
   tutBtn: { fontSize: 11.5, fontWeight: 600, color: ACCENT, background: "rgba(249,115,22,0.12)", border: "none", padding: "3px 9px", borderRadius: 6, cursor: "pointer", fontFamily: "inherit" },
 
   segmented: { display: "flex", gap: 4, background: BG, borderRadius: 9, padding: 3, border: `1px solid ${BORDER}`, flexShrink: 0 },

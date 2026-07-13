@@ -96,15 +96,15 @@ export const TASKS: Task[] = [
   { id: "grp-op-automacao", frente: "grupo", ordem: 9, sugestao: "victor", recorrencia: "semanal", label: "[CICLO] Apontar a automação de entrada pro link novo da semana", detalhe: "ManyChat ou link direto na tela final da Aula 12 — sem esse passo, a entrada fica manual e não escala com o tráfego. No 1º ciclo, monta a automação; nos seguintes, só troca a variável do link." },
 
   // ---------- FRENTE 1 — GRAVAÇÃO (ordem de prioridade) ----------
-  { id: "grav-aula12", frente: "gravacao", ordem: 1, sugestao: "victor", label: "Regravar a aula 12 do IAA (Introdução à Automação)", detalhe: "Nova ponte final aponta pro grupo de aquecimento (link só entra depois de grp-op-link estar pronto), não pro S.H.A.R.K. genérico" },
-  { id: "grav-criativos", frente: "gravacao", ordem: 2, sugestao: "victor", label: "Produzir criativos do curso de entrada (IAA)", detalhe: "Reel 'quanto cobrar' + UGC casual — desbloqueia o tráfego" },
-  { id: "grav-5aulas", frente: "gravacao", ordem: 3, sugestao: "victor", label: "Gravar as 5 aulas do evento", detalhe: "CRM ao vivo com Claude Code, 40-50min cada (a construção do CRM faz parte das aulas)" },
-  { id: "grav-pitch", frente: "gravacao", ordem: 4, sugestao: "victor", label: "Escrever o pitch de domingo (Aula 6)", detalhe: "Vende a Formação S.H.A.R.K. R$998" },
+  { id: "grav-aula12", frente: "gravacao", ordem: 1, sugestao: "victor", recorrencia: "unica", label: "Regravar a aula 12 do IAA (Introdução à Automação)", detalhe: "Nova ponte final aponta pro grupo de aquecimento (link só entra depois de grp-op-link estar pronto), não pro S.H.A.R.K. genérico" },
+  { id: "grav-criativos", frente: "gravacao", ordem: 2, sugestao: "victor", recorrencia: "unica", label: "Produzir criativos do curso de entrada (IAA)", detalhe: "Reel 'quanto cobrar' + UGC casual — desbloqueia o tráfego" },
+  { id: "grav-5aulas", frente: "gravacao", ordem: 3, sugestao: "victor", recorrencia: "unica", label: "Gravar as 5 aulas do evento", detalhe: "CRM ao vivo com Claude Code, 40-50min cada. Gravado uma vez — as aulas são reusadas em todos os ciclos (o L do LPSG é 'Gravado')" },
+  { id: "grav-pitch", frente: "gravacao", ordem: 4, sugestao: "victor", recorrencia: "unica", label: "Escrever o pitch de domingo (Aula 6)", detalhe: "Vende a Formação S.H.A.R.K. R$998" },
 
   // ---------- FRENTE 2 — HOTMART (com tutoriais) ----------
   {
-    id: "hot-ingresso", frente: "hotmart", sugestao: "gleyce",
-    label: "Criar produto 'Ingresso do evento' R$44", detalhe: "Produto próprio no Hotmart",
+    id: "hot-ingresso", frente: "hotmart", sugestao: "gleyce", recorrencia: "unica", ordem: 1,
+    label: "Criar produto 'Ingresso do evento' R$44", detalhe: "Produto próprio no Hotmart — criado uma vez, o mesmo checkout serve todos os ciclos",
     tutorial: {
       titulo: "Criar o produto do Ingresso R$44",
       passos: [
@@ -119,7 +119,7 @@ export const TASKS: Task[] = [
     },
   },
   {
-    id: "hot-reprecificar", frente: "hotmart", sugestao: "gleyce",
+    id: "hot-reprecificar", frente: "hotmart", sugestao: "gleyce", recorrencia: "unica", ordem: 2,
     label: "Reajustar preços do IAA e dos bumps", detalhe: "IAA R$97→R$17 · Bump 1 R$37→R$26 · Bump 2 R$27→R$35 (soma 8)",
     tutorial: {
       titulo: "Reajustar preços (clube da soma 8)",
@@ -133,7 +133,7 @@ export const TASKS: Task[] = [
     },
   },
   {
-    id: "hot-capas", frente: "hotmart", sugestao: "gleyce",
+    id: "hot-capas", frente: "hotmart", sugestao: "gleyce", recorrencia: "unica", ordem: 3,
     label: "Trocar as capas dos bumps após reajustar",
     tutorial: {
       titulo: "Trocar as capas dos bumps",
@@ -145,23 +145,39 @@ export const TASKS: Task[] = [
     },
   },
   {
-    id: "hot-formacao", frente: "hotmart", sugestao: "gleyce",
-    label: "Criar produto Formação S.H.A.R.K. R$998", detalhe: "12x R$97 · carrinho abre 27/jul",
+    id: "hot-formacao", frente: "hotmart", sugestao: "gleyce", recorrencia: "unica", ordem: 4,
+    label: "Criar produto Formação S.H.A.R.K. R$998", detalhe: "12x R$83,17 · carrinho abre 27/jul",
     tutorial: {
       titulo: "Criar o produto da Formação S.H.A.R.K.",
       passos: [
         "Produtos → Novo Produto → tipo 'Curso Online / Área de Membros'.",
         "Nome: 'Formação S.H.A.R.K.'.",
-        "Precificação: R$998 à vista + parcelamento em 12x (Parcelado com taxas, até 12x).",
+        "Precificação: R$998 à vista + parcelamento em 12x de R$83,17 (Parcelado com taxas, até 12x).",
         "Configurar 'Parcelado' para exibir 12x como padrão no checkout (parâmetro ?split=12).",
-        "Garantia: configurar 7 dias.",
+        "Garantia: configurar 7 dias (a garantia condicional de 90+90 dias é tratada por fora, no atendimento).",
         "NÃO abrir o carrinho ainda — deixar pronto para ativar em 27/jul às 6h50.",
         "Anotar o ID do produto e o código de checkout.",
       ],
     },
   },
   {
-    id: "hot-checkout", frente: "hotmart", sugestao: "gleyce",
+    id: "hot-coparticipacao-gleyce", frente: "hotmart", sugestao: "gleyce", recorrencia: "unica", ordem: 5,
+    label: "Alterar a coparticipação da Gleyce para 20% na Formação S.H.A.R.K.",
+    detalhe: "Configurar a divisão de comissão (coprodução) da Formação S.H.A.R.K. com 20% para a Gleyce. Fazer depois que o produto hot-formacao estiver criado.",
+    tutorial: {
+      titulo: "Configurar coprodução 20% na Formação",
+      passos: [
+        "Produtos → 'Formação S.H.A.R.K.' → menu lateral → Coprodução (ou Colaboradores).",
+        "Adicionar/editar a Gleyce como coprodutora.",
+        "Definir a porcentagem de comissão: 20%.",
+        "Definir a vigência do contrato de coprodução (data de início e, se aplicável, término).",
+        "Enviar o convite — a Gleyce precisa aceitar na conta Hotmart dela.",
+        "Confirmar que o split aparece corretamente antes de abrir o carrinho em 27/jul.",
+      ],
+    },
+  },
+  {
+    id: "hot-checkout", frente: "hotmart", sugestao: "gleyce", recorrencia: "unica", ordem: 6,
     label: "Configurar checkout do ingresso + área de entrega", detalhe: "Onde as aulas gravadas ficam disponíveis",
     tutorial: {
       titulo: "Checkout do ingresso + área de membros",
@@ -174,7 +190,7 @@ export const TASKS: Task[] = [
     },
   },
   {
-    id: "hot-limpar", frente: "hotmart", sugestao: "gleyce",
+    id: "hot-limpar", frente: "hotmart", sugestao: "gleyce", recorrencia: "unica", ordem: 7,
     label: "Limpar o Hotmart deixando só a RedPro AI Academy",
     tutorial: {
       titulo: "Limpar o Club",
@@ -185,29 +201,29 @@ export const TASKS: Task[] = [
       ],
     },
   },
-  { id: "hot-provasocial", frente: "hotmart", sugestao: "victor", pendencia: true, label: "Fornecer prova social real (nome + resultado)", detalhe: "Depoimentos para os e-mails e o carrinho — só o Victor tem os casos. PENDÊNCIA." },
+  { id: "hot-provasocial", frente: "hotmart", sugestao: "victor", pendencia: true, recorrencia: "unica", ordem: 8, label: "Fornecer prova social real (nome + resultado)", detalhe: "Depoimentos para os e-mails e o carrinho — só o Victor tem os casos. PENDÊNCIA." },
 
   // ---------- FRENTE 3 — PÁGINAS E AUTOMAÇÃO (Victor) ----------
-  { id: "pag-ingresso", frente: "paginas", sugestao: "victor", label: "Página de checkout do ingresso (sem página de venda tradicional)", detalhe: "Método Tabari: o ingresso é vendido DENTRO do grupo (ver grp-tpl-revelacao), a página aqui é só o checkout do Hotmart pra onde o link do grupo aponta — sem formulário/pop-up/narrativa de venda extra" },
-  { id: "pag-formacao", frente: "paginas", sugestao: "victor", label: "Página de venda da Formação S.H.A.R.K.", detalhe: "Para o carrinho de 27/jul" },
-  { id: "pag-obrigado", frente: "paginas", sugestao: "victor", label: "Página de obrigado do ingresso (pós-compra)", detalhe: "Reforça que a pessoa já está no grupo (ela entrou antes de comprar) — não é aqui que o link do grupo é entregue pela primeira vez, isso já aconteceu na Aula 12" },
-  { id: "aut-liberacao", frente: "paginas", sugestao: "victor", label: "Automação que libera o acesso às aulas do evento pós-compra do ingresso", detalhe: "Distinta da entrada no grupo (que já é automática via grp-op-automacao) — essa é só a liberação da área de membros" },
-  { id: "aut-ficha", frente: "paginas", sugestao: "victor", label: "Ficha de interesse (abre na aula de quinta, 23/jul)", detalhe: "Spec pronta" },
-  { id: "aut-emails", frente: "paginas", sugestao: "victor", label: "Programar a sequência de e-mails", detalhe: "12 e-mails já escritos" },
-  { id: "aut-lista", frente: "paginas", sugestao: "victor", label: "Criar a lista de e-mail dos inscritos" },
-  { id: "aut-recuperacao", frente: "paginas", sugestao: "victor", label: "Automação de recuperação de carrinho abandonado", detalhe: "3 mensagens prontas" },
-  { id: "aut-plataforma", frente: "paginas", sugestao: "victor", label: "Definir a plataforma onde as aulas gravadas vão rodar" },
+  { id: "pag-ingresso", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Página de checkout do ingresso (sem página de venda tradicional)", detalhe: "Método Tabari: o ingresso é vendido DENTRO do grupo (ver grp-tpl-revelacao), a página aqui é só o checkout do Hotmart pra onde o link do grupo aponta — sem formulário/pop-up/narrativa de venda extra" },
+  { id: "pag-formacao", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Página de venda da Formação S.H.A.R.K.", detalhe: "Para o carrinho de 27/jul" },
+  { id: "pag-obrigado", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Página de obrigado do ingresso (pós-compra)", detalhe: "Reforça que a pessoa já está no grupo (ela entrou antes de comprar) — não é aqui que o link do grupo é entregue pela primeira vez, isso já aconteceu na Aula 12" },
+  { id: "aut-liberacao", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Automação que libera o acesso às aulas do evento pós-compra do ingresso", detalhe: "Distinta da entrada no grupo (que já é automática via grp-op-automacao) — essa é só a liberação da área de membros" },
+  { id: "aut-ficha", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Ficha de interesse (abre na aula de quinta, 23/jul)", detalhe: "Spec pronta" },
+  { id: "aut-emails", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Programar a sequência de e-mails", detalhe: "12 e-mails já escritos" },
+  { id: "aut-lista", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Criar a lista de e-mail dos inscritos" },
+  { id: "aut-recuperacao", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Automação de recuperação de carrinho abandonado", detalhe: "3 mensagens prontas" },
+  { id: "aut-plataforma", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Definir a plataforma onde as aulas gravadas vão rodar" },
 
   // ---------- FRENTE 4 — TRÁFEGO E CAPTAÇÃO (Victor) ----------
-  { id: "traf-anuncios", frente: "trafego", sugestao: "victor", label: "Montar os anúncios de venda do ingresso", detalhe: "5 variações, máx. 60% de texto na imagem — usados como reforço fora do grupo (Stories/Reels), a venda em si acontece dentro do grupo (grp-tpl-revelacao)" },
-  { id: "traf-curso", frente: "trafego", sugestao: "victor", pendencia: true, label: "Subir o tráfego do curso de entrada (IAA)", detalhe: "⚠️ BLOQUEADO até toda a frente Grupo estar pronta (templates escritos + grp-op-criar → grp-op-automacao do ciclo atual) — cada real gasto aqui manda gente pra Aula 12, que aponta pro grupo. Assim que os 2 criativos ficarem prontos E o grupo existir." },
-  { id: "traf-ingresso", frente: "trafego", sugestao: "victor", label: "Ligar tráfego pago do ingresso R$44", detalhe: "Método Tabari: ROAS piso 1,25 · começa com lista IAA + orgânico, liga pago com os criativos" },
-  { id: "traf-meta", frente: "trafego", sugestao: "victor", label: "Configurar meta de lista até 19/jul", detalhe: "Referência: 30% de presença na Aula 1" },
+  { id: "traf-anuncios", frente: "trafego", sugestao: "victor", recorrencia: "unica", label: "Montar os anúncios de venda do ingresso", detalhe: "5 variações, máx. 60% de texto na imagem — usados como reforço fora do grupo (Stories/Reels), a venda em si acontece dentro do grupo (grp-tpl-revelacao)" },
+  { id: "traf-curso", frente: "trafego", sugestao: "victor", pendencia: true, recorrencia: "unica", label: "Subir o tráfego do curso de entrada (IAA)", detalhe: "⚠️ BLOQUEADO até toda a frente Grupo estar pronta (templates escritos + grp-op-criar → grp-op-automacao do ciclo atual) — cada real gasto aqui manda gente pra Aula 12, que aponta pro grupo. Assim que os 2 criativos ficarem prontos E o grupo existir. Liga uma vez e roda perpétuo." },
+  { id: "traf-ingresso", frente: "trafego", sugestao: "victor", recorrencia: "semanal", label: "Ligar tráfego pago do ingresso R$44", detalhe: "Método Tabari: ROAS piso 1,25 · começa com lista IAA + orgânico, liga pago com os criativos. Reativado/ajustado a cada ciclo." },
+  { id: "traf-meta", frente: "trafego", sugestao: "victor", recorrencia: "semanal", label: "Configurar meta de lista do ciclo", detalhe: "Referência: 30% de presença na Aula 1. Definida a cada semana." },
 
-  // ---------- FRENTE 5 — GESTÃO (Gleyce) ----------
-  { id: "ges-cronograma", frente: "gestao", sugestao: "gleyce", label: "Manter o cronograma vivo e cobrar cada prazo" },
-  { id: "ges-ordem", frente: "gestao", sugestao: "gleyce", label: "Garantir a ordem certa: Grupo → Hotmart → Páginas", detalhe: "O grupo bloqueia o tráfego do IAA, que já está rodando — é a prioridade nº 1 antes de qualquer outra coisa" },
-  { id: "ges-status", frente: "gestao", sugestao: "gleyce", label: "Relatório de status diário até o evento" },
+  // ---------- FRENTE 5 — GESTÃO (Gleyce) — coordenação recorrente ----------
+  { id: "ges-cronograma", frente: "gestao", sugestao: "gleyce", recorrencia: "semanal", label: "Manter o cronograma vivo e cobrar cada prazo" },
+  { id: "ges-ordem", frente: "gestao", sugestao: "gleyce", recorrencia: "semanal", label: "Garantir a ordem certa: Grupo → Hotmart → Páginas", detalhe: "O grupo bloqueia o tráfego do IAA, que já está rodando — é a prioridade nº 1 antes de qualquer outra coisa" },
+  { id: "ges-status", frente: "gestao", sugestao: "gleyce", recorrencia: "semanal", label: "Relatório de status diário até o evento" },
 ];
 
 // Fases do método Tabari com as datas reais do 1º ciclo.
