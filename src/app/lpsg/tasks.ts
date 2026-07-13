@@ -292,7 +292,7 @@ export const FASES_TABARI: Fase[] = [
   {
     num: "2",
     titulo: "Aquecimento no Grupo de WhatsApp",
-    data: "13 → 24/jul",
+    data: "13 → 26/jul",
     descricao: "É dentro do grupo — não numa página — que a oferta do ingresso R$44 é revelada e vendida, com ancoragem e escassez real (padrão Turbo Express). Conteúdo orgânico + e-mails reforçam por fora. Meta: 30% de presença na 1ª aula do evento.",
     cor: "#fb923c",
   },
