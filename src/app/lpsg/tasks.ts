@@ -31,6 +31,14 @@ export interface Frente {
 
 export const FRENTES: Frente[] = [
   {
+    id: "setup",
+    titulo: "🔑 Setup / Pré-requisitos (Método Tabari)",
+    estrategico:
+      "Etapa 0 do ebook LPSG (Turbo Academy). São as contas e dados técnicos que precisam existir antes de qualquer execução — sem isso, tudo trava no meio. Feito uma vez, serve para todos os ciclos. Boa parte da nossa infra já existe (Meta, Hotmart, ManyChat); esta frente garante que nada foi esquecido e que os 5 dados críticos estão anotados.",
+    tatico:
+      "Contas + os 5 dados críticos do ebook (Pixel ID, CAPI Token, Phone Number ID, Product ID + Offer Key, HOTTOK). Adaptado ao nosso stack: sem n8n no 1º ciclo (usamos ManyChat + webhooks); captação via grupo de WhatsApp em vez de 5 páginas.",
+  },
+  {
     id: "grupo",
     titulo: "💬 Grupo de Aquecimento (WhatsApp)",
     estrategico:
@@ -78,9 +86,32 @@ export const FRENTES: Frente[] = [
     tatico:
       "Coordenação contínua até o evento. Cobra prazos, mantém o cronograma vivo e reporta status.",
   },
+  {
+    id: "dashboard",
+    titulo: "📊 Dashboard & Métricas",
+    estrategico:
+      "Ebook Fase 8: painel ao vivo de métricas do lançamento. Você olha e sabe em 3 segundos se está ganhando, estável ou se precisa agir. No nosso caso, o painel de acompanhamento (este) + as métricas de venda do Hotmart/Meta.",
+    tatico:
+      "Conferir os números durante o evento e o carrinho. Documentar os resultados do 1º ciclo para recalibrar os benchmarks Tabari depois de 4-6 ciclos.",
+  },
+  {
+    id: "cs",
+    titulo: "🤝 Pós-venda (Customer Success)",
+    estrategico:
+      "Ebook Etapa 6: aluno satisfeito vira prova social real pro próximo ciclo. O pós-venda não é caridade — alimenta o lançamento seguinte. O ciclo fecha aqui e recomeça melhor. Roda DEPOIS das primeiras vendas.",
+    tatico:
+      "Onboarding 90 dias + pesquisa NPS + captura de prova social. A prova bruta vira estudo de caso narrativo e volta pras páginas e criativos do próximo ciclo.",
+  },
 ];
 
 export const TASKS: Task[] = [
+  // ---------- FRENTE SETUP — ETAPA 0 DO EBOOK TABARI (pré-requisitos, feito uma vez) ----------
+  { id: "set-contas-infra", frente: "setup", ordem: 1, sugestao: "gleyce", recorrencia: "unica", label: "Conferir as contas de infra (Meta, Hotmart, ManyChat, Vercel, domínio)", detalhe: "Etapa 0 do ebook. Boa parte já existe. Confirmar acesso ativo a: Meta Business + Ad Account, Hotmart Pro, ManyChat Pro, Vercel, domínio + Cloudflare. Sem n8n no 1º ciclo (adaptação nossa)." },
+  { id: "set-google-sa", frente: "setup", ordem: 2, sugestao: "victor", recorrencia: "unica", label: "Google + Service Account (Sheets/Drive/Calendar do CS)", detalhe: "Necessário para CRM em planilha, Drive do lançamento e Calendar do pós-venda. O JSON da Service Account fica em pasta criptografada." },
+  { id: "set-waba", frente: "setup", ordem: 3, sugestao: "victor", recorrencia: "unica", label: "WABA (WhatsApp Business API) — número dedicado da mensageria", detalhe: "Já temos WABA (+55 61 9108-9602). Confirmar que está ativa e anotar o Phone Number ID." },
+  { id: "set-dados-criticos", frente: "setup", ordem: 4, sugestao: "victor", pendencia: true, recorrencia: "unica", label: "Anotar os 5 dados críticos do ebook em local seguro (vault)", detalhe: "PENDÊNCIA: (1) Pixel ID (Meta), (2) CAPI Token (System User, sem expiração), (3) Phone Number ID (WABA), (4) Product ID + Offer Key dos 2 produtos Hotmart (ingresso + Formação), (5) HOTTOK (valida o webhook do onboarding). Tokens no gerenciador de senhas, nunca em texto puro." },
+  { id: "set-pixel-capi", frente: "setup", ordem: 5, sugestao: "victor", recorrencia: "unica", label: "Confirmar Pixel + CAPI ativos (rastreamento server-side)", detalhe: "Pixel Vibecoding 1543917230170877. CAPI já ativa (Purchase + ViewContent + InitiateCheckout). Validar que os eventos estão chegando antes de ligar tráfego." },
+
   // ---------- FRENTE 0 — GRUPO DE AQUECIMENTO (bloqueio mais urgente — ordem de prioridade) ----------
   // -- Templates: escrever uma vez, reusar em todo ciclo semanal --
   { id: "grp-tpl-boasvindas", frente: "grupo", ordem: 1, sugestao: "victor", recorrencia: "unica", label: "[TEMPLATE] Mensagem de boas-vindas automática do grupo", detalhe: "Dispara quando a pessoa entra. Confirma que ela está no lugar certo e adianta o cronograma (silêncio até o Dia 1). Escrever uma vez, reusar toda semana." },
@@ -100,6 +131,9 @@ export const TASKS: Task[] = [
   { id: "grav-criativos", frente: "gravacao", ordem: 2, sugestao: "victor", recorrencia: "unica", label: "Produzir criativos do curso de entrada (IAA)", detalhe: "Reel 'quanto cobrar' + UGC casual — desbloqueia o tráfego" },
   { id: "grav-5aulas", frente: "gravacao", ordem: 3, sugestao: "victor", recorrencia: "unica", label: "Gravar as 5 aulas do evento", detalhe: "CRM ao vivo com Claude Code, 40-50min cada. Gravado uma vez — as aulas são reusadas em todos os ciclos (o L do LPSG é 'Gravado')" },
   { id: "grav-pitch", frente: "gravacao", ordem: 4, sugestao: "victor", recorrencia: "unica", label: "Escrever o pitch de domingo (Aula 6)", detalhe: "Vende a Formação S.H.A.R.K. R$998" },
+  { id: "grav-aula4-avisos", frente: "gravacao", ordem: 5, sugestao: "victor", recorrencia: "unica", label: "Garantir os 3 avisos obrigatórios na Aula 4 (pré-pitch)", detalhe: "Coreografia sagrada do ebook Tabari. A Aula 4 (qui 23/jul) é 100% produto, cria desejo, SEM preço/bônus. Deve conter: (1) apresenta o produto + abre a ficha de interesse; (2) avisa que segunda quem preencheu a ficha entra 6h50 com bônus único, geral às 7h; (3) avisa que domingo 20h tem a revelação de preço e bônus. Preço/bônus SÓ no domingo." },
+  { id: "grav-foto-expert", frente: "gravacao", ordem: 6, sugestao: "victor", recorrencia: "unica", label: "Produzir a foto profissional do expert (para as páginas)", detalhe: "Ebook Fase 5: a página de venda precisa da foto profissional do Red. Usar os estilos aprovados de foto (LUA/LoRA)." },
+  { id: "grav-depoimentos", frente: "gravacao", ordem: 7, sugestao: "victor", pendencia: true, recorrencia: "unica", label: "Colher 6 depoimentos reais como estudo de caso (nome+idade+contexto+obstáculo+resultado)", detalhe: "Ebook Fase 5: depoimento solto não converte — cada um vira estudo de caso narrativo. São os 5 nomes travados (Neto, Wilson, Marcos Flávio, Rafael, Henrique) + 1. Com autorização de uso. PENDÊNCIA — só o Victor tem os casos." },
 
   // ---------- FRENTE 2 — HOTMART (com tutoriais) ----------
   {
@@ -211,8 +245,11 @@ export const TASKS: Task[] = [
   { id: "aut-ficha", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Ficha de interesse (abre na aula de quinta, 23/jul)", detalhe: "Spec pronta" },
   { id: "aut-emails", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Programar a sequência de e-mails", detalhe: "12 e-mails já escritos" },
   { id: "aut-lista", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Criar a lista de e-mail dos inscritos" },
-  { id: "aut-recuperacao", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Automação de recuperação de carrinho abandonado", detalhe: "3 mensagens prontas" },
+  { id: "aut-recuperacao", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Automação de recuperação de carrinho abandonado", detalhe: "3 mensagens prontas. Ebook: a recuperação dos indecisos é 1 a 1 pelo time de vendas, não disparo em massa." },
   { id: "aut-plataforma", frente: "paginas", sugestao: "victor", recorrencia: "unica", label: "Definir a plataforma onde as aulas gravadas vão rodar" },
+  { id: "aut-templates-meta", frente: "paginas", sugestao: "victor", pendencia: true, recorrencia: "unica", label: "Submeter os templates de WhatsApp na Meta (leva 1-3 dias úteis)", detalhe: "Ebook Fase 2: a aprovação dos templates leva de 1 a 3 dias úteis — fazer CEDO, senão trava a mensageria do evento. PENDÊNCIA de prazo." },
+  { id: "aut-cap44", frente: "paginas", sugestao: "victor", recorrencia: "semanal", label: "Aplicar o cap 4+4 na mensageria do evento", detalhe: "Regra inegociável do ebook: no máximo 4 mensagens na API + 4 no grupo por dia. Sem repescagem, sem trocar o nome do grupo. Vale a cada ciclo." },
+  { id: "aut-disparos-d1", frente: "paginas", sugestao: "victor", recorrencia: "semanal", label: "Programar os 5 disparos do D1 do carrinho (6h50→7h→8h→10h→19h)", detalhe: "Ebook Etapa 5: 85-90% das vendas saem no D1. 5 disparos: 6h50 (ficha entra 10min antes, bônus único) → 7h (abre geral) → 8h → 10h → 19h. De terça a sexta: ZERO mensagem (silêncio proposital). ⚠️ No nosso 1º ciclo o carrinho fecha 21h do mesmo dia (D1), então ajustar os horários da tarde/noite ao nosso fechamento." },
 
   // ---------- FRENTE 4 — TRÁFEGO E CAPTAÇÃO (Victor) ----------
   { id: "traf-anuncios", frente: "trafego", sugestao: "victor", recorrencia: "unica", label: "Montar os anúncios de venda do ingresso", detalhe: "5 variações, máx. 60% de texto na imagem — usados como reforço fora do grupo (Stories/Reels), a venda em si acontece dentro do grupo (grp-tpl-revelacao)" },
@@ -224,6 +261,15 @@ export const TASKS: Task[] = [
   { id: "ges-cronograma", frente: "gestao", sugestao: "gleyce", recorrencia: "semanal", label: "Manter o cronograma vivo e cobrar cada prazo" },
   { id: "ges-ordem", frente: "gestao", sugestao: "gleyce", recorrencia: "semanal", label: "Garantir a ordem certa: Grupo → Hotmart → Páginas", detalhe: "O grupo bloqueia o tráfego do IAA, que já está rodando — é a prioridade nº 1 antes de qualquer outra coisa" },
   { id: "ges-status", frente: "gestao", sugestao: "gleyce", recorrencia: "semanal", label: "Relatório de status diário até o evento" },
+
+  // ---------- FRENTE DASHBOARD & MÉTRICAS (ebook Fase 8) ----------
+  { id: "dash-metricas", frente: "dashboard", sugestao: "gleyce", recorrencia: "semanal", label: "Conferir as métricas do evento e do carrinho", detalhe: "Presença por aula, queda entre aulas, ficha de interesse (%), conversão no carrinho, ROAS do ingresso. Fonte: Hotmart + Meta. Comparar com os benchmarks Tabari." },
+  { id: "dash-documentar", frente: "dashboard", sugestao: "gleyce", recorrencia: "semanal", label: "Documentar os números do 1º ciclo (fecha o carrinho → registra)", detalhe: "Ebook: ao fechar o carrinho, documentar os resultados. Serve para recalibrar os benchmarks depois de 4-6 ciclos e comparar ciclo a ciclo." },
+
+  // ---------- FRENTE PÓS-VENDA / CS (ebook Etapa 6 — roda após as primeiras vendas) ----------
+  { id: "cs-onboarding", frente: "cs", sugestao: "gleyce", recorrencia: "unica", label: "Montar o onboarding de 90 dias da Formação S.H.A.R.K.", detalhe: "Ebook Etapa 6: boas-vindas, primeiros passos, marcos de progresso para a pessoa não sumir. Feito uma vez, reusado a cada turma." },
+  { id: "cs-nps", frente: "cs", sugestao: "gleyce", recorrencia: "semanal", label: "Rodar a pesquisa NPS e captar depoimentos no momento certo", detalhe: "Mede satisfação e capta prova social. Repete a cada turma/ciclo." },
+  { id: "cs-provasocial", frente: "cs", sugestao: "victor", recorrencia: "semanal", label: "Transformar depoimento bruto em estudo de caso narrativo", detalhe: "Ebook: a prova social volta pras páginas e criativos do próximo ciclo. É o que faz cada lançamento começar melhor que o anterior." },
 ];
 
 // Fases do método Tabari com as datas reais do 1º ciclo.
