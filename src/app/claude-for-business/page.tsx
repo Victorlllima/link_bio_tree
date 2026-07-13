@@ -626,6 +626,27 @@ const html = `
     margin-right: 4px;
   }
 
+  .cfb-root .preco-de {
+    font-size: 34px;
+    font-weight: 400;
+    color: var(--texto-mid);
+    text-decoration: line-through;
+    text-decoration-color: var(--laranja);
+    letter-spacing: -.02em;
+    margin-right: 16px;
+    vertical-align: 18px;
+  }
+  .cfb-root .preco-de .moeda-de {
+    font-size: 18px;
+    font-weight: 300;
+    vertical-align: 6px;
+    margin-right: 2px;
+  }
+  @media (max-width: 640px) {
+    .cfb-root .preco-de { font-size: 26px; vertical-align: 14px; margin-right: 10px; }
+    .cfb-root .preco-de .moeda-de { font-size: 14px; }
+  }
+
   .cfb-root .preco-vs {
     font-size: 14px;
     color: var(--texto-soft);
@@ -781,7 +802,7 @@ const html = `
           <div class="proof-item"><span class="ic"></span>Acesso vitalício com os combinados</div>
         </div>
 
-        <a href="${CHECKOUT_URL}" class="btn btn-large">Quero o sistema rodando — R$47</a>
+        <a href="${CHECKOUT_URL}" class="btn btn-large">Quero o sistema rodando — R$62</a>
         <p class="cta-note">Acesso imediato após o pagamento · Garantia incondicional</p>
       </div>
 
@@ -1068,7 +1089,7 @@ const html = `
 
       <div class="narrow">
         <span class="section-label">A oferta</span>
-        <h2>R$47 uma vez.<br>Menos do que um freela cobra só pra te ouvir — e esse não some depois.</h2>
+        <h2>R$62 uma vez.<br>Menos do que um freela cobra só pra te ouvir — e esse não some depois.</h2>
       </div>
 
       <div class="preco-card">
@@ -1076,11 +1097,11 @@ const html = `
 
         <p class="preco-comparacao">Você paga <s>R$100/mês</s> de Claude Pro e ainda usa errado.</p>
 
-        <div class="preco-valor"><span class="moeda">R$</span>47</div>
+        <div class="preco-valor"><span class="preco-de"><span class="moeda-de">R$</span>179</span><span class="moeda">R$</span>62</div>
         <p class="preco-comparacao">uma vez · não é assinatura</p>
 
         <p class="preco-vs">
-          <strong>R$47 uma vez</strong> pra aprender a configurar — vs. R$100/mês pra continuar usando como Google melhorado.
+          <strong>R$62 uma vez</strong> pra aprender a configurar — vs. R$100/mês pra continuar usando como Google melhorado.
         </p>
 
         <a href="${CHECKOUT_URL}" class="btn btn-large" id="btn-checkout">Quero entrar agora</a>
@@ -1173,7 +1194,7 @@ const html = `
         Comece hoje. O sistema vai estar rodando antes do final da semana.
       </p>
 
-      <a href="${CHECKOUT_URL}" class="btn btn-large">Entrar no Claude for Business — R$47</a>
+      <a href="${CHECKOUT_URL}" class="btn btn-large">Entrar no Claude for Business — R$62</a>
       <p class="cta-note">Acesso imediato · Garantia incondicional · Sem precisar programar</p>
 
     </div>
