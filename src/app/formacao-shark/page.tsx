@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-// ⚠️ PLACEHOLDER: substituir pelo checkout real da Formação S.H.A.R.K. quando a Gleyce criar o produto no Hotmart.
-const CHECKOUT_URL = "#checkout-formacao-a-criar";
+// Checkout real da Formação S.H.A.R.K. (produto Hotmart 8125084). Carrinho abre 3/ago 6h50.
+const CHECKOUT_URL = "https://pay.hotmart.com/D106737858J";
 
 export const metadata: Metadata = {
   title: "Formação S.H.A.R.K. — RedPro AI Academy",
