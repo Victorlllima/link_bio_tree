@@ -158,7 +158,8 @@ export const TASKS: Task[] = [
         "Salvar e conferir no checkout se a capa nova aparece.",
       ],
     } },
-  { id: "hot-formacao", frente: "hotmart", ordem: 5, sugestao: "gleyce", recorrencia: "unica", label: "Criar produto Formação S.H.A.R.K. R$998", detalhe: "12x R$83,17 · carrinho abre 3/ago", tutorial: {
+  { id: "hot-imagens-produtos", frente: "hotmart", ordem: 5, sugestao: "ambos", pendencia: true, recorrencia: "unica", label: "Colocar/melhorar as imagens de TODOS os produtos (600×600)", detalhe: "Padronizar as capas de produto no Hotmart com a ID visual RedPro (laranja/preto). ✅ Capa do Ingresso pronta em 10-assets/capas-hotmart/ingresso-crm-5-dias-600x600.png. Faltam: IAA, os 2 bumps, CFB, Formação. Compor via HTML/CSS (texto nítido, não IA generativa). PENDÊNCIA." },
+  { id: "hot-formacao", frente: "hotmart", ordem: 6, sugestao: "gleyce", recorrencia: "unica", label: "Criar produto Formação S.H.A.R.K. R$998", detalhe: "12x R$83,17 · carrinho abre 3/ago", tutorial: {
       titulo: "Criar o produto da Formação S.H.A.R.K.",
       passos: [
         "Produtos → Novo Produto → tipo 'Curso Online / Área de Membros'.",
@@ -170,7 +171,7 @@ export const TASKS: Task[] = [
         "Anotar o ID do produto e o código de checkout.",
       ],
     } },
-  { id: "hot-coparticipacao-gleyce", frente: "hotmart", ordem: 6, sugestao: "gleyce", recorrencia: "unica", label: "Alterar a coparticipação da Gleyce para 20% na Formação S.H.A.R.K.", detalhe: "Configurar a divisão de comissão (coprodução) da Formação S.H.A.R.K. com 20% para a Gleyce. Fazer depois que o produto hot-formacao estiver criado.", tutorial: {
+  { id: "hot-coparticipacao-gleyce", frente: "hotmart", ordem: 7, sugestao: "gleyce", recorrencia: "unica", label: "Alterar a coparticipação da Gleyce para 20% na Formação S.H.A.R.K.", detalhe: "Configurar a divisão de comissão (coprodução) da Formação S.H.A.R.K. com 20% para a Gleyce. Fazer depois que o produto hot-formacao estiver criado.", tutorial: {
       titulo: "Configurar coprodução 20% na Formação",
       passos: [
         "Produtos → 'Formação S.H.A.R.K.' → menu lateral → Coprodução (ou Colaboradores).",
@@ -181,7 +182,7 @@ export const TASKS: Task[] = [
         "Confirmar que o split aparece corretamente antes de abrir o carrinho em 3/ago.",
       ],
     } },
-  { id: "hot-checkout", frente: "hotmart", ordem: 7, sugestao: "gleyce", recorrencia: "unica", label: "Configurar checkout do ingresso + área de entrega", detalhe: "Onde as aulas gravadas ficam disponíveis", tutorial: {
+  { id: "hot-checkout", frente: "hotmart", ordem: 8, sugestao: "gleyce", recorrencia: "unica", label: "Configurar checkout do ingresso + área de entrega", detalhe: "Onde as aulas gravadas ficam disponíveis", tutorial: {
       titulo: "Checkout do ingresso + área de membros",
       passos: [
         "Produtos → Área de Membros → área do 'Ingresso' → Conteúdo → Criar módulo (uma aula por dia do evento).",
@@ -190,7 +191,7 @@ export const TASKS: Task[] = [
         "Testar o fluxo com cupom de ~99% (deixa em R$1,00) — comprar e conferir se o acesso libera.",
       ],
     } },
-  { id: "hot-limpar", frente: "hotmart", ordem: 8, sugestao: "gleyce", recorrencia: "unica", label: "Limpar o Hotmart deixando só a RedPro AI Academy", tutorial: {
+  { id: "hot-limpar", frente: "hotmart", ordem: 9, sugestao: "gleyce", recorrencia: "unica", label: "Limpar o Hotmart deixando só a RedPro AI Academy", tutorial: {
       titulo: "Limpar o Club",
       passos: [
         "Produtos → Área de Membros: revisar quais áreas/produtos ainda estão ativos.",
@@ -198,7 +199,7 @@ export const TASKS: Task[] = [
         "Confirmar com o Victor antes de remover qualquer produto com vendas.",
       ],
     } },
-  { id: "hot-provasocial", frente: "hotmart", ordem: 9, sugestao: "victor", pendencia: true, recorrencia: "unica", label: "Fornecer prova social real (nome + resultado)", detalhe: "Depoimentos para os e-mails e o carrinho — só o Victor tem os casos. PENDÊNCIA." },
+  { id: "hot-provasocial", frente: "hotmart", ordem: 10, sugestao: "victor", pendencia: true, recorrencia: "unica", label: "Fornecer prova social real (nome + resultado)", detalhe: "Depoimentos para os e-mails e o carrinho — só o Victor tem os casos. PENDÊNCIA." },
   { id: "pag-ingresso", frente: "paginas", ordem: 1, sugestao: "victor", recorrencia: "unica", label: "Página de checkout do ingresso (sem página de venda tradicional)", detalhe: "Método Tabari: o ingresso é vendido DENTRO do grupo (ver grp-tpl-revelacao), a página aqui é só o checkout do Hotmart pra onde o link do grupo aponta — sem formulário/pop-up/narrativa de venda extra" },
   { id: "pag-formacao", frente: "paginas", ordem: 2, sugestao: "victor", recorrencia: "unica", label: "✅ Página de venda da Formação S.H.A.R.K.", detalhe: "CODADA e no ar: redpro.com.br/formacao-shark (15 dobras). Para o carrinho de 3/ago. ⚠️ Placeholders aguardando dado real: checkout Hotmart da Formação, foto do expert (LUA), depoimentos (Neto/Wilson/Marcos Flávio/Rafael/Henrique)." },
   { id: "pag-obrigado", frente: "paginas", ordem: 3, sugestao: "victor", recorrencia: "unica", label: "✅ Página de obrigado do ingresso (pós-compra)", detalhe: "CODADA e no ar: redpro.com.br/lpsg-obrigado. Reforça que a pessoa já está no grupo. ⚠️ Placeholder: link do grupo de WhatsApp (grp-op-link) + micro-instrução (checklist PDF ambiente pronto)." },
