@@ -172,7 +172,7 @@ export const TASKS: Task[] = [
         "Anotar o ID do produto e o código de checkout.",
       ],
     } },
-  { id: "hot-coparticipacao-gleyce", frente: "hotmart", ordem: 7, sugestao: "gleyce", recorrencia: "unica", label: "Alterar a coparticipação da Gleyce para 20% na Formação S.H.A.R.K.", detalhe: "Configurar a divisão de comissão (coprodução) da Formação S.H.A.R.K. com 20% para a Gleyce. Fazer depois que o produto hot-formacao estiver criado.", tutorial: {
+  { id: "hot-coparticipacao-gleyce", frente: "hotmart", ordem: 7, sugestao: "gleyce", recorrencia: "unica", label: "✅ Alterar a coparticipação da Gleyce para 20% na Formação S.H.A.R.K.", detalhe: "Configurar a divisão de comissão (coprodução) da Formação S.H.A.R.K. com 20% para a Gleyce. Fazer depois que o produto hot-formacao estiver criado.", tutorial: {
       titulo: "Configurar coprodução 20% na Formação",
       passos: [
         "Produtos → 'Formação S.H.A.R.K.' → menu lateral → Coprodução (ou Colaboradores).",
