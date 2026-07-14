@@ -160,12 +160,12 @@ export const TASKS: Task[] = [
       ],
     } },
   { id: "hot-imagens-produtos", frente: "hotmart", ordem: 5, sugestao: "ambos", pendencia: true, recorrencia: "unica", label: "Colocar/melhorar as imagens de TODOS os produtos (600×600)", detalhe: "Padronizar as capas de produto no Hotmart com a ID visual RedPro (laranja/preto). ✅ Capa do Ingresso pronta em 10-assets/capas-hotmart/ingresso-crm-5-dias-600x600.png. Faltam: IAA, os 2 bumps, CFB, Formação. Compor via HTML/CSS (texto nítido, não IA generativa). PENDÊNCIA." },
-  { id: "hot-formacao", frente: "hotmart", ordem: 6, sugestao: "gleyce", recorrencia: "unica", label: "✅ Criar produto Formação S.H.A.R.K. R$998", detalhe: "CRIADO (ID 8125084 · checkout D106737858J · oferta jos48auw · R$998). Capa + descrição aplicadas. Checkout ligado na página /formacao-shark. ⚠️ Falta: (1) resolver parcela (checkout cobra 12x R$103,22 COM taxa, página diz R$83,17); (2) montar área de membros; (3) NÃO abrir carrinho até 3/ago. Coprodução Gleyce 20% pendente (hot-coparticipacao-gleyce).", tutorial: {
+  { id: "hot-formacao", frente: "hotmart", ordem: 6, sugestao: "gleyce", recorrencia: "unica", label: "✅ Criar produto Formação S.H.A.R.K. R$998", detalhe: "CRIADO (ID 8125084 · checkout D106737858J · oferta jos48auw · R$998). Capa + descrição aplicadas. Checkout ligado na página /formacao-shark. ⚠️ Falta: (1) resolver parcela (checkout cobra 12x R$103,22 COM taxa, página diz R$103,22); (2) montar área de membros; (3) NÃO abrir carrinho até 3/ago. Coprodução Gleyce 20% pendente (hot-coparticipacao-gleyce).", tutorial: {
       titulo: "Criar o produto da Formação S.H.A.R.K.",
       passos: [
         "Produtos → Novo Produto → tipo 'Curso Online / Área de Membros'.",
         "Nome: 'Formação S.H.A.R.K.'.",
-        "Precificação: R$998 à vista + parcelamento em 12x de R$83,17 (Parcelado com taxas, até 12x).",
+        "Precificação: R$998 à vista + parcelamento em 12x de R$103,22 (Parcelado com taxas, até 12x).",
         "Configurar 'Parcelado' para exibir 12x como padrão no checkout (parâmetro ?split=12).",
         "Garantia: configurar 7 dias (a garantia condicional de 90+90 dias é tratada por fora, no atendimento).",
         "NÃO abrir o carrinho ainda — deixar pronto para ativar em 3/ago às 6h50.",
