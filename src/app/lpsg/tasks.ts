@@ -160,7 +160,7 @@ export const TASKS: Task[] = [
       ],
     } },
   { id: "hot-imagens-produtos", frente: "hotmart", ordem: 5, sugestao: "ambos", pendencia: true, recorrencia: "unica", label: "Colocar/melhorar as imagens de TODOS os produtos (600×600)", detalhe: "Padronizar as capas de produto no Hotmart com a ID visual RedPro (laranja/preto). ✅ Capa do Ingresso pronta em 10-assets/capas-hotmart/ingresso-crm-5-dias-600x600.png. Faltam: IAA, os 2 bumps, CFB, Formação. Compor via HTML/CSS (texto nítido, não IA generativa). PENDÊNCIA." },
-  { id: "hot-formacao", frente: "hotmart", ordem: 6, sugestao: "gleyce", recorrencia: "unica", label: "Criar produto Formação S.H.A.R.K. R$998", detalhe: "12x R$83,17 · carrinho abre 3/ago", tutorial: {
+  { id: "hot-formacao", frente: "hotmart", ordem: 6, sugestao: "gleyce", recorrencia: "unica", label: "✅ Criar produto Formação S.H.A.R.K. R$998", detalhe: "CRIADO (ID 8125084 · checkout D106737858J · oferta jos48auw · R$998). Capa + descrição aplicadas. Checkout ligado na página /formacao-shark. ⚠️ Falta: (1) resolver parcela (checkout cobra 12x R$103,22 COM taxa, página diz R$83,17); (2) montar área de membros; (3) NÃO abrir carrinho até 3/ago. Coprodução Gleyce 20% pendente (hot-coparticipacao-gleyce).", tutorial: {
       titulo: "Criar o produto da Formação S.H.A.R.K.",
       passos: [
         "Produtos → Novo Produto → tipo 'Curso Online / Área de Membros'.",
