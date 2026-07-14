@@ -802,7 +802,7 @@ const html = `
           <div class="proof-item"><span class="ic"></span>Acesso vitalício com os combinados</div>
         </div>
 
-        <a href="${CHECKOUT_URL}" class="btn btn-large">Quero o sistema rodando — R$62</a>
+        <a href="${CHECKOUT_URL}" class="btn btn-large cfb-cta">Quero o sistema rodando — R$62</a>
         <p class="cta-note">Acesso imediato após o pagamento · Garantia incondicional</p>
       </div>
 
@@ -1104,7 +1104,7 @@ const html = `
           <strong>R$62 uma vez</strong> pra aprender a configurar — vs. R$100/mês pra continuar usando como Google melhorado.
         </p>
 
-        <a href="${CHECKOUT_URL}" class="btn btn-large" id="btn-checkout">Quero entrar agora</a>
+        <a href="${CHECKOUT_URL}" class="btn btn-large cfb-cta" id="btn-checkout">Quero entrar agora</a>
 
         <p class="garantia">
           <strong>Garantia incondicional.</strong><br>
@@ -1194,7 +1194,7 @@ const html = `
         Comece hoje. O sistema vai estar rodando antes do final da semana.
       </p>
 
-      <a href="${CHECKOUT_URL}" class="btn btn-large">Entrar no Claude for Business — R$62</a>
+      <a href="${CHECKOUT_URL}" class="btn btn-large cfb-cta">Entrar no Claude for Business — R$62</a>
       <p class="cta-note">Acesso imediato · Garantia incondicional · Sem precisar programar</p>
 
     </div>
@@ -1210,21 +1210,57 @@ const html = `
 `;
 
 export default function ClaudeForBusinessPage() {
+  // O fbq vem do layout e pode não estar pronto quando este script roda —
+  // por isso o ViewContent espera o fbq aparecer antes de disparar.
   const pixelViewContent = `
-    if (typeof fbq !== 'undefined') {
-      fbq('track', 'ViewContent', {
-        content_name: 'Claude for Business',
-        content_ids: ['V105607171C'],
-        content_type: 'product',
-        value: 47.00,
-        currency: 'BRL'
-      });
-    }
+    (function () {
+      var tentativas = 0;
+      function dispararViewContent() {
+        if (typeof fbq !== 'undefined') {
+          fbq('track', 'ViewContent', {
+            content_name: 'Claude for Business',
+            content_ids: ['V105607171C'],
+            content_type: 'product',
+            value: 62.00,
+            currency: 'BRL'
+          });
+          return;
+        }
+        if (++tentativas < 20) setTimeout(dispararViewContent, 250);
+      }
+      dispararViewContent();
+    })();
+  `;
+
+  const pixelInitiateCheckout = `
+    (function () {
+      function ligarCTAs() {
+        document.querySelectorAll('.cfb-cta').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            if (typeof fbq !== 'undefined') {
+              fbq('track', 'InitiateCheckout', {
+                content_name: 'Claude for Business',
+                content_ids: ['V105607171C'],
+                content_type: 'product',
+                value: 62.00,
+                currency: 'BRL'
+              });
+            }
+          });
+        });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', ligarCTAs);
+      } else {
+        ligarCTAs();
+      }
+    })();
   `;
 
   return (
     <>
       <script dangerouslySetInnerHTML={{ __html: pixelViewContent }} />
+      <script dangerouslySetInnerHTML={{ __html: pixelInitiateCheckout }} />
       <div dangerouslySetInnerHTML={{ __html: html }} />
     </>
   );
