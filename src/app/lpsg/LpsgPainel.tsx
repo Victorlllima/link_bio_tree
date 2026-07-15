@@ -10,11 +10,12 @@ import {
   type TutorialPasso,
   type DriveTipo,
 } from "./tasks";
+import MetricasPainel from "./MetricasPainel";
 
 type EstadoItem = { task_id: string; responsavel: Responsavel; done: boolean };
 type EstadoMap = Record<string, { responsavel: Responsavel; done: boolean }>;
 
-type Nivel = "operacional" | "drive";
+type Nivel = "operacional" | "drive" | "metricas";
 
 const DRIVE_ICON: Record<DriveTipo, string> = {
   doc: "📄", pdf: "📕", html: "🌐", img: "🖼️", planilha: "📊", video: "🎬", pasta: "📁", link: "🔗",
@@ -170,6 +171,7 @@ export default function LpsgPainel() {
         <nav style={s.abas}>
           {([
             ["operacional", "✅ Checklist Operacional"],
+            ["metricas", "📊 Métricas de Tráfego"],
             ["drive", "📁 Drive de Conteúdo"],
           ] as [Nivel, string][]).map(([n, label]) => (
             <button key={n} onClick={() => setNivel(n)} style={{ ...s.aba, ...(nivel === n ? s.abaAtiva : {}) }}>
@@ -178,8 +180,11 @@ export default function LpsgPainel() {
           ))}
         </nav>
 
-        {/* ---------- SUB-FILTRO DE PESSOA (não aparece no Drive) ---------- */}
-        {nivel !== "drive" && (
+        {/* ---------- MÉTRICAS DE TRÁFEGO ---------- */}
+        {nivel === "metricas" && <MetricasPainel />}
+
+        {/* ---------- SUB-FILTRO DE PESSOA (só no Checklist) ---------- */}
+        {nivel === "operacional" && (
           <div style={s.subfiltro}>
             {([
               ["todos", "Todos"],
@@ -243,8 +248,8 @@ export default function LpsgPainel() {
           </div>
         )}
 
-        {/* ---------- CONTEÚDO POR FRENTE ---------- */}
-        {nivel !== "drive" && (
+        {/* ---------- CONTEÚDO POR FRENTE (só no Checklist) ---------- */}
+        {nivel === "operacional" && (
         <div style={s.checklist}>
           <div style={s.legenda}>
             <span style={s.legendaItem}><span style={s.recUnica}>1× só</span> feito uma vez, serve pra todos os ciclos</span>
