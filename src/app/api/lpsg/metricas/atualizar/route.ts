@@ -64,8 +64,18 @@ export async function POST(req: Request) {
 
     if (jsonCamp.error) {
       console.error("[ATUALIZAR] Meta API erro:", jsonCamp.error);
+      // Token expirado é o erro mais comum (o token de usuário da Meta dura ~60 dias).
+      // Devolve instrução acionável em vez do erro cru do Facebook.
+      const expirado =
+        jsonCamp.error.code === 190 || /expired|session has expired/i.test(jsonCamp.error.message || "");
       return NextResponse.json(
-        { success: false, error: `Meta: ${jsonCamp.error.message}` },
+        {
+          success: false,
+          tokenExpirado: expirado,
+          error: expirado
+            ? "O token de acesso à Meta expirou. Peça pro Claude gerar um novo (System User, sem expiração) — os números do painel continuam válidos até lá."
+            : `Meta: ${jsonCamp.error.message}`,
+        },
         { status: 502 }
       );
     }
