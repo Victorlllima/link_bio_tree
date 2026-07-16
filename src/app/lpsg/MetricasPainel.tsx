@@ -1,7 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { METAS, REGRAS_OURO, TICKET_IAA, type Semaforo } from "./metas-tabari";
+import {
+  METAS,
+  REGRAS_OURO,
+  TICKET_IAA,
+  avaliarCriativo,
+  IMPRESSOES_MIN_JULGAR,
+  type Semaforo,
+} from "./metas-tabari";
+import { gerarAcoes, URGENCIA_META, QUEM_LABEL, type EstadoCampanha } from "./proximas-acoes";
 
 // ============================================================
 // Painel de Métricas do Tráfego (aba dentro do /lpsg).
@@ -28,6 +36,37 @@ interface Snapshot {
   purchases: number;
   receita: number;
   fonte: string;
+}
+
+interface Criativo {
+  id: number;
+  dia: string;
+  ad_id: string;
+  nome: string;
+  formato: string;
+  impressoes: number;
+  cliques: number;
+  link_clicks: number;
+  ctr: number;
+  cpc: number;
+  gasto: number;
+  purchases: number;
+}
+
+// Data em que a campanha começou a rodar (GMT-3) — base pra contar a fase de aprendizado.
+const INICIO_CAMPANHA = "2026-07-15";
+
+function diasDesde(iso: string): number {
+  const inicio = new Date(`${iso}T05:00:00-03:00`).getTime();
+  const agora = Date.now();
+  return Math.max(0, Math.floor((agora - inicio) / 86400000));
+}
+
+// deixa o nome do criativo legível: IAA_EST_08_jornal-homem-misterioso → "Jornal homem misterioso"
+function nomeAmigavel(n: string): string {
+  const semPrefixo = n.replace(/^IAA_(EST|VID)_\d+_/, "").replace(/_/g, " ");
+  const limpo = semPrefixo.replace(/-/g, " ").trim();
+  return limpo.charAt(0).toUpperCase() + limpo.slice(1);
 }
 
 const CORES: Record<Semaforo, { bg: string; borda: string; texto: string; dot: string; label: string }> = {
@@ -69,24 +108,77 @@ function derivar(s: Snapshot) {
 
 export default function MetricasPainel() {
   const [snaps, setSnaps] = useState<Snapshot[]>([]);
+  const [criativos, setCriativos] = useState<Criativo[]>([]);
   const [carregando, setCarregando] = useState(true);
+  const [atualizando, setAtualizando] = useState(false);
+  const [msg, setMsg] = useState<{ tipo: "ok" | "erro"; texto: string } | null>(null);
+
+  async function carregar() {
+    try {
+      const res = await fetch("/api/lpsg/metricas", { cache: "no-store" });
+      const data = await res.json();
+      setSnaps(data.items || []);
+      setCriativos(data.criativos || []);
+    } catch {
+      setSnaps([]);
+      setCriativos([]);
+    } finally {
+      setCarregando(false);
+    }
+  }
 
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch("/api/lpsg/metricas", { cache: "no-store" });
-        const data = await res.json();
-        setSnaps(data.items || []);
-      } catch {
-        setSnaps([]);
-      } finally {
-        setCarregando(false);
-      }
-    })();
+    carregar();
   }, []);
+
+  async function atualizarAgora() {
+    setAtualizando(true);
+    setMsg(null);
+    try {
+      const res = await fetch("/api/lpsg/metricas/atualizar", { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        await carregar();
+        setMsg({ tipo: "ok", texto: `Números atualizados direto da Meta · ${data.criativos} criativos` });
+      } else {
+        setMsg({ tipo: "erro", texto: data.error || "Não consegui atualizar." });
+      }
+    } catch {
+      setMsg({ tipo: "erro", texto: "Erro de conexão ao atualizar." });
+    } finally {
+      setAtualizando(false);
+      setTimeout(() => setMsg(null), 6000);
+    }
+  }
 
   const hoje = snaps[0]; // ordenado dia.desc
   const derivadas = useMemo(() => (hoje ? derivar(hoje) : null), [hoje]);
+
+  // estado consolidado pro motor de próximas ações
+  const acoes = useMemo(() => {
+    const diasRodando = diasDesde(INICIO_CAMPANHA);
+    const gastoTotal = snaps.reduce((s, x) => s + Number(x.gasto), 0);
+    const impressoesTotal = criativos.reduce((s, c) => s + c.impressoes, 0) ||
+      snaps.reduce((s, x) => s + x.impressoes, 0);
+    const purchasesTotal = snaps.reduce((s, x) => s + x.purchases, 0);
+    const receitaTotal = snaps.reduce((s, x) => s + Number(x.receita), 0);
+    const estado: EstadoCampanha = {
+      diasRodando,
+      gastoTotal,
+      impressoesTotal,
+      ctrMedio: hoje?.ctr || 0,
+      roas: gastoTotal > 0 ? receitaTotal / gastoTotal : 0,
+      purchases: purchasesTotal,
+      inicioISO: INICIO_CAMPANHA,
+      criativos: criativos.map((c) => ({
+        nome: nomeAmigavel(c.nome),
+        ctr: Number(c.ctr),
+        impressoes: c.impressoes,
+        purchases: c.purchases,
+      })),
+    };
+    return gerarAcoes(estado);
+  }, [snaps, criativos, hoje]);
 
   if (carregando) {
     return <div style={st.vazio}>Carregando métricas…</div>;
@@ -107,6 +199,43 @@ export default function MetricasPainel() {
 
   return (
     <div>
+      {/* ---------- PRÓXIMAS AÇÕES (o que fazer agora) ---------- */}
+      <section style={st.acoesWrap}>
+        <div style={st.acoesHead}>
+          <div>
+            <h3 style={st.acoesTitulo}>🎯 Próximas ações</h3>
+            <p style={st.acoesSub}>
+              O que fazer agora, segundo o método. Se a ação certa é esperar, está escrito aqui também.
+            </p>
+          </div>
+          <span style={st.acoesDias}>Dia {diasDesde(INICIO_CAMPANHA) + 1} de campanha</span>
+        </div>
+
+        <div style={st.acoesLista}>
+          {acoes.map((a, i) => {
+            const u = URGENCIA_META[a.urgencia];
+            return (
+              <div key={i} style={{ ...st.acaoCard, borderLeftColor: u.cor }}>
+                <div style={st.acaoTopo}>
+                  <span style={{ ...st.acaoBadge, background: `${u.cor}22`, color: u.cor, borderColor: `${u.cor}66` }}>
+                    {u.emoji} {u.texto}
+                  </span>
+                  <span style={st.acaoQuem}>{QUEM_LABEL[a.quem]}</span>
+                </div>
+                <div style={st.acaoTitulo}>{a.titulo}</div>
+                <div style={st.acaoPorque}>{a.porque}</div>
+                {a.comoFazer && (
+                  <div style={st.acaoComo}>
+                    <strong style={{ color: "#f97316" }}>Como fazer:</strong> {a.comoFazer}
+                  </div>
+                )}
+                {a.fonte && a.fonte !== "—" && <div style={st.acaoFonte}>Regra do Tabari · {a.fonte}</div>}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
       {/* resumo do dia */}
       <div style={st.resumoBar}>
         <div style={st.resumoItem}>
@@ -116,6 +245,10 @@ export default function MetricasPainel() {
         <div style={st.resumoItem}>
           <span style={st.resumoLabel}>Gasto</span>
           <span style={st.resumoVal}>R${hoje.gasto.toFixed(2).replace(".", ",")}</span>
+        </div>
+        <div style={st.resumoItem}>
+          <span style={st.resumoLabel}>Impressões</span>
+          <span style={st.resumoVal}>{fmtNum(hoje.impressoes)}</span>
         </div>
         <div style={st.resumoItem}>
           <span style={st.resumoLabel}>Alcance</span>
@@ -129,8 +262,19 @@ export default function MetricasPainel() {
           <span style={st.resumoLabel}>Vendas</span>
           <span style={{ ...st.resumoVal, color: hoje.purchases > 0 ? "#4ade80" : "#f5f5f5" }}>{hoje.purchases}</span>
         </div>
-        {hoje.fonte === "manual" && <span style={st.tagManual}>snapshot manual</span>}
+        <div style={st.resumoAcoes}>
+          {hoje.fonte === "manual" && <span style={st.tagManual}>snapshot manual</span>}
+          <button onClick={atualizarAgora} disabled={atualizando} style={{ ...st.btnAtualizar, opacity: atualizando ? 0.6 : 1 }}>
+            {atualizando ? "⏳ Buscando na Meta…" : "🔄 Atualizar agora"}
+          </button>
+        </div>
       </div>
+
+      {msg && (
+        <div style={{ ...st.msg, color: msg.tipo === "ok" ? "#4ade80" : "#f87171", borderColor: msg.tipo === "ok" ? "rgba(74,222,128,0.35)" : "rgba(248,113,113,0.35)" }}>
+          {msg.tipo === "ok" ? "✅" : "⚠️"} {msg.texto}
+        </div>
+      )}
 
       <p style={st.intro}>
         Cada cartão abaixo compara um número seu com a <strong>meta do método Tabari</strong>.
@@ -170,6 +314,70 @@ export default function MetricasPainel() {
           );
         })}
       </div>
+
+      {/* RANKING DE CRIATIVOS — a decisão que o método manda tomar */}
+      {criativos.length > 0 && (
+        <>
+          <h3 style={st.secTitulo}>🎨 Ranking dos criativos</h3>
+          <p style={st.secSub}>
+            É aqui que se decide. O Tabari é literal: <em>&ldquo;o que você vai otimizar primeiro é sempre o
+            criativo&rdquo;</em> — e a régua (CTR abaixo de 1% = pausa) vale <strong>por anúncio</strong>, não pela média da
+            campanha. Números acumulados desde o início.
+          </p>
+          <div style={st.tabelaWrap}>
+            <table style={st.tabela}>
+              <thead>
+                <tr>
+                  {["Criativo", "Tipo", "Impressões", "CTR", "CPC", "Gasto", "Vendas", "Veredicto"].map((h) => (
+                    <th key={h} style={st.th}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[...criativos]
+                  .sort((a, b) => Number(b.ctr) - Number(a.ctr))
+                  .map((c) => {
+                    const v = avaliarCriativo(Number(c.ctr), c.impressoes, c.purchases);
+                    const cor = CORES[v.cor];
+                    return (
+                      <tr key={c.ad_id}>
+                        <td style={{ ...st.td, fontWeight: 600, color: "#f5f5f5", whiteSpace: "normal", minWidth: 170 }}>
+                          {nomeAmigavel(c.nome)}
+                        </td>
+                        <td style={st.td}>{c.formato === "video" ? "🎬 Vídeo" : "🖼️ Imagem"}</td>
+                        <td style={st.td}>
+                          {fmtNum(c.impressoes)}
+                          {c.impressoes < IMPRESSOES_MIN_JULGAR && (
+                            <span style={st.tdAviso} title={`O método pede ${IMPRESSOES_MIN_JULGAR.toLocaleString("pt-BR")} impressões antes de julgar`}>
+                              ⏳
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ ...st.td, fontWeight: 800, color: cor.texto }}>
+                          {Number(c.ctr).toFixed(2).replace(".", ",")}%
+                        </td>
+                        <td style={st.td}>R${Number(c.cpc).toFixed(2).replace(".", ",")}</td>
+                        <td style={st.td}>R${Number(c.gasto).toFixed(2).replace(".", ",")}</td>
+                        <td style={{ ...st.td, color: c.purchases > 0 ? "#4ade80" : "#6b6b6b", fontWeight: c.purchases > 0 ? 800 : 400 }}>
+                          {c.purchases || "—"}
+                        </td>
+                        <td style={{ ...st.td, whiteSpace: "normal", minWidth: 210 }}>
+                          <span style={{ ...st.veredicto, background: `${cor.dot}22`, color: cor.texto, borderColor: `${cor.dot}55` }}>
+                            {v.label}
+                          </span>
+                          <div style={st.veredictoAcao}>{v.acao}</div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
+          <p style={st.legendaCrt}>
+            ⏳ = ainda sem as {IMPRESSOES_MIN_JULGAR.toLocaleString("pt-BR")} impressões que o método pede pra decidir. Não mate esses ainda.
+          </p>
+        </>
+      )}
 
       {/* FUNIL DO DIA (o caminho do lead) */}
       <h3 style={st.secTitulo}>🔻 O caminho do lead hoje (funil)</h3>
@@ -263,6 +471,34 @@ export default function MetricasPainel() {
 
 const st: Record<string, React.CSSProperties> = {
   vazio: { textAlign: "center", padding: "60px 24px", color: "#a3a3a3", fontFamily: "'DM Sans', system-ui", maxWidth: 480, margin: "0 auto" },
+
+  // próximas ações
+  acoesWrap: { background: "linear-gradient(180deg, rgba(249,115,22,0.07), rgba(249,115,22,0.02))", border: "1px solid rgba(249,115,22,0.25)", borderRadius: 14, padding: 20, marginBottom: 22 },
+  acoesHead: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap", marginBottom: 14 },
+  acoesTitulo: { fontSize: 19, fontWeight: 800, color: "#f5f5f5", margin: 0, fontFamily: "'DM Sans', system-ui" },
+  acoesSub: { fontSize: 13, color: "#a3a3a3", margin: "4px 0 0", lineHeight: 1.5, fontFamily: "'DM Sans', system-ui" },
+  acoesDias: { fontSize: 12, color: "#f97316", border: "1px solid rgba(249,115,22,0.4)", borderRadius: 20, padding: "4px 12px", whiteSpace: "nowrap", fontFamily: "'DM Sans', system-ui", fontWeight: 700 },
+  acoesLista: { display: "flex", flexDirection: "column", gap: 10 },
+  acaoCard: { background: "#141414", border: "1px solid rgba(255,255,255,0.07)", borderLeft: "3px solid", borderRadius: 10, padding: "14px 16px", fontFamily: "'DM Sans', system-ui" },
+  acaoTopo: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, marginBottom: 6, flexWrap: "wrap" },
+  acaoBadge: { fontSize: 11.5, fontWeight: 800, padding: "3px 10px", borderRadius: 20, border: "1px solid", whiteSpace: "nowrap" },
+  acaoQuem: { fontSize: 11.5, color: "#8a8a8a", fontWeight: 600 },
+  acaoTitulo: { fontSize: 15.5, fontWeight: 700, color: "#f5f5f5", lineHeight: 1.3, marginBottom: 5 },
+  acaoPorque: { fontSize: 13.5, color: "#b8b8b8", lineHeight: 1.5 },
+  acaoComo: { fontSize: 13, color: "#d4d4d4", lineHeight: 1.5, marginTop: 8, background: "rgba(249,115,22,0.06)", border: "1px solid rgba(249,115,22,0.18)", borderRadius: 8, padding: "8px 10px" },
+  acaoFonte: { fontSize: 10.5, color: "#5a5a5a", marginTop: 8, fontFamily: "'JetBrains Mono', monospace" },
+
+  // botão atualizar
+  resumoAcoes: { marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 },
+  btnAtualizar: { background: "#f97316", color: "#0a0a0a", border: "none", borderRadius: 8, padding: "9px 16px", fontSize: 13.5, fontWeight: 800, cursor: "pointer", fontFamily: "'DM Sans', system-ui", whiteSpace: "nowrap" },
+  msg: { fontSize: 13, padding: "10px 14px", border: "1px solid", borderRadius: 8, marginBottom: 18, fontFamily: "'DM Sans', system-ui", fontWeight: 600 },
+
+  // ranking de criativos
+  veredicto: { fontSize: 11, fontWeight: 800, padding: "2px 8px", borderRadius: 20, border: "1px solid", display: "inline-block", marginBottom: 4 },
+  veredictoAcao: { fontSize: 11.5, color: "#8a8a8a", lineHeight: 1.4 },
+  tdAviso: { marginLeft: 5, fontSize: 11, cursor: "help" },
+  legendaCrt: { fontSize: 12, color: "#6b6b6b", marginTop: -12, marginBottom: 30, fontFamily: "'DM Sans', system-ui" },
+
   resumoBar: { display: "flex", flexWrap: "wrap", gap: 20, alignItems: "center", padding: "16px 20px", background: "#161616", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, marginBottom: 18 },
   resumoItem: { display: "flex", flexDirection: "column", gap: 2 },
   resumoLabel: { fontSize: 11, color: "#6b6b6b", textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "'DM Sans', system-ui" },

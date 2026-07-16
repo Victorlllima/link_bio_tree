@@ -26,26 +26,38 @@ function authed(req: Request): boolean {
   return cookie.includes(`lpsg_auth=${LPSG_PASSWORD}`);
 }
 
-// GET → histórico completo, mais recente primeiro
+// GET → histórico de snapshots + desempenho por criativo (o mais recente de cada anúncio)
 export async function GET(req: Request) {
   if (!authed(req)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/traf_snapshots?select=*&order=dia.desc`,
-      { headers, cache: "no-store" }
-    );
-    if (!res.ok) {
-      const err = await res.text();
-      console.error("[METRICAS] Erro ao ler:", err);
-      return NextResponse.json({ items: [] }, { status: 200 });
-    }
-    const items = await res.json();
-    return NextResponse.json({ items }, { status: 200 });
+    const [resSnaps, resCrt] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/traf_snapshots?select=*&order=dia.desc`, {
+        headers,
+        cache: "no-store",
+      }),
+      fetch(`${SUPABASE_URL}/rest/v1/traf_criativos?select=*&order=dia.desc,ctr.desc`, {
+        headers,
+        cache: "no-store",
+      }),
+    ]);
+
+    const items = resSnaps.ok ? await resSnaps.json() : [];
+    const todosCriativos = resCrt.ok ? await resCrt.json() : [];
+
+    // fica só a linha mais recente de cada ad_id (o acumulado atual)
+    const vistos = new Set<string>();
+    const criativos = (todosCriativos as Array<{ ad_id: string }>).filter((c) => {
+      if (vistos.has(c.ad_id)) return false;
+      vistos.add(c.ad_id);
+      return true;
+    });
+
+    return NextResponse.json({ items, criativos }, { status: 200 });
   } catch (err) {
     console.error("[METRICAS] Erro interno GET:", err);
-    return NextResponse.json({ items: [] }, { status: 200 });
+    return NextResponse.json({ items: [], criativos: [] }, { status: 200 });
   }
 }
 

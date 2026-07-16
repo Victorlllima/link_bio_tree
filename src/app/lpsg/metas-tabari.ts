@@ -144,6 +144,62 @@ export const METAS: Record<string, Meta> = {
   },
 };
 
+// ============================================================
+// AVALIAÇÃO POR CRIATIVO (a decisão que o Tabari manda tomar).
+// "O que você vai otimizar primeiro se está ruim: sempre criativo, sempre."
+// (compilado_tabari.md:220)
+// ============================================================
+
+export const IMPRESSOES_MIN_JULGAR = 5000; // LPSG-engenharia-reversa.md:136
+
+export interface VeredictoCriativo {
+  status: "matar" | "escalar" | "manter" | "cedo";
+  cor: Semaforo;
+  label: string;
+  acao: string;
+}
+
+/**
+ * Decide o que fazer com um criativo, seguindo o método:
+ * - < 5.000 impressões → não julgue ainda (regra dura)
+ * - CTR < 1% → pausa esse anúncio
+ * - CTR >= 2% → forte, candidato a escalar
+ */
+export function avaliarCriativo(ctr: number, impressoes: number, purchases: number): VeredictoCriativo {
+  if (impressoes < IMPRESSOES_MIN_JULGAR) {
+    return {
+      status: "cedo",
+      cor: "neutro",
+      label: "Aguardando dados",
+      acao: `Só ${impressoes.toLocaleString("pt-BR")} de ${IMPRESSOES_MIN_JULGAR.toLocaleString("pt-BR")} impressões. O método manda NÃO julgar ainda.`,
+    };
+  }
+  if (ctr < 1) {
+    return {
+      status: "matar",
+      cor: "vermelho",
+      label: "Pausar",
+      acao: "CTR abaixo de 1% com volume suficiente. Pelo método, pause SÓ este anúncio.",
+    };
+  }
+  if (ctr >= 2) {
+    return {
+      status: "escalar",
+      cor: "verde",
+      label: "Forte",
+      acao: purchases > 0
+        ? "CTR alto E já vendeu. É um vencedor — considere fazer variações de hook dele."
+        : "CTR alto. Fique de olho se converte (CTR alto sem venda = entretenimento, não vende).",
+    };
+  }
+  return {
+    status: "manter",
+    cor: "amarelo",
+    label: "Ok",
+    acao: "Acima do piso de 1%. Mantenha rodando e observe.",
+  };
+}
+
 // As regras de ouro que ficam no painel lateral (impedem besteira).
 export const REGRAS_OURO = [
   {
