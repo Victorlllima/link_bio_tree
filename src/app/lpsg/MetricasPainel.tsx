@@ -346,7 +346,13 @@ export default function MetricasPainel() {
                           <div style={st.crtCell}>
                             {c.thumb_url ? (
                               // eslint-disable-next-line @next/next/no-img-element
-                              <img src={c.thumb_url} alt={nomeAmigavel(c.nome)} style={st.crtThumb} loading="lazy" />
+                              <img
+                                src={c.thumb_url}
+                                alt={nomeAmigavel(c.nome)}
+                                style={st.crtThumb}
+                                loading="lazy"
+                                referrerPolicy="no-referrer"
+                              />
                             ) : (
                               <div style={{ ...st.crtThumb, ...st.crtThumbVazio }}>
                                 {c.formato === "video" ? "🎬" : "🖼️"}
