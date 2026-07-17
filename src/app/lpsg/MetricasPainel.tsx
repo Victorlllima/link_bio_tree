@@ -51,6 +51,7 @@ interface Criativo {
   cpc: number;
   gasto: number;
   purchases: number;
+  thumb_url?: string | null;
 }
 
 // Data em que a campanha começou a rodar (GMT-3) — base pra contar a fase de aprendizado.
@@ -341,8 +342,18 @@ export default function MetricasPainel() {
                     const cor = CORES[v.cor];
                     return (
                       <tr key={c.ad_id}>
-                        <td style={{ ...st.td, fontWeight: 600, color: "#f5f5f5", whiteSpace: "normal", minWidth: 170 }}>
-                          {nomeAmigavel(c.nome)}
+                        <td style={{ ...st.td, minWidth: 200 }}>
+                          <div style={st.crtCell}>
+                            {c.thumb_url ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={c.thumb_url} alt={nomeAmigavel(c.nome)} style={st.crtThumb} loading="lazy" />
+                            ) : (
+                              <div style={{ ...st.crtThumb, ...st.crtThumbVazio }}>
+                                {c.formato === "video" ? "🎬" : "🖼️"}
+                              </div>
+                            )}
+                            <span style={st.crtNome}>{nomeAmigavel(c.nome)}</span>
+                          </div>
                         </td>
                         <td style={st.td}>{c.formato === "video" ? "🎬 Vídeo" : "🖼️ Imagem"}</td>
                         <td style={st.td}>
@@ -494,6 +505,10 @@ const st: Record<string, React.CSSProperties> = {
   msg: { fontSize: 13, padding: "10px 14px", border: "1px solid", borderRadius: 8, marginBottom: 18, fontFamily: "'DM Sans', system-ui", fontWeight: 600 },
 
   // ranking de criativos
+  crtCell: { display: "flex", alignItems: "center", gap: 10 },
+  crtThumb: { width: 40, height: 52, borderRadius: 6, objectFit: "cover", border: "1px solid rgba(255,255,255,0.1)", flexShrink: 0, background: "#0a0a0a" },
+  crtThumbVazio: { display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 },
+  crtNome: { fontWeight: 600, color: "#f5f5f5", lineHeight: 1.25 },
   veredicto: { fontSize: 11, fontWeight: 800, padding: "2px 8px", borderRadius: 20, border: "1px solid", display: "inline-block", marginBottom: 4 },
   veredictoAcao: { fontSize: 11.5, color: "#8a8a8a", lineHeight: 1.4 },
   tdAviso: { marginLeft: 5, fontSize: 11, cursor: "help" },

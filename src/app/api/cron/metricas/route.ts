@@ -38,6 +38,40 @@ function acao(actions: Array<{ action_type: string; value: string }> | undefined
   return a ? Number(a.value) : 0;
 }
 
+// Busca a miniatura de cada anúncio (ad_id → creative_id → image_url).
+// As URLs da fbcdn expiram, por isso re-buscamos a cada atualização.
+async function buscarThumbs(adIds: string[]): Promise<Record<string, string>> {
+  const out: Record<string, string> = {};
+  try {
+    // 1. ad_id → creative_id
+    const rAds = await fetch(
+      `${GRAPH}/act_${AD_ACCOUNT}/ads?fields=id,creative&limit=50&access_token=${META_TOKEN}`,
+      { cache: "no-store" }
+    );
+    const jAds = await rAds.json();
+    const adToCreative: Record<string, string> = {};
+    for (const a of jAds.data || []) {
+      if (a.creative?.id && adIds.includes(String(a.id))) adToCreative[String(a.id)] = a.creative.id;
+    }
+    const cids = [...new Set(Object.values(adToCreative))];
+    if (!cids.length) return out;
+
+    // 2. creative_ids → image_url (batch)
+    const rCr = await fetch(
+      `${GRAPH}/?ids=${cids.join(",")}&fields=thumbnail_url,image_url&access_token=${META_TOKEN}`,
+      { cache: "no-store" }
+    );
+    const jCr = await rCr.json();
+    for (const [adId, cId] of Object.entries(adToCreative)) {
+      const c = jCr[cId];
+      if (c) out[adId] = c.image_url || c.thumbnail_url;
+    }
+  } catch (e) {
+    console.error("[CRON thumbs]", e);
+  }
+  return out;
+}
+
 async function atualizar(): Promise<{ ok: boolean; dia: string; criativos: number; erro?: string }> {
   const dia = hojeBR();
   if (!META_TOKEN) return { ok: false, dia, criativos: 0, erro: "sem META_ADS_TOKEN" };
@@ -93,11 +127,14 @@ async function atualizar(): Promise<{ ok: boolean; dia: string; criativos: numbe
   const jAds = await rAds.json();
   let criativos = 0;
   if (jAds.data?.length) {
+    const adIds = jAds.data.map((a: Record<string, unknown>) => String(a.ad_id));
+    const thumbs = await buscarThumbs(adIds);
     const linhas = jAds.data.map((a: Record<string, unknown>) => {
       const nome = String(a.ad_name || "");
+      const adId = String(a.ad_id);
       return {
         dia,
-        ad_id: String(a.ad_id),
+        ad_id: adId,
         nome,
         formato: nome.includes("_VID_") ? "video" : "estatico",
         impressoes: Number(a.impressions || 0),
@@ -107,6 +144,7 @@ async function atualizar(): Promise<{ ok: boolean; dia: string; criativos: numbe
         cpc: Number(a.cpc || 0),
         gasto: Number(a.spend || 0),
         purchases: acao(a.actions as never, "omni_purchase") || acao(a.actions as never, "purchase"),
+        ...(thumbs[adId] ? { thumb_url: thumbs[adId] } : {}),
       };
     });
     const r = await fetch(`${SUPABASE_URL}/rest/v1/traf_criativos?on_conflict=dia,ad_id`, {
