@@ -77,7 +77,7 @@ async function atualizar(): Promise<{ ok: boolean; dia: string; criativos: numbe
       receita,
       fonte: "api",
     };
-    await fetch(`${SUPABASE_URL}/rest/v1/traf_snapshots`, {
+    await fetch(`${SUPABASE_URL}/rest/v1/traf_snapshots?on_conflict=dia,campanha_id`, {
       method: "POST",
       headers: { ...sbHeaders, Prefer: "resolution=merge-duplicates,return=minimal" },
       body: JSON.stringify(snapshot),
@@ -109,7 +109,7 @@ async function atualizar(): Promise<{ ok: boolean; dia: string; criativos: numbe
         purchases: acao(a.actions as never, "omni_purchase") || acao(a.actions as never, "purchase"),
       };
     });
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/traf_criativos`, {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/traf_criativos?on_conflict=dia,ad_id`, {
       method: "POST",
       headers: { ...sbHeaders, Prefer: "resolution=merge-duplicates,return=minimal" },
       body: JSON.stringify(linhas),

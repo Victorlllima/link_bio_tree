@@ -114,7 +114,7 @@ export async function POST(req: Request) {
       fonte: "api",
     };
 
-    await fetch(`${SUPABASE_URL}/rest/v1/traf_snapshots`, {
+    await fetch(`${SUPABASE_URL}/rest/v1/traf_snapshots?on_conflict=dia,campanha_id`, {
       method: "POST",
       headers: { ...sbHeaders, Prefer: "resolution=merge-duplicates,return=minimal" },
       body: JSON.stringify(snapshot),
@@ -145,7 +145,7 @@ export async function POST(req: Request) {
           purchases: acao(a.actions as never, "omni_purchase") || acao(a.actions as never, "purchase"),
         };
       });
-      const resIns = await fetch(`${SUPABASE_URL}/rest/v1/traf_criativos`, {
+      const resIns = await fetch(`${SUPABASE_URL}/rest/v1/traf_criativos?on_conflict=dia,ad_id`, {
         method: "POST",
         headers: { ...sbHeaders, Prefer: "resolution=merge-duplicates,return=minimal" },
         body: JSON.stringify(linhas),
