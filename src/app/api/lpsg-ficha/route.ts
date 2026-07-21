@@ -2,20 +2,50 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-// Qualifica o lead em HOT / WARM / COLD a partir das respostas (padrão Tabari — separa curioso de comprador).
+const EXECUCAO: Record<string, string> = {
+    "no-ar": "CRM já no ar, com link 🔥",
+    construindo: "Construindo, acompanhando",
+    assistindo: "Só assistindo",
+    atrasado: "Ainda não começou",
+};
+
+const INTENCAO: Record<string, string> = {
+    "viver-disso": "Viver disso — cobrar de empresas 🔥",
+    "renda-extra": "Renda extra por fora",
+    "minha-empresa": "Usar no próprio negócio",
+    "nao-sei": "Ainda não sabe",
+};
+
+const QUANDO: Record<string, string> = {
+    agora: "AGORA — essa semana 🔥",
+    mes: "Próximos 30 dias",
+    trimestre: "Próximos 3 meses",
+    "sem-pressa": "Sem pressa",
+};
+
+// Qualifica o lead em HOT / WARM / COLD a partir das 4 perguntas MQL (padrão Tabari — separa
+// curioso de comprador). Os 3 sinais que mais pesam: EXECUÇÃO (quem constrói compra),
+// INTENÇÃO (quer viver disso) e URGÊNCIA (quer começar agora).
 function qualificar(d: Record<string, string>): "HOT" | "WARM" | "COLD" {
     let score = 0;
-    if (d.tem_crm === "sim") score += 2;                       // já publicou o CRM = mão na massa
-    if (d.objetivo === "prestar-servico") score += 2;          // quer virar prestador (não hobby)
-    if (d.ja_cobrou === "sim") score += 1;                     // já tentou cobrar
-    const meta = parseInt(d.meta_faturamento || "0", 10);
-    if (meta >= 3000) score += 1;                              // ambição real
-    const prontidao = parseInt(d.prontidao || "0", 10);
-    if (prontidao >= 8) score += 2;
-    else if (prontidao >= 5) score += 1;
 
-    if (score >= 5) return "HOT";
-    if (score >= 3) return "WARM";
+    // 1. Execução — quem já pôs a mão na massa é quem compra o próximo passo
+    if (d.execucao === "no-ar") score += 3;
+    else if (d.execucao === "construindo") score += 2;
+    else if (d.execucao === "assistindo") score += 1;
+
+    // 2. Intenção — quer transformar isso em receita
+    if (d.intencao === "viver-disso") score += 3;
+    else if (d.intencao === "renda-extra") score += 2;
+    else if (d.intencao === "minha-empresa") score += 1;
+
+    // 3. Urgência — o sinal mais forte de compra imediata
+    if (d.quando === "agora") score += 3;
+    else if (d.quando === "mes") score += 2;
+    else if (d.quando === "trimestre") score += 1;
+
+    if (score >= 7) return "HOT";
+    if (score >= 4) return "WARM";
     return "COLD";
 }
 
@@ -32,13 +62,11 @@ export async function POST(req: NextRequest) {
             `📧 *Email:* ${data.email || "—"}`,
             `📱 *WhatsApp:* ${data.whatsapp || "—"}`,
             "",
-            `🖥️ *CRM do evento publicado?* ${data.tem_crm || "—"}`,
-            `🎯 *Objetivo com IA:* ${data.objetivo || "—"}`,
-            `💰 *Meta de faturamento (90d):* R$${data.meta_faturamento || "—"}`,
-            `💵 *Já tentou cobrar por IA?* ${data.ja_cobrou || "—"}`,
+            `🔨 *1. Executou até aqui:* ${EXECUCAO[data.execucao] || data.execucao || "—"}`,
+            `🎯 *2. Quer fazer com isso:* ${INTENCAO[data.intencao] || data.intencao || "—"}`,
+            `⏱️ *3. Quer começar:* ${QUANDO[data.quando] || data.quando || "—"}`,
             "",
-            `😤 *O que mais trava hoje:*\n${data.trava || "—"}`,
-            `⚡ *Prontidão pra começar (0-10):* ${data.prontidao || "—"}`,
+            `😤 *4. O que ainda trava:*\n${data.trava || "—"}`,
         ].filter(Boolean).join("\n");
 
         const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
