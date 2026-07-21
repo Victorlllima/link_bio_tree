@@ -151,7 +151,7 @@ const html = `
   <!-- HERO -->
   <div class="hero">
     <div class="wrap">
-      <span class="eyebrow">Desafio · 5 dias · 7h da manhã</span>
+      <span class="eyebrow">Começa 27 de julho · 5 dias · 7h da manhã</span>
       <h1>Construa um <em>CRM completo</em> em 5 dias. Sem escrever código.</h1>
       <p class="sub">De segunda a sexta, você constrói do zero um sistema de verdade... e publica na internet com <strong>o seu link</strong>. O tipo de sistema que empresa paga caro pra ter.</p>
       <a href="${CHECKOUT_URL}" class="btn dc-cta" data-cta="hero">Garantir minha vaga — R$44</a>
@@ -190,7 +190,7 @@ const html = `
   <section class="crono">
     <div class="wrap">
       <h2 class="sec-tit">Os <em>5 dias</em></h2>
-      <p class="sec-intro">De segunda a sexta, sempre às 7h da manhã. Uma etapa por dia, construindo em cima da anterior.</p>
+      <p class="sec-intro">De <strong style="color:var(--branco)">27 a 31 de julho</strong>, segunda a sexta, sempre às 7h da manhã. Uma etapa por dia, construindo em cima da anterior.</p>
       <div class="crono-list">
         <div class="crono-item"><span class="crono-dia">SEG · 7h</span><p><strong>O começo.</strong> O sistema que empresa paga caro, montado em minutos na sua frente.</p></div>
         <div class="crono-item"><span class="crono-dia">TER · 7h</span><p><strong>Um prompt, um CRM.</strong> E a armadilha que ninguém te conta.</p></div>
@@ -259,7 +259,7 @@ const html = `
   <section class="cta-final">
     <div class="wrap">
       <h2>5 dias pra construir o que você <em>adia há um ano.</em></h2>
-      <p class="sub" style="margin-bottom:32px">Segunda você começa do zero. Sexta você tem um CRM no ar, com seu link. Bora.</p>
+      <p class="sub" style="margin-bottom:32px">Dia 27 você começa do zero. Dia 31 você tem um CRM no ar, com seu link. Bora.</p>
       <a href="${CHECKOUT_URL}" class="btn dc-cta" data-cta="cta-final">Garantir minha vaga — R$44</a>
       <span class="btn-sub">acesso por 1 ano · pagamento único</span>
     </div>

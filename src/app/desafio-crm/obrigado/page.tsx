@@ -54,7 +54,7 @@ const html = `
 
     <div class="bloco">
       <div class="tit"><span class="num">2</span> As aulas são de manhã, 7h</div>
-      <p>De segunda a sexta, sempre às 7h. Deixe o computador do lado, porque <strong>desde o primeiro dia é mão na massa</strong>. Você constrói junto.</p>
+      <p>De <strong>27 a 31 de julho</strong>, segunda a sexta, sempre às 7h. Deixe o computador do lado, porque <strong>desde o primeiro dia é mão na massa</strong>. Você constrói junto.</p>
     </div>
 
     <div class="bloco">
