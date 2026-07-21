@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ ok: true });
     } catch (err) {
-        console.error("lpsg-matricula route error:", err);
+        console.error("crm-week-matricula route error:", err);
         return NextResponse.json({ ok: false }, { status: 500 });
     }
 }

@@ -5,7 +5,7 @@ import { useState } from "react";
 // FICHA DE INTERESSE — abre na AULA 4 (quinta), padrão Tabari: "pré-pitch sem preço + ficha de
 // interesse (4 perguntas MQL)". Quem preenche entra no carrinho às 6h50 (10min antes dos demais).
 // Benchmark Tabari: ~25% da base da aula 4 preenche; efeito = +30% de presença no pitch de domingo.
-// NÃO confundir com /lpsg-matricula (onboarding de quem comprou o ingresso, antes do evento).
+// NÃO confundir com /crm-week-matricula (onboarding de quem comprou o ingresso, antes do evento).
 
 type Form = {
   nome: string; email: string; whatsapp: string;

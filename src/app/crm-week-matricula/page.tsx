@@ -20,7 +20,7 @@ const INITIAL: Form = {
   nicho: "", objetivo: "", maior_duvida: "",
 };
 
-export default function LpsgMatriculaPage() {
+export default function CrmWeekMatriculaPage() {
   const [form, setForm] = useState<Form>(INITIAL);
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
@@ -36,7 +36,7 @@ export default function LpsgMatriculaPage() {
     if (!valido || sending) return;
     setSending(true);
     try {
-      await fetch("/api/lpsg-matricula", {
+      await fetch("/api/crm-week-matricula", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

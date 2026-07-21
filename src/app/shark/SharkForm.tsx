@@ -167,7 +167,9 @@ export default function SharkForm() {
 
       if (!res.ok) throw new Error("server_error");
 
+      const data = await res.json();
       setState("success");
+      (window as any).fbq?.("track", "Lead", { content_name: "SHARK Lista de Espera" }, { eventID: data.event_id });
       setTimeout(() => {
         successRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 50);
