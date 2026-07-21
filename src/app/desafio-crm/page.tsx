@@ -66,6 +66,26 @@ const html = `
   .dc-root .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(249,115,22,.4); }
   .dc-root .btn-sub { display: block; margin-top: 12px; font-size: 13px; color: var(--mid); font-family: 'JetBrains Mono', monospace; }
 
+  /* ---------- FOTO DO RED (hero) ---------- */
+  .dc-root .hero-grid { display: grid; grid-template-columns: 1fr; gap: 34px; align-items: center; }
+  .dc-root .hero-foto { position: relative; justify-self: center; max-width: 330px; width: 100%; }
+  .dc-root .hero-foto img {
+    width: 100%; height: auto; display: block; border-radius: 18px;
+    border: 1px solid rgba(249,115,22,.25);
+    box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 50px rgba(249,115,22,.12);
+  }
+  .dc-root .hero-foto figcaption {
+    margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--mid); text-align: center; letter-spacing: .04em;
+  }
+  .dc-root .hero-foto figcaption b { color: var(--laranja); font-weight: 700; }
+  @media (min-width: 860px) {
+    .dc-root .hero-grid { grid-template-columns: 1.25fr .75fr; gap: 44px; text-align: left; }
+    .dc-root .hero-grid .hero-txt { text-align: left; }
+    .dc-root .hero-grid .hero-txt .sub { margin-left: 0; }
+    .dc-root .hero-foto { justify-self: end; max-width: 340px; }
+  }
+
   /* ---------- SEÇÃO GENÉRICA ---------- */
   .dc-root section { padding: 56px 0; }
   .dc-root .sec-tit {
@@ -151,11 +171,19 @@ const html = `
   <!-- HERO -->
   <div class="hero">
     <div class="wrap">
-      <span class="eyebrow">Começa 27 de julho · 5 dias · 7h da manhã</span>
-      <h1>Construa um <em>CRM completo</em> em 5 dias. Sem escrever código.</h1>
-      <p class="sub">De segunda a sexta, você constrói do zero um sistema de verdade... e publica na internet com <strong>o seu link</strong>. O tipo de sistema que empresa paga caro pra ter.</p>
-      <a href="${CHECKOUT_URL}" class="btn dc-cta" data-cta="hero">Garantir minha vaga — R$44</a>
-      <span class="btn-sub">acesso às aulas por 1 ano</span>
+      <div class="hero-grid">
+        <div class="hero-txt">
+          <span class="eyebrow">Começa 27 de julho · 5 dias · 7h da manhã</span>
+          <h1>Construa um <em>CRM completo</em> em 5 dias. Sem escrever código.</h1>
+          <p class="sub">De segunda a sexta, você constrói do zero um CRM de verdade.<br>O tipo de sistema que toda empresa paga caro pra ter.</p>
+          <a href="${CHECKOUT_URL}" class="btn dc-cta" data-cta="hero">Garantir minha vaga — R$44</a>
+          <span class="btn-sub">acesso às aulas por 1 ano</span>
+        </div>
+        <figure class="hero-foto">
+          <img src="/red-desafio-crm.jpg" alt="Red, criador do Desafio Construindo um CRM em 5 Dias" width="750" height="1000" loading="eager">
+          <figcaption>Com o <b>Red</b> · RedPro AI Academy</figcaption>
+        </figure>
+      </div>
     </div>
   </div>
 
@@ -165,9 +193,9 @@ const html = `
       <h2 class="sec-tit">Você já sabe usar IA. <em>Mas isso não paga suas contas.</em></h2>
       <p class="sec-intro">Usar ChatGPT no dia a dia é uma coisa. Construir algo que a empresa dos outros precisa e paga pra ter é outra. E é essa segunda que vira renda.</p>
       <div class="dor-list">
-        <div class="dor-item"><span class="dor-x">✕</span><p>Você mexe com IA, mas continua no mesmo lugar, porque não tem <strong>uma coisa concreta</strong> pra entregar.</p></div>
-        <div class="dor-item"><span class="dor-x">✕</span><p>Acha que precisa <strong>saber programar</strong> pra construir sistema. Não precisa. A ferramenta constrói.</p></div>
-        <div class="dor-item"><span class="dor-x">✕</span><p>Coleciona curso de IA, mas empresa <strong>não olha certificado</strong>. Olha se você resolve.</p></div>
+        <div class="dor-item"><span class="dor-x">✕</span><p>Você usa IA, mas continua no mesmo lugar, porque não tem <strong>um produto concreto</strong> pra entregar.</p></div>
+        <div class="dor-item"><span class="dor-x">✕</span><p>Acha que precisa <strong>saber programar</strong> pra construir sistemas. Não precisa.</p></div>
+        <div class="dor-item"><span class="dor-x">✕</span><p>Coleciona cursos de IA, mas as empresas <strong>não olham certificados</strong>. Olham se você resolve o problema delas.</p></div>
       </div>
     </div>
   </section>
@@ -176,11 +204,11 @@ const html = `
   <section>
     <div class="wrap">
       <h2 class="sec-tit">O que você <em>sai construindo</em></h2>
-      <p class="sec-intro">Não é teoria sobre IA. Em 5 dias você sai com um sistema real, no ar, feito por você.</p>
+      <p class="sec-intro">Não é teoria sobre IA. Em 5 dias você sai com um CRM real, no ar, feito por você.</p>
       <div class="entrega-grid">
-        <div class="ent-card"><div class="num">1</div><h3>Um CRM publicado</h3><p>Sistema completo na internet, com seu link. Cadastro de cliente, funil de vendas, painel do dono.</p></div>
-        <div class="ent-card"><div class="num">2</div><h3>Sem uma linha de código</h3><p>Você descreve o que precisa em português. A ferramenta constrói. O trabalho pesado deixa de ser seu.</p></div>
-        <div class="ent-card"><div class="num">3</div><h3>Uma prova de que resolve</h3><p>Um sistema pronto que você mostra pra qualquer empresa: "construí isso. Faço um pro seu negócio".</p></div>
+        <div class="ent-card"><div class="num">1</div><h3>Um CRM publicado</h3><p>Sistema completo na internet, com seu link. Cadastro de cliente, funil de vendas, dashboard do dono.</p></div>
+        <div class="ent-card"><div class="num">2</div><h3>Sem uma linha de código</h3><p>Você descreve o que precisa em português. A IA constrói. O trabalho pesado deixa de ser seu.</p></div>
+        <div class="ent-card"><div class="num">3</div><h3>Uma prova de que você resolve</h3><p>Um sistema pronto que você mostra pra qualquer empresa: "Eu construí isso. Posso construir um pro seu negócio".</p></div>
         <div class="ent-card"><div class="num">4</div><h3>Acesso por 1 ano</h3><p>As aulas ficam com você por 12 meses. Constrói junto, revisita quando quiser, adapta pro seu nicho.</p></div>
       </div>
     </div>
@@ -192,11 +220,11 @@ const html = `
       <h2 class="sec-tit">Os <em>5 dias</em></h2>
       <p class="sec-intro">De <strong style="color:var(--branco)">27 a 31 de julho</strong>, segunda a sexta, sempre às 7h da manhã. Uma etapa por dia, construindo em cima da anterior.</p>
       <div class="crono-list">
-        <div class="crono-item"><span class="crono-dia">SEG · 7h</span><p><strong>O começo.</strong> O sistema que empresa paga caro, montado em minutos na sua frente.</p></div>
-        <div class="crono-item"><span class="crono-dia">TER · 7h</span><p><strong>Um prompt, um CRM.</strong> E a armadilha que ninguém te conta.</p></div>
-        <div class="crono-item"><span class="crono-dia">QUA · 7h</span><p><strong>Os dados.</strong> Onde empresa de verdade guarda, e por que o seu sistema trava sozinho sem isso.</p></div>
-        <div class="crono-item"><span class="crono-dia">QUI · 7h</span><p><strong>O CRM ganha vida.</strong> A parte que muda tudo.</p></div>
-        <div class="crono-item"><span class="crono-dia">SEX · 7h</span><p><strong>O link no ar.</strong> O sistema publicado, pronto pra você mostrar pro mundo.</p></div>
+        <div class="crono-item"><span class="crono-dia">SEG · 7h</span><p>Você vê, funcionando na tela, <strong>o sistema que vai construir até sexta</strong>. E entende por que toda empresa paga caro por ele.</p></div>
+        <div class="crono-item"><span class="crono-dia">TER · 7h</span><p><strong>Seu CRM nasce.</strong> Cadastro de cliente, negócios e funil de vendas na sua tela, em um dia.</p></div>
+        <div class="crono-item"><span class="crono-dia">QUA · 7h</span><p><strong>Seu sistema ganha memória.</strong> É o dia que separa um teste bonito de um sistema que empresas usam de verdade.</p></div>
+        <div class="crono-item"><span class="crono-dia">QUI · 7h</span><p><strong>Seu CRM ganha vida</strong> com a cara do negócio que você escolher.</p></div>
+        <div class="crono-item"><span class="crono-dia">SEX · 7h</span><p><strong>Seu link no ar.</strong> Seu sistema publicado na internet, pronto pra mandar pra qualquer pessoa.</p></div>
       </div>
     </div>
   </section>
@@ -205,7 +233,7 @@ const html = `
   <section class="oferta">
     <div class="wrap">
       <h2 class="sec-tit">Sua <em>vaga</em> no desafio</h2>
-      <p class="sec-intro">Um sistema desses, sob medida, é vendido no mercado por até R$5.000. A vaga pra aprender a construir um custa menos que um almoço.</p>
+      <p class="sec-intro">Um CRM desses, sob medida, é vendido no mercado por até R$5.000. A vaga pra aprender a construir um custa menos que um almoço.</p>
       <div class="preco-card">
         <div class="preco-de">de R$97</div>
         <div class="preco-num"><span class="cifra">R$</span>44</div>
@@ -235,7 +263,7 @@ const html = `
             <li>Procura fórmula mágica de dinheiro rápido sem fazer nada</li>
             <li>Não vai reservar as manhãs pra construir junto</li>
             <li>Quer só mais um certificado pra pendurar na parede</li>
-            <li>Acha que dá pra virar prestador sem ter uma prova pra mostrar</li>
+            <li>Acha que dá pra cobrar de uma empresa sem ter uma prova pra mostrar</li>
           </ul>
         </div>
       </div>
