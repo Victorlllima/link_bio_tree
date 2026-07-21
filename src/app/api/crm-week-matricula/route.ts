@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 // Ficha de MATRÍCULA (passo 2 da mensageria Tabari) — onboarding de quem já comprou o ingresso.
 // Sem scoring de lead: aqui não se qualifica ninguém, só se coleta contexto pras aulas.
-// A qualificação MQL acontece na ficha de INTERESSE (/api/lpsg-ficha), que abre na aula 4.
+// A qualificação MQL acontece na ficha de INTERESSE (/api/crm-week-status), que abre na aula 4.
 
 const OCUPACAO: Record<string, string> = {
     clt: "Contratado (CLT)",

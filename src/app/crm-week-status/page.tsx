@@ -17,7 +17,7 @@ const INITIAL: Form = {
   execucao: "", intencao: "", quando: "", trava: "",
 };
 
-export default function LpsgFichaPage() {
+export default function CrmWeekStatusPage() {
   const [form, setForm] = useState<Form>(INITIAL);
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
@@ -31,7 +31,7 @@ export default function LpsgFichaPage() {
     if (!valido || sending) return;
     setSending(true);
     try {
-      await fetch("/api/lpsg-ficha", {
+      await fetch("/api/crm-week-status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

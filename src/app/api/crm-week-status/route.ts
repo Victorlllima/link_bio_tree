@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
         // Retorna a tag pro front (pode ser usada pra redirecionar HOT vs COLD depois).
         return NextResponse.json({ ok: true, tag });
     } catch (err) {
-        console.error("lpsg-ficha route error:", err);
+        console.error("crm-week-status route error:", err);
         return NextResponse.json({ ok: false }, { status: 500 });
     }
 }

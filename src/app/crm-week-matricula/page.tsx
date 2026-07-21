@@ -6,7 +6,7 @@ import { useState } from "react";
 // ("1. confirma e-mail · 2. FICHA · 3. grupo backup").
 // Preenchida por quem JÁ comprou o ingresso, ANTES do evento começar.
 // Função: onboarding + contexto pro Red adaptar os exemplos das aulas.
-// NÃO confundir com /lpsg-ficha (ficha de INTERESSE, abre na aula 4 e qualifica MQL).
+// NÃO confundir com /crm-week-status (ficha de INTERESSE, abre na aula 4 e qualifica MQL).
 
 type Form = {
   nome: string; email: string; whatsapp: string;
