@@ -2,6 +2,46 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
+const SUPABASE_URL = "https://supabase.redpro.com.br";
+// Ciclo atual do CRM Week (data da segunda que abre). Trocar a cada novo ciclo.
+const CICLO = "2026-07-27";
+
+// Grava no banco. Nunca derruba a resposta: se o Supabase falhar, o Telegram ainda notifica.
+async function salvar(d: Record<string, string>) {
+    const key = process.env.SUPABASE_SERVICE_KEY;
+    if (!key) return { ok: false, erro: "SUPABASE_SERVICE_KEY ausente" };
+    try {
+        const res = await fetch(
+            `${SUPABASE_URL}/rest/v1/crm_week_matriculas?on_conflict=ciclo,email`,
+            {
+                method: "POST",
+                headers: {
+                    apikey: key,
+                    Authorization: `Bearer ${key}`,
+                    "Content-Type": "application/json",
+                    Prefer: "resolution=merge-duplicates,return=minimal",
+                },
+                body: JSON.stringify({
+                    ciclo: CICLO,
+                    nome: d.nome,
+                    email: (d.email || "").toLowerCase().trim(),
+                    whatsapp: d.whatsapp,
+                    ocupacao: d.ocupacao || null,
+                    nivel_ia: d.nivel_ia || null,
+                    ja_construiu: d.ja_construiu || null,
+                    nicho: d.nicho || null,
+                    objetivo: d.objetivo || null,
+                    maior_duvida: d.maior_duvida || null,
+                }),
+            },
+        );
+        if (!res.ok) return { ok: false, erro: `${res.status} ${await res.text()}` };
+        return { ok: true };
+    } catch (e) {
+        return { ok: false, erro: String(e) };
+    }
+}
+
 // Ficha de MATRÍCULA (passo 2 da mensageria Tabari) — onboarding de quem já comprou o ingresso.
 // Sem scoring de lead: aqui não se qualifica ninguém, só se coleta contexto pras aulas.
 // A qualificação MQL acontece na ficha de INTERESSE (/api/crm-week-status), que abre na aula 4.
@@ -39,8 +79,13 @@ export async function POST(req: NextRequest) {
     try {
         const d = await req.json();
 
+        // Persistir ANTES de notificar: o dado no banco é o que sobrevive.
+        const gravou = await salvar(d);
+        if (!gravou.ok) console.error("crm-week-matricula: falha ao gravar —", gravou.erro);
+
         const msg = [
             "🎓 *Nova matrícula — Desafio CRM em 5 dias*",
+            gravou.ok ? "" : "⚠️ _não gravou no banco — ver logs_",
             "",
             `👤 *Nome:* ${d.nome || "—"}`,
             `📧 *Email:* ${d.email || "—"}`,

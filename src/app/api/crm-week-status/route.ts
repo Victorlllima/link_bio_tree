@@ -26,7 +26,7 @@ const QUANDO: Record<string, string> = {
 // Qualifica o lead em HOT / WARM / COLD a partir das 4 perguntas MQL (padrão Tabari — separa
 // curioso de comprador). Os 3 sinais que mais pesam: EXECUÇÃO (quem constrói compra),
 // INTENÇÃO (quer viver disso) e URGÊNCIA (quer começar agora).
-function qualificar(d: Record<string, string>): "HOT" | "WARM" | "COLD" {
+function qualificar(d: Record<string, string>): { tag: "HOT" | "WARM" | "COLD"; score: number } {
     let score = 0;
 
     // 1. Execução — quem já pôs a mão na massa é quem compra o próximo passo
@@ -44,19 +44,63 @@ function qualificar(d: Record<string, string>): "HOT" | "WARM" | "COLD" {
     else if (d.quando === "mes") score += 2;
     else if (d.quando === "trimestre") score += 1;
 
-    if (score >= 7) return "HOT";
-    if (score >= 4) return "WARM";
-    return "COLD";
+    const tag = score >= 7 ? "HOT" : score >= 4 ? "WARM" : "COLD";
+    return { tag, score };
+}
+
+const SUPABASE_URL = "https://supabase.redpro.com.br";
+// Ciclo atual do CRM Week (data da segunda que abre). Trocar a cada novo ciclo.
+const CICLO = "2026-07-27";
+
+// Grava no banco. Nunca derruba a resposta: se o Supabase falhar, o Telegram ainda notifica.
+async function salvar(d: Record<string, string>, tag: string, score: number) {
+    const key = process.env.SUPABASE_SERVICE_KEY;
+    if (!key) return { ok: false, erro: "SUPABASE_SERVICE_KEY ausente" };
+    try {
+        const res = await fetch(
+            `${SUPABASE_URL}/rest/v1/crm_week_status?on_conflict=ciclo,email`,
+            {
+                method: "POST",
+                headers: {
+                    apikey: key,
+                    Authorization: `Bearer ${key}`,
+                    "Content-Type": "application/json",
+                    Prefer: "resolution=merge-duplicates,return=minimal",
+                },
+                body: JSON.stringify({
+                    ciclo: CICLO,
+                    nome: d.nome,
+                    email: (d.email || "").toLowerCase().trim(),
+                    whatsapp: d.whatsapp,
+                    execucao: d.execucao || null,
+                    intencao: d.intencao || null,
+                    quando: d.quando || null,
+                    trava: d.trava || null,
+                    tag,
+                    score,
+                }),
+            },
+        );
+        if (!res.ok) return { ok: false, erro: `${res.status} ${await res.text()}` };
+        return { ok: true };
+    } catch (e) {
+        return { ok: false, erro: String(e) };
+    }
 }
 
 export async function POST(req: NextRequest) {
     try {
         const data = await req.json();
-        const tag = qualificar(data);
+        const { tag, score } = qualificar(data);
+
+        // Persistir ANTES de notificar: o dado no banco é o que sobrevive.
+        const gravou = await salvar(data, tag, score);
+        if (!gravou.ok) console.error("crm-week-status: falha ao gravar —", gravou.erro);
 
         const emoji = tag === "HOT" ? "🔥" : tag === "WARM" ? "🟡" : "🔵";
         const msg = [
-            `${emoji} *Ficha de interesse LPSG — lead ${tag}*`,
+            `${emoji} *Ficha de interesse — lead ${tag}* (score ${score}/9)`,
+            gravou.ok ? "" : "⚠️ _não gravou no banco — ver logs_",
             "",
             `👤 *Nome:* ${data.nome || "—"}`,
             `📧 *Email:* ${data.email || "—"}`,

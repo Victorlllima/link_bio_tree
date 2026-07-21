@@ -11,11 +11,12 @@ import {
   type DriveTipo,
 } from "./tasks";
 import MetricasPainel from "./MetricasPainel";
+import LeadsPainel from "./LeadsPainel";
 
 type EstadoItem = { task_id: string; responsavel: Responsavel; done: boolean };
 type EstadoMap = Record<string, { responsavel: Responsavel; done: boolean }>;
 
-type Nivel = "operacional" | "drive" | "metricas";
+type Nivel = "operacional" | "drive" | "metricas" | "leads";
 
 const DRIVE_ICON: Record<DriveTipo, string> = {
   doc: "📄", pdf: "📕", html: "🌐", img: "🖼️", planilha: "📊", video: "🎬", pasta: "📁", link: "🔗",
@@ -172,6 +173,7 @@ export default function LpsgPainel() {
           {([
             ["operacional", "✅ Checklist Operacional"],
             ["metricas", "📊 Métricas de Tráfego"],
+            ["leads", "🎓 Leads & Fichas"],
             ["drive", "📁 Drive de Conteúdo"],
           ] as [Nivel, string][]).map(([n, label]) => (
             <button key={n} onClick={() => setNivel(n)} style={{ ...s.aba, ...(nivel === n ? s.abaAtiva : {}) }}>
@@ -182,6 +184,9 @@ export default function LpsgPainel() {
 
         {/* ---------- MÉTRICAS DE TRÁFEGO ---------- */}
         {nivel === "metricas" && <MetricasPainel />}
+
+        {/* ---------- LEADS & FICHAS ---------- */}
+        {nivel === "leads" && <LeadsPainel />}
 
         {/* ---------- SUB-FILTRO DE PESSOA (só no Checklist) ---------- */}
         {nivel === "operacional" && (
