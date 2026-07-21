@@ -34,7 +34,7 @@ create table if not exists crm_week_matriculas (
 
 -- Um e-mail só se matricula uma vez por ciclo (repreenchimento atualiza, não duplica).
 create unique index if not exists crm_week_matriculas_ciclo_email
-  on crm_week_matriculas (ciclo, lower(email));
+  on crm_week_matriculas (ciclo, email);   -- coluna simples: o PostgREST nao casa on_conflict com indice de expressao (lower())
 
 create index if not exists crm_week_matriculas_criado
   on crm_week_matriculas (criado_em desc);
@@ -61,7 +61,7 @@ create table if not exists crm_week_status (
 );
 
 create unique index if not exists crm_week_status_ciclo_email
-  on crm_week_status (ciclo, lower(email));
+  on crm_week_status (ciclo, email);   -- idem: e-mail e normalizado (lowercase) na aplicacao
 
 -- Ordenar os leads mais quentes primeiro é a consulta principal do painel.
 create index if not exists crm_week_status_score
