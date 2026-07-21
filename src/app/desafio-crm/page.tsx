@@ -173,7 +173,7 @@ const html = `
     <div class="wrap">
       <div class="hero-grid">
         <div class="hero-txt">
-          <span class="eyebrow">Começa 27 de julho · 5 dias · 7h da manhã</span>
+          <span class="eyebrow">Começa 27 de julho · seg a sex, 7h da manhã</span>
           <h1>Construa um <em>CRM completo</em> em 5 dias. Sem escrever código.</h1>
           <p class="sub">De segunda a sexta, você constrói do zero um CRM de verdade.<br>O tipo de sistema que toda empresa paga caro pra ter.</p>
           <a href="${CHECKOUT_URL}" class="btn dc-cta" data-cta="hero">Garantir minha vaga — R$44</a>
@@ -218,13 +218,15 @@ const html = `
   <section class="crono">
     <div class="wrap">
       <h2 class="sec-tit">Os <em>5 dias</em></h2>
-      <p class="sec-intro">De <strong style="color:var(--branco)">27 a 31 de julho</strong>, segunda a sexta, sempre às 7h da manhã. Uma etapa por dia, construindo em cima da anterior.</p>
+      <p class="sec-intro">De <strong style="color:var(--branco)">27 a 31 de julho</strong>, segunda a sexta, sempre às 7h da manhã. Uma etapa por dia, construindo em cima da anterior. <strong style="color:var(--branco)">E ainda tem mais dois encontros no fim de semana.</strong></p>
       <div class="crono-list">
         <div class="crono-item"><span class="crono-dia">SEG · 7h</span><p>Você vê, funcionando na tela, <strong>o sistema que vai construir até sexta</strong>. E entende por que toda empresa paga caro por ele.</p></div>
         <div class="crono-item"><span class="crono-dia">TER · 7h</span><p><strong>Seu CRM nasce.</strong> Cadastro de cliente, negócios e funil de vendas na sua tela, em um dia.</p></div>
         <div class="crono-item"><span class="crono-dia">QUA · 7h</span><p><strong>Seu sistema ganha memória.</strong> É o dia que separa um teste bonito de um sistema que empresas usam de verdade.</p></div>
         <div class="crono-item"><span class="crono-dia">QUI · 7h</span><p><strong>Seu CRM ganha vida</strong> com a cara do negócio que você escolher.</p></div>
         <div class="crono-item"><span class="crono-dia">SEX · 7h</span><p><strong>Seu link no ar.</strong> Seu sistema publicado na internet, pronto pra mandar pra qualquer pessoa.</p></div>
+        <div class="crono-item"><span class="crono-dia">SÁB · 10h</span><p><strong>Tira-dúvidas.</strong> Travou em alguma parte? Traz a dúvida que eu limpo. Sem replay — é só quem aparece.</p></div>
+        <div class="crono-item"><span class="crono-dia">DOM · 20h</span><p><strong>O tabuleiro inteiro.</strong> Onde esse CRM se encaixa num quadro maior, e o que dá pra fazer com isso daqui pra frente.</p></div>
       </div>
     </div>
   </section>
