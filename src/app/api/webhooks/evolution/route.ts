@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { enviarWhatsApp } from "@/lib/evolution";
+import { enviarMensagem } from "@/lib/whatsapp";
 import { passosRestantes } from "@/lib/mensagens-crmweek";
 
 /**
@@ -176,7 +176,7 @@ export async function POST(req: NextRequest) {
     const tipo = classificar(texto);
 
     if (tipo === "confirmou") {
-        const r = await enviarWhatsApp(fone, passosRestantes(true));
+        const r = await enviarMensagem(fone, passosRestantes(true));
         await telegram(
             `✅ *E-mail confirmado — Desafio CRM*\n\n👤 ${nome}\n📱 ${fone}\n\n` +
             `${r.ok ? "Passos 2 e 3 enviados." : `⚠️ Falha ao enviar os passos: ${r.erro}`}`,
@@ -187,7 +187,7 @@ export async function POST(req: NextRequest) {
     if (tipo === "email_novo") {
         const emailNovo = (texto.match(EMAIL_RE) || [""])[0];
         await corrigirEmail(fone, emailNovo);
-        const r = await enviarWhatsApp(fone, passosRestantes(false, emailNovo));
+        const r = await enviarMensagem(fone, passosRestantes(false, emailNovo));
         await telegram(
             `📧 *E-mail CORRIGIDO — Desafio CRM*\n\n👤 ${nome}\n📱 ${fone}\n` +
             `De: ${comprador.email}\nPara: *${emailNovo}*\n\n` +

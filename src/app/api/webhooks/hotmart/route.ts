@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { enviarWhatsApp } from "@/lib/evolution";
+import { enviarMensagem } from "@/lib/whatsapp";
 import { confirmarEmail } from "@/lib/mensagens-crmweek";
 
 /**
@@ -208,7 +208,7 @@ export async function POST(req: NextRequest) {
             metaCapi(email, nome, fone, valor, moeda, transacao),
             resend(email, nome),
             enviarWpp
-                ? enviarWhatsApp(fone, confirmarEmail(nome, email))
+                ? enviarMensagem(fone, confirmarEmail(nome, email))
                 : Promise.resolve(null),
         ]);
         if (!capi.ok) console.error("[hotmart] CAPI:", capi.erro);
