@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 // ⚠️ SEMANAL: trocar este link do grupo a cada novo ciclo do Desafio (tarefa pag-obrigado-desafio).
 // Página de obrigado EXCLUSIVA da LP do Desafio (/desafio-crm) — separada da /lpsg-obrigado.
-const GRUPO_URL = "https://chat.whatsapp.com/IsvZFOVIYKmDss3tSRwrKx";
+const GRUPO_URL = "https://chat.whatsapp.com/Jtk4YdLJMFGK2S6LtUUkMr";
 
 export const metadata: Metadata = {
   title: "Vaga garantida — Desafio CRM em 5 Dias",
