@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 // Link do grupo de WhatsApp do ciclo atual (recriado a cada ciclo — ver tarefa grp-op-link).
-const GRUPO_URL = "https://chat.whatsapp.com/Jtk4YdLJMFGK2S6LtUUkMr";
+const GRUPO_URL = "https://chat.whatsapp.com/I3AcP8IpTtsG2y3gC7O0bS";
 
 export const metadata: Metadata = {
   title: "Vaga garantida — LPSG RedPro AI Academy",
