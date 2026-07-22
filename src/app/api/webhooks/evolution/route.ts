@@ -54,12 +54,20 @@ function extrairTexto(msg: Record<string, unknown>): string {
 
 const EMAIL_RE = /[\w.+-]+@[\w-]+\.[\w.-]+/;
 
-/** Classifica a resposta para decidir o tratamento. */
+/**
+ * Classifica a resposta para decidir o tratamento.
+ *
+ * E-mail vem PRIMEIRO na ordem: se a pessoa escreve "confirmo, mas usa
+ * outro@email.com", o que vale é o e-mail novo. Confirmar antes trataria como
+ * "está certo" e o acesso iria pro endereço errado.
+ */
 function classificar(texto: string): "confirmou" | "email_novo" | "outro" {
-    const t = texto.toLowerCase().trim();
-    if (/^(email_ok|sim|s|isso|ok|confirmo|correto|certo|é esse|eh esse)\b/.test(t)) return "confirmou";
-    if (/^(email_corrigir)\b/.test(t)) return "outro"; // pediu pra corrigir mas ainda não mandou
     if (EMAIL_RE.test(texto)) return "email_novo";
+    const t = texto.toLowerCase().trim();
+    // "confirmo" é a palavra pedida; as demais cobrem quem responde à sua maneira.
+    if (/^(confirmo|confirmado|sim|isso|ok|correto|certo|é esse|eh esse|esse mesmo|tá certo|ta certo)\b/.test(t)) {
+        return "confirmou";
+    }
     return "outro";
 }
 

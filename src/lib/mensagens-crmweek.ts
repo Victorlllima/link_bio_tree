@@ -37,6 +37,18 @@ export function primeiroNome(nome: string): string {
  *
  * O e-mail não é pretexto: é por ele que a Hotmart entrega o acesso.
  */
+/**
+ * ⚠️ Sem botões nativos, por decisão técnica (22/07/2026).
+ * `sendButtons` no conector Baileys devolve HTTP 201 mas NUNCA entrega — bug
+ * confirmado nas issues #2390 e #2404 da Evolution API, reproduzido aqui na
+ * v2.3.7. Botão interativo só funciona no conector Cloud API (WABA oficial) e
+ * está em vias de ser descontinuado no Baileys. Texto é o que entrega hoje.
+ *
+ * A palavra é *CONFIRMO*, não "SIM": "sim" aparece solto em qualquer frase e
+ * gera falso positivo na classificação; "CONFIRMO" é inequívoco. Digitar uma
+ * palavra específica também é um micro-compromisso — psicologicamente mais
+ * forte que tocar um botão.
+ */
 export function confirmarEmail(nome: string, email: string): string {
     const p = primeiroNome(nome);
     const saudacao = p ? `Opa, ${p}!` : "Opa!";
@@ -50,32 +62,8 @@ export function confirmarEmail(nome: string, email: string): string {
         "",
         `Seu e-mail é *${email}*?`,
         "",
-        "Responde *SIM* se estiver certo, ou manda o e-mail correto que eu corrijo aqui.",
+        "Responde *CONFIRMO* se estiver certo, ou manda o e-mail correto que eu ajusto aqui.",
     ].join("\n");
-}
-
-/** Versão com botões da mensagem 1 — um toque converte mais que digitar. */
-export function confirmarEmailBotoes(nome: string, email: string) {
-    const p = primeiroNome(nome);
-    const saudacao = p ? `Opa, ${p}!` : "Opa!";
-
-    return {
-        title: "Vaga confirmada 🧩",
-        description: [
-            `${saudacao}`,
-            "",
-            "Sua vaga no *Desafio: Seu CRM em 5 Dias* tá confirmada.",
-            "",
-            "Antes de te passar os acessos, confirma pra mim:",
-            "",
-            `Seu e-mail é *${email}*?`,
-        ].join("\n"),
-        footer: "Desafio: Seu CRM em 5 Dias",
-        buttons: [
-            { type: "reply" as const, displayText: "SIM, é esse", id: "email_ok" },
-            { type: "reply" as const, displayText: "Não, vou corrigir", id: "email_corrigir" },
-        ],
-    };
 }
 
 /**

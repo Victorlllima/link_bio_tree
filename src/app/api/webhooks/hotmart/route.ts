@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { enviarComBotoesOuTexto } from "@/lib/evolution";
-import { confirmarEmail, confirmarEmailBotoes } from "@/lib/mensagens-crmweek";
+import { enviarWhatsApp } from "@/lib/evolution";
+import { confirmarEmail } from "@/lib/mensagens-crmweek";
 
 /**
  * Webhook da Hotmart — hub de pós-compra.
@@ -208,11 +208,7 @@ export async function POST(req: NextRequest) {
             metaCapi(email, nome, fone, valor, moeda, transacao),
             resend(email, nome),
             enviarWpp
-                ? enviarComBotoesOuTexto(
-                    fone,
-                    confirmarEmailBotoes(nome, email),
-                    confirmarEmail(nome, email),
-                )
+                ? enviarWhatsApp(fone, confirmarEmail(nome, email))
                 : Promise.resolve(null),
         ]);
         if (!capi.ok) console.error("[hotmart] CAPI:", capi.erro);
