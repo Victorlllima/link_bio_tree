@@ -68,6 +68,56 @@ export async function enviarWhatsApp(
     }
 }
 
+export type Botao = { type: "reply"; displayText: string; id: string };
+
+/**
+ * Envia mensagem com botões nativos. Um toque converte muito mais que digitar,
+ * e resposta rápida é o que abre a janela de 24h e protege o número.
+ *
+ * ⚠️ Botão nativo depende do app do destinatário renderizar `interactiveMessage`.
+ * Em versões antigas do WhatsApp a mensagem pode chegar sem os botões — por isso
+ * `enviarComBotoesOuTexto` cai para texto puro se o envio falhar.
+ */
+export async function enviarBotoes(
+    destino: string,
+    payload: { title: string; description: string; footer: string; buttons: Botao[] },
+): Promise<EnvioResultado> {
+    const apikey = process.env.EVOLUTION_API_KEY;
+    if (!apikey) return { ok: false, erro: "EVOLUTION_API_KEY ausente" };
+
+    const base = process.env.EVOLUTION_API_URL || URL_PADRAO;
+    const instancia = process.env.EVOLUTION_INSTANCE || INSTANCIA_PADRAO;
+
+    const numero = normalizarDestino(destino);
+    if (!numero) return { ok: false, erro: "destino vazio ou inválido" };
+
+    try {
+        const res = await fetch(`${base}/message/sendButtons/${instancia}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", apikey },
+            body: JSON.stringify({ number: numero, ...payload }),
+        });
+        if (!res.ok) return { ok: false, erro: `${res.status} ${await res.text()}` };
+        return { ok: true };
+    } catch (e) {
+        return { ok: false, erro: String(e) };
+    }
+}
+
+/** Tenta botões; se falhar, manda o texto equivalente. Ninguém fica sem receber. */
+export async function enviarComBotoesOuTexto(
+    destino: string,
+    payload: { title: string; description: string; footer: string; buttons: Botao[] },
+    textoFallback: string,
+): Promise<EnvioResultado & { via?: "botoes" | "texto" }> {
+    const comBotoes = await enviarBotoes(destino, payload);
+    if (comBotoes.ok) return { ok: true, via: "botoes" };
+
+    console.error("[evolution] botões falharam, caindo pra texto:", comBotoes.erro);
+    const texto = await enviarWhatsApp(destino, textoFallback);
+    return texto.ok ? { ok: true, via: "texto" } : texto;
+}
+
 /** Estado da instância — use para diagnosticar antes de culpar o disparo. */
 export async function estadoInstancia(): Promise<{ ok: boolean; estado?: string; erro?: string }> {
     const apikey = process.env.EVOLUTION_API_KEY;

@@ -22,37 +22,86 @@ export function primeiroNome(nome: string): string {
 }
 
 /**
- * Boas-vindas pós-compra do ingresso (R$44).
+ * MENSAGEM 1 — imediata, no momento da compra.
  *
- * Segue os 3 passos obrigatórios do Tabari (MECANICA-DEFINITIVA-LPSG.md):
- *   (a) confirmar o e-mail  (b) preencher a ficha  (c) entrar no grupo
+ * Uma pergunta só, resposta de um toque. A ordem é deliberada: os 3 passos do
+ * Tabari (confirma e-mail → ficha → grupo) foram divididos em DUAS mensagens,
+ * com o pedido de resposta ANTES de qualquer tarefa.
  *
- * Uma mensagem só, com os 3 passos numerados. O método pede os 3 passos, não 3
- * mensagens: cada disparo extra consome cota do cap 4+4 e aumenta risco de
- * bloqueio do número.
+ * Por quê: desde 2026 o WhatsApp mantém um contador cumulativo de mensagens sem
+ * resposta em 48h (janela móvel de 30 dias). Número que só envia e nunca recebe
+ * entra na fila de banimento. Pedir a confirmação no fim, depois de 3 tarefas,
+ * só é respondido por quem já ia responder — a taxa de silêncio sobe justamente
+ * no grupo mais frio. Pedindo primeiro, todo mundo responde em segundos, o que
+ * abre a janela de 24h e marca conversa bidirecional.
+ *
+ * O e-mail não é pretexto: é por ele que a Hotmart entrega o acesso.
  */
-export function boasVindasIngresso(nome: string, email: string): string {
+export function confirmarEmail(nome: string, email: string): string {
     const p = primeiroNome(nome);
     const saudacao = p ? `Opa, ${p}!` : "Opa!";
 
     return [
         `${saudacao} 🧩`,
         "",
-        "Sua vaga no *Desafio: Seu CRM em 5 Dias* está confirmada.",
+        "Sua vaga no *Desafio: Seu CRM em 5 Dias* tá confirmada.",
         "",
-        "São 3 passos rápidos pra você não perder nada:",
+        "Antes de te passar os acessos, confirma uma coisa rápida pra mim:",
         "",
-        `*1.* Confirma pra mim se esse e-mail está certo: ${email}`,
-        "É por ele que chega seu acesso. Se estiver errado, me responde aqui com o correto.",
+        `Seu e-mail é *${email}*?`,
         "",
-        `*2.* Preenche a ficha de matrícula (1 minuto): ${FICHA_MATRICULA_URL}`,
+        "Responde *SIM* se estiver certo, ou manda o e-mail correto que eu corrijo aqui.",
+    ].join("\n");
+}
+
+/** Versão com botões da mensagem 1 — um toque converte mais que digitar. */
+export function confirmarEmailBotoes(nome: string, email: string) {
+    const p = primeiroNome(nome);
+    const saudacao = p ? `Opa, ${p}!` : "Opa!";
+
+    return {
+        title: "Vaga confirmada 🧩",
+        description: [
+            `${saudacao}`,
+            "",
+            "Sua vaga no *Desafio: Seu CRM em 5 Dias* tá confirmada.",
+            "",
+            "Antes de te passar os acessos, confirma pra mim:",
+            "",
+            `Seu e-mail é *${email}*?`,
+        ].join("\n"),
+        footer: "Desafio: Seu CRM em 5 Dias",
+        buttons: [
+            { type: "reply" as const, displayText: "SIM, é esse", id: "email_ok" },
+            { type: "reply" as const, displayText: "Não, vou corrigir", id: "email_corrigir" },
+        ],
+    };
+}
+
+/**
+ * MENSAGEM 2 — só depois que a pessoa responde.
+ *
+ * Vai dentro da janela de 24h aberta pela resposta dela: é o envio mais seguro
+ * que existe no WhatsApp. Traz os passos 2 e 3 (ficha + grupo).
+ */
+export function passosRestantes(emailEstavaCerto: boolean, emailNovo?: string): string {
+    const abertura = emailEstavaCerto
+        ? "Show, e-mail confirmado. ✅"
+        : `Anotado, vou usar *${emailNovo}*. ✅`;
+
+    return [
+        abertura,
+        "",
+        "Agora os 2 últimos passos:",
+        "",
+        `*1.* Ficha de matrícula (1 minuto)`,
+        FICHA_MATRICULA_URL,
         "É o que me deixa adaptar as aulas ao seu momento.",
         "",
-        `*3.* Entra no grupo do desafio: ${GRUPO_URL}`,
+        `*2.* Entra no grupo do desafio`,
+        GRUPO_URL,
         "É lá que eu aviso quando cada aula entra no ar.",
         "",
         "As aulas são de *segunda a sexta, às 7h*. Deixa o computador do lado, porque desde o primeiro dia é mão na massa.",
-        "",
-        'Feito os 3 passos, me responde aqui com um "ok" que eu confirmo seu lugar.',
     ].join("\n");
 }

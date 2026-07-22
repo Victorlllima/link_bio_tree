@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { enviarWhatsApp } from "@/lib/evolution";
-import { boasVindasIngresso } from "@/lib/mensagens-crmweek";
+import { enviarComBotoesOuTexto } from "@/lib/evolution";
+import { confirmarEmail, confirmarEmailBotoes } from "@/lib/mensagens-crmweek";
 
 /**
  * Webhook da Hotmart — hub de pós-compra.
@@ -197,8 +197,10 @@ export async function POST(req: NextRequest) {
     if (!gravou.ok) console.error("[hotmart] falha ao gravar:", gravou.erro);
 
     if (evento === "PURCHASE_APPROVED") {
-        // Boas-vindas por WhatsApp só pro ingresso do Desafio, e só se veio telefone.
-        // Os 3 passos do Tabari (confirma e-mail → ficha → grupo) vão numa mensagem só.
+        // WhatsApp só pro ingresso do Desafio, e só se a Hotmart mandou telefone.
+        // Aqui vai a MENSAGEM 1: uma pergunta de um toque (confirma o e-mail).
+        // Os passos 2 e 3 saem em /api/webhooks/evolution, quando a pessoa responde —
+        // resposta primeiro abre a janela de 24h e protege o número do banimento.
         const ehIngresso = produtoId === PRODUTO_INGRESSO;
         const enviarWpp = ehIngresso && Boolean(fone);
 
@@ -206,7 +208,11 @@ export async function POST(req: NextRequest) {
             metaCapi(email, nome, fone, valor, moeda, transacao),
             resend(email, nome),
             enviarWpp
-                ? enviarWhatsApp(fone, boasVindasIngresso(nome, email))
+                ? enviarComBotoesOuTexto(
+                    fone,
+                    confirmarEmailBotoes(nome, email),
+                    confirmarEmail(nome, email),
+                )
                 : Promise.resolve(null),
         ]);
         if (!capi.ok) console.error("[hotmart] CAPI:", capi.erro);
