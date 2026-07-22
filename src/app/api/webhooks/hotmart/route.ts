@@ -16,13 +16,21 @@ import crypto from "crypto";
  *
  * Cancelamento/reembolso: grava e avisa (sem CAPI — a Meta não recebe estorno por aqui).
  *
- * ENV NECESSÁRIAS: HOTMART_HOTTOK, SUPABASE_SERVICE_KEY, META_CAPI_TOKEN, META_PIXEL_ID,
- *                  RESEND_API_KEY, RESEND_AUDIENCE_ID, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+ * ENV (nomes alinhados com o que já existe na Vercel — ver /api/meta-capi):
+ *   HOTMART_HOTTOK ✅ · SUPABASE_SERVICE_KEY ✅ · TELEGRAM_BOT_TOKEN ✅ · TELEGRAM_CHAT_ID ✅
+ *   META_CAPI_ACCESS_TOKEN ✅ (pixel é hardcoded, igual /api/meta-capi)
+ *   RESEND_API_KEY ⚠️ não está na Vercel — sem ela o comprador não entra na lista
+ *   RESEND_CRMWEEK_AUDIENCE_ID → RESEND_AUDIENCE_ID → RESEND_SHARK_AUDIENCE_ID (fallback)
+ *
+ * Nada disso derruba o webhook: cada serviço falha isolado, loga, e o Telegram avisa com ⚠️.
  */
 
 export const dynamic = "force-dynamic";
 
 const SUPABASE_URL = "https://supabase.redpro.com.br";
+
+// Pixel [Vibecoding] — fixo, mesmo valor usado em /api/meta-capi.
+const PIXEL_ID = "1543917230170877";
 
 // Produtos (ver .claude/workspace/hotmart_doc.md)
 const PRODUTOS: Record<string, string> = {
@@ -63,9 +71,10 @@ async function gravar(row: Record<string, unknown>) {
 
 // event_id = transação da Hotmart → a Meta deduplica contra o Purchase do pixel no browser.
 async function metaCapi(email: string, nome: string, fone: string, valor: number, moeda: string, eventId: string) {
-    const token = process.env.META_CAPI_TOKEN;
-    const pixel = process.env.META_PIXEL_ID;
-    if (!token || !pixel) return { ok: false, erro: "META_CAPI_TOKEN/META_PIXEL_ID ausente" };
+    // Nome da var alinhado com /api/meta-capi, que já roda em produção.
+    const token = process.env.META_CAPI_ACCESS_TOKEN || process.env.META_CAPI_TOKEN;
+    const pixel = PIXEL_ID;
+    if (!token) return { ok: false, erro: "META_CAPI_ACCESS_TOKEN ausente" };
 
     const user_data: Record<string, string[]> = {};
     if (email) user_data.em = [sha256(email)];
@@ -97,8 +106,14 @@ async function metaCapi(email: string, nome: string, fone: string, valor: number
 
 async function resend(email: string, nome: string) {
     const key = process.env.RESEND_API_KEY;
-    const audiencia = process.env.RESEND_AUDIENCE_ID;
-    if (!key || !audiencia || !email) return { ok: false, erro: "RESEND_API_KEY/AUDIENCE_ID ausente" };
+    // Ordem de preferência: audiência própria do CRM Week → genérica → a da Formação (fallback).
+    const audiencia =
+        process.env.RESEND_CRMWEEK_AUDIENCE_ID ||
+        process.env.RESEND_AUDIENCE_ID ||
+        process.env.RESEND_SHARK_AUDIENCE_ID;
+    if (!key) return { ok: false, erro: "RESEND_API_KEY ausente" };
+    if (!audiencia) return { ok: false, erro: "nenhuma RESEND_*_AUDIENCE_ID configurada" };
+    if (!email) return { ok: false, erro: "sem email" };
     try {
         const res = await fetch(`https://api.resend.com/audiences/${audiencia}/contacts`, {
             method: "POST",
