@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
+import { enviarWhatsApp } from "@/lib/evolution";
+import { boasVindasIngresso } from "@/lib/mensagens-crmweek";
 
 /**
  * Webhook da Hotmart — hub de pós-compra.
@@ -38,6 +40,9 @@ const PRODUTOS: Record<string, string> = {
     "8124888": "Ingresso — Desafio CRM em 5 Dias (R$44)",
     "7646318": "Claude for Business",
 };
+
+// Quem compra o ingresso recebe as boas-vindas por WhatsApp (3 passos do Tabari).
+const PRODUTO_INGRESSO = "8124888";
 
 const sha256 = (v: string) => crypto.createHash("sha256").update(v.trim().toLowerCase()).digest("hex");
 
@@ -192,12 +197,31 @@ export async function POST(req: NextRequest) {
     if (!gravou.ok) console.error("[hotmart] falha ao gravar:", gravou.erro);
 
     if (evento === "PURCHASE_APPROVED") {
-        const [capi, lista] = await Promise.all([
+        // Boas-vindas por WhatsApp só pro ingresso do Desafio, e só se veio telefone.
+        // Os 3 passos do Tabari (confirma e-mail → ficha → grupo) vão numa mensagem só.
+        const ehIngresso = produtoId === PRODUTO_INGRESSO;
+        const enviarWpp = ehIngresso && Boolean(fone);
+
+        const [capi, lista, wpp] = await Promise.all([
             metaCapi(email, nome, fone, valor, moeda, transacao),
             resend(email, nome),
+            enviarWpp
+                ? enviarWhatsApp(fone, boasVindasIngresso(nome, email))
+                : Promise.resolve(null),
         ]);
         if (!capi.ok) console.error("[hotmart] CAPI:", capi.erro);
         if (!lista.ok) console.error("[hotmart] Resend:", lista.erro);
+        if (wpp && !wpp.ok) console.error("[hotmart] WhatsApp:", wpp.erro);
+
+        // Sem telefone no ingresso o comprador fica órfão da mensageria — precisa
+        // aparecer no alerta, senão passa despercebido até o dia da aula.
+        const statusWpp = !ehIngresso
+            ? ""
+            : !fone
+                ? " · 🔴 WhatsApp: comprador SEM telefone"
+                : wpp?.ok
+                    ? " · ✅ WhatsApp"
+                    : " · ⚠️ WhatsApp falhou";
 
         await telegram([
             `💰 *VENDA — ${produtoNome}*`,
@@ -207,10 +231,13 @@ export async function POST(req: NextRequest) {
             fone ? `📱 ${fone}` : "",
             `💵 ${moeda} ${valor.toFixed(2)}`,
             "",
-            `${gravou.ok ? "✅" : "⚠️"} banco · ${capi.ok ? "✅" : "⚠️"} Meta CAPI · ${lista.ok ? "✅" : "⚠️"} Resend`,
+            `${gravou.ok ? "✅" : "⚠️"} banco · ${capi.ok ? "✅" : "⚠️"} Meta CAPI · ${lista.ok ? "✅" : "⚠️"} Resend${statusWpp}`,
         ].filter(Boolean).join("\n"));
 
-        return NextResponse.json({ ok: true, evento, gravou: gravou.ok, capi: capi.ok, resend: lista.ok });
+        return NextResponse.json({
+            ok: true, evento, gravou: gravou.ok, capi: capi.ok, resend: lista.ok,
+            whatsapp: wpp ? wpp.ok : null,
+        });
     }
 
     if (evento === "PURCHASE_CANCELED" || evento === "PURCHASE_REFUNDED" || evento === "PURCHASE_CHARGEBACK") {
