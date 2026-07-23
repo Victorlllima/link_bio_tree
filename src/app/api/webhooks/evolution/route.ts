@@ -71,24 +71,44 @@ function classificar(texto: string): "confirmou" | "email_novo" | "outro" {
     return "outro";
 }
 
-/** Última compra de ingresso deste telefone — para saber se é comprador. */
+/**
+ * Última compra de ingresso deste telefone — para saber se é comprador.
+ *
+ * ⚠️ Casa pelos últimos 8 dígitos porque o formato varia (com/sem DDI 55, com/sem
+ * o 9º dígito). A busca por 8 dígitos absorve essas diferenças. Se ainda não
+ * achar, tenta os últimos 8 SEM o nono dígito (celulares antigos gravados sem o 9).
+ *
+ * Bug histórico (23/07): compras gravadas ANTES do fix do checkout_phone ficaram
+ * com whatsapp vazio no banco, então quem respondia CONFIRMO não era reconhecido
+ * e o fluxo travava (caía em "encaminhado"). O fix do webhook da Hotmart resolve
+ * pra frente; os registros antigos foram populados à mão.
+ */
 async function buscarComprador(fone: string) {
     const key = process.env.SUPABASE_SERVICE_KEY;
     if (!key) return null;
-    const ultimos8 = fone.slice(-8);
-    try {
-        const res = await fetch(
-            `${SUPABASE_URL}/rest/v1/hotmart_compras` +
-            `?produto_id=eq.8124888&evento=eq.PURCHASE_APPROVED` +
-            `&whatsapp=like.*${ultimos8}*&select=nome,email,whatsapp&order=id.desc&limit=1`,
-            { headers: { apikey: key, Authorization: `Bearer ${key}` } },
-        );
-        if (!res.ok) return null;
-        const rows = await res.json();
-        return Array.isArray(rows) && rows[0] ? rows[0] : null;
-    } catch {
-        return null;
+
+    const so = fone.replace(/\D/g, "");
+    // Chaves de busca em ordem de precisão: 8 últimos, e (fallback) sem o 9º dígito.
+    const chaves = new Set<string>();
+    if (so.length >= 8) chaves.add(so.slice(-8));
+    if (so.length >= 9) chaves.add(so.slice(-11, -9) + so.slice(-8)); // DDD + 8 sem o 9
+
+    for (const chave of chaves) {
+        try {
+            const res = await fetch(
+                `${SUPABASE_URL}/rest/v1/hotmart_compras` +
+                `?produto_id=eq.8124888&evento=eq.PURCHASE_APPROVED` +
+                `&whatsapp=like.*${chave}*&select=nome,email,whatsapp&order=id.desc&limit=1`,
+                { headers: { apikey: key, Authorization: `Bearer ${key}` } },
+            );
+            if (!res.ok) continue;
+            const rows = await res.json();
+            if (Array.isArray(rows) && rows[0]) return rows[0];
+        } catch {
+            /* tenta a próxima chave */
+        }
     }
+    return null;
 }
 
 /**
