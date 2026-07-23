@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 
-// ⚠️ SEMANAL: trocar este link do grupo a cada novo ciclo do Desafio (tarefa pag-obrigado-desafio).
 // Página de obrigado EXCLUSIVA da LP do Desafio (/desafio-crm) — separada da /lpsg-obrigado.
-const GRUPO_URL = "https://chat.whatsapp.com/I3AcP8IpTtsG2y3gC7O0bS";
+// FUNÇÃO ÚNICA: pedir a FICHA. O grupo do WhatsApp é entregue pelo WhatsApp (msg 2), não aqui —
+// a pessoa vem do anúncio, já está no celular, e entrar no grupo é 1 clique lá.
+const FICHA_URL = "https://www.redpro.com.br/crm-week-matricula";
 
 export const metadata: Metadata = {
   title: "Vaga garantida — Desafio CRM em 5 Dias",
@@ -36,31 +37,24 @@ const html = `
   .ob-root .bloco .tit .num { width: 26px; height: 26px; min-width: 26px; border-radius: 7px; background: var(--laranja); color: var(--preto); font-size: 14px; display: inline-flex; align-items: center; justify-content: center; font-weight: 900; }
   .ob-root .bloco p { color: var(--soft); font-size: 14.5px; }
   .ob-root .bloco strong { color: var(--branco); }
-  .ob-root .btn { display: inline-block; background: var(--laranja); color: var(--preto); font-weight: 800; font-size: 16px; padding: 15px 34px; border-radius: 10px; text-decoration: none; margin-top: 14px; transition: transform .15s; }
+  .ob-root .btn { display: inline-block; background: var(--laranja); color: var(--preto); font-weight: 800; font-size: 16px; padding: 15px 34px; border-radius: 10px; text-decoration: none; margin-top: 20px; transition: transform .15s; }
   .ob-root .btn:hover { transform: translateY(-2px); }
+  .ob-root .nota { color: var(--mid); font-size: 13.5px; margin-top: 22px; font-family: 'JetBrains Mono', monospace; line-height: 1.5; }
 </style>
 
 <div class="ob-root">
   <div class="card">
     <div class="check">✓</div>
-    <h1>Pronto, sua vaga <em>tá garantida.</em></h1>
-    <p class="lead">Você está dentro do Desafio "Construindo um CRM em 5 Dias". Agora, o passo mais importante:</p>
+    <h1>Sua vaga <em>tá garantida.</em></h1>
+    <p class="lead">Falta um passo antes do nosso Desafio.</p>
 
     <div class="bloco">
-      <div class="tit"><span class="num">1</span> Entre no grupo agora</div>
-      <p>É pelo grupo do WhatsApp que você recebe <strong>todos os links das aulas, os avisos e o material</strong>. Sem entrar no grupo, você fica de fora. Entra agora, antes de fechar essa página:</p>
-      <a href="${GRUPO_URL}" class="btn">Entrar no grupo do desafio</a>
+      <p>Preenche a <strong>ficha de matrícula</strong> — leva só 1 minutinho, e é com as suas respostas que eu preparo as aulas pensando na sua realidade.</p>
+      <p style="margin-top:12px">Quanto mais honesto você for aí, mais as aulas vão parecer feitas pra você.</p>
+      <a href="${FICHA_URL}" class="btn">Preencher minha ficha (1 min)</a>
     </div>
 
-    <div class="bloco">
-      <div class="tit"><span class="num">2</span> As aulas são de manhã, 7h</div>
-      <p>De <strong>27 a 31 de julho</strong>, segunda a sexta, sempre às 7h. Deixe o computador do lado, porque <strong>desde o primeiro dia é mão na massa</strong>. Você constrói junto.</p>
-    </div>
-
-    <div class="bloco">
-      <div class="tit"><span class="num">3</span> Responda as mensagens</div>
-      <p>Quando eu te mandar algo no WhatsApp, responde (nem que seja "ok"). É o que mantém a entrega dos links funcionando pra você. Detalhe pequeno, faz diferença.</p>
-    </div>
+    <p class="nota">O link do grupo do WhatsApp eu já te mandei no seu WhatsApp. É por lá que as aulas acontecem.</p>
   </div>
 </div>
 `;

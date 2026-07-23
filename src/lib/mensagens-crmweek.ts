@@ -90,22 +90,63 @@ export function passosRestantes(emailEstavaCerto: boolean, emailNovo?: string, s
         ? ["Show, e-mail confirmado. ✅", "Perfeito, e-mail confirmado. ✅", "Fechou, e-mail confirmado. ✅"]
         : [`Anotado, vou usar *${emailNovo}*. ✅`, `Corrigido, vou usar *${emailNovo}*. ✅`];
 
+    // FUNÇÃO ÚNICA desta msg (decisão do Red 23/07): SÓ o grupo. A ficha saiu daqui —
+    // agora ela é pedida na página de obrigado (web), e o e-mail é a rede de segurança
+    // dos dois. Mantida a estrutura de variações rotativas do ION (anti-repetição).
     return montarMensagem(
         [
             abertura,
             "",
-            ["Agora os 2 últimos passos:", "Faltam só 2 passos:", "Agora só mais 2 coisas:"],
+            [
+                "Agora seu passo mais importante: *entra no grupo do desafio.* É lá que eu aviso quando cada aula entra no ar.",
+                "Agora o passo que não pode faltar: *entra no grupo do desafio.* É por lá que eu aviso quando cada aula entra no ar.",
+                "Falta uma coisa só, e é a mais importante: *entra no grupo do desafio.* É lá que eu aviso quando cada aula sai.",
+            ],
             "",
-            "*1.* Ficha de matrícula (1 minuto):",
-            FICHA_MATRICULA_URL,
-            "Essa ficha é muito importante pra mim. É com ela que eu consigo melhorar e direcionar melhor as aulas.",
+            `👉 ${GRUPO_URL}`,
             "",
-            "*2.* Entrar no grupo do desafio:",
-            GRUPO_URL,
-            "É lá que eu aviso quando cada aula entra no ar.",
+            "As aulas são de *segunda a sexta, às 7h*. Desde o primeiro dia é mão na massa, então já vem com o computador do lado pra você não perder nada e construir tudo junto comigo.",
             "",
-            "As aulas são de *segunda a sexta, às 7h*. Deixa o computador do lado, porque desde o primeiro dia é mão na massa.",
+            "Te espero segunda. Bora construir seu CRM. 🦈",
         ],
         sem,
     );
+}
+
+/**
+ * E-MAIL de boas-vindas — a REDE DE SEGURANÇA.
+ *
+ * Função única: pegar quem escapou do grupo e da ficha. Por isso menciona os DOIS
+ * ("caso ainda não tenha feito") — é o único canal que fica guardado e a pessoa
+ * reabre dias depois. A obrigado cuida da ficha, o WhatsApp cuida do grupo; o
+ * e-mail é o plano B de ambos. Retorna { subject, html }.
+ */
+export function emailBoasVindas(nome: string): { subject: string; html: string } {
+    const p = primeiroNome(nome) || "Shark";
+    const subject = `${p}, garante seu lugar no Desafio antes de segunda`;
+    const html = `
+    <div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:520px;margin:0 auto;background:#080808;color:#f5f5f5;padding:36px 28px;border-radius:16px">
+      <h1 style="font-size:25px;font-weight:800;margin:0 0 18px;line-height:1.25">Sua vaga tá garantida, ${p}. 🦈</h1>
+      <p style="font-size:16px;line-height:1.6;color:#c9c9c9;margin:0 0 16px">
+        Você está dentro do <strong style="color:#fff">Desafio: Seu CRM em 5 Dias</strong>. De segunda a sexta, 7h da manhã, a gente constrói do zero um CRM completo — o tipo de sistema que as empresas pagam caro pra ter. E sem escrever código.
+      </p>
+      <p style="font-size:15px;line-height:1.6;color:#c9c9c9;margin:0 0 22px">
+        Pra você não perder nada, confere se já fez estas duas coisas. <strong style="color:#fff">Se já fez, então tá tudo pronto.</strong>
+      </p>
+      <div style="background:#141414;border:1px solid #1f1f1f;border-radius:12px;padding:20px 22px;margin:0 0 14px">
+        <p style="font-size:16px;font-weight:700;color:#fff;margin:0 0 6px">1. Entrou no grupo do WhatsApp?</p>
+        <p style="font-size:14.5px;line-height:1.55;color:#a3a3a3;margin:0 0 14px">É por lá que eu mando o link de cada aula. Sem o grupo, você fica de fora dos avisos.</p>
+        <a href="${GRUPO_URL}" style="display:inline-block;background:#25D366;color:#0a0a0a;font-weight:800;font-size:15px;padding:12px 24px;border-radius:10px;text-decoration:none">👉 Entrar no grupo</a>
+      </div>
+      <div style="background:#141414;border:1px solid #1f1f1f;border-radius:12px;padding:20px 22px;margin:0 0 24px">
+        <p style="font-size:16px;font-weight:700;color:#fff;margin:0 0 6px">2. Preencheu a ficha de matrícula?</p>
+        <p style="font-size:14.5px;line-height:1.55;color:#a3a3a3;margin:0 0 14px">É com ela que eu adapto os exemplos das aulas pra sua realidade.</p>
+        <a href="${FICHA_MATRICULA_URL}" style="display:inline-block;background:#F97316;color:#0a0a0a;font-weight:800;font-size:15px;padding:12px 24px;border-radius:10px;text-decoration:none">👉 Preencher a ficha</a>
+      </div>
+      <p style="font-size:14px;line-height:1.6;color:#8a8a8a;margin:0 0 20px">
+        As aulas começam <strong style="color:#c9c9c9">segunda, 7h</strong>. Deixa o computador do lado — desde o primeiro dia é construção.
+      </p>
+      <p style="font-size:15px;color:#c9c9c9;margin:0">Te espero lá.<br><strong style="color:#fff">Red</strong></p>
+    </div>`;
+    return { subject, html };
 }

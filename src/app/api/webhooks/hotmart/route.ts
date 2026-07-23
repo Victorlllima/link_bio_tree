@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { enviarMensagem } from "@/lib/whatsapp";
-import { confirmarEmail } from "@/lib/mensagens-crmweek";
+import { confirmarEmail, emailBoasVindas } from "@/lib/mensagens-crmweek";
 
 /**
  * Webhook da Hotmart — hub de pós-compra.
@@ -132,6 +132,25 @@ async function resend(email: string, nome: string) {
     }
 }
 
+// ENVIA o e-mail de boas-vindas (rede de segurança: grupo + ficha). Diferente de resend(),
+// que só inscreve na audiência sem disparar nada.
+async function enviarEmailBoasVindas(email: string, nome: string) {
+    const key = process.env.RESEND_API_KEY;
+    if (!key || !email) return { ok: false, erro: "sem RESEND_API_KEY ou email" };
+    const { subject, html } = emailBoasVindas(nome);
+    try {
+        const res = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ from: "Red · RedPro Academy <red@redpro.com.br>", to: [email], subject, html }),
+        });
+        if (!res.ok) return { ok: false, erro: `${res.status} ${await res.text()}` };
+        return { ok: true };
+    } catch (e) {
+        return { ok: false, erro: String(e) };
+    }
+}
+
 async function telegram(msg: string) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chat = process.env.TELEGRAM_CHAT_ID;
@@ -204,16 +223,19 @@ export async function POST(req: NextRequest) {
         const ehIngresso = produtoId === PRODUTO_INGRESSO;
         const enviarWpp = ehIngresso && Boolean(fone);
 
-        const [capi, lista, wpp] = await Promise.all([
+        const [capi, lista, wpp, mail] = await Promise.all([
             metaCapi(email, nome, fone, valor, moeda, transacao),
             resend(email, nome),
             enviarWpp
                 ? enviarMensagem(fone, confirmarEmail(nome, email, fone))
                 : Promise.resolve(null),
+            // E-mail de boas-vindas (rede de segurança grupo+ficha) só pro ingresso.
+            ehIngresso ? enviarEmailBoasVindas(email, nome) : Promise.resolve(null),
         ]);
         if (!capi.ok) console.error("[hotmart] CAPI:", capi.erro);
-        if (!lista.ok) console.error("[hotmart] Resend:", lista.erro);
+        if (!lista.ok) console.error("[hotmart] Resend audiência:", lista.erro);
         if (wpp && !wpp.ok) console.error("[hotmart] WhatsApp:", wpp.erro);
+        if (mail && !mail.ok) console.error("[hotmart] e-mail boas-vindas:", mail.erro);
 
         // Sem telefone no ingresso o comprador fica órfão da mensageria — precisa
         // aparecer no alerta, senão passa despercebido até o dia da aula.
@@ -233,11 +255,12 @@ export async function POST(req: NextRequest) {
             fone ? `📱 ${fone}` : "",
             `💵 ${moeda} ${valor.toFixed(2)}`,
             "",
-            `${gravou.ok ? "✅" : "⚠️"} banco · ${capi.ok ? "✅" : "⚠️"} Meta CAPI · ${lista.ok ? "✅" : "⚠️"} Resend${statusWpp}`,
+            `${gravou.ok ? "✅" : "⚠️"} banco · ${capi.ok ? "✅" : "⚠️"} Meta CAPI · ${lista.ok ? "✅" : "⚠️"} Resend${statusWpp}${ehIngresso ? ` · ${mail?.ok ? "✅" : "⚠️"} e-mail` : ""}`,
         ].filter(Boolean).join("\n"));
 
         return NextResponse.json({
             ok: true, evento, gravou: gravou.ok, capi: capi.ok, resend: lista.ok,
+            email_boas_vindas: ehIngresso ? (mail?.ok ?? false) : null,
             whatsapp: wpp ? wpp.ok : null,
         });
     }
