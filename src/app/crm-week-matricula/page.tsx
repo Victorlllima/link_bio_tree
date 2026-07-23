@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 
+// ⚠️ SEMANAL: trocar o link do grupo a cada ciclo (mesmo link da página de obrigado).
+const GRUPO_URL = "https://chat.whatsapp.com/I3AcP8IpTtsG2y3gC7O0bS";
+
 // FICHA DE MATRÍCULA — passo 2 da mensageria de boas-vindas do Tabari
 // ("1. confirma e-mail · 2. FICHA · 3. grupo backup").
 // Preenchida por quem JÁ comprou o ingresso, ANTES do evento começar.
@@ -9,13 +12,28 @@ import { useState } from "react";
 // NÃO confundir com /crm-week-status (ficha de INTERESSE, abre na aula 4 e qualifica MQL).
 
 type Form = {
-  nome: string; email: string; whatsapp: string;
+  nome: string; email: string; ddi: string; whatsapp: string;
   ocupacao: string; nivel_ia: string; ja_construiu: string;
   nicho: string; objetivo: string; maior_duvida: string;
 };
 
+// DDIs mais comuns pro público do Red (Brasil default + países com brasileiros no exterior).
+const DDIS = [
+  { code: "+55", label: "🇧🇷 +55" },
+  { code: "+351", label: "🇵🇹 +351" },
+  { code: "+1", label: "🇺🇸 +1" },
+  { code: "+44", label: "🇬🇧 +44" },
+  { code: "+34", label: "🇪🇸 +34" },
+  { code: "+353", label: "🇮🇪 +353" },
+  { code: "+61", label: "🇦🇺 +61" },
+  { code: "+49", label: "🇩🇪 +49" },
+  { code: "+33", label: "🇫🇷 +33" },
+  { code: "+39", label: "🇮🇹 +39" },
+  { code: "+81", label: "🇯🇵 +81" },
+];
+
 const INITIAL: Form = {
-  nome: "", email: "", whatsapp: "",
+  nome: "", email: "", ddi: "+55", whatsapp: "",
   ocupacao: "", nivel_ia: "", ja_construiu: "",
   nicho: "", objetivo: "", maior_duvida: "",
 };
@@ -36,10 +54,12 @@ export default function CrmWeekMatriculaPage() {
     if (!valido || sending) return;
     setSending(true);
     try {
+      // Grava o WhatsApp já com o DDI na frente (ex: "+55 (61) 99999-9999").
+      const payload = { ...form, whatsapp: `${form.ddi} ${form.whatsapp}`.trim() };
       await fetch("/api/crm-week-matricula", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       setDone(true);
     } catch {
@@ -53,18 +73,26 @@ export default function CrmWeekMatriculaPage() {
       <div style={S.wrap}>
         {done ? (
           <div style={S.doneBox}>
+            <img src="/logo-academy.png" alt="RedPro AI Academy" style={S.logoDone} />
             <div style={S.check}>✓</div>
             <h1 style={S.h1}>Matrícula confirmada.</h1>
             <p style={S.lead}>
-              Recebi suas respostas — elas me ajudam a adaptar os exemplos das aulas pra sua realidade.
+              Recebi suas respostas, Shark. Elas vão me ajudar a adaptar os exemplos das aulas pra sua realidade.
               <br /><br />
-              Agora <strong style={{ color: "#F97316" }}>entra no grupo do WhatsApp</strong>, se ainda não entrou. É por lá que saem todos os links.
+              Agora sua <strong style={{ color: "#F97316" }}>primeira missão</strong> é entrar no nosso grupo do WhatsApp. É por lá que eu vou te mandar todos os links e avisos das nossas aulas.
               <br /><br />
-              Te espero segunda, 7h. Bora construir o seu.
+              Te espero segunda, 7h. Bora construir seu CRM!
             </p>
+            <a href={GRUPO_URL} style={S.btnWpp} target="_blank" rel="noopener noreferrer">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              Entrar no grupo do WhatsApp
+            </a>
           </div>
         ) : (
           <>
+            <img src="/logo-academy.png" alt="RedPro AI Academy" style={S.logo} />
             <div style={S.kicker}>Ficha de matrícula · Desafio CRM em 5 dias</div>
             <h1 style={S.h1}>Antes de começar, <span style={{ color: "#F97316" }}>me conta de você</span></h1>
             <p style={S.lead}>
@@ -82,7 +110,12 @@ export default function CrmWeekMatriculaPage() {
                 <input style={S.input} type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="voce@email.com" />
               </Field>
               <Field label="WhatsApp (com DDD)">
-                <input style={S.input} value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} placeholder="(61) 99999-9999" />
+                <div style={{ display: "flex", gap: 8 }}>
+                  <select style={{ ...S.select, width: 118, flexShrink: 0 }} value={form.ddi} onChange={(e) => set("ddi", e.target.value)}>
+                    {DDIS.map((d) => (<option key={d.code} value={d.code}>{d.label}</option>))}
+                  </select>
+                  <input style={{ ...S.input, flex: 1 }} value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} placeholder="(61) 99999-9999" inputMode="tel" />
+                </div>
               </Field>
 
               <div style={S.secTit}>Seu contexto</div>
@@ -170,6 +203,9 @@ const S: Record<string, React.CSSProperties> = {
   select: { background: "#141414", border: "1px solid #1F1F1F", borderRadius: 10, padding: "13px 15px", color: "#F5F5F5", fontSize: 15, fontFamily: "inherit", outline: "none", appearance: "none" },
   textarea: { background: "#141414", border: "1px solid #1F1F1F", borderRadius: 10, padding: "13px 15px", color: "#F5F5F5", fontSize: 15, fontFamily: "inherit", outline: "none", resize: "vertical" },
   btn: { background: "#F97316", color: "#080808", fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 17, padding: "17px", borderRadius: 10, border: "none", marginTop: 8 },
-  doneBox: { textAlign: "center", paddingTop: 60 },
+  doneBox: { textAlign: "center", paddingTop: 40 },
+  logo: { height: 34, display: "block", margin: "0 0 26px" },
+  logoDone: { height: 40, display: "block", margin: "0 auto 28px" },
   check: { width: 72, height: 72, margin: "0 auto 24px", borderRadius: "50%", background: "rgba(74,222,128,.12)", border: "2px solid #4ADE80", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, color: "#4ADE80" },
+  btnWpp: { display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 10, background: "#25D366", color: "#0a0a0a", fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 17, padding: "16px 30px", borderRadius: 12, textDecoration: "none", marginTop: 34, boxShadow: "0 8px 30px rgba(37,211,102,.28)" },
 };

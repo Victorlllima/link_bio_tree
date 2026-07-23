@@ -42,8 +42,13 @@ const LABEL: Record<string, string> = {
 
 const lbl = (v: string | null) => (v ? LABEL[v] || v : "—");
 
+// Banco grava em UTC. Forçar GMT-3 (Brasil sem horário de verão desde 2019) — senão
+// o painel mostra o horário UTC do servidor da Vercel (ex: 15h54 em vez de 12h54).
 const dataBR = (iso: string) =>
-  new Date(iso).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+  new Date(iso).toLocaleString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit",
+  });
 
 function baixarCSV(nome: string, linhas: Record<string, unknown>[]) {
   if (!linhas.length) return;
