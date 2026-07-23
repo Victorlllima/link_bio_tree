@@ -208,7 +208,7 @@ export async function POST(req: NextRequest) {
             metaCapi(email, nome, fone, valor, moeda, transacao),
             resend(email, nome),
             enviarWpp
-                ? enviarMensagem(fone, confirmarEmail(nome, email))
+                ? enviarMensagem(fone, confirmarEmail(nome, email, fone))
                 : Promise.resolve(null),
         ]);
         if (!capi.ok) console.error("[hotmart] CAPI:", capi.erro);

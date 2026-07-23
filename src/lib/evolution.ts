@@ -20,6 +20,16 @@ const INSTANCIA_PADRAO = "academy-suporte";
 
 export type EnvioResultado = { ok: true } | { ok: false; erro: string };
 
+// Faixa do delay de "digitação" (ms). Fixo em 1200 era assinatura de bot —
+// toda mensagem saía com o mesmo tempo. Faixa ampla e aleatória imita gente.
+const DELAY_MIN = 900;
+const DELAY_MAX = 2600;
+
+/** Delay aleatório dentro da faixa. Sorteado a cada envio, nunca fixo. */
+function delayAleatorio(): number {
+    return DELAY_MIN + Math.floor(Math.random() * (DELAY_MAX - DELAY_MIN));
+}
+
 /** Só dígitos com DDI 55 — formato que a Evolution espera no destinatário. */
 export function normalizarDestino(fone: string): string {
     const d = (fone || "").replace(/\D/g, "");
@@ -56,8 +66,9 @@ export async function enviarWhatsApp(
             body: JSON.stringify({
                 number: numero,
                 text: texto,
-                // delay simula digitação: parece humano e reduz risco de bloqueio.
-                delay: opts.delayMs ?? 1200,
+                // delay simula digitação. Aleatório por padrão (parece humano);
+                // o chamador só sobrescreve em teste.
+                delay: opts.delayMs ?? delayAleatorio(),
                 linkPreview: false,
             }),
         });

@@ -11,15 +11,12 @@
  *  4. Nunca inventar número, depoimento ou resultado.
  */
 
+import { montarMensagem, saudacaoVariada, primeiroNome } from "./wpp-humanizar";
+
 export const GRUPO_URL = "https://chat.whatsapp.com/I3AcP8IpTtsG2y3gC7O0bS";
 export const FICHA_MATRICULA_URL = "https://www.redpro.com.br/crm-week-matricula";
 
-/** Primeiro nome, capitalizado. "  joão da silva " → "João" */
-export function primeiroNome(nome: string): string {
-    const p = (nome || "").trim().split(/\s+/)[0] || "";
-    if (!p) return "";
-    return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase();
-}
+export { primeiroNome };
 
 /**
  * MENSAGEM 1 — imediata, no momento da compra.
@@ -49,21 +46,36 @@ export function primeiroNome(nome: string): string {
  * palavra específica também é um micro-compromisso — psicologicamente mais
  * forte que tocar um botão.
  */
-export function confirmarEmail(nome: string, email: string): string {
-    const p = primeiroNome(nome);
-    const saudacao = p ? `Opa, ${p}!` : "Opa!";
-
-    return [
-        `${saudacao} 🧩`,
-        "",
-        "Sua vaga no *Desafio: Seu CRM em 5 Dias* tá confirmada.",
-        "",
-        "Antes de te passar os acessos, confirma uma coisa rápida pra mim:",
-        "",
-        `Seu e-mail é *${email}*?`,
-        "",
-        "Responde *CONFIRMO* se estiver certo, ou manda o e-mail correto que eu ajusto aqui.",
-    ].join("\n");
+export function confirmarEmail(nome: string, email: string, semente = ""): string {
+    // A semente é o telefone: mesma pessoa sempre recebe a mesma variante, mas
+    // duas pessoas diferentes quase nunca recebem texto idêntico (anti-ban).
+    const sem = semente || nome || email;
+    return montarMensagem(
+        [
+            `${saudacaoVariada(nome, sem)} 🧩`,
+            "",
+            [
+                "Sua vaga no *Desafio: Seu CRM em 5 Dias* tá confirmada.",
+                "Tá confirmada sua vaga no *Desafio: Seu CRM em 5 Dias*.",
+                "Você garantiu sua vaga no *Desafio: Seu CRM em 5 Dias*.",
+            ],
+            "",
+            [
+                "Antes de te passar os acessos, confirma uma coisa rápida pra mim:",
+                "Antes de liberar seu acesso, preciso confirmar uma coisa:",
+                "Só uma checagem rápida antes de te mandar os acessos:",
+            ],
+            "",
+            `Seu e-mail é *${email}*?`,
+            "",
+            [
+                "Responde *CONFIRMO* se estiver certo, ou manda o e-mail correto que eu ajusto aqui.",
+                "Se estiver certo, responde *CONFIRMO*. Se não, me manda o e-mail correto que eu ajusto.",
+                "Tá certo? Responde *CONFIRMO*. Se for outro, é só mandar aqui que eu corrijo.",
+            ],
+        ],
+        sem,
+    );
 }
 
 /**
@@ -72,24 +84,28 @@ export function confirmarEmail(nome: string, email: string): string {
  * Vai dentro da janela de 24h aberta pela resposta dela: é o envio mais seguro
  * que existe no WhatsApp. Traz os passos 2 e 3 (ficha + grupo).
  */
-export function passosRestantes(emailEstavaCerto: boolean, emailNovo?: string): string {
+export function passosRestantes(emailEstavaCerto: boolean, emailNovo?: string, semente = ""): string {
+    const sem = semente || emailNovo || "passos";
     const abertura = emailEstavaCerto
-        ? "Show, e-mail confirmado. ✅"
-        : `Anotado, vou usar *${emailNovo}*. ✅`;
+        ? ["Show, e-mail confirmado. ✅", "Perfeito, e-mail confirmado. ✅", "Fechou, e-mail confirmado. ✅"]
+        : [`Anotado, vou usar *${emailNovo}*. ✅`, `Corrigido, vou usar *${emailNovo}*. ✅`];
 
-    return [
-        abertura,
-        "",
-        "Agora os 2 últimos passos:",
-        "",
-        "*1.* Ficha de matrícula (1 minuto):",
-        FICHA_MATRICULA_URL,
-        "Essa ficha é muito importante pra mim. É com ela que eu consigo melhorar e direcionar melhor as aulas.",
-        "",
-        "*2.* Entrar no grupo do desafio:",
-        GRUPO_URL,
-        "É lá que eu aviso quando cada aula entra no ar.",
-        "",
-        "As aulas são de *segunda a sexta, às 7h*. Deixa o computador do lado, porque desde o primeiro dia é mão na massa.",
-    ].join("\n");
+    return montarMensagem(
+        [
+            abertura,
+            "",
+            ["Agora os 2 últimos passos:", "Faltam só 2 passos:", "Agora só mais 2 coisas:"],
+            "",
+            "*1.* Ficha de matrícula (1 minuto):",
+            FICHA_MATRICULA_URL,
+            "Essa ficha é muito importante pra mim. É com ela que eu consigo melhorar e direcionar melhor as aulas.",
+            "",
+            "*2.* Entrar no grupo do desafio:",
+            GRUPO_URL,
+            "É lá que eu aviso quando cada aula entra no ar.",
+            "",
+            "As aulas são de *segunda a sexta, às 7h*. Deixa o computador do lado, porque desde o primeiro dia é mão na massa.",
+        ],
+        sem,
+    );
 }
