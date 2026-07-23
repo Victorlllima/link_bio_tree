@@ -197,7 +197,14 @@ export async function POST(req: NextRequest) {
 
     const email = String(buyer?.email ?? "");
     const nome = String(buyer?.name ?? "");
-    const fone = String(buyer?.phone ?? buyer?.cellphone ?? "");
+    // ⚠️ A Hotmart manda o telefone em buyer.checkout_phone, NÃO em phone/cellphone
+    // (esses não existem no payload real — verificado 23/07 nas compras de Gleyce e
+    // Emidio, que ficaram sem o WhatsApp da RedPro por isso). E ATENÇÃO:
+    // checkout_phone JÁ inclui o DDD (ex: "87992052920"), então NÃO concatenar com
+    // checkout_phone_code — isso duplicaria o DDD. normalizarDestino acrescenta o 55.
+    const fone = String(
+        buyer?.checkout_phone ?? buyer?.phone ?? buyer?.cellphone ?? "",
+    );
     const produtoId = String(product?.id ?? "");
     const produtoNome = PRODUTOS[produtoId] || String(product?.name ?? "—");
     const valor = Number(price?.value ?? 0);
