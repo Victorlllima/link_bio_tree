@@ -109,15 +109,21 @@ async function metaCapi(email: string, nome: string, fone: string, valor: number
     }
 }
 
-async function resend(email: string, nome: string) {
+// Cada produto tem sua audiência no Resend — segmentação por produto, igual ao
+// WhatsApp. Antes TODO comprador caía na lista do CRM Week (bug): quem comprava
+// só o IAA recebia o e-mail de aluno do evento. IDs verificados na API 23/07.
+const AUDIENCIA_POR_PRODUTO: Record<string, string | undefined> = {
+    "8124888": process.env.RESEND_CRMWEEK_AUDIENCE_ID,   // Ingresso → crm-week-ingresso
+    "8039631": process.env.RESEND_IAA_AUDIENCE_ID,       // IAA → compradores-r17
+};
+
+async function resend(email: string, nome: string, produtoId: string) {
     const key = process.env.RESEND_API_KEY;
-    // Ordem de preferência: audiência própria do CRM Week → genérica → a da Formação (fallback).
-    const audiencia =
-        process.env.RESEND_CRMWEEK_AUDIENCE_ID ||
-        process.env.RESEND_AUDIENCE_ID ||
-        process.env.RESEND_SHARK_AUDIENCE_ID;
+    // Audiência do produto. Sem mapa → não inscreve em lista nenhuma (melhor não
+    // inscrever do que inscrever na lista errada e mandar a mensagem errada).
+    const audiencia = AUDIENCIA_POR_PRODUTO[produtoId];
     if (!key) return { ok: false, erro: "RESEND_API_KEY ausente" };
-    if (!audiencia) return { ok: false, erro: "nenhuma RESEND_*_AUDIENCE_ID configurada" };
+    if (!audiencia) return { ok: false, erro: `sem audiência mapeada pro produto ${produtoId}` };
     if (!email) return { ok: false, erro: "sem email" };
     try {
         const res = await fetch(`https://api.resend.com/audiences/${audiencia}/contacts`, {
@@ -225,7 +231,7 @@ export async function POST(req: NextRequest) {
 
         const [capi, lista, wpp, mail] = await Promise.all([
             metaCapi(email, nome, fone, valor, moeda, transacao),
-            resend(email, nome),
+            resend(email, nome, produtoId),
             enviarWpp
                 ? enviarMensagem(fone, confirmarEmail(nome, email, fone))
                 : Promise.resolve(null),
