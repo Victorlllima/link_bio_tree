@@ -9,7 +9,7 @@ import { useState, useRef } from "react";
 // Título de cada módulo = o PROBLEMA que ele resolve (não a ferramenta).
 // Soma de todos os 12 = R$ 2.997 (conferido).
 
-type Modulo = { id: string; titulo: string; itens: string[]; preco: number };
+type Modulo = { id: string; titulo: string; itens: string[]; preco: number; obrigatorio?: boolean };
 type Secao = { nome: string; modulos: Modulo[] };
 
 const SECOES: Secao[] = [
@@ -25,6 +25,7 @@ const SECOES: Secao[] = [
           "Sair do 'não sei por onde começar'",
         ],
         preco: 197,
+        obrigatorio: true,
       },
       {
         id: "m02",
@@ -35,6 +36,7 @@ const SECOES: Secao[] = [
           "Do zero a um projeto completo",
         ],
         preco: 247,
+        obrigatorio: true,
       },
       {
         id: "m03",
@@ -45,6 +47,7 @@ const SECOES: Secao[] = [
           "Conectar ferramentas que não se falam",
         ],
         preco: 247,
+        obrigatorio: true,
       },
     ],
   },
@@ -157,6 +160,10 @@ const SECOES: Secao[] = [
 
 const TODOS = SECOES.flatMap((s) => s.modulos);
 const TOTAL_CHEIO = TODOS.reduce((acc, m) => acc + m.preco, 0); // 2997
+// A Fundação (m01-m03) é obrigatória: já vem marcada e não dá pra desmarcar.
+const SEL_INICIAL: Record<string, boolean> = Object.fromEntries(
+  TODOS.filter((m) => m.obrigatorio).map((m) => [m.id, true]),
+);
 
 const fmt = (n: number) => n.toLocaleString("pt-BR");
 
@@ -177,14 +184,18 @@ const DDIS = [
 const INITIAL: Form = { nome: "", email: "", ddi: "+55", whatsapp: "", sugestao: "" };
 
 export default function MonteSuaMentoriaPage() {
-  const [sel, setSel] = useState<Record<string, boolean>>({});
+  const [sel, setSel] = useState<Record<string, boolean>>(SEL_INICIAL);
   const [form, setForm] = useState<Form>(INITIAL);
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
 
   const set = (k: keyof Form, v: string) => setForm((f) => ({ ...f, [k]: v }));
-  const toggle = (id: string) => setSel((s) => ({ ...s, [id]: !s[id] }));
+  const toggle = (id: string) => {
+    const mod = TODOS.find((m) => m.id === id);
+    if (mod?.obrigatorio) return; // Fundação é fixa, não desmarca
+    setSel((s) => ({ ...s, [id]: !s[id] }));
+  };
 
   const escolhidos = TODOS.filter((m) => sel[m.id]);
   const total = escolhidos.reduce((acc, m) => acc + m.preco, 0);
@@ -279,8 +290,9 @@ export default function MonteSuaMentoriaPage() {
             Escolha só o que você <span style={{ color: "#F97316" }}>precisa aprender</span>
           </h1>
           <p style={S.lead}>
-            Marque os módulos que fazem sentido pra você. O preço soma na hora. No fim, deixa seu
-            contato — eu entro em contato pra liberar seu acesso.
+            A base (Fundação) já vem incluída pra todo mundo. Marque por cima só o que fizer sentido
+            pra você, e o preço soma na hora. No fim, deixa seu contato — eu entro em contato pra
+            liberar seu acesso.
           </p>
           <p style={S.leadMono}>
             {TODOS.length} módulos · leve tudo por <strong style={{ color: "#F5F5F5" }}>R$ {fmt(TOTAL_CHEIO)}</strong>
@@ -295,20 +307,25 @@ export default function MonteSuaMentoriaPage() {
               <div style={S.cards}>
                 {secao.modulos.map((m) => {
                   const on = !!sel[m.id];
+                  const fixo = !!m.obrigatorio;
                   return (
                     <button
                       key={m.id}
                       type="button"
                       onClick={() => toggle(m.id)}
-                      style={{ ...S.card, ...(on ? S.cardOn : null) }}
+                      style={{ ...S.card, ...(on ? S.cardOn : null), ...(fixo ? { cursor: "default" } : null) }}
                       aria-pressed={on}
+                      aria-disabled={fixo}
                     >
                       <span style={{ ...S.checkbox, ...(on ? S.checkboxOn : null) }}>
                         {on ? "✓" : ""}
                       </span>
                       <span style={S.cardBody}>
-                        <span style={{ ...S.cardTitulo, ...(on ? { color: "#F5F5F5" } : null) }}>
-                          {m.titulo}
+                        <span style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                          <span style={{ ...S.cardTitulo, ...(on ? { color: "#F5F5F5" } : null) }}>
+                            {m.titulo}
+                          </span>
+                          {fixo && <span style={S.selo}>base · incluído</span>}
                         </span>
                         <span style={S.itens}>
                           {m.itens.map((it, i) => (
@@ -516,6 +533,19 @@ const S: Record<string, React.CSSProperties> = {
     transition: "background .15s, border-color .15s",
   },
   checkboxOn: { background: "#F97316", borderColor: "#F97316", color: "#080808" },
+  selo: {
+    fontFamily: MONO,
+    fontSize: 10,
+    fontWeight: 700,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase" as const,
+    color: "#F97316",
+    background: "rgba(249,115,22,0.12)",
+    border: "1px solid rgba(249,115,22,0.35)",
+    borderRadius: 6,
+    padding: "3px 8px",
+    whiteSpace: "nowrap" as const,
+  },
   cardBody: { display: "flex", flexDirection: "column", gap: 10, flex: 1, minWidth: 0 },
   cardTitulo: { fontSize: 16.5, fontWeight: 800, lineHeight: 1.25, color: "#E8E8E8", letterSpacing: "-0.01em" },
   itens: { display: "flex", flexDirection: "column", gap: 4 },
