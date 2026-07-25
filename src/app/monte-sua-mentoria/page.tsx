@@ -310,6 +310,11 @@ export default function MonteSuaMentoriaPage() {
         rel="stylesheet"
       />
 
+      {/* FOTO DE FUNDO FIXA — o Red ancorado à direita, texto rola por cima.
+          position:fixed (não background-attachment:fixed, que quebra no mobile). */}
+      <div style={S.bgFoto} aria-hidden="true" />
+      <div style={S.bgOverlay} aria-hidden="true" />
+
       {/* GLOW de fundo */}
       <div style={S.glow} aria-hidden="true" />
 
@@ -496,8 +501,29 @@ const S: Record<string, React.CSSProperties> = {
     WebkitFontSmoothing: "antialiased",
     overflowX: "hidden",
   },
+  // Foto de fundo FIXA (o Red). No desktop ancora à direita; no mobile fica atrás do texto.
+  // Fica travada enquanto o conteúdo (wrap, z-index 1) rola por cima.
+  bgFoto: {
+    position: "fixed",
+    inset: 0,
+    backgroundImage: "url('/red-hero-bg.webp')",
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "cover",
+    backgroundPosition: "right center",
+    pointerEvents: "none",
+    zIndex: 0,
+  },
+  // Véu escuro forte por cima da foto, pra o texto claro ficar 100% legível.
+  bgOverlay: {
+    position: "fixed",
+    inset: 0,
+    background:
+      "linear-gradient(90deg, rgba(8,8,8,0.94) 0%, rgba(8,8,8,0.86) 45%, rgba(8,8,8,0.66) 100%)",
+    pointerEvents: "none",
+    zIndex: 0,
+  },
   glow: {
-    position: "absolute",
+    position: "fixed",
     top: 0,
     left: "50%",
     transform: "translateX(-50%)",
