@@ -508,10 +508,14 @@ const S: Record<string, React.CSSProperties> = {
     inset: 0,
     backgroundImage: "url('/red-hero-bg.webp')",
     backgroundRepeat: "no-repeat",
-    // 'contain' encosta na direita e mantém a foto INTEIRA (rosto sempre visível),
-    // sem cortar do peito pra cima em telas largas. Em telas estreitas vira quase cover.
+    // 'auto 100%' mantém a foto INTEIRA (rosto sempre visível), sem cortar do peito
+    // pra cima em telas largas. Ancorada à direita.
     backgroundSize: "auto 100%",
     backgroundPosition: "right top",
+    // Mask esfumaça a borda ESQUERDA da foto no fundo (dissolve, sem linha dura).
+    // Transparente à esquerda → opaco à direita.
+    maskImage: "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.35) 22%, #000 55%)",
+    WebkitMaskImage: "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.35) 22%, #000 55%)",
     pointerEvents: "none",
     zIndex: 0,
   },
@@ -519,8 +523,10 @@ const S: Record<string, React.CSSProperties> = {
   bgOverlay: {
     position: "fixed",
     inset: 0,
+    // Véu escuro pra legibilidade do texto. O fade lateral já é feito pelo mask da foto,
+    // então aqui o overlay é mais suave à direita (deixa o Red aparecer).
     background:
-      "linear-gradient(90deg, rgba(8,8,8,0.94) 0%, rgba(8,8,8,0.86) 45%, rgba(8,8,8,0.66) 100%)",
+      "linear-gradient(90deg, rgba(8,8,8,0.82) 0%, rgba(8,8,8,0.72) 50%, rgba(8,8,8,0.5) 100%)",
     pointerEvents: "none",
     zIndex: 0,
   },
