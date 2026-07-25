@@ -165,6 +165,26 @@ export async function POST(req: NextRequest) {
     }
 
     const evento = String(body.event ?? "");
+
+    // HEALTHCHECK EM TEMPO REAL: a Evolution emite connection.update no INSTANTE
+    // em que o WhatsApp muda de estado (open → connecting/close...). Melhor que
+    // polling: avisa na hora, sem cron. Se cair, as boas-vindas param em silêncio
+    // e o comprador fica sem o link — por isso o alerta é imediato.
+    if (evento === "connection.update") {
+        const d = body.data as Record<string, unknown> | undefined;
+        const estado = String(d?.state ?? d?.connection ?? "desconhecido");
+        if (estado === "open") {
+            await telegram("🟢 *WhatsApp reconectado* — instância `academy-suporte` voltou pra *open*. Boas-vindas voltam a sair.");
+        } else {
+            await telegram(
+                `🔴 *WhatsApp caiu* — instância \`academy-suporte\` está em *${estado}*.\n\n` +
+                `As vendas do ingresso NÃO estão recebendo a mensagem de boas-vindas.\n` +
+                `Reconectar em evo.redpro.com.br/manager.`,
+            );
+        }
+        return NextResponse.json({ ok: true, connection: estado });
+    }
+
     if (evento !== "messages.upsert") return NextResponse.json({ ok: true, ignorado: evento });
 
     const data = body.data as Record<string, unknown> | undefined;
