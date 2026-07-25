@@ -508,8 +508,10 @@ const S: Record<string, React.CSSProperties> = {
     inset: 0,
     backgroundImage: "url('/red-hero-bg.webp')",
     backgroundRepeat: "no-repeat",
-    backgroundSize: "cover",
-    backgroundPosition: "right center",
+    // 'contain' encosta na direita e mantém a foto INTEIRA (rosto sempre visível),
+    // sem cortar do peito pra cima em telas largas. Em telas estreitas vira quase cover.
+    backgroundSize: "auto 100%",
+    backgroundPosition: "right top",
     pointerEvents: "none",
     zIndex: 0,
   },
