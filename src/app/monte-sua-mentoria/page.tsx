@@ -9,7 +9,7 @@ import { useState, useRef } from "react";
 // Título de cada módulo = o PROBLEMA que ele resolve (nível estratégico).
 // Subitens = o TÁTICO (o que consegue fazer). "ver ferramentas" = o OPERACIONAL
 // (qual ferramenta domina), expansível, discreto — o leigo ignora, o avançado abre.
-// 13 módulos · soma de todos = R$ 3.244 (conferido).
+// 12 módulos · soma de todos = R$ 3.244 (conferido).
 
 type Modulo = { id: string; titulo: string; itens: string[]; preco: number; ferramentas?: string[]; obrigatorio?: boolean };
 type Secao = { nome: string; modulos: Modulo[] };
@@ -19,18 +19,6 @@ const SECOES: Secao[] = [
     nome: "Fundação",
     modulos: [
       {
-        id: "m01",
-        titulo: "Entender onde está o dinheiro com IA e montar minha base",
-        itens: [
-          "Mapa do mercado e onde as empresas pagam",
-          "Montar meu ambiente de trabalho do zero",
-          "Sair do 'não sei por onde começar'",
-        ],
-        ferramentas: ["Perplexity", "Claude", "NotebookLM"],
-        preco: 197,
-        obrigatorio: true,
-      },
-      {
         id: "m02",
         titulo: "Ter minha própria equipe de IA construindo pra mim",
         itens: [
@@ -39,7 +27,7 @@ const SECOES: Secao[] = [
           "Do zero a um projeto completo",
         ],
         ferramentas: ["Antigravity", "Claude Code"],
-        preco: 247,
+        preco: 346,
         obrigatorio: true,
       },
       {
@@ -51,7 +39,7 @@ const SECOES: Secao[] = [
           "Conectar ferramentas que não se falam",
         ],
         ferramentas: ["Claude Code", "API", "Webhook", "MCP", "n8n"],
-        preco: 247,
+        preco: 345,
         obrigatorio: true,
       },
     ],
@@ -190,7 +178,7 @@ const SECOES: Secao[] = [
 
 const TODOS = SECOES.flatMap((s) => s.modulos);
 const TOTAL_CHEIO = TODOS.reduce((acc, m) => acc + m.preco, 0); // 3244
-// A Fundação (m01-m03) é obrigatória: já vem marcada e não dá pra desmarcar.
+// A Fundação (m02-m03) é obrigatória: já vem marcada e não dá pra desmarcar.
 const SEL_INICIAL: Record<string, boolean> = Object.fromEntries(
   TODOS.filter((m) => m.obrigatorio).map((m) => [m.id, true]),
 );
