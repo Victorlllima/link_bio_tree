@@ -512,21 +512,17 @@ const S: Record<string, React.CSSProperties> = {
     // pra cima em telas largas. Ancorada à direita.
     backgroundSize: "auto 100%",
     backgroundPosition: "right top",
-    // Mask esfumaça a borda ESQUERDA da foto no fundo (dissolve, sem linha dura).
-    // Transparente à esquerda → opaco à direita.
-    maskImage: "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.35) 22%, #000 55%)",
-    WebkitMaskImage: "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.35) 22%, #000 55%)",
     pointerEvents: "none",
     zIndex: 0,
   },
-  // Véu escuro forte por cima da foto, pra o texto claro ficar 100% legível.
+  // Véu escuro por cima da foto: legibilidade do texto E dissolve a emenda da foto no
+  // fundo. Preto quase sólido à esquerda → transparente à direita (o Red aparece).
+  // Medido a partir da DIREITA (right→left) pra o fade acompanhar a foto em qualquer largura.
   bgOverlay: {
     position: "fixed",
     inset: 0,
-    // Véu escuro pra legibilidade do texto. O fade lateral já é feito pelo mask da foto,
-    // então aqui o overlay é mais suave à direita (deixa o Red aparecer).
     background:
-      "linear-gradient(90deg, rgba(8,8,8,0.82) 0%, rgba(8,8,8,0.72) 50%, rgba(8,8,8,0.5) 100%)",
+      "linear-gradient(270deg, rgba(8,8,8,0.45) 0%, rgba(8,8,8,0.72) 30%, rgba(8,8,8,0.92) 52%, #080808 66%)",
     pointerEvents: "none",
     zIndex: 0,
   },
