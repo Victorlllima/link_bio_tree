@@ -524,9 +524,10 @@ const S: Record<string, React.CSSProperties> = {
     position: "fixed",
     inset: 0,
     // 'to left' + paradas em vh: a foto tem ~80vh de largura (ratio 1289/1600 × 100vh).
-    // As paradas medem da borda direita pra dentro, acompanhando a foto em qualquer tela.
+    // Overlay LEVE na direita (0.12) pra o Red aparecer NÍTIDO, subindo pra preto sólido
+    // à esquerda pra o texto ser legível. As paradas medem da borda direita pra dentro.
     background:
-      "linear-gradient(to left, rgba(8,8,8,0.35) 0, rgba(8,8,8,0.62) 22vh, rgba(8,8,8,0.9) 45vh, #080808 70vh)",
+      "linear-gradient(to left, rgba(8,8,8,0.12) 0, rgba(8,8,8,0.4) 26vh, rgba(8,8,8,0.82) 48vh, #080808 72vh)",
     pointerEvents: "none",
     zIndex: 0,
   },
