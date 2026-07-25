@@ -515,14 +515,18 @@ const S: Record<string, React.CSSProperties> = {
     pointerEvents: "none",
     zIndex: 0,
   },
-  // Véu escuro por cima da foto: legibilidade do texto E dissolve a emenda da foto no
-  // fundo. Preto quase sólido à esquerda → transparente à direita (o Red aparece).
-  // Medido a partir da DIREITA (right→left) pra o fade acompanhar a foto em qualquer largura.
+  // Véu escuro por cima da foto. O truque pra não ter linha NEM bloco preto morto em
+  // nenhuma proporção de tela: o gradiente é medido em PIXELS a partir da borda DIREITA,
+  // numa distância proporcional à altura da tela (a foto tem ~0.8×altura de largura).
+  // Assim a zona de transição cai SEMPRE sobre a foto, seja tela quadrada ou wide.
+  // right→left: transparente na direita (Red nítido) → preto sólido ~85vh pra dentro.
   bgOverlay: {
     position: "fixed",
     inset: 0,
+    // 'to left' + paradas em vh: a foto tem ~80vh de largura (ratio 1289/1600 × 100vh).
+    // As paradas medem da borda direita pra dentro, acompanhando a foto em qualquer tela.
     background:
-      "linear-gradient(270deg, rgba(8,8,8,0.45) 0%, rgba(8,8,8,0.72) 30%, rgba(8,8,8,0.92) 52%, #080808 66%)",
+      "linear-gradient(to left, rgba(8,8,8,0.35) 0, rgba(8,8,8,0.62) 22vh, rgba(8,8,8,0.9) 45vh, #080808 70vh)",
     pointerEvents: "none",
     zIndex: 0,
   },
