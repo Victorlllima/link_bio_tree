@@ -6,10 +6,12 @@ import { useState, useRef } from "react";
 // em tempo real e ele envia um pedido. O Red recebe por e-mail (Resend) + Telegram e
 // entra em contato pra fechar. Venda de módulos avulsos reais.
 //
-// Título de cada módulo = o PROBLEMA que ele resolve (não a ferramenta).
-// Soma de todos os 12 = R$ 2.997 (conferido).
+// Título de cada módulo = o PROBLEMA que ele resolve (nível estratégico).
+// Subitens = o TÁTICO (o que consegue fazer). "ver ferramentas" = o OPERACIONAL
+// (qual ferramenta domina), expansível, discreto — o leigo ignora, o avançado abre.
+// 13 módulos · soma de todos = R$ 3.244 (conferido).
 
-type Modulo = { id: string; titulo: string; itens: string[]; preco: number; obrigatorio?: boolean };
+type Modulo = { id: string; titulo: string; itens: string[]; preco: number; ferramentas?: string[]; obrigatorio?: boolean };
 type Secao = { nome: string; modulos: Modulo[] };
 
 const SECOES: Secao[] = [
@@ -24,6 +26,7 @@ const SECOES: Secao[] = [
           "Montar meu ambiente de trabalho do zero",
           "Sair do 'não sei por onde começar'",
         ],
+        ferramentas: ["Perplexity", "Claude", "NotebookLM"],
         preco: 197,
         obrigatorio: true,
       },
@@ -35,6 +38,7 @@ const SECOES: Secao[] = [
           "Dar ordens em português, sem código",
           "Do zero a um projeto completo",
         ],
+        ferramentas: ["Antigravity", "Claude Code"],
         preco: 247,
         obrigatorio: true,
       },
@@ -46,33 +50,25 @@ const SECOES: Secao[] = [
           "Resolver problemas dentro de sistemas que já uso",
           "Conectar ferramentas que não se falam",
         ],
+        ferramentas: ["Claude Code", "API", "Webhook", "MCP", "n8n"],
         preco: 247,
         obrigatorio: true,
       },
     ],
   },
   {
-    nome: "Colocar no ar",
+    nome: "IA no dia a dia",
     modulos: [
       {
-        id: "m04",
-        titulo: "Construir um sistema e colocar no ar pra um cliente",
+        id: "m13",
+        titulo: "Usar IA no dia a dia da empresa sem depender de ninguém",
         itens: [
-          "Um app ou site do zero",
-          "Guardar os dados com segurança",
-          "Publicar na internet com link",
+          "Documentos, apresentações e análises em minutos",
+          "Design rápido sem contratar designer",
+          "Sua equipe trabalhando junto com a IA",
         ],
-        preco: 407,
-      },
-      {
-        id: "m05",
-        titulo: "Manter o que construí rodando sem quebrar",
-        itens: [
-          "Sistema que não cai",
-          "Ser avisado quando dá problema",
-          "Uma equipe que cuida sozinha",
-        ],
-        preco: 197,
+        ferramentas: ["Claude Cowork", "Claude Design", "Claude (Projetos)", "NotebookLM"],
+        preco: 247,
       },
     ],
   },
@@ -87,6 +83,7 @@ const SECOES: Secao[] = [
           "Qualifica e marca na agenda",
           "Sem contratar ninguém",
         ],
+        ferramentas: ["Uzapi", "Evolution", "VPS", "n8n", "Google Calendar API"],
         preco: 447,
       },
       {
@@ -97,16 +94,18 @@ const SECOES: Secao[] = [
           "Atende a ligação sozinho",
           "Marca compromisso na agenda",
         ],
+        ferramentas: ["ElevenLabs", "Twilio"],
         preco: 297,
       },
       {
         id: "m08",
-        titulo: "Criar imagens profissionais da minha marca ou do cliente",
+        titulo: "Criar imagens minhas com qualidade de estúdio (meu clone visual)",
         itens: [
-          "Qualidade de estúdio",
-          "Minha cara e marca sempre iguais",
-          "Sem contratar fotógrafo",
+          "Ensinar a IA o seu rosto (LoRA) pra gerar quantas fotos suas quiser",
+          "Você em qualquer cenário, roupa ou situação",
+          "Sem sessão de fotos, sem fotógrafo",
         ],
+        ferramentas: ["LoRA", "fal.ai"],
         preco: 197,
       },
       {
@@ -117,6 +116,7 @@ const SECOES: Secao[] = [
           "Um avatar que apresenta",
           "Gravar conteúdo sem aparecer",
         ],
+        ferramentas: ["ElevenLabs", "Heygen"],
         preco: 197,
       },
       {
@@ -127,6 +127,34 @@ const SECOES: Secao[] = [
           "Reels e anúncios",
           "Sem estúdio e sem edição manual",
         ],
+        ferramentas: ["Higgsfield"],
+        preco: 197,
+      },
+    ],
+  },
+  {
+    nome: "Colocar no ar",
+    modulos: [
+      {
+        id: "m04",
+        titulo: "Construir um sistema e colocar no ar pra um cliente",
+        itens: [
+          "Um app ou site do zero",
+          "Guardar os dados com segurança",
+          "Publicar na internet com link",
+        ],
+        ferramentas: ["Supabase", "Vercel", "Github", "Next.js", "API"],
+        preco: 407,
+      },
+      {
+        id: "m05",
+        titulo: "Manter o que construí rodando sem quebrar",
+        itens: [
+          "Sistema que não cai",
+          "Ser avisado quando dá problema",
+          "Uma equipe que cuida sozinha",
+        ],
+        ferramentas: ["VPS", "Docker", "Coolify"],
         preco: 197,
       },
     ],
@@ -142,6 +170,7 @@ const SECOES: Secao[] = [
           "Montar a oferta",
           "Precificar sem medo de errar",
         ],
+        ferramentas: ["Perplexity", "Claude"],
         preco: 147,
       },
       {
@@ -152,6 +181,7 @@ const SECOES: Secao[] = [
           "Conduzir e fechar a venda",
           "Cliente que paga todo mês",
         ],
+        ferramentas: ["O CRM que você construiu", "Cal.com"],
         preco: 220,
       },
     ],
@@ -159,7 +189,7 @@ const SECOES: Secao[] = [
 ];
 
 const TODOS = SECOES.flatMap((s) => s.modulos);
-const TOTAL_CHEIO = TODOS.reduce((acc, m) => acc + m.preco, 0); // 2997
+const TOTAL_CHEIO = TODOS.reduce((acc, m) => acc + m.preco, 0); // 3244
 // A Fundação (m01-m03) é obrigatória: já vem marcada e não dá pra desmarcar.
 const SEL_INICIAL: Record<string, boolean> = Object.fromEntries(
   TODOS.filter((m) => m.obrigatorio).map((m) => [m.id, true]),
@@ -188,8 +218,10 @@ export default function MonteSuaMentoriaPage() {
   const [form, setForm] = useState<Form>(INITIAL);
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
+  const [verFerr, setVerFerr] = useState<Record<string, boolean>>({});
   const formRef = useRef<HTMLDivElement>(null);
 
+  const toggleFerr = (id: string) => setVerFerr((s) => ({ ...s, [id]: !s[id] }));
   const set = (k: keyof Form, v: string) => setForm((f) => ({ ...f, [k]: v }));
   const toggle = (id: string) => {
     const mod = TODOS.find((m) => m.id === id);
@@ -334,6 +366,26 @@ export default function MonteSuaMentoriaPage() {
                             </span>
                           ))}
                         </span>
+                        {m.ferramentas && m.ferramentas.length > 0 && (
+                          <span style={S.ferrWrap}>
+                            <span
+                              role="button"
+                              tabIndex={0}
+                              onClick={(e) => { e.stopPropagation(); toggleFerr(m.id); }}
+                              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); toggleFerr(m.id); } }}
+                              style={S.ferrToggle}
+                            >
+                              {verFerr[m.id] ? "ocultar ferramentas ▲" : "ver ferramentas ▾"}
+                            </span>
+                            {verFerr[m.id] && (
+                              <span style={S.ferrLista}>
+                                {m.ferramentas.map((f, i) => (
+                                  <span key={i} style={S.ferrTag}>{f}</span>
+                                ))}
+                              </span>
+                            )}
+                          </span>
+                        )}
                       </span>
                       <span style={{ ...S.preco, ...(on ? { color: "#F97316" } : null) }}>
                         <span style={S.precoCifra}>R$</span> {fmt(m.preco)}
@@ -544,6 +596,29 @@ const S: Record<string, React.CSSProperties> = {
     border: "1px solid rgba(249,115,22,0.35)",
     borderRadius: 6,
     padding: "3px 8px",
+    whiteSpace: "nowrap" as const,
+  },
+  ferrWrap: { display: "flex", flexDirection: "column" as const, gap: 8, marginTop: 4 },
+  ferrToggle: {
+    fontFamily: MONO,
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: "0.05em",
+    textTransform: "uppercase" as const,
+    color: "#8A8A8A",
+    cursor: "pointer",
+    width: "fit-content",
+    transition: "color .15s",
+  },
+  ferrLista: { display: "flex", flexWrap: "wrap" as const, gap: 6 },
+  ferrTag: {
+    fontFamily: MONO,
+    fontSize: 11,
+    color: "#B8B8B8",
+    background: "#0E0E0E",
+    border: "1px solid #262626",
+    borderRadius: 6,
+    padding: "4px 9px",
     whiteSpace: "nowrap" as const,
   },
   cardBody: { display: "flex", flexDirection: "column", gap: 10, flex: 1, minWidth: 0 },
