@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { enviarMensagem } from "@/lib/whatsapp";
+import { estadoInstancia } from "@/lib/evolution";
 import { confirmarEmail, emailBoasVindas } from "@/lib/mensagens-crmweek";
 
 /**
@@ -249,6 +250,39 @@ export async function POST(req: NextRequest) {
         if (!lista.ok) console.error("[hotmart] Resend audiência:", lista.erro);
         if (wpp && !wpp.ok) console.error("[hotmart] WhatsApp:", wpp.erro);
         if (mail && !mail.ok) console.error("[hotmart] e-mail boas-vindas:", mail.erro);
+
+        // 🔴 ALERTA ANTI-SILÊNCIO — dispara ANTES do resumo de venda e SEPARADO dele.
+        // Contexto (25/07/2026, ION): a 1ª venda real do CRM Week saiu, mas o WhatsApp
+        // de boas-vindas NÃO foi entregue — a instância Evolution estava `close` e a
+        // falha só virava um "⚠️ WhatsApp falhou" perdido no rodapé da msg de sucesso.
+        // Ninguém percebeu. Agora, se o WhatsApp do ingresso falhar (ou o comprador vier
+        // sem telefone), o Red recebe um alerta próprio, chamativo, com o estado real da
+        // instância — pra saber na hora se precisa reconectar (ler o QR no celular).
+        if (ehIngresso && (!fone || (wpp && !wpp.ok))) {
+            // Consulta o estado real da instância na fonte — não adianta chutar.
+            const estado = fone ? await estadoInstancia() : null;
+            const diagInstancia = estado
+                ? estado.ok
+                    ? estado.estado === "open"
+                        ? "🟢 instância `open` (conectada) — a falha NÃO é de conexão, investigar o número/mensagem"
+                        : `🔴 instância *${estado.estado ?? "?"}* — WhatsApp DESCONECTADO, precisa reconectar (ler o QR no celular)`
+                    : `⚠️ não consegui checar o estado da instância: ${estado.erro}`
+                : "";
+
+            await telegram([
+                "🔴🔴 *WHATSAPP DE BOAS-VINDAS NÃO SAIU* 🔴🔴",
+                "",
+                `Comprou o *ingresso* mas NÃO recebeu a mensagem 1:`,
+                `👤 ${nome || "—"}`,
+                fone ? `📱 ${fone}` : "📱 🔴 comprador SEM telefone no cadastro",
+                `📧 ${email || "—"}`,
+                "",
+                fone ? `Erro do envio: \`${wpp?.erro ?? "—"}\`` : "",
+                diagInstancia,
+                "",
+                "➡️ *Ação:* reconecta a `academy-suporte` (QR no WhatsApp) e, se quiser, reenvia a msg 1 manualmente.",
+            ].filter(Boolean).join("\n"));
+        }
 
         // Sem telefone no ingresso o comprador fica órfão da mensageria — precisa
         // aparecer no alerta, senão passa despercebido até o dia da aula.
