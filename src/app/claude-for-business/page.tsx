@@ -1012,17 +1012,17 @@ const html = `
         <div class="sobre-bio">
           <span class="section-label">Quem construiu</span>
           <p style="font-size:18px; color:#fff; font-weight:600; margin:8px 0 16px; letter-spacing:-0.01em;">Victor Lima · Criador da RedPro AI Academy</p>
-          <h2>Engenharia, segurança e 10 anos de TI federal<br><em class="lj">— transformados em método.</em></h2>
+          <h2>Uma operação de IA rodando de verdade<br><em class="lj">— transformada em método.</em></h2>
           <p>
-            Engenheiro de telecomunicações, pós-graduado em segurança da informação, MBA em IA para negócios. 10 anos gerindo TI no setor público federal — vi de dentro o que trava operação grande. Larguei a estabilidade pra construir o que ensino aqui.
+            Eu não ensino teoria de IA. Eu rodo uma empresa de IA todo dia e ensino exatamente o que uso pra ela funcionar. O curso é o método que mantém a RedPro AI Academy no ar — não um material que montei pra vender.
           </p>
           <p>
-            O curso é o método que uso pra rodar a RedPro AI Academy todo dia. Cada bloco — Chat, Cowork, Code — está em produção na operação. Você não vai aprender a usar IA. Vai aprender a configurar IA pro seu negócio com a cabeça de quem entende infraestrutura, segurança e processo.
+            Cada bloco — Chat, Cowork, Code — está em produção na minha operação agora. Você não vai aprender a usar IA. Vai aprender a configurar IA pro seu negócio com a cabeça de quem já fez isso pra valer, com processo e segurança, não no improviso.
           </p>
           <ul class="sobre-bullets">
-            <li>Engenheiro de telecomunicações · pós em segurança da informação · MBA em IA para negócios</li>
-            <li>10 anos de gestão de TI no setor público federal</li>
             <li>Criador da RedPro AI Academy e do Método S.H.A.R.K. — pipeline de 5 agentes em produção</li>
+            <li>Presto serviço de IA e automação para empresas pela RedPro AI Solutions</li>
+            <li>Método construído na prática, testado na própria operação antes de virar aula</li>
             <li>Empresário, marido e pai — construindo um negócio de IA que não depende de mim</li>
           </ul>
         </div>

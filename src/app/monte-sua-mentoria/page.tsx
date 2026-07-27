@@ -9,7 +9,7 @@ import { useState, useRef } from "react";
 // Título de cada módulo = o PROBLEMA que ele resolve (nível estratégico).
 // Subitens = o TÁTICO (o que consegue fazer). "ver ferramentas" = o OPERACIONAL
 // (qual ferramenta domina), expansível, discreto — o leigo ignora, o avançado abre.
-// 12 módulos · soma de todos = R$ 3.244 (conferido).
+// 11 módulos · soma de todos = R$ 2.997 (conferido).
 
 type Modulo = { id: string; titulo: string; itens: string[]; preco: number; ferramentas?: string[]; obrigatorio?: boolean };
 type Secao = { nome: string; modulos: Modulo[] };
@@ -38,25 +38,9 @@ const SECOES: Secao[] = [
           "Resolver problemas dentro de sistemas que já uso",
           "Conectar ferramentas que não se falam",
         ],
-        ferramentas: ["Claude Code", "API", "Webhook", "MCP", "n8n"],
+        ferramentas: ["Claude Code", "API", "Webhook", "MCP"],
         preco: 345,
         obrigatorio: true,
-      },
-    ],
-  },
-  {
-    nome: "IA no dia a dia",
-    modulos: [
-      {
-        id: "m13",
-        titulo: "Usar IA no dia a dia da empresa sem depender de ninguém",
-        itens: [
-          "Documentos, apresentações e análises em minutos",
-          "Design rápido sem contratar designer",
-          "Sua equipe trabalhando junto com a IA",
-        ],
-        ferramentas: ["Claude Cowork", "Claude Design", "Claude (Projetos)", "NotebookLM"],
-        preco: 247,
       },
     ],
   },
@@ -312,12 +296,13 @@ export default function MonteSuaMentoriaPage() {
           <img src="/logo-academy.png" alt="RedPro AI Academy" style={S.logo} />
           <div style={S.eyebrow}>Monte sua mentoria · módulos avulsos</div>
           <h1 style={S.h1}>
-            Escolha só o que você <span style={{ color: "#F97316" }}>precisa aprender</span>
+            Escolha o seu <span style={{ color: "#F97316" }}>arsenal</span>. Eu já uso cada peça dele na minha própria operação.
           </h1>
           <p style={S.lead}>
-            A base (Fundação) já vem incluída pra todo mundo. Marque por cima só o que fizer sentido
-            pra você, e o preço soma na hora. No fim, deixa seu contato — eu entro em contato pra
-            liberar seu acesso.
+            A base já vem incluída pra todo mundo. Ela é a nossa bancada de trabalho pra tudo o que
+            vem depois. Daqui pra baixo, marque só o que fizer sentido pro seu momento, pro seu nicho.
+            Você sai com a sua trilha personalizada, não uma trilha genérica. No fim, deixa seu
+            contato pra gente poder alinhar datas e horários.
           </p>
           <p style={S.leadMono}>
             {TODOS.length} módulos · leve tudo por <strong style={{ color: "#F5F5F5" }}>R$ {fmt(TOTAL_CHEIO)}</strong>
