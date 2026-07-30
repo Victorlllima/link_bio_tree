@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { enviarMensagem } from "@/lib/whatsapp";
 import { estadoInstancia } from "@/lib/evolution";
 import { confirmarEmail, emailBoasVindas } from "@/lib/mensagens-crmweek";
+import { enfileirar } from "@/lib/wpp-fila";
 
 /**
  * Webhook da Hotmart — hub de pós-compra.
@@ -310,6 +311,33 @@ export async function POST(req: NextRequest) {
             email_boas_vindas: ehIngresso ? (mail?.ok ?? false) : null,
             whatsapp: wpp ? wpp.ok : null,
         });
+    }
+
+    if (evento === "PURCHASE_OUT_OF_SHOPPING_CART") {
+        // Abandono de checkout. Payload diferente do de compra: sem
+        // purchase/price (ninguém pagou ainda) — `fone` já cobre buyer.phone
+        // como fallback (linha acima). Ver developers.hotmart.com/.../cart-abandonment-webhook.
+        const ehIngressoAbandono = produtoId === PRODUTO_INGRESSO;
+
+        if (ehIngressoAbandono && fone) {
+            // Approval gate: só enfileira. O envio de verdade depende de
+            // "crmweek-c1-abandono" estar em WPP_CAMPANHAS_ATIVAS (Vercel) — a
+            // mesma trava que protege as outras campanhas de disparo em massa.
+            const r = await enfileirar("crmweek-c1-abandono", [
+                { telefone: fone.replace(/\D/g, ""), nome },
+            ]);
+            if (!r.ok) console.error("[hotmart] enfileirar abandono:", r.erro);
+            await telegram(
+                `🟡 *Abandono de checkout* — ${produtoNome}\n\n` +
+                `👤 ${nome || "—"}\n📱 ${fone || "—"}\n📧 ${email || "—"}\n\n` +
+                `${r.ok ? "✅ enfileirado pra recuperação (crmweek-c1-abandono)" : `⚠️ falha ao enfileirar: ${r.erro}`}`,
+            );
+        } else if (ehIngressoAbandono) {
+            // Abandonou mas a Hotmart não mandou telefone — não dá pra recuperar por WhatsApp.
+            await telegram(`🟡 *Abandono de checkout* — ${produtoNome}\n\n👤 ${nome || "—"}\n📧 ${email || "—"}\n\n📱 sem telefone — recuperação por WhatsApp não é possível.`);
+        }
+
+        return NextResponse.json({ ok: true, evento, gravou: gravou.ok, enfileirado: ehIngressoAbandono && Boolean(fone) });
     }
 
     if (evento === "PURCHASE_CANCELED" || evento === "PURCHASE_REFUNDED" || evento === "PURCHASE_CHARGEBACK") {

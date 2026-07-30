@@ -67,6 +67,41 @@ const CAMPANHAS: Record<string, Render> = {
             item.telefone,
         ),
 
+    // Recuperação de abandono de checkout do INGRESSO (R$44). Disparo único,
+    // ~2h após o evento PURCHASE_OUT_OF_SHOPPING_CART da Hotmart. 1-a-1 no
+    // privado, nunca broadcast (regra Tabari). Checkout fixo (não muda por
+    // ciclo, ao contrário do link de aula) — nunca propagar `bid=` (Mission Control).
+    "crmweek-c1-abandono": (item) => {
+        const link = "https://pay.hotmart.com/R106737413U?checkoutMode=10";
+        return montarMensagem(
+            [
+                `${saudacaoVariada(item.nome, item.telefone)}`,
+                "",
+                [
+                    "Vi que você chegou até o pagamento do *Desafio: Seu CRM em 5 Dias* e não finalizou.",
+                    "Percebi que você tava fechando a vaga no *Desafio: Seu CRM em 5 Dias* e travou no pagamento.",
+                    "Vi que sua inscrição no *Desafio: Seu CRM em 5 Dias* ficou parada no checkout.",
+                ],
+                "",
+                [
+                    "Deu algum problema no cartão ou foi só o corre do dia?",
+                    "Foi erro no pagamento ou só ficou pra depois?",
+                    "Travou em alguma etapa ou foi mais falta de tempo mesmo?",
+                ],
+                "",
+                "Se for técnico, me chama aqui que eu resolvo com você agora. Se só sumiu a aba, o link tá aqui de novo:",
+                "",
+                link,
+                "",
+                [
+                    "As aulas começam segunda, 7h. Ainda dá tempo.",
+                    "Começa segunda, 7h da manhã. Cabe.",
+                ],
+            ],
+            item.telefone,
+        );
+    },
+
     // Carrinho — inscrições abertas.
     "crmweek-c1-carrinho": (item, link) =>
         montarMensagem(
