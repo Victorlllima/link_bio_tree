@@ -7,8 +7,8 @@ import { useEffect, useState } from "react";
  *
  * Cada card = um disparo do ciclo (data + fase + nome do grupo + texto).
  * A Gleyce edita o texto direto aqui (salva no banco), copia com 1 clique, e
- * marca como enviada. Botão "disparar no grupo" existe mas exige o segredo —
- * fica atrás de um prompt, pra não disparar sem querer.
+ * marca como enviada. NÃO há botão de disparar no grupo — decisão do Red (02/08):
+ * a operação é copiar-e-colar, sem envio automático em massa.
  */
 
 type Msg = {
