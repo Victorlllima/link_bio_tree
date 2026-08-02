@@ -13,11 +13,12 @@ import {
 import MetricasPainel from "./MetricasPainel";
 import LeadsPainel from "./LeadsPainel";
 import GarantiaPainel from "./GarantiaPainel";
+import MensageriaPainel from "./MensageriaPainel";
 
 type EstadoItem = { task_id: string; responsavel: Responsavel; done: boolean };
 type EstadoMap = Record<string, { responsavel: Responsavel; done: boolean }>;
 
-type Nivel = "operacional" | "drive" | "metricas" | "leads" | "garantia";
+type Nivel = "operacional" | "drive" | "metricas" | "leads" | "garantia" | "mensageria";
 
 const DRIVE_ICON: Record<DriveTipo, string> = {
   doc: "📄", pdf: "📕", html: "🌐", img: "🖼️", planilha: "📊", video: "🎬", pasta: "📁", link: "🔗",
@@ -176,6 +177,7 @@ export default function LpsgPainel() {
             ["metricas", "📊 Métricas de Tráfego"],
             ["leads", "🎓 Leads & Fichas"],
             ["garantia", "🛡️ Garantia 90 dias"],
+            ["mensageria", "💬 Mensageria"],
             ["drive", "📁 Drive de Conteúdo"],
           ] as [Nivel, string][]).map(([n, label]) => (
             <button key={n} onClick={() => setNivel(n)} style={{ ...s.aba, ...(nivel === n ? s.abaAtiva : {}) }}>
@@ -192,6 +194,9 @@ export default function LpsgPainel() {
 
         {/* ---------- GARANTIA 90 DIAS ---------- */}
         {nivel === "garantia" && <GarantiaPainel />}
+
+        {/* ---------- MENSAGERIA ---------- */}
+        {nivel === "mensageria" && <MensageriaPainel />}
 
         {/* ---------- SUB-FILTRO DE PESSOA (só no Checklist) ---------- */}
         {nivel === "operacional" && (
