@@ -2,8 +2,9 @@
 name: demo-cliente
 description: |
   Transforma o seu CRM numa demonstração personalizada pra qualquer empresa, a partir do site dela.
-  Você cola o link, a skill lê a página e adapta tudo: nome, logo, cores, etapas do funil e campos —
-  com dados de exemplo daquele ramo. Você chega na reunião com o sistema já com a cara do cliente.
+  Você cola o link, a skill lê a página e adapta tudo: nome, ramo, etapas do funil, campos e dados
+  de exemplo daquele mercado. Se você quiser logo e cores exatas da marca, ela te oferece dois
+  caminhos a mais. Você chega na reunião com o sistema já com a cara do cliente.
   Use quando disser "/demo-cliente", "prepara uma demo pra esse cliente", "adapta meu CRM pra essa empresa",
   ou colar o link do site de uma empresa pedindo uma demonstração.
 ---
@@ -26,14 +27,15 @@ O empresário abre o link, vê o próprio logo, as próprias cores e um funil qu
 
 ## O que esta skill FAZ
 
-| Extrai do site | Aplica no CRM |
-|---|---|
-| Nome da empresa | Nome do sistema, título da aba, header |
-| Logo | Marca no topo |
-| Cores da marca | Cor de destaque (sobre a base escura premium) |
-| Nicho / o que vende | **Etapas do funil daquele ramo** |
-| Produtos e serviços | Campos do cadastro e segmentos |
-| Cidade / região | Dados de exemplo coerentes |
+| Extrai do site | Aplica no CRM | Caminho 1 (grátis) | Caminho 2/3 (completo) |
+|---|---|---|---|
+| Nome da empresa | Nome do sistema, título da aba, header | ✅ | ✅ |
+| Nicho / o que vende | **Etapas do funil daquele ramo** | ✅ | ✅ |
+| Produtos e serviços | Campos do cadastro e segmentos | ✅ | ✅ |
+| Cidade / região | Dados de exemplo coerentes | ✅ | ✅ |
+| Tom da marca | Textos do sistema | ✅ | ✅ |
+| **Cores da marca** | Cor de destaque | ⚠️ inferida do ramo | ✅ exatas, do CSS |
+| **Logo** | Marca no topo | ❌ aluno envia o arquivo | ✅ baixado do site |
 
 ## O que esta skill NÃO FAZ
 
@@ -55,9 +57,35 @@ Pergunte de forma simples e aceite **qualquer** um destes:
 
 ⚠️ **Nunca exija o site.** Muita PME brasileira não tem, ou tem um site abandonado. A skill funciona nos três casos — só a riqueza do resultado muda.
 
+## Passo 1.5 — Escolher COMO ler o site (explique ao aluno e deixe ele decidir)
+
+Existem três caminhos, e eles entregam coisas diferentes. **Explique em linguagem simples e deixe o aluno escolher** — não decida por ele:
+
+> "Antes de eu ler o site dele, você escolhe como. Tem três jeitos:
+>
+> **1. Rápido e grátis** — eu leio o texto do site. Pego o nome, o que ele vende, o ramo, a cidade. **Não pego o logo nem as cores exatas** — as cores eu escolho combinando com o ramo dele. Funciona bem e não custa nada.
+>
+> **2. Completo com Apify** — um serviço que abre o site de verdade e me traz tudo: logo, cores exatas, imagens. O resultado fica bem mais parecido com a marca dele. **Tem plano grátis de 5 dólares por mês**, que dá pra várias demonstrações. Se você quiser mais, o plano pago é 29 dólares mensais. Precisa criar conta e me passar uma chave — mesmo processo do Supabase.
+>
+> **3. Completo sem custo, mas com instalação** — o Chrome DevTools, que abre o site no navegador aqui do seu computador e lê tudo. É grátis, mas exige uma instalação a mais na sua máquina.
+>
+> Pro seu primeiro cliente, eu sugiro começar pelo **1**. Se a demonstração for pra um cliente grande e você quiser caprichar na identidade visual, aí vale o **2** ou o **3**."
+
+**Regra de execução:**
+
+| Caminho | Ferramenta | Entrega | Custo |
+|---|---|---|---|
+| 1 — padrão | `WebFetch` | nome, nicho, serviços, cidade, tom. Cores inferidas do ramo. Sem logo. | grátis |
+| 2 — completo | **Apify** (`mcp__apify__*`) | + logo real, cores exatas do CSS, imagens | free tier US$5/mês · pago US$29/mês |
+| 3 — fallback | **Chrome DevTools MCP** | igual ao 2, rodando local | grátis, exige instalar o MCP |
+
+- **Sempre comece oferecendo os três.** O aluno decide.
+- Se ele escolher 2 ou 3 e a ferramenta **não estiver disponível**, avise e **caia pro caminho 1** — nunca trave: *"o Apify não tá configurado aqui. Quer configurar agora, ou eu sigo pelo caminho rápido e você me manda o logo depois?"*
+- Se ele escolher 2, oriente: criar conta grátis no Apify, copiar o token, colar aqui. É o mesmo fluxo do Supabase da Aula 3.
+
 ## Passo 2 — Ler a página e extrair
 
-Use `WebFetch` na URL informada. Extraia, na ordem de importância:
+Use a ferramenta do caminho escolhido no passo anterior. Extraia, na ordem de importância:
 
 1. **Nome da empresa** — do título da página, do logo ou do rodapé
 2. **O que ela vende** — produtos, serviços, o texto principal da home
