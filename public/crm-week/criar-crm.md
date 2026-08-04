@@ -903,10 +903,16 @@ Relembre o F5 da Aula 2: você mexeu no funil, o dashboard mudou, e aí bastou r
 Oriente o usuário a:
 1. Entrar no site do Supabase e **criar uma conta grátis**.
 2. **Criar um projeto novo** (só clicar em "novo projeto", dar um nome, e esperar ficar pronto).
-3. **Copiar duas informações** que o Supabase mostra nas configurações do projeto (a skill/Red mostra na tela onde ficam):
-   - a **URL do projeto**
-   - a **chave** (a chave pública/anon key)
+3. Com o projeto aberto, clicar no botão **"Get Connected"** (canto superior direito). Abre um menu com 4 itens — **só os dois primeiros interessam**, cada um copia com um clique:
+   - **Project URL** — o endereço (começa com `https://`)
+   - **Publishable key** — a chave (começa com `sb_publishable_`)
 4. Guardar as duas, que ele vai colar no Antigravity no próximo passo.
+
+> ⚠️ **Os outros dois itens do menu NÃO devem ser usados**, e a skill deve avisar isso:
+> - **Direct connection string** — traz a senha do banco. Nunca vai em código de front-end.
+> - **CLI setup commands** — é pra terminal, e o aluno não usa terminal.
+>
+> ⚠️ **Nomenclatura (conferido 04/08):** o Supabase renomeou a antiga **"anon key"** para **"Publishable key"** (prefixo `sb_publishable_`). Se a skill falar "anon key", o aluno procura na tela e não acha. Use sempre o nome que está na tela dele. Se ele estiver num projeto antigo e vir "anon public" em vez de "Publishable key", é a mesma coisa — pode usar.
 
 > Diga claramente: "essas duas informações são a ponte. Você só precisa copiar e colar. Não precisa entender o que elas fazem por dentro. O Claude usa elas pra fazer todo o trabalho."
 
