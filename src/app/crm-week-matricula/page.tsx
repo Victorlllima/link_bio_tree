@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 // ⚠️ SEMANAL: trocar o link do grupo a cada ciclo (mesmo link da página de obrigado).
-const GRUPO_URL = "https://chat.whatsapp.com/I3AcP8IpTtsG2y3gC7O0bS";
+const GRUPO_URL = "https://chat.whatsapp.com/F6Ft8TgXwSuK1WU00DSV3H";
 
 // FICHA DE MATRÍCULA — passo 2 da mensageria de boas-vindas do Tabari
 // ("1. confirma e-mail · 2. FICHA · 3. grupo backup").

@@ -13,7 +13,7 @@
 
 import { montarMensagem, saudacaoVariada, primeiroNome } from "./wpp-humanizar";
 
-export const GRUPO_URL = "https://chat.whatsapp.com/I3AcP8IpTtsG2y3gC7O0bS";
+export const GRUPO_URL = "https://chat.whatsapp.com/F6Ft8TgXwSuK1WU00DSV3H";
 export const FICHA_MATRICULA_URL = "https://www.redpro.com.br/crm-week-matricula";
 
 export { primeiroNome };
