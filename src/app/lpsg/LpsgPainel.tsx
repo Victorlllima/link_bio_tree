@@ -11,6 +11,7 @@ import {
   type DriveTipo,
 } from "./tasks";
 import MetricasPainel from "./MetricasPainel";
+import CriativosPainel from "./CriativosPainel";
 import LeadsPainel from "./LeadsPainel";
 import GarantiaPainel from "./GarantiaPainel";
 import MensageriaPainel from "./MensageriaPainel";
@@ -18,7 +19,7 @@ import MensageriaPainel from "./MensageriaPainel";
 type EstadoItem = { task_id: string; responsavel: Responsavel; done: boolean };
 type EstadoMap = Record<string, { responsavel: Responsavel; done: boolean }>;
 
-type Nivel = "operacional" | "drive" | "metricas" | "leads" | "garantia" | "mensageria";
+type Nivel = "operacional" | "drive" | "metricas" | "criativos" | "leads" | "garantia" | "mensageria";
 
 const DRIVE_ICON: Record<DriveTipo, string> = {
   doc: "📄", pdf: "📕", html: "🌐", img: "🖼️", planilha: "📊", video: "🎬", pasta: "📁", link: "🔗",
@@ -175,6 +176,7 @@ export default function LpsgPainel() {
           {([
             ["operacional", "✅ Checklist Operacional"],
             ["metricas", "📊 Métricas de Tráfego"],
+            ["criativos", "🎨 Criativos por Público"],
             ["leads", "🎓 Leads & Fichas"],
             ["garantia", "🛡️ Garantia 90 dias"],
             ["mensageria", "💬 Mensageria"],
@@ -188,6 +190,9 @@ export default function LpsgPainel() {
 
         {/* ---------- MÉTRICAS DE TRÁFEGO ---------- */}
         {nivel === "metricas" && <MetricasPainel />}
+
+        {/* ---------- CRIATIVOS POR TEMPERATURA DE PÚBLICO ---------- */}
+        {nivel === "criativos" && <CriativosPainel />}
 
         {/* ---------- LEADS & FICHAS ---------- */}
         {nivel === "leads" && <LeadsPainel />}
