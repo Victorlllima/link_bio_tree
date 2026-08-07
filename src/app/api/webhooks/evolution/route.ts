@@ -19,6 +19,7 @@ import { passosRestantes } from "@/lib/mensagens-crmweek";
  * estava mais em uso). Valor antigo guardado no vault `starlight`.
  */
 export const dynamic = "force-dynamic";
+export const maxDuration = 60; // cobre o setTimeout da re-checagem de conexão
 
 const SUPABASE_URL = "https://supabase.redpro.com.br";
 
@@ -156,6 +157,62 @@ async function telegram(msg: string) {
     }).catch((e) => console.error("[evolution] telegram:", e));
 }
 
+const HEALTH_CHAVE = "evolution:academy-suporte";
+
+/**
+ * Registra o estado da conexão em wpp_health_state — SEM alertar.
+ * Grava `caiu_em` (quando saiu de open) para o cron medir há quanto tempo está
+ * caída e decidir o alerta com debounce. Ao voltar pra open, zera `caiu_em`.
+ */
+async function registrarEstadoConexao(estado: string) {
+    const key = process.env.SUPABASE_SERVICE_KEY;
+    if (!key) return;
+    const headers = { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" };
+    // lê o estado anterior pra saber se é transição
+    let anterior: { estado?: string; caiu_em?: string | null } = {};
+    try {
+        const r = await fetch(
+            `${SUPABASE_URL}/rest/v1/wpp_health_state?chave=eq.${encodeURIComponent(HEALTH_CHAVE)}&select=estado,caiu_em&limit=1`,
+            { headers, cache: "no-store" },
+        );
+        if (r.ok) { const a = await r.json(); anterior = a?.[0] || {}; }
+    } catch { /* segue com anterior vazio */ }
+
+    // caiu_em: marca o instante em que saiu de open; limpa quando volta a open.
+    let caiuEm: string | null | undefined;
+    if (estado === "open") {
+        caiuEm = null; // recuperou
+    } else if (anterior.estado === "open" || !anterior.caiu_em) {
+        caiuEm = new Date().toISOString(); // acabou de cair (ou primeira vez caído)
+    } else {
+        caiuEm = anterior.caiu_em; // continua caído — preserva o início da queda
+    }
+
+    await fetch(`${SUPABASE_URL}/rest/v1/wpp_health_state?on_conflict=chave`, {
+        method: "POST",
+        headers: { ...headers, Prefer: "resolution=merge-duplicates,return=minimal" },
+        body: JSON.stringify({ chave: HEALTH_CHAVE, estado, caiu_em: caiuEm, checado_em: "now()" }),
+    }).catch(() => {});
+}
+
+const DEBOUNCE_MS = (Number(process.env.WPP_DEBOUNCE_MIN) || 5) * 60_000;
+
+/**
+ * Agenda UMA re-checagem do /api/cron/wpp-health após o debounce. Se a instância
+ * já tiver voltado (reconexão curta do Baileys), o cron não faz nada; se ainda
+ * estiver caída, ele alerta. Fire-and-forget — supre a falta de cron sub-diário
+ * no Hobby. setTimeout dentro da função serverless: dispara o fetch antes da
+ * função encerrar (o webhook responde na hora; este timer roda em paralelo).
+ */
+function agendarRechecagem(req: NextRequest) {
+    const secret = process.env.CRON_SECRET;
+    if (!secret) return;
+    const url = new URL("/api/cron/wpp-health", req.nextUrl.origin).toString();
+    setTimeout(() => {
+        fetch(url, { headers: { authorization: `Bearer ${secret}` } }).catch(() => {});
+    }, DEBOUNCE_MS + 5_000);
+}
+
 export async function POST(req: NextRequest) {
     let body: Record<string, unknown>;
     try {
@@ -166,21 +223,23 @@ export async function POST(req: NextRequest) {
 
     const evento = String(body.event ?? "");
 
-    // HEALTHCHECK EM TEMPO REAL: a Evolution emite connection.update no INSTANTE
-    // em que o WhatsApp muda de estado (open → connecting/close...). Melhor que
-    // polling: avisa na hora, sem cron. Se cair, as boas-vindas param em silêncio
-    // e o comprador fica sem o link — por isso o alerta é imediato.
+    // HEALTHCHECK COM DEBOUNCE: o Baileys (WhatsApp não-oficial) reconecta sozinho
+    // a cada ~45-70 min, em 1-2s, SEM perder mensagem. Alertar em toda
+    // connection.update spammava o Telegram ("caiu/voltou") por micro-reconexões
+    // inofensivas. Agora este webhook só REGISTRA o estado + o instante da queda em
+    // wpp_health_state; quem decide alertar é o cron /api/cron/wpp-health, que só
+    // avisa se a instância ficar caída por mais de WPP_DEBOUNCE_MIN minutos (queda
+    // REAL) — e manda o "recuperado" só se a queda chegou a ser alertada.
     if (evento === "connection.update") {
         const d = body.data as Record<string, unknown> | undefined;
         const estado = String(d?.state ?? d?.connection ?? "desconhecido");
-        if (estado === "open") {
-            await telegram("🟢 *WhatsApp reconectado* — instância `academy-suporte` voltou pra *open*. Boas-vindas voltam a sair.");
-        } else {
-            await telegram(
-                `🔴 *WhatsApp caiu* — instância \`academy-suporte\` está em *${estado}*.\n\n` +
-                `As vendas do ingresso NÃO estão recebendo a mensagem de boas-vindas.\n` +
-                `Reconectar em evo.redpro.com.br/manager.`,
-            );
+        await registrarEstadoConexao(estado);
+        // Caiu? Agenda UMA verificação após o debounce. Se ainda estiver caída lá,
+        // o cron alerta; se já reconectou (o caso comum do Baileys), nada acontece.
+        // Fire-and-forget: no plano Hobby não há cron sub-diário, então o próprio
+        // webhook agenda a re-checagem. Não bloqueia a resposta.
+        if (estado !== "open") {
+            agendarRechecagem(req);
         }
         return NextResponse.json({ ok: true, connection: estado });
     }

@@ -2,19 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { estadoInstancia } from "@/lib/evolution";
 
 /**
- * HEALTHCHECK PREVENTIVO da instância Evolution.
+ * HEALTHCHECK da instância Evolution — COM DEBOUNCE.
  *
- * O problema que resolve: quando o WhatsApp cai de "open", as vendas param de
- * receber a mensagem de boas-vindas EM SILÊNCIO — só descobrimos depois que um
- * comprador reclama. Este cron pergunta o estado periodicamente e avisa no
- * Telegram ANTES disso virar prejuízo.
+ * O Baileys (WhatsApp não-oficial) reconecta sozinho a cada ~45-70 min, em 1-2s,
+ * sem perder mensagem. Alertar em toda queda spammava o Telegram com falsos
+ * positivos ("caiu/voltou" por micro-reconexão). Agora:
  *
- * Alerta em qualquer estado != "open" (connecting, close, refused...). Também
- * alerta se a própria consulta falhar (servidor Evolution fora do ar).
- *
- * Anti-spam: não repete o alerta enquanto o estado não MUDA. O último estado
- * avisado vive numa linha da tabela wpp_health_state — sem isso, um número caído
- * geraria um alerta a cada tick. Quando volta pra "open", manda um "recuperado".
+ *  - o webhook /api/webhooks/evolution só REGISTRA estado + `caiu_em` (quando saiu
+ *    de open), sem alertar.
+ *  - este cron consulta o estado real e SÓ alerta queda se a instância estiver
+ *    caída há mais de WPP_DEBOUNCE_SEC segundos (queda REAL, não reconexão curta).
+ *  - manda "recuperado" só se a queda chegou a ser alertada (flag `alertado`).
  *
  * Autenticação: Bearer <CRON_SECRET> (a Vercel injeta no cron).
  */
@@ -23,33 +21,38 @@ export const maxDuration = 30;
 
 const SUPABASE_URL = "https://supabase.redpro.com.br";
 const CRON_SECRET = process.env.CRON_SECRET;
-const CHAVE = "evolution:academy-suporte"; // uma linha de estado por instância
+const CHAVE = "evolution:academy-suporte";
+// Segundos caído antes de alertar. 45s filtra as reconexões curtas do Baileys
+// (1-2s) mas ainda pega queda real rápido. Cabe no maxDuration=60 do webhook que
+// agenda a re-checagem (limite do plano Hobby, sem cron sub-diário).
+const DEBOUNCE_MS = (Number(process.env.WPP_DEBOUNCE_SEC) || 45) * 1000;
 
 function sbHeaders() {
     const key = process.env.SUPABASE_SERVICE_KEY!;
     return { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" };
 }
 
-/** Lê o último estado avisado (para não repetir alerta). */
-async function ultimoEstado(): Promise<string | null> {
+type Health = { estado?: string; caiu_em?: string | null; alertado?: boolean };
+
+async function lerHealth(): Promise<Health> {
     try {
         const res = await fetch(
-            `${SUPABASE_URL}/rest/v1/wpp_health_state?chave=eq.${encodeURIComponent(CHAVE)}&select=estado&limit=1`,
+            `${SUPABASE_URL}/rest/v1/wpp_health_state?chave=eq.${encodeURIComponent(CHAVE)}&select=estado,caiu_em,alertado&limit=1`,
             { headers: sbHeaders(), cache: "no-store" },
         );
-        if (!res.ok) return null;
+        if (!res.ok) return {};
         const rows = await res.json();
-        return Array.isArray(rows) && rows[0] ? rows[0].estado : null;
+        return (Array.isArray(rows) && rows[0]) || {};
     } catch {
-        return null;
+        return {};
     }
 }
 
-async function salvarEstado(estado: string) {
+async function salvar(patch: Record<string, unknown>) {
     await fetch(`${SUPABASE_URL}/rest/v1/wpp_health_state?on_conflict=chave`, {
         method: "POST",
         headers: { ...sbHeaders(), Prefer: "resolution=merge-duplicates,return=minimal" },
-        body: JSON.stringify({ chave: CHAVE, estado, checado_em: "now()" }),
+        body: JSON.stringify({ chave: CHAVE, checado_em: "now()", ...patch }),
     }).catch(() => {});
 }
 
@@ -71,31 +74,44 @@ export async function GET(req: NextRequest) {
     }
 
     const r = await estadoInstancia();
-    // estado "real": o valor da Evolution, ou "erro" se a consulta falhou.
     const atual = r.ok ? (r.estado || "desconhecido") : "erro";
-    const anterior = await ultimoEstado();
+    const prev = await lerHealth();
 
-    // Só age quando o estado MUDA (anti-spam).
-    if (atual === anterior) {
-        return NextResponse.json({ ok: true, estado: atual, mudou: false });
-    }
-
-    await salvarEstado(atual);
-
+    // ── Instância SAUDÁVEL ────────────────────────────────────────────────
     if (atual === "open") {
-        // Voltou ao ar (ou primeira checagem saudável): avisa só se vinha de um estado ruim.
-        if (anterior && anterior !== "open") {
-            await telegram(`🟢 *WhatsApp RECUPERADO*\n\nInstância \`academy-suporte\` voltou pra *open*. As boas-vindas voltam a sair.`);
+        // Se a queda anterior chegou a ser ALERTADA, avisa a recuperação.
+        if (prev.alertado) {
+            await telegram(`🟢 *WhatsApp RECUPERADO* — instância \`academy-suporte\` voltou pra *open*.`);
         }
-    } else {
-        await telegram(
-            `🔴 *WhatsApp FORA DO AR*\n\n` +
-            `Instância \`academy-suporte\` está em *${atual}* (antes: ${anterior || "?"}).\n` +
-            (atual === "erro" ? `⚠️ A consulta à Evolution falhou: ${r.erro || "sem detalhe"}\n` : "") +
-            `\n*As vendas do ingresso NÃO estão recebendo a mensagem de boas-vindas.*\n` +
-            `Reconectar em evo.redpro.com.br/manager antes que acumule.`,
-        );
+        await salvar({ estado: "open", caiu_em: null, alertado: false });
+        return NextResponse.json({ ok: true, estado: "open", recuperou: !!prev.alertado });
     }
 
-    return NextResponse.json({ ok: true, estado: atual, anterior, mudou: true });
+    // ── Instância CAÍDA ───────────────────────────────────────────────────
+    // Marca o início da queda se ainda não estava marcado.
+    const caiuEm = prev.caiu_em || new Date().toISOString();
+    const msCaida = Date.now() - new Date(caiuEm).getTime();
+    const minCaida = Math.round(msCaida / 60000);
+
+    // Ainda dentro da janela de debounce → só registra, NÃO alerta (é provável
+    // reconexão curta do Baileys, que volta sozinha em segundos).
+    if (msCaida < DEBOUNCE_MS) {
+        await salvar({ estado: atual, caiu_em: caiuEm });
+        return NextResponse.json({ ok: true, estado: atual, caida_min: minCaida, alertado: false, motivo: "dentro do debounce" });
+    }
+
+    // Passou do debounce e ainda não alertou → queda REAL, avisa uma vez.
+    if (!prev.alertado) {
+        await telegram(
+            `🔴 *WhatsApp FORA DO AR há ${minCaida} min* — instância \`academy-suporte\` em *${atual}*.\n` +
+            (atual === "erro" ? `⚠️ Consulta à Evolution falhou: ${r.erro || "sem detalhe"}\n` : "") +
+            `\nNão é reconexão curta. *As boas-vindas não estão saindo.*\nReconectar em evo.redpro.com.br/manager.`,
+        );
+        await salvar({ estado: atual, caiu_em: caiuEm, alertado: true });
+        return NextResponse.json({ ok: true, estado: atual, caida_min: minCaida, alertou: true });
+    }
+
+    // Já alertou e continua caído → só registra, não repete o alerta.
+    await salvar({ estado: atual, caiu_em: caiuEm });
+    return NextResponse.json({ ok: true, estado: atual, caida_min: minCaida, motivo: "já alertado" });
 }
