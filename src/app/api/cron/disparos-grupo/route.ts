@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { enviarTextoGrupo, trocarNomeGrupo } from "@/lib/evolution-grupo";
+import { enviarMensagem } from "@/lib/whatsapp";
 import { linkAprovacao } from "@/lib/aprovacao-disparo";
 
 /**
@@ -97,6 +98,24 @@ function agendarRecheck(req: NextRequest) {
 
 /** Executa um disparo aprovado: troca o nome do grupo e posta o texto. */
 async function executar(d: Disparo, req: NextRequest): Promise<void> {
+    // ── Modo TESTE: destino é um número pessoal (não grupo). Usa a lib 1:1
+    // testada, sem tocar em @g.us. Serve só pra validar a corrente
+    // aprovação → cron → envio → alerta com o número do Red.
+    if (d.tipo_grupo === "teste") {
+        const r = await enviarMensagem(d.jid, d.texto || "(teste)");
+        await patch(d.id, {
+            status: r.ok ? "enviado" : "falhou",
+            erro: r.ok ? null : r.erro,
+            enviado_em: "now()",
+        });
+        await telegram(
+            r.ok
+                ? `✅ *TESTE ok* — mensagem enviada pro número pessoal. A corrente funciona.`
+                : `🔴 *TESTE falhou* no envio: \`${r.erro}\``,
+        );
+        return;
+    }
+
     // 1) troca o nome do grupo (se houver)
     let nomeOk = true;
     if (d.novo_nome) {
