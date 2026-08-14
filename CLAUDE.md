@@ -79,3 +79,53 @@ As Fases 2-4 do roadmap (analytics, lead capture, deploy) ainda não foram imple
 6. `/redflix` — Redflix (rota ainda não existe)
 
 Branch principal de desenvolvimento: `layout_v2` (não `main`).
+
+---
+
+## 📎 Assets do RedReply — convenção fixa
+
+Todo arquivo que uma automação do RedReply entrega por DM (skill, guia, PDF,
+checklist) mora aqui:
+
+```
+public/redreply/<nome-do-arquivo>
+```
+
+E fica público em:
+
+```
+https://redpro.com.br/redreply/<nome-do-arquivo>
+```
+
+Esse é o link que vai na automação — no campo `asset_url`, ou concatenado ao
+`dm_template` quando a automação não usa flow.
+
+**Por que aqui e não no próprio RedReply:** a rota `/r/[slug]` do RedReply lê
+arquivos com `readFile()` do disco local. Isso funcionava no servidor antigo,
+mas em Vercel o filesystem é efêmero — o arquivo sumiria no próximo deploy.
+Servir de `public/` resolve: o arquivo vai junto no build e é estático.
+
+**Ao adicionar um asset novo:**
+1. Copiar o arquivo para `public/redreply/`
+2. Commitar e dar push (a Vercel republica sozinha)
+3. Conferir que a URL responde 200 antes de usar na automação
+
+Arquivos já publicados:
+
+| Arquivo | URL |
+|---|---|
+| `otimiza-pagina.md` | https://redpro.com.br/redreply/otimiza-pagina.md |
+
+---
+
+## ⚠️ Tailscale descontinuado (2026-08-04)
+
+O Tailscale foi **removido** da infraestrutura. Os IPs `100.64.77.5` (servidor) e `100.69.142.117` (máquina local) estão **mortos** — qualquer referência a eles é legado e não funciona.
+
+- **SSH:** `ssh -i ~/.ssh/id_ed25519 root@46.62.143.223`
+- **Banco/APIs internas:** portas bloqueadas para a internet. Acesso apenas via **túnel SSH**:
+  ```bash
+  ssh -i ~/.ssh/id_ed25519 -L 5432:localhost:5432 root@46.62.143.223
+  ```
+- Nunca reintroduzir `100.64.77.5`, `100.64.0.0/10` ou dependência de VPN Tailscale neste projeto.
+- Isso vale também para o **conteúdo do portfólio** (`src/app/portfolio/page.tsx`): não listar "Tailscale" na stack de nenhum projeto.
