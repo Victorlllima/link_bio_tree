@@ -253,26 +253,26 @@ function montarHtml(skill, logoDataUri) {
         font-size:10pt; color:#8a8a8a; }
   .kw b { color:${LARANJA}; font-family:'JetBrains Mono',monospace; font-size:12pt; letter-spacing:.06em; }
 
-  .miolo { padding:18mm 20mm 20mm; background:${PRETO}; }
+  .miolo { padding:14mm 20mm 16mm; background:${PRETO}; }
   .miolo > h2:first-of-type { margin-top:0; }
-  .bloco { margin-bottom:9mm; break-inside:avoid; }
+  .bloco { margin-bottom:6.5mm; break-inside:avoid; }
   .bloco h2 { font-size:13pt; font-weight:700; color:${LARANJA}; margin-bottom:4mm;
               padding-bottom:2mm; border-bottom:1px solid rgba(249,115,22,.25); }
-  .item { display:flex; gap:5mm; padding:3mm 0; border-bottom:1px solid rgba(255,255,255,.055);
+  .item { display:flex; gap:5mm; padding:2.2mm 0; border-bottom:1px solid rgba(255,255,255,.055);
           break-inside:avoid; }
   .termo { flex:0 0 62mm; font-family:'JetBrains Mono',monospace; font-size:9.5pt;
            font-weight:500; color:#f5f5f5; line-height:1.45; }
   .custo { flex:1; font-size:9.5pt; color:#a8a8a8; line-height:1.55; }
 
-  .como { margin-top:10mm; padding:7mm; border:1px solid rgba(249,115,22,.3); border-radius:3mm;
+  .como { margin-top:7mm; padding:6mm; border:1px solid rgba(249,115,22,.3); border-radius:3mm;
           background:rgba(249,115,22,.05); break-inside:avoid; }
   .como h3 { font-size:12pt; color:${LARANJA}; margin-bottom:4mm; }
-  .passo { font-size:10pt; color:#d0d0d0; line-height:1.7; margin-bottom:2.5mm; }
+  .passo { font-size:9.5pt; color:#d0d0d0; line-height:1.55; margin-bottom:2mm; }
   .passo b { color:#f5f5f5; }
   .link { display:block; margin-top:5mm; padding:4mm 5mm; background:${LARANJA}; color:${PRETO};
           font-family:'JetBrains Mono',monospace; font-size:9.5pt; font-weight:500;
           border-radius:2mm; text-decoration:none; word-break:break-all; }
-  .rodape { margin-top:9mm; padding-top:5mm; border-top:1px solid rgba(255,255,255,.1);
+  .rodape { margin-top:6mm; padding-top:4mm; border-top:1px solid rgba(255,255,255,.1);
             font-size:9pt; color:#6a6a6a; display:flex; justify-content:space-between; }
   .rodape b { color:${LARANJA}; }
 </style></head><body>
