@@ -2,8 +2,10 @@ import { Resend } from "resend";
 import { NextResponse } from "next/server";
 import { emailSharkListaEspera } from "@/lib/email-templates";
 
+import { limitarFormulario } from "@/lib/rate-limit";
 export const dynamic = "force-dynamic";
-
+
+
 
 // TODO: Criar audience "lista-espera-formacao-shark" no Resend dashboard
 // e substituir o valor da env var RESEND_SHARK_AUDIENCE_ID pelo ID real
@@ -11,6 +13,9 @@ export const dynamic = "force-dynamic";
 const SHARK_AUDIENCE_ID = process.env.RESEND_SHARK_AUDIENCE_ID ?? "";
 
 export async function POST(req: Request) {
+    const bloqueio = limitarFormulario(req);
+    if (bloqueio) return bloqueio;
+
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { nome, email } = await req.json();
     const eventId = `lead_shark_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;

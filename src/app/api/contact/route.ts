@@ -2,11 +2,15 @@ import { Resend } from "resend";
 import { NextResponse } from "next/server";
 import { emailContato } from "@/lib/email-templates";
 
+import { limitarFormulario } from "@/lib/rate-limit";
 export const dynamic = "force-dynamic";
 
 const AUDIENCE_ID = "772bf76a-410e-49c0-8737-76f1c1279114";
 
 export async function POST(req: Request) {
+    const bloqueio = limitarFormulario(req);
+    if (bloqueio) return bloqueio;
+
     // Instanciado dentro do handler (runtime), não no build — evita quebrar o build quando RESEND_API_KEY não está no ambiente de build.
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { name, email, topic, message } = await req.json();
