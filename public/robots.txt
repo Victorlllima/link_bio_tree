@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Material entregue por DM (skills, guias, PDFs).
+# Fora do índice para que o acesso passe pelo funil, não pela busca.
+# Não é proteção de segurança — quem tem o link direto continua acessando.
+Disallow: /redreply/
+Disallow: /crm-week/
