@@ -6,21 +6,21 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "RedPro | Seu Hub de Desenvolvimento e Negócios Digitais",
-  description: "Descubra projetos prontos, contrate desenvolvedores certificados e aprenda a criar aplicações com IA. RedPro - Transformando ideias em realidade.",
-  keywords: "desenvolvimento, programação, vibe coding, método shark, cursos, projetos prontos, desenvolvedores",
+  title: "RedPro | Soluções Agênticas",
+  description: "Delegar o código é a parte fácil. Difícil é saber conferir depois. Skills, guias e sistemas para quem constrói com IA.",
+  keywords: "soluções agênticas, agentes de IA, claude code, engenharia de contexto, sistemas agênticos, automação com IA, arquiteto de agentes",
   authors: [{ name: "RedPro" }],
   openGraph: {
     type: "website",
     url: "https://redpro.com.br",
-    title: "RedPro | Seu Hub de Desenvolvimento e Negócios Digitais",
-    description: "Descubra projetos prontos, contrate desenvolvedores certificados e aprenda a criar aplicações com IA.",
+    title: "RedPro | Soluções Agênticas",
+    description: "Delegar o código é a parte fácil. Difícil é saber conferir depois. Skills, guias e sistemas para quem constrói com IA.",
     locale: "pt_BR",
   },
   twitter: {
     card: "summary_large_image",
-    title: "RedPro | Seu Hub de Desenvolvimento e Negócios Digitais",
-    description: "Descubra projetos prontos, contrate desenvolvedores certificados e aprenda a criar aplicações com IA.",
+    title: "RedPro | Soluções Agênticas",
+    description: "Delegar o código é a parte fácil. Difícil é saber conferir depois. Skills, guias e sistemas para quem constrói com IA.",
   },
   icons: {
     icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦈</text></svg>",
