@@ -186,6 +186,52 @@ export const RESOURCES: Resource[] = [
     ],
   },
   {
+    slug: "auditoria-reversibilidade",
+    titulo: "Auditoria de Reversibilidade",
+    categoria: "Skills",
+    novo: true,
+    resumo: "Mostra quais ações dos seus agentes rodam sem ninguém conferir, e quais delas você não consegue desfazer.",
+    intro:
+      "Seu agente funciona. A pergunta é outra: quando ele erra, você consegue desfazer? Um agente que verifica o próprio trabalho carrega o mesmo viés que produziu o erro — ele já decidiu que estava certo quando escreveu. Esta skill separa o que dá pra desfazer do que não dá.",
+    arquivo: "/redreply/skills/auditoria-reversibilidade.md",
+    comando: "/auditoria-reversibilidade",
+    secoes: [
+      {
+        titulo: "O que ela mapeia",
+        texto:
+          "Toda ação que o agente executa além de gerar texto:\n\n" +
+          "• Escrita em banco (INSERT, UPDATE, DELETE, migrations)\n" +
+          "• Chamadas externas que mudam estado (POST, PUT, PATCH, DELETE)\n" +
+          "• Comunicação com terceiros (e-mail, WhatsApp, SMS, DM, push)\n" +
+          "• Dinheiro (cobrança, reembolso, mudança de plano, nota fiscal)\n" +
+          "• Arquivos (escrever, sobrescrever, apagar, mover, upload)\n" +
+          "• Deploy e infra (push, merge, restart, env var)\n" +
+          "• Permissão e acesso (criar usuário, mudar role, revogar)\n\n" +
+          "Leitura pura fica de fora. Ler não quebra nada.",
+      },
+      {
+        titulo: "O critério que ela aplica",
+        texto:
+          "Ação reversível o agente faz sozinho. Ação irreversível nunca sem um segundo par de olhos. " +
+          "É o que separa demo de operação: numa demo todo erro é desfazível porque não tem ninguém do outro lado.",
+      },
+      {
+        titulo: "O que você recebe",
+        texto:
+          "A lista de ações classificadas por reversibilidade, com arquivo e linha, quem dispara cada uma " +
+          "(usuário, cron, webhook, outro agente) e se existe verificação antes. As irreversíveis sem gate " +
+          "vêm primeiro, porque são as que cobram a conta.",
+      },
+      {
+        titulo: "Por que isso é dívida, não falha",
+        texto:
+          "Cada semana que passa, mais ação irreversível entra no sistema sem verificação. E mais caro fica " +
+          "separar depois o que precisa de gate do que não precisa.",
+      },
+      COMO_INSTALAR,
+    ],
+  },
+  {
     slug: "caveman-mode",
     titulo: "Caveman Mode",
     categoria: "Guias",
