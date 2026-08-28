@@ -259,6 +259,51 @@ export const RESOURCES: Resource[] = [
     ],
   },
   {
+    slug: "mcp-vs-a2a",
+    titulo: "MCP vs A2A",
+    categoria: "Guias",
+    novo: true,
+    resumo: "Os dois protocolos que todo mundo confunde. Um dá mãos pro seu agente, o outro dá colegas.",
+    intro:
+      "Seu agente sabe usar ferramenta. Ele lê arquivo, chama API, mexe no banco. O que ele não sabe é pedir ajuda para outro agente. São dois encanamentos diferentes, e quase todo mundo instalou só o primeiro achando que tinha os dois.",
+    arquivo: "/redreply/skills/mcp-vs-a2a.md",
+    secoes: [
+      {
+        titulo: "A diferença em uma linha",
+        texto:
+          "MCP conecta agente a ferramenta e dado (banco, API, arquivo). A2A conecta agente a agente.\n\n" +
+          "O teste pra saber qual você precisa: o outro lado da conexão toma alguma decisão?\n" +
+          "• Não (banco, API, planilha) → MCP\n" +
+          "• Sim (avalia, recusa, pede mais informação) → A2A",
+      },
+      {
+        titulo: "O que o guia cobre",
+        texto:
+          "• O Agent Card: como um agente descobre o outro antes de mandar trabalho\n" +
+          "• As operações reais da spec 1.0 (SendMessage, GetTask, CancelTask, SubscribeToTask)\n" +
+          "• Os 8 estados de uma tarefa, e os 2 que não existem no mundo MCP\n" +
+          "• Transporte (JSON-RPC 2.0, gRPC, HTTP+REST) e os SDKs nas 6 linguagens\n" +
+          "• Por que com 2 agentes você é o carteiro e com 5 vira o gargalo",
+      },
+      {
+        titulo: "A parte que quase ninguém escreve",
+        texto:
+          "O guia diz também o que NÃO dá pra fazer hoje: não existe app store de agentes A2A, " +
+          "a maioria das ferramentas ainda não fala A2A, e ele não substitui o MCP (agente A2A sem " +
+          "MCP tem com quem conversar, mas não tem mãos).\n\n" +
+          "E a ordem certa de aprender: MCP primeiro, depois escopo e permissão, só então A2A. " +
+          "Pular direto pra A2A é montar organograma antes de ter funcionário.",
+      },
+      {
+        titulo: "Como usar",
+        texto:
+          "Baixa o .md e lê. É guia de entendimento, não skill de rodar: serve pra você decidir " +
+          "qual protocolo resolve o problema que você tem agora, sem perder tempo no que ainda não " +
+          "está maduro.",
+      },
+    ],
+  },
+  {
     slug: "migrar-chatgpt-claude",
     titulo: "Migrar do ChatGPT pro Claude",
     categoria: "Guias",
