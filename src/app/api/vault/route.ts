@@ -42,8 +42,8 @@ export async function POST(req: Request) {
       html: `
         <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#161617">
           <p>Boa! Seu acesso ao RedVault tá liberado.</p>
-          <p>É onde eu solto tudo que uso pra operar com IA — prompts, skills, guias, clones de mentores. Tá tudo copy-paste, nada pra baixar.</p>
-          <p><a href="https://redpro.com.br/vault" style="display:inline-block;background:#f97316;color:#0a0a0a;font-weight:700;padding:12px 22px;border-radius:100px;text-decoration:none">Abrir o Vault →</a></p>
+          <p>É onde eu solto as skills que uso pra operar com IA. Baixa o .md, joga na pasta do teu projeto e roda.</p>
+          <p><a href="https://redpro.com.br/vault" style="display:inline-block;background:#f97316;color:#0a0a0a;font-weight:700;padding:12px 22px;border-radius:100px;text-decoration:none">Abrir o RedVault →</a></p>
           <p style="color:#726f69;font-size:13px">O vault cresce toda semana. Você vai receber por aqui quando entra coisa nova.</p>
         </div>`,
     }),

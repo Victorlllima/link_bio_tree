@@ -1,235 +1,245 @@
 // RedVault — fonte de dados dos resources. Espelha .claude/REDVAULT-RESOURCES.md do Starlight.
-// Cada resource vira um card no vault + uma página /vault/[slug] com blocos copy-paste (nada pra baixar).
+// Cada resource vira um card no vault + uma página /vault/[slug].
+//
+// MODELO (decidido por Red, 28/08/2026): as skills são ARQUIVOS .md PARA BAIXAR.
+// A página explica o que a skill faz, como usar e o que esperar; o arquivo é o entregável.
+// (Antes era copy-paste; mudou porque skill de Claude Code precisa virar arquivo mesmo.)
 
-export type BlocoTipo = "texto" | "codigo";
-export interface Bloco {
-  titulo?: string;
-  tipo: BlocoTipo;
-  conteudo: string;
+export interface Secao {
+  titulo: string;
+  texto: string;
 }
 export interface Resource {
   slug: string;
   titulo: string;
-  categoria: "Prompts" | "Skills" | "Guias" | "Clones" | "Agentes" | "Automação";
+  categoria: "Skills" | "Guias";
   destaque?: boolean;
   novo?: boolean;
-  resumo: string;      // aparece no card
-  intro: string;       // 1-2 parágrafos no topo da página
-  blocos: Bloco[];     // os blocos copy-paste
+  resumo: string;        // aparece no card
+  intro: string;         // 1-2 parágrafos no topo da página
+  arquivo: string;       // caminho do .md para download
+  comando?: string;      // o comando que roda a skill (ex: /raio-x-custo)
+  secoes: Secao[];       // explicação didática do que a skill faz
 }
 
-export const CATEGORIAS = ["Tudo", "Prompts", "Skills", "Guias", "Clones", "Agentes", "Automação"] as const;
+export const CATEGORIAS = ["Tudo", "Skills", "Guias"] as const;
+
+const COMO_INSTALAR: Secao = {
+  titulo: "Como instalar (1 minuto)",
+  texto:
+    "1. Baixa o arquivo .md no botão acima.\n" +
+    "2. Na pasta do teu projeto, cria (ou abre) a pasta .claude/skills/\n" +
+    "3. Joga o arquivo lá dentro.\n" +
+    "4. Abre o Claude Code nessa pasta e digita o comando da skill.\n\n" +
+    "Não precisa instalar nada, não precisa configurar. O Claude Code lê a pasta .claude/skills/ sozinho.",
+};
 
 export const RESOURCES: Resource[] = [
   {
-    slug: "context-engineering",
-    titulo: "Context Engineering em 5 minutos",
-    categoria: "Guias",
-    destaque: true,
-    novo: true,
-    resumo: "A skill que o Karpathy diz valer mais que \"saber programar\". As 3 peças do contexto e como aplicar hoje.",
-    intro: "Você aprendeu a fazer \"prompt\". Funciona. Mas tem um nível acima, e é onde mora a diferença entre quem usa IA e quem faz IA trabalhar de verdade: context engineering. Prompt é a pergunta que você faz. Contexto é tudo que o agente sabe quando vai responder. Quem controla o contexto, controla a qualidade.",
-    blocos: [
-      { titulo: "As 3 peças do contexto", tipo: "texto", conteudo: "1. INSTRUÇÃO — o que o agente deve fazer, seu papel, suas regras. (o \"quem você é\")\n2. MEMÓRIA — o que ele já sabe de você e da conversa. Curto prazo (essa sessão) e longo prazo (histórico, preferências).\n3. BUSCA (retrieval/RAG) — trazer os dados certos na hora certa. Seu manual, sua tabela, seus documentos." },
-      { titulo: "Como aplicar hoje (3 passos)", tipo: "texto", conteudo: "1. Antes de pedir algo à IA, pergunte: \"ela tem TODA a informação que um humano precisaria pra fazer isso?\"\n2. Se falta, dê o contexto: cole o documento, explique a regra, dê o exemplo.\n3. Estruture: instrução clara + dados relevantes + exemplo do resultado esperado." },
-      { titulo: "Por que isso importa", tipo: "texto", conteudo: "Um prompt bom com contexto ruim dá resposta genérica. Um prompt simples com contexto certo dá resposta cirúrgica. A maioria briga com o prompt quando o problema é o contexto. Context engineering é a base de todo agente de verdade." },
-    ],
-  },
-  {
-    slug: "memoria-agente",
-    titulo: "Como dar memória ao seu agente",
-    categoria: "Guias",
-    novo: true,
-    resumo: "Por que seu GPT esquece tudo e o passo a passo pra dar memória de longo prazo. Vira funcionário, não papagaio.",
-    intro: "A reclamação nº1 de quem mexe com IA: \"configurei tudo, fechei, abri de novo e ele não lembra de nada\". Isso não é defeito. É falta de memória de longo prazo. E dá pra resolver.",
-    blocos: [
-      { titulo: "As 2 memórias de um agente", tipo: "texto", conteudo: "CURTO PRAZO: o que rolou nessa conversa. Todo chatbot tem. Fecha a aba, perde.\nLONGO PRAZO: o que persiste entre conversas. Suas preferências, seu histórico, o que já deu certo. É isso que faz o agente te conhecer." },
-      { titulo: "O passo a passo (memória de longo prazo)", tipo: "texto", conteudo: "1. Escolha o que vale lembrar: nem tudo. Preferências, decisões, fatos sobre você/seu negócio.\n2. Um lugar pra guardar: um arquivo, um banco simples, ou a memória nativa da ferramenta.\n3. Regra de escrita: o agente registra o que é novo e estrutural, não cada mensagem.\n4. Regra de leitura: no começo de cada conversa, ele lê o que já sabe de você.\n5. Manutenção: revisar o que virou desatualizado." },
-      { titulo: "O resultado", tipo: "texto", conteudo: "Você volta semana que vem e ele já sabe quem você é, o que você faz, como você gosta. Deixa de recomeçar do zero. Vira funcionário, não papagaio." },
-    ],
-  },
-  {
-    slug: "primeiro-agente",
-    titulo: "Checklist: seu primeiro agente",
-    categoria: "Skills",
-    novo: true,
-    resumo: "Os 8 passos pra escolher e montar o primeiro agente que te liberta da tarefa mais repetitiva.",
-    intro: "Todo mundo quer começar pelo agente mais impressionante. Erro. Você começa pelo mais chato: o que tira de você a tarefa que você mais repete. É onde você aprende rápido.",
-    blocos: [
-      { titulo: "O checklist (8 passos)", tipo: "texto", conteudo: "☐ 1. Ache a tarefa certa. Não a mais impressionante. A que você MAIS repete e mais te cansa.\n☐ 2. Descreva o que é \"feito\". Como saberia que o agente fez certo?\n☐ 3. Liste as regras. O que ele NUNCA pode fazer? Onde deve te perguntar antes?\n☐ 4. Escolha a ferramenta. Comece simples.\n☐ 5. Escreva a instrução. Quem ele é + o que faz + tom + regras.\n☐ 6. Teste com casos reais que você conhece de cor.\n☐ 7. Corrija e repita. Errou? Ajusta a instrução, não o código.\n☐ 8. Solte pequeno. Deixa fazer a tarefa real com você conferindo, antes de confiar sozinho." },
-      { titulo: "A regra de ouro", tipo: "texto", conteudo: "Você vai errar no começo. Por isso escolhe uma tarefa que você conhece, pra corrigir rápido. Quando esse primeiro funciona, você entendeu o mecanismo. Aí monta o time." },
-    ],
-  },
-  {
-    slug: "arquiteto-agentes",
-    titulo: "Mapa: virar Arquiteto de Soluções Agênticas",
-    categoria: "Guias",
-    novo: true,
-    resumo: "Os 4 níveis (de \"usa IA\" a \"orquestra sistemas\") e o caminho pra subir. A profissão que o Karpathy descreveu.",
-    intro: "Karpathy disse: o melhor engenheiro não escreve cada linha, lidera os agentes que escrevem. Essa profissão tem nome e um caminho. Aqui está o mapa.",
-    blocos: [
-      { titulo: "Os 4 níveis", tipo: "texto", conteudo: "1. USA IA — você pergunta, ela responde. (a maioria para aqui)\n2. AUTOMATIZA — você monta fluxos fixos (se isso, faça aquilo).\n3. CONSTRÓI AGENTES — sistemas que agem, lembram e decidem sozinhos.\n4. ORQUESTRA SISTEMAS — um time de agentes operando um negócio. (o Arquiteto)" },
-      { titulo: "O caminho", tipo: "texto", conteudo: "Nível 3 primeiro: monte UM agente que resolve UMA dor sua. Domine o mecanismo. Depois escale pro time. Não pule pro nível 4 sem passar pelo 3." },
-      { titulo: "O que NÃO é preciso", tipo: "texto", conteudo: "Não é preciso escrever código do zero nem virar dev. É preciso saber orquestrar. A ferramenta faz o código; você faz a decisão." },
-    ],
-  },
-  {
-    slug: "o-caminho",
-    titulo: "O caminho (do 1º agente ao time)",
-    categoria: "Guias",
-    novo: true,
-    resumo: "O caminho que eu segui de verdade, sem romantizar. Do primeiro agente feio ao time inteiro.",
-    intro: "Comecei respondendo a mesma mensagem pela milésima vez, às 11 da noite. Montei um agente feio que funcionava. E não parei mais. Aqui está o caminho, pra você seguir o seu.",
-    blocos: [
-      { titulo: "As 5 fases", tipo: "texto", conteudo: "1. O INCÔMODO (a faísca). Ache a tarefa que te faz pensar \"por que EU tô fazendo isso?\".\n2. O PRIMEIRO AGENTE (feio e funcional). Não tente fazer bonito. Faça funcionar.\n3. O LOOP DE MELHORIA. Você usa, vê onde falha, ajusta. Cada semana ele fica melhor.\n4. O SEGUNDO AGENTE. Quando o primeiro funciona, o segundo é mais fácil.\n5. O TIME. Um agente chama outro. Aí você tem uma operação, não uma ferramenta." },
-      { titulo: "A verdade que ninguém conta", tipo: "texto", conteudo: "Não começou bonito nem rápido. Começou com uma tarefa chata e teimosia. Se você espera o momento perfeito, não começa. Comece feio." },
-    ],
-  },
-  {
-    slug: "hormozi-coach",
-    titulo: "Alex Hormozi Business Coach",
-    categoria: "Clones",
-    destaque: true,
-    resumo: "Transforma o Claude num coach estilo Hormozi. O prompt + os frameworks dos livros dele num knowledge pack pra colar no projeto.",
-    intro: "Transforma o Claude no Alex Hormozi — o coach que corta a enrolação e te diz a UMA coisa pra arrumar. E não é só o estilo: você carrega os frameworks dos livros dele, então ele te orienta como ele realmente faria. Nada pra baixar: copia cada bloco, cola num doc, salva. Esse é o arquivo.",
-    blocos: [
-      { titulo: "Passo 1 — o prompt (cole nas instruções do Projeto Claude)", tipo: "codigo", conteudo: "# Papel\nVocê é Alex Hormozi — coach de negócios, autor de $100M Offers, $100M Leads e $100M Money Models.\n\n# Voz\nDireto. Sem rodeio. Frases curtas. Cita frameworks pelo nome. Fala o que a pessoa não quer ouvir. Usa matemática, não conselho vago.\n\n# Regras\n1. SEMPRE diagnostique antes de prescrever — faça 3 a 5 perguntas primeiro.\n2. Use o framework 6M (Métricas, Modelo, Dinheiro, Time, Gestão, Mercado) pra achar a UMA restrição.\n3. Cite frameworks pelo nome — Equação de Valor, Grand Slam Offer, Core Four.\n4. Use matemática. Dê números específicos.\n5. Termine toda resposta com UMA ação específica pras próximas 48 horas." },
-      { titulo: "Passo 2 — a Equação de Valor (knowledge doc)", tipo: "codigo", conteudo: "Valor = (Resultado dos Sonhos × Probabilidade Percebida de Conquista) / (Tempo de Espera × Esforço e Sacrifício)\n\nMaximize o topo. Minimize a base. É o jogo inteiro.\n- Resultado dos Sonhos (AUMENTAR): torne o estado final mais vívido, maior, mais status.\n- Probabilidade (AUMENTAR): prova social, cases, garantias, mecanismo explicado.\n- Tempo de Espera (DIMINUIR): crie vitórias rápidas no começo.\n- Esforço (DIMINUIR): feito-por-você > feito-com-você > faça-você-mesmo." },
-      { titulo: "Passo 3 — as perguntas de diagnóstico", tipo: "codigo", conteudo: "Antes de qualquer conselho, pergunte:\n1. Qual sua receita mensal atual?\n2. Qual sua margem bruta?\n3. Quantos clientes você tem?\n4. Pra quanto quer crescer, e até quando?\n5. Qual você acha que é sua restrição nº1 agora?\n\nNão prescreva sem isso. Sempre diagnostique primeiro. Termine com UMA ação pras próximas 48h." },
-    ],
-  },
-  {
-    slug: "5-prompts-claude",
-    titulo: "5 Prompts pro Claude",
-    categoria: "Prompts",
-    resumo: "Os 5 prompts que eu mais uso no dia a dia, prontos pra colar. Copy-paste, sem enrolação.",
-    intro: "Cinco prompts que resolvem o grosso do que você precisa no Claude. Copia, cola, usa. (Guia completo já publicado em /guias/5-prompts-claude — este card leva pra lá.)",
-    blocos: [
-      { titulo: "Onde pegar", tipo: "texto", conteudo: "Este resource já tem guia publicado. Acesse a versão completa em redpro.com.br/guias/5-prompts-claude." },
-    ],
-  },
-  {
     slug: "auditoria-seguranca",
-    titulo: "Skill: Auditoria de Segurança",
+    titulo: "Auditoria de Segurança",
     categoria: "Skills",
+    destaque: true,
     novo: true,
-    resumo: "Roda uma auditoria completa no seu projeto: RLS aberto, chave exposta, rota sem proteção. O que consultoria cobra caro pra achar.",
-    intro: "Skill de Claude Code que audita a segurança do seu sistema sem você precisar saber por onde começar. Ela varre o projeto, encontra o que está exposto e explica o risco de cada achado em português. Copia o conteúdo abaixo, salva como arquivo .md na pasta .claude/skills/ do teu projeto, e roda.",
-    blocos: [
-      { titulo: "A skill completa (copia e salva como .md)", tipo: "codigo", conteudo: "---\nname: auditoria-seguranca\ndescription: |\n  Audita a segurança de um projeto que foi construído com IA. Varre o código e as configurações\n  atrás dos 12 pontos que mais expõem sistema em produção — RLS desligado, chave de API no\n  frontend, CORS aberto, rota sem autenticação, segredo no repositório. Entrega um laudo com\n  severidade, o arquivo e a linha exata, e o comando pra corrigir.\n  Use quando disser \"audita a segurança\", \"isso aqui tá seguro?\", \"/auditoria-seguranca\",\n  ou antes de subir qualquer coisa pra cliente.\n---\n\n# Auditoria de Segurança — o que a IA não checou por você\n\nVocê pediu um sistema. Ela entregou um sistema que funciona. Funcionar e estar seguro são\nduas coisas diferentes, e ninguém verificou a segunda.\n\nEsta skill verifica.\n\n> Referência: numa auditoria de 1.400+ aplicações construídas com IA, **65% tinham falha de\n> segurança e 58% tinham pelo menos uma crítica**. Em apps com Supabase, **88% estavam com\n> Row Level Security inteiramente desabilitado.**\n\n---\n\n## Como rodar\n\nDentro da pasta do projeto:\n\n```\n/auditoria-seguranca\n```\n\nOu peça: *\"roda a auditoria de segurança nesse projeto\"*.\n\n---\n\n## O que a skill faz\n\n### PASSO 1 — Reconhecer o terreno\n\nAntes de procurar problema, entender o que existe. Identifique e reporte:\n\n1. **Stack** — leia `package.json`, `requirements.txt`, `go.mod`, `composer.json`\n2. **Banco de dados** — Supabase, Postgres direto, Firebase, MongoDB, Prisma\n3. **Framework** — Next.js, Vite, Express, FastAPI, Rails\n4. **Onde roda** — Vercel, Netlify, VPS, Docker\n5. **Autenticação** — se existe, e qual (Clerk, Auth.js, Supabase Auth, próprio)\n\nReporte em uma linha antes de continuar: `Stack detectada: <resumo>`.\n\nSe o projeto não tiver nenhum desses arquivos, avise que não é um projeto de código e pare.\n\n---\n\n### PASSO 2 — Os 12 pontos\n\nVerifique cada um. Para cada achado registre: **arquivo**, **linha**, **severidade**, **o que\nacontece se ninguém arrumar**, e **como corrigir**.\n\n#### 🔴 CRÍTICO — corrija antes de qualquer pessoa usar\n\n**1 · Row Level Security desligado (Supabase/Postgres)**\n- Procure em `migrations/`, `supabase/`, `*.sql`: tabelas criadas sem `ENABLE ROW LEVEL SECURITY`\n- Procure `.from('` no client: qualquer tabela lida do browser sem RLS está aberta\n- **O que acontece:** qualquer pessoa abre o DevTools, copia a request e lê a tabela inteira\n- **Correção:** `ALTER TABLE <tabela> ENABLE ROW LEVEL SECURITY;` + policy por `auth.uid()`\n\n**2 · Chave de API ou segredo no código do frontend**\n- Procure por: `sk-`, `sk_live`, `ghp_`, `service_role`, `SUPABASE_SERVICE`, `STRIPE_SECRET`,\n  `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`\n- Em `src/`, `app/`, `components/`, `pages/` — qualquer coisa que vá para o browser\n- ⚠️ Em Next.js, **`NEXT_PUBLIC_*` vai para o browser**. Chave secreta com esse prefixo é vazamento\n- **O que acontece:** a chave está no bundle. Qualquer visitante extrai e usa no seu crédito\n- **Correção:** mova para variável server-side, revogue a chave exposta e gere outra\n\n**3 · Segredo commitado no repositório**\n- Verifique se `.env`, `.env.local`, `.env.production` estão no `.gitignore`\n- Rode `git log --all --full-history -- .env` — se retornar commit, o segredo está no histórico\n- **O que acontece:** quem clonar o repo tem suas credenciais, mesmo que você apague o arquivo hoje\n- **Correção:** revogue TODAS as chaves expostas. Remover o arquivo não basta — o histórico guarda\n\n**4 · Rota de API sem autenticação**\n- Liste tudo em `app/api/`, `pages/api/`, `routes/`\n- Para cada uma: existe verificação de sessão/token antes da lógica?\n- Atenção especial a rotas que escrevem, deletam ou cobram\n- **O que acontece:** qualquer pessoa chama a rota direto, sem passar pela sua interface\n- **Correção:** verifique sessão no início do handler e retorne 401 quando não houver\n\n---\n\n#### 🟠 ALTO — corrija antes de produção\n\n**5 · CORS liberado para qualquer origem**\n- Procure `Access-Control-Allow-Origin: *` ou `cors()` sem configuração\n- **O que acontece:** qualquer site chama sua API usando a sessão do seu usuário\n\n**6 · Sem rate limit em rota cara**\n- Rotas que chamam LLM, enviam e-mail, processam pagamento ou fazem upload\n- **O que acontece:** um script roda sua fatura de API até o teto em minutos\n\n**7 · Webhook sem verificação de assinatura**\n- Procure handlers de webhook (Stripe, Hotmart, Meta) que não validam o header de assinatura\n- **O que acontece:** qualquer um forja um evento de \"pagamento aprovado\"\n\n**8 · Erro devolvendo stack trace para o usuário**\n- Procure `catch` que retorna `error.message`, `error.stack` ou o objeto inteiro\n- **O que acontece:** você entrega estrutura interna, caminho de arquivo e às vezes credencial\n\n---\n\n#### 🟡 MÉDIO — corrija em breve\n\n**9 · Input do usuário indo direto para query**\n- Concatenação de string em SQL, `$where` em Mongo, template literal em query\n- **Correção:** query parametrizada, sempre\n\n**10 · Upload sem validar tipo e tamanho**\n- Procure handlers de upload sem checagem de MIME e sem limite de bytes\n\n**11 · Headers de segurança ausentes**\n- `Content-Security-Policy`, `X-Frame-Options`, `Strict-Transport-Security`\n- Em Next.js: configure em `next.config.js` → `headers()`\n\n**12 · Dependência com vulnerabilidade conhecida**\n- Rode `npm audit --production` ou `pip-audit`\n- Reporte apenas as de severidade alta ou crítica que tenham correção disponível\n\n---\n\n### PASSO 3 — O laudo\n\nEntregue exatamente neste formato:\n\n```\nLAUDO DE AUDITORIA — <nome do projeto>\nStack: <resumo>\nData: <data>\n\n🔴 CRÍTICO (N)\n  [1] <ponto> — <arquivo>:<linha>\n      O que acontece: <consequência concreta>\n      Correção: <comando ou mudança exata>\n\n🟠 ALTO (N)\n  ...\n\n🟡 MÉDIO (N)\n  ...\n\n✅ PASSOU (N de 12)\n  <lista dos pontos que estão corretos>\n\n────────────────────────────\nDÍVIDA TOTAL: N pontos abertos\nPRÓXIMA AÇÃO: <o item mais crítico, em uma linha>\n```\n\n---\n\n## Regras de execução\n\n- **Nunca invente achado.** Se não encontrar o padrão, marque como PASSOU. Auditoria que inventa\n  problema é pior que auditoria nenhuma\n- **Sempre cite arquivo e linha.** \"Tem chave exposta\" não serve. `src/lib/api.ts:14` serve\n- **Não corrija sozinho.** Esta skill audita e reporta. A correção é decisão de quem opera —\n  algumas mudanças quebram funcionalidade e precisam ser feitas com contexto\n- **Se encontrar segredo exposto, avise imediatamente**, antes de terminar o resto do laudo.\n  Chave vazada é urgência, não item de lista\n- **Não envie nada para fora.** Tudo roda local. Nenhum trecho de código sai da máquina\n\n---\n\n## Depois do laudo\n\nCada ponto aberto é uma dívida com vencimento. Ela não some sozinha e fica mais cara com o tempo:\nsistema com dívida técnica custa em média **300% mais para manter em 18 meses**.\n\nRode de novo depois de corrigir. E rode antes de cada entrega para cliente.\n\n---\n\n*Skill do @redpro.ia · A conta chega.*\n" },
-      { titulo: "Como usar", tipo: "texto", conteudo: "1. Copia o conteúdo acima.\n2. Salva como auditoria-seguranca.md dentro de .claude/skills/ na pasta do teu projeto.\n3. Abre o Claude Code nessa pasta.\n4. Digita /auditoria-seguranca e deixa ela rodar com você." },
+    resumo: "Varre o projeto e encontra o que está exposto: RLS aberto, chave no código, rota sem proteção.",
+    intro:
+      "Sistema que funciona não é sistema seguro. A maioria das falhas que derrubam projeto pequeno são as mesmas cinco ou seis, e todas dá pra achar antes de alguém achar por você. Esta skill faz essa varredura e explica o risco de cada achado em português, sem jargão.",
+    arquivo: "/redreply/skills/auditoria-seguranca.md",
+    comando: "/auditoria-seguranca",
+    secoes: [
+      {
+        titulo: "O que ela procura",
+        texto:
+          "• RLS desligado ou mal configurado no Supabase (o erro nº1 de quem constrói rápido)\n" +
+          "• Chave de API, token e senha no código ou no repositório\n" +
+          "• Rota sem autenticação que devia ter\n" +
+          "• Endpoint caro sem rate limit (qualquer um roda sua cota)\n" +
+          "• Dado sensível em log e em resposta de erro\n" +
+          "• Dependência com CVE conhecido",
+      },
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um relatório por severidade (crítico → baixo), e para cada achado: o arquivo e a linha, o que dá errado na prática, e a correção. Não é lista genérica de boas práticas: é o que está no SEU código.",
+      },
+      {
+        titulo: "Quando rodar",
+        texto:
+          "Antes do primeiro deploy. Antes de colocar dado de cliente. E de novo depois de qualquer mudança grande de arquitetura. Leva alguns minutos e é a diferença entre descobrir você ou descobrir na conta.",
+      },
+      COMO_INSTALAR,
     ],
   },
   {
     slug: "raio-x-custo",
-    titulo: "Skill: Raio-X de Custo",
+    titulo: "Raio-X de Custo",
     categoria: "Skills",
     novo: true,
-    resumo: "Descobre quanto custa manter seu sistema de IA rodando, e onde o dinheiro está vazando, antes da fatura chegar.",
-    intro: "Você sabe quanto custou construir. Sabe quanto custa manter? Esta skill mapeia toda chamada paga, calcula custo por request e por mês, e aponta onde tem desperdício. Copia, salva como .md em .claude/skills/ e roda no teu projeto.",
-    blocos: [
-      { titulo: "A skill completa (copia e salva como .md)", tipo: "codigo", conteudo: "---\nname: raio-x-custo\ndescription: |\n  Calcula quanto custa de verdade manter um sistema de IA rodando. Encontra chamadas de LLM sem\n  teto, retry sem limite, contexto sendo reenviado à toa, e falta de cache. Entrega o custo\n  estimado por request, por usuário e por mês — e onde está o dinheiro vazando.\n  Use quando disser \"quanto custa isso rodando\", \"raio-x de custo\", \"/raio-x-custo\".\n---\n\n# Raio-X de Custo — a fatura que ninguém abriu\n\nVocê sabe quanto custou construir. Sabe quanto custa manter?\n\nA maioria descobre quando a fatura chega. Esta skill descobre antes.\n\n> Isto é **dívida técnica**, não falha: cresce todo mês que ninguém mede. Sistema com dívida\n> técnica custa em média **300% mais para manter em 18 meses**.\n\n---\n\n## Como rodar\n\nDentro da pasta do projeto: `/raio-x-custo`\nOu peça: *\"faz o raio-x de custo desse projeto\"*.\n\n---\n\n## PASSO 1 — Mapear as chamadas pagas\n\nEncontre tudo que custa por uso:\n\n1. **Chamadas de LLM** — procure `anthropic`, `openai`, `messages.create`, `chat.completions`,\n   `generateText`, `streamText`\n2. **Embeddings** — `embeddings.create`, `embed`, `vectorize`\n3. **Storage e banco** — uploads, queries em loop, `SELECT *` em tabela grande\n4. **Serviços de terceiro** — Resend, Twilio, transcrição, geração de imagem\n\nPara cada uma, registre: **arquivo**, **linha**, **modelo/serviço**, e **o que dispara a chamada**\n(request do usuário, cron, webhook, loop).\n\n---\n\n## PASSO 2 — Os 8 pontos onde o dinheiro vaza\n\n#### 🔴 CRÍTICO\n\n**1 · Chamada de LLM sem `max_tokens`**\n- Sem teto, a resposta pode ir até o limite do modelo\n- **Custa:** uma resposta que devia ter 200 tokens pode sair com 4.000. 20x o previsto\n- **Correção:** defina `max_tokens` no valor que a sua UI realmente exibe\n\n**2 · Retry sem limite ou sem backoff**\n- Procure `retry`, `while`, `catch` que refaz a chamada\n- **Custa:** cada tentativa é cobrada como chamada nova. Um erro persistente vira loop pago\n- **Correção:** teto de 3 tentativas, com espera crescente entre elas\n\n**3 · Rota cara sem autenticação e sem rate limit**\n- Rota pública que chama LLM\n- **Custa:** um script roda sua cota até o teto numa madrugada\n- **Correção:** rate limit por IP e, se possível, exigir sessão\n\n#### 🟠 ALTO\n\n**4 · Contexto reenviado inteiro a cada mensagem**\n- Histórico de conversa crescendo sem corte\n- **Custa:** a conversa nº 20 custa 20x a nº 1. O custo cresce dentro da mesma sessão\n- **Correção:** janela deslizante ou resumo do histórico antigo\n\n**5 · Sem cache em pergunta repetida**\n- Mesma pergunta, mesma resposta, cobrada toda vez\n- **Custa:** em FAQ e busca, costuma ser a maior fatia da fatura\n- **Correção:** cache por hash da entrada; prompt caching quando o provedor oferece\n\n**6 · Modelo grande em tarefa pequena**\n- Classificar, extrair campo, decidir sim/não usando o modelo mais caro\n- **Custa:** até 10x o necessário\n- **Correção:** modelo menor na tarefa mecânica; o grande onde há julgamento\n\n#### 🟡 MÉDIO\n\n**7 · Embedding recalculado sem necessidade**\n- Reindexação do corpus inteiro quando só uma parte mudou\n- **Custa:** pouco por vez, muito no acumulado\n- **Correção:** indexe por diferença, não por varredura completa\n\n**8 · Sem registro de consumo**\n- Nenhum log de tokens por request\n- **Custa:** você não descobre o vazamento — descobre a fatura\n- **Correção:** registre `input_tokens` e `output_tokens` por chamada\n\n---\n\n## PASSO 3 — A conta\n\nEstime com os preços vigentes do provedor. Se não tiver acesso a eles, peça ao operador.\n\n```\nRAIO-X DE CUSTO — <projeto>\nData: <data>\n\nCHAMADAS PAGAS ENCONTRADAS: N\n  <arquivo:linha> — <modelo> — disparada por <origem>\n\nCUSTO ESTIMADO\n  Por request:     ~<valor>\n  Por usuário/mês: ~<valor>   (assumindo <N> requests/usuário — confirmar)\n  Total/mês:       ~<valor>   (assumindo <N> usuários — confirmar)\n\nONDE O DINHEIRO VAZA\n  🔴 <ponto> — <arquivo:linha> — desperdício estimado: <valor ou múltiplo>\n  🟠 ...\n\nSE NADA MUDAR\n  Em 6 meses: ~<valor>\n  Em 18 meses: ~<valor>   (referência de mercado: +300%)\n\n────────────────────────────\nMAIOR VAZAMENTO: <o item nº1, em uma linha>\n```\n\n---\n\n## Regras de execução\n\n- **Toda estimativa vem com a premissa declarada.** \"R$400/mês\" sem dizer quantos usuários é\n  chute. \"R$400/mês assumindo 100 usuários × 30 requests\" é estimativa\n- **Não invente preço de modelo.** Se não souber o valor vigente, peça. Número errado aqui é pior\n  que número nenhum\n- **Separe o que é medido do que é estimado.** Se houver log de tokens, use o dado real e diga que\n  é real\n- **Não otimize sozinha.** Esta skill mede e aponta. Trocar modelo ou cortar contexto muda a\n  qualidade da saída, e essa decisão é de quem opera\n\n---\n\n*Skill do @redpro.ia · A conta chega.*\n" },
-      { titulo: "Como usar", tipo: "texto", conteudo: "1. Copia o conteúdo acima.\n2. Salva como raio-x-custo.md dentro de .claude/skills/ na pasta do teu projeto.\n3. Abre o Claude Code nessa pasta.\n4. Digita /raio-x-custo e deixa ela rodar com você." },
+    resumo: "Descobre quanto custa manter seu sistema de IA rodando e onde o dinheiro está vazando, antes da fatura chegar.",
+    intro:
+      "Você sabe quanto custou construir. Sabe quanto custa manter? A maioria descobre quando a fatura chega, porque o custo de IA é agregado: vem tudo somado, sem dizer qual chamada gastou o quê. Esta skill abre esse número.",
+    arquivo: "/redreply/skills/raio-x-custo.md",
+    comando: "/raio-x-custo",
+    secoes: [
+      {
+        titulo: "Os 8 pontos onde o dinheiro vaza",
+        texto:
+          "Chamada de LLM sem teto de tokens · retry sem limite (cada tentativa é cobrada) · rota cara sem rate limit · histórico inteiro reenviado a cada mensagem · falta de cache em pergunta repetida · modelo caro em tarefa mecânica · e mais dois que só aparecem em escala.",
+      },
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Custo estimado por request, por usuário e por mês. E o mapa de onde cortar, com arquivo e linha. O relatório é ordenado pelo que mais pesa, não pelo que é mais fácil de arrumar.",
+      },
+      {
+        titulo: "Por que isso é dívida, não falha",
+        texto:
+          "Custo não medido cresce com o uso. Cada mês sem medir aumenta o buraco, e refatorar contexto num agente com 3 ferramentas é uma tarde; com 30, é uma reescrita.",
+      },
+      COMO_INSTALAR,
     ],
   },
   {
     slug: "teste-de-carga",
-    titulo: "Skill: Teste de Carga",
+    titulo: "Teste de Carga",
     categoria: "Skills",
     novo: true,
     resumo: "Descobre em que ponto seu sistema quebra, antes que ele quebre com cliente dentro.",
-    intro: "Funciona com você testando sozinho. E com 200 pessoas ao mesmo tempo? Esta skill simula carga real e mostra onde está o gargalo. Copia, salva como .md em .claude/skills/ e roda.",
-    blocos: [
-      { titulo: "A skill completa (copia e salva como .md)", tipo: "codigo", conteudo: "---\nname: teste-de-carga\ndescription: |\n  Descobre o que quebra no seu sistema quando o uso dobrar. Procura query sem índice, N+1,\n  operação pesada no request, ausência de fila e de paginação — os pontos que funcionam com\n  10 usuários e travam com 1.000.\n  Use quando disser \"isso aguenta se crescer\", \"teste de carga\", \"/teste-de-carga\".\n---\n\n# Teste de Carga — funciona hoje, e amanhã?\n\nTodo sistema funciona com um usuário. A pergunta é o que acontece na segunda-feira de manhã,\nquando chegam todos de uma vez.\n\n> Isto é **dívida técnica**: o custo de refazer sobe a cada feature nova construída em cima.\n> De ~10.000 startups que subiram app feito com IA, **mais de 8.000 precisaram de resgate ou\n> reconstrução** — a conta entre US$50k e US$500k.\n\n---\n\n## Como rodar\n\nDentro da pasta do projeto: `/teste-de-carga`\nOu peça: *\"testa se esse projeto aguenta crescer\"*.\n\n---\n\n## PASSO 1 — Mapear os caminhos quentes\n\nIdentifique o que roda com mais frequência:\n1. Rotas chamadas em toda navegação\n2. Queries executadas no carregamento de página\n3. Operações disparadas por webhook\n4. Jobs de cron\n\nSem isso, você otimiza o que ninguém usa.\n\n---\n\n## PASSO 2 — Os 10 pontos que quebram na escala\n\n#### 🔴 CRÍTICO\n\n**1 · Query sem índice em coluna de filtro**\n- Procure `WHERE`, `.eq()`, `.filter()` em colunas sem índice declarado nas migrations\n- **Quebra assim:** 100 registros = 5ms. 100.000 = 4s. O banco varre a tabela inteira toda vez\n- **Correção:** `CREATE INDEX ON <tabela>(<coluna>);` nas colunas usadas em filtro e ordenação\n\n**2 · N+1 — query dentro de loop**\n- Procure `for`, `map`, `forEach` com `await` de banco lá dentro\n- **Quebra assim:** listar 50 itens dispara 51 queries. Com 500, são 501\n- **Correção:** uma query com `IN` ou `join`, não uma por item\n\n**3 · Sem paginação**\n- Procure `SELECT *`, `.select()` sem `.limit()` ou `.range()`\n- **Quebra assim:** funciona até a tabela crescer; aí o payload estoura a memória\n- **Correção:** limite obrigatório, com cursor ou offset\n\n#### 🟠 ALTO\n\n**4 · Operação pesada dentro do request**\n- Envio de e-mail, geração de PDF, chamada de LLM, upload — tudo antes de responder\n- **Quebra assim:** o usuário espera; sob concorrência, os requests empilham e estouram timeout\n- **Correção:** responda primeiro, processe depois (fila ou background)\n\n**5 · Sem fila para trabalho assíncrono**\n- Webhook que processa tudo de forma síncrona\n- **Quebra assim:** um pico de eventos derruba o endpoint e você perde evento sem saber\n- **Correção:** receba, grave, responda 200, processe fora do request\n\n**6 · Conexão de banco criada por request**\n- `new Client()` dentro do handler\n- **Quebra assim:** em serverless o pool esgota rápido e as conexões passam a ser recusadas\n- **Correção:** use pooler (Supabase porta 6543, modo transaction) e reaproveite a conexão\n\n**7 · Sem timeout em chamada externa**\n- `fetch` sem `AbortSignal.timeout()`\n- **Quebra assim:** o terceiro fica lento e o seu sistema trava junto\n\n#### 🟡 MÉDIO\n\n**8 · Sem cache no que muda pouco**\n- Configuração, catálogo, dado calculado — recalculados a cada request\n\n**9 · Arquivo servido pela aplicação**\n- Imagem ou PDF passando pelo runtime em vez de CDN\n\n**10 · Log de tudo em produção**\n- `console.log` em caminho quente: custa I/O e enche o storage de log\n\n---\n\n## PASSO 3 — O laudo\n\n```\nTESTE DE CARGA — <projeto>\nData: <data>\n\nCAMINHOS QUENTES: N identificados\n  <rota/query> — chamada em <contexto>\n\n🔴 QUEBRA PRIMEIRO (N)\n  [1] <ponto> — <arquivo:linha>\n      Hoje: <comportamento atual>\n      Com 10x o uso: <o que acontece>\n      Correção: <ação exata>\n\n🟠 QUEBRA DEPOIS (N)\n🟡 DEGRADA (N)\n\n✅ AGUENTA (N de 10)\n\n────────────────────────────\nPONTO DE RUPTURA ESTIMADO: ~<N> usuários simultâneos\nPRIMEIRO A QUEBRAR: <item, em uma linha>\n```\n\n---\n\n## Regras de execução\n\n- **Estimativa de ruptura vem com premissa declarada.** Se não der para estimar com o que está\n  no código, diga que não dá e explique o que faltou medir\n- **Não confunda lento com quebrado.** Query de 200ms é lenta; query que varre 1M de linhas em\n  cada request é quebra iminente. Separe os dois\n- **Não refatore sozinha.** Aponte. Mudar arquitetura sob suposição de crescimento que não veio\n  também é desperdício\n- **Se não houver caminho quente identificável** (projeto muito novo, sem tráfego), diga isso e\n  aponte só os pontos estruturais\n\n---\n\n*Skill do @redpro.ia · A conta chega.*\n" },
-      { titulo: "Como usar", tipo: "texto", conteudo: "1. Copia o conteúdo acima.\n2. Salva como teste-de-carga.md dentro de .claude/skills/ na pasta do teu projeto.\n3. Abre o Claude Code nessa pasta.\n4. Digita /teste-de-carga e deixa ela rodar com você." },
+    intro:
+      "Funciona com você testando sozinho. E com 200 pessoas ao mesmo tempo? A resposta quase nunca é 'escala igual' — tem sempre um ponto que cede primeiro, e ele raramente é o que você imagina.",
+    arquivo: "/redreply/skills/teste-de-carga.md",
+    comando: "/teste-de-carga",
+    secoes: [
+      {
+        titulo: "O que ela testa",
+        texto:
+          "Simula carga real crescente e observa onde a curva quebra: conexões do banco, timeout de chamada externa, memória, fila que não drena, e limite de rate da API que você consome.",
+      },
+      {
+        titulo: "O que você recebe",
+        texto:
+          "O número de usuários simultâneos que o sistema aguenta hoje, qual componente cede primeiro, e o que fazer para subir esse teto. Com o gargalo apontado no código, não em tese.",
+      },
+      {
+        titulo: "Quando rodar",
+        texto:
+          "Antes de qualquer divulgação grande: lançamento, live, campanha de tráfego. Descobrir o teto na véspera é bem mais barato que descobrir durante.",
+      },
+      COMO_INSTALAR,
     ],
   },
   {
     slug: "mapa-do-sistema",
-    titulo: "Skill: Mapa do Sistema",
+    titulo: "Mapa do Sistema",
     categoria: "Skills",
     novo: true,
-    resumo: "Gera o mapa completo do que você construiu: o que conversa com o quê, o que depende de quê, onde estão os pontos únicos de falha.",
-    intro: "Sistema que você não consegue explicar é sistema que você não controla. Esta skill lê o projeto inteiro e devolve o desenho real de como as peças se conectam. Copia, salva como .md em .claude/skills/ e roda.",
-    blocos: [
-      { titulo: "A skill completa (copia e salva como .md)", tipo: "codigo", conteudo: "---\nname: mapa-do-sistema\ndescription: |\n  Lê um projeto inteiro e explica o que cada parte faz, em português, para quem não escreveu o\n  código. Entrega um mapa: por onde entra a requisição, onde o dado é gravado, o que depende do\n  quê, e o que quebra se você mexer em cada peça.\n  Use quando disser \"explica esse projeto\", \"mapa do sistema\", \"/mapa-do-sistema\",\n  ou quando pegar um projeto que a IA construiu e você não sabe o que tem dentro.\n---\n\n# Mapa do Sistema — o que você tem nas mãos\n\nVocê pediu. Ela construiu. Funciona.\n\nSe alguém perguntar como funciona por dentro, você responde ou muda de assunto?\n\n> Isto é **dívida técnica**: cada semana que o sistema roda sem você entender, ele fica mais caro\n> de decifrar. A IA pode fazer no seu lugar. Ela só não pode saber no seu lugar.\n\n---\n\n## Como rodar\n\nDentro da pasta do projeto: `/mapa-do-sistema`\nOu peça: *\"faz o mapa desse sistema pra mim\"*.\n\n---\n\n## PASSO 1 — O que é isto\n\nAntes de detalhar, responda em quatro linhas:\n1. **O que este sistema faz** — em uma frase, sem jargão\n2. **Quem usa** — usuário final, admin, outro sistema\n3. **Onde roda** — Vercel, VPS, local\n4. **Do que depende para funcionar** — banco, APIs de terceiro, serviços pagos\n\nSe alguma dessas não for respondível pelo código, diga qual e por quê.\n\n---\n\n## PASSO 2 — Os caminhos\n\n### 2.1 Por onde entra\nListe cada porta de entrada:\n- Páginas que o usuário abre\n- Rotas de API — quem chama cada uma\n- Webhooks — quem dispara\n- Jobs agendados — com que frequência\n\nPara cada uma: `<caminho> — <o que faz, em português> — <quem aciona>`\n\n### 2.2 Onde o dado mora\n- Tabelas existentes e o que cada uma guarda\n- Quais são lidas pelo browser (risco) e quais só pelo servidor\n- O que é gravado em arquivo, cache ou serviço externo\n\n### 2.3 O que depende do quê\nMonte a cadeia de dependência das partes principais:\n```\n<parte A> ──precisa de──> <parte B> ──precisa de──> <serviço externo>\n```\nMarque onde uma queda derruba o resto.\n\n---\n\n## PASSO 3 — O que quebra se você mexer\n\nPara cada peça principal, responda:\n- **Se eu apagar isto, o que para de funcionar?**\n- **Se este serviço externo cair, o sistema continua de pé?**\n- **Se eu mudar isto, o que mais precisa mudar junto?**\n\nEsta seção é a mais útil do mapa. É o que separa \"eu tenho um sistema\" de \"eu sei o que tenho\".\n\n---\n\n## PASSO 4 — O que não dá para saber pelo código\n\nListe honestamente:\n- Variáveis de ambiente usadas mas cujo valor você não vê\n- Serviços chamados sem documentação no repositório\n- Decisões que só quem escreveu saberia explicar\n- Partes que parecem mortas — código que nada chama\n\n> Código morto é dívida silenciosa: ninguém sabe se pode apagar, então fica.\n\n---\n\n## PASSO 5 — O mapa\n\n```\nMAPA DO SISTEMA — <projeto>\nData: <data>\n\nO QUE É\n  Faz: <uma frase>\n  Usa: <quem>\n  Roda em: <onde>\n  Depende de: <lista>\n\nENTRADAS (N)\n  <caminho> — <o que faz> — <quem aciona>\n\nDADOS\n  <tabela> — <o que guarda> — <lido por: browser | servidor>\n\nCADEIA DE DEPENDÊNCIA\n  <diagrama simples>\n\nO QUE QUEBRA SE MEXER\n  <peça> → derruba <o quê>\n\nNÃO DÁ PRA SABER PELO CÓDIGO (N)\n  <item> — <por que não dá>\n\nCÓDIGO POSSIVELMENTE MORTO (N)\n  <arquivo> — nada parece chamar\n\n────────────────────────────\nPARTE MAIS CRÍTICA: <a que derruba mais coisa se cair>\nMAIOR ZONA CEGA: <o que ninguém consegue explicar>\n```\n\n---\n\n## Regras de execução\n\n- **Escreva para quem não programa.** \"Middleware de autenticação\" não serve; \"o porteiro que\n  confere se você está logado antes de deixar passar\" serve\n- **Não invente propósito.** Se um arquivo não deixa claro o que faz, diga que não deixa. Mapa\n  com invenção é pior que mapa incompleto\n- **Marque o que é suposição.** \"Provavelmente serve para X\" é aceitável se vier marcado\n- **Não reorganize o projeto.** Esta skill lê e explica. Mover arquivo é outra conversa\n- **Em projeto grande, comece pelo caminho principal** — a jornada mais comum do usuário — e\n  diga o que ficou de fora\n\n---\n\n*Skill do @redpro.ia · A conta chega.*\n" },
-      { titulo: "Como usar", tipo: "texto", conteudo: "1. Copia o conteúdo acima.\n2. Salva como mapa-do-sistema.md dentro de .claude/skills/ na pasta do teu projeto.\n3. Abre o Claude Code nessa pasta.\n4. Digita /mapa-do-sistema e deixa ela rodar com você." },
+    resumo: "Gera o desenho real do que você construiu: o que conversa com o quê e onde estão os pontos únicos de falha.",
+    intro:
+      "Sistema que você não consegue explicar é sistema que você não controla. Depois de umas semanas construindo rápido, ninguém lembra de tudo que está conectado com tudo. Esta skill lê o projeto inteiro e devolve o mapa.",
+    arquivo: "/redreply/skills/mapa-do-sistema.md",
+    comando: "/mapa-do-sistema",
+    secoes: [
+      {
+        titulo: "O que ela mapeia",
+        texto:
+          "Todos os serviços e integrações · o que depende do quê · fluxo de dado do início ao fim · onde estão os pontos únicos de falha (se isso cair, o que para junto) · e o que está no sistema mas ninguém usa mais.",
+      },
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um documento navegável com o desenho da arquitetura real (não a que você planejou), a lista de dependências críticas, e os pontos que derrubam mais de uma coisa se falharem.",
+      },
+      {
+        titulo: "Pra que serve na prática",
+        texto:
+          "Explicar seu sistema para outra pessoa. Decidir onde mexer sem quebrar o resto. E ter clareza do que existe antes de escalar em cima.",
+      },
+      COMO_INSTALAR,
     ],
   },
   {
     slug: "checklist-deploy",
-    titulo: "Skill: Checklist de Deploy",
+    titulo: "Checklist de Deploy",
     categoria: "Skills",
     novo: true,
-    resumo: "A verificação que evita o deploy que quebra em produção. Roda antes de subir, não depois de apanhar.",
-    intro: "Subir pra produção sem checklist é apostar. Esta skill roda a verificação completa antes do deploy e te diz o que ainda não está pronto. Copia, salva como .md em .claude/skills/ e roda.",
-    blocos: [
-      { titulo: "A skill completa (copia e salva como .md)", tipo: "codigo", conteudo: "---\nname: checklist-deploy\ndescription: |\n  Roda a verificação final antes de entregar um sistema para cliente. Confere o que acontece\n  quando dá errado: erro tratado, log, backup, monitoramento, rollback, variáveis de ambiente.\n  Os pontos que ninguém checa porque o sistema \"está funcionando\".\n  Use quando disser \"vou entregar pro cliente\", \"checklist de deploy\", \"/checklist-deploy\".\n---\n\n# Checklist de Deploy — antes de colocar o nome na conta\n\nA IA construiu. Você vai assinar embaixo.\n\nQuando aquilo cair com cliente dentro, ninguém vai perguntar qual modelo você usou.\n\n---\n\n## Como rodar\n\nDentro da pasta do projeto: `/checklist-deploy`\nOu peça: *\"roda o checklist antes de eu entregar isso\"*.\n\n---\n\n## PASSO 1 — Onde isso vai rodar\n\nAntes de verificar, entenda o destino:\n1. **Ambiente** — Vercel, VPS, container, on-premise do cliente\n2. **Quem opera depois** — você, o cliente, ninguém\n3. **O que acontece se cair às 3h da manhã** — alguém é avisado?\n\nA terceira pergunta define metade deste checklist.\n\n---\n\n## PASSO 2 — Os 12 pontos\n\n#### 🔴 BLOQUEIA A ENTREGA\n\n**1 · Erro sem tratamento em caminho crítico**\n- `await` sem `try/catch` em pagamento, gravação, envio\n- **Se ninguém arrumar:** o usuário vê tela branca e você descobre por reclamação\n\n**2 · Erro devolvendo detalhe interno**\n- `catch` que retorna `error.message`, `error.stack` ou o objeto cru\n- **Se ninguém arrumar:** você entrega caminho de arquivo, estrutura e às vezes credencial\n\n**3 · Sem backup do banco**\n- Verifique se há rotina de backup e se alguém já testou restaurar\n- **Se ninguém arrumar:** backup que nunca foi restaurado não é backup, é esperança\n\n**4 · Variável de ambiente faltando em produção**\n- Compare o que o código usa (`process.env.X`) com o que está declarado\n- **Se ninguém arrumar:** funciona local, quebra no deploy — geralmente na frente do cliente\n\n#### 🟠 CORRIJA ANTES\n\n**5 · Sem log estruturado**\n- `console.log` solto não serve para investigar incidente\n- **Se ninguém arrumar:** o sistema cai e você não sabe por onde começar a olhar\n\n**6 · Sem monitoramento ou alerta**\n- Nenhum health check, nenhum aviso de erro\n- **Se ninguém arrumar:** você descobre pela mensagem do cliente\n\n**7 · Sem plano de rollback**\n- Dá para voltar à versão anterior rápido?\n- **Se ninguém arrumar:** deploy ruim vira madrugada de conserto\n\n**8 · Migration sem caminho de volta**\n- Alteração de schema sem `DOWN` e sem backup prévio\n- **Se ninguém arrumar:** migration errada em produção não desfaz sozinha\n\n**9 · Dependência de serviço externo sem plano B**\n- O que acontece se a API de terceiro ficar fora?\n- **Se ninguém arrumar:** a queda dele vira a sua queda\n\n#### 🟡 VERIFIQUE\n\n**10 · Sem página de erro própria**\n- 404 e 500 mostrando tela padrão do framework\n\n**11 · Timezone e formato de data**\n- Servidor em UTC, cliente esperando horário local\n\n**12 · Documentação mínima de operação**\n- Como subir, como reiniciar, onde estão os logs, quem chamar\n- Se quem opera depois não é você, isto deixa de ser opcional\n\n---\n\n## PASSO 3 — O laudo\n\n```\nCHECKLIST DE DEPLOY — <projeto>\nDestino: <ambiente> · Opera depois: <quem>\nData: <data>\n\n🔴 BLOQUEIA (N)\n  [1] <ponto> — <arquivo:linha ou \"ausente\">\n      Se ninguém arrumar: <consequência>\n      Correção: <ação>\n\n🟠 CORRIGIR ANTES (N)\n🟡 VERIFICAR (N)\n\n✅ PRONTO (N de 12)\n\n────────────────────────────\nVEREDITO: <PODE ENTREGAR | NÃO ENTREGUE AINDA>\nSE CAIR ÀS 3H: <o que acontece hoje, em uma linha>\n```\n\n---\n\n## Regras de execução\n\n- **O veredito é binário.** Qualquer 🔴 aberto = NÃO ENTREGUE AINDA. Sem \"quase pronto\"\n- **Ausência é achado.** Não encontrar rotina de backup não é \"passou\" — é 🔴, e o laudo deve\n  dizer \"ausente\", não ficar em silêncio\n- **A pergunta das 3h é obrigatória.** Se a resposta for \"ninguém fica sabendo\", isso vai no\n  laudo com todas as letras\n- **Não configure nada sozinha.** Esta skill verifica. Configurar monitoramento e backup envolve\n  credencial e custo — decisão de quem opera\n\n---\n\n*Skill do @redpro.ia · A conta chega.*\n" },
-      { titulo: "Como usar", tipo: "texto", conteudo: "1. Copia o conteúdo acima.\n2. Salva como checklist-deploy.md dentro de .claude/skills/ na pasta do teu projeto.\n3. Abre o Claude Code nessa pasta.\n4. Digita /checklist-deploy e deixa ela rodar com você." },
+    resumo: "A verificação que roda antes de subir, não depois de apanhar.",
+    intro:
+      "Subir para produção sem checklist é apostar. Não porque você é descuidado, mas porque a lista do que conferir cresce junto com o sistema e ninguém guarda tudo de cabeça. Esta skill roda a verificação completa antes do deploy.",
+    arquivo: "/redreply/skills/checklist-deploy.md",
+    comando: "/checklist-deploy",
+    secoes: [
+      {
+        titulo: "O que ela confere",
+        texto:
+          "Variáveis de ambiente que faltam em produção · migration não aplicada · build que passa local mas quebra no CI · segredo commitado sem querer · rota nova sem proteção · e o que mudou desde o último deploy que merece atenção.",
+      },
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um veredito: pronto ou não pronto. E se não, exatamente o que falta, em ordem. Sem 'talvez seja bom verificar' — ou está resolvido ou não está.",
+      },
+      {
+        titulo: "Quando rodar",
+        texto: "Toda vez, antes de todo deploy em produção. Leva menos tempo que reverter um deploy quebrado.",
+      },
+      COMO_INSTALAR,
     ],
   },
   {
     slug: "caveman-mode",
     titulo: "Caveman Mode",
-    categoria: "Prompts",
-    resumo: "O modo de escrever prompt que corta a enrolação e faz a IA ir direto ao ponto.",
-    intro: "O modo de escrever prompt que corta a enrolação e faz a IA ir direto ao ponto. Abre a versão completa no link abaixo.",
-    blocos: [
-      { titulo: "Abrir o guia completo", tipo: "texto", conteudo: "https://redpro.com.br/guias/caveman-mode" },
-    ],
-  },
-  {
-    slug: "custom-instructions",
-    titulo: "Custom Instructions",
-    categoria: "Prompts",
-    resumo: "As instruções personalizadas que fazem a IA parar de responder igual pra todo mundo.",
-    intro: "As instruções personalizadas que fazem a IA parar de responder igual pra todo mundo. Abre a versão completa no link abaixo.",
-    blocos: [
-      { titulo: "Abrir o guia completo", tipo: "texto", conteudo: "https://redpro.com.br/guias/custom-instructions" },
+    categoria: "Guias",
+    resumo: "O ajuste de instrução que faz a IA parar de responder bonito e passar a responder direto.",
+    intro:
+      "A IA responde no registro em que você escreve. Prompt cheio de rodeio devolve resposta cheia de rodeio. Caveman Mode é um bloco de instrução que corta advérbio, adjetivo de venda e oferta de ajuda no final.",
+    arquivo: "/redreply/skills/caveman-mode.md",
+    secoes: [
+      {
+        titulo: "O que muda",
+        texto:
+          "Antes: 'Ótima pergunta! Basicamente, o que acontece é que o sistema funciona de uma maneira bastante interessante. Deixa eu te explicar...'\n\n" +
+          "Depois: 'O cache guarda a resposta pela hash da entrada. Entrada idêntica não vai pro modelo de novo.'",
+      },
+      {
+        titulo: "Por que funciona",
+        texto:
+          "Instrução vaga ('seja objetivo') não muda nada, porque 'objetivo' é subjetivo para o modelo. O bloco funciona porque nomeia o que cortar, item por item — vira regra verificável em vez de qualidade abstrata.",
+      },
+      {
+        titulo: "Onde colar",
+        texto:
+          "Custom Instructions no ChatGPT, CLAUDE.md no Claude Code, ou no começo da conversa. Funciona em qualquer modelo.",
+      },
     ],
   },
   {
     slug: "migrar-chatgpt-claude",
     titulo: "Migrar do ChatGPT pro Claude",
     categoria: "Guias",
-    resumo: "O que muda, o que você ganha e como levar seu setup sem recomeçar do zero.",
-    intro: "O que muda, o que você ganha e como levar seu setup sem recomeçar do zero. Abre a versão completa no link abaixo.",
-    blocos: [
-      { titulo: "Abrir o guia completo", tipo: "texto", conteudo: "https://redpro.com.br/guias/migrar-chatgpt-claude" },
-    ],
-  },
-  {
-    slug: "prompts-claude-cowork",
-    titulo: "Prompts Claude Cowork",
-    categoria: "Prompts",
-    resumo: "Prompts prontos pra usar o Claude como parceiro de trabalho, não como buscador.",
-    intro: "Prompts prontos pra usar o Claude como parceiro de trabalho, não como buscador. Abre a versão completa no link abaixo.",
-    blocos: [
-      { titulo: "Abrir o guia completo", tipo: "texto", conteudo: "https://redpro.com.br/guias/prompts-claude-cowork" },
-    ],
-  },
-  {
-    slug: "agente-sdr-nexseven",
-    titulo: "Agente SDR (NexSeven)",
-    categoria: "Agentes",
-    resumo: "O agente de pré-venda que qualifica lead sozinho, montado num caso real.",
-    intro: "O agente de pré-venda que qualifica lead sozinho, montado num caso real. Abre a versão completa no link abaixo.",
-    blocos: [
-      { titulo: "Abrir o guia completo", tipo: "texto", conteudo: "https://redpro.com.br/guias/dica-02-agente-sdr-nexseven" },
-    ],
-  },
-  {
-    slug: "auditoria-reversibilidade",
-    titulo: "Skill: Auditoria de Reversibilidade",
-    categoria: "Skills",
-    novo: true,
-    resumo: "Lista toda ação que seus agentes executam, classifica por reversibilidade, e mostra quais estão rodando sem verificação nenhuma.",
-    intro: "Seu agente funciona. A pergunta é outra: quando ele erra, você consegue desfazer? Esta skill mapeia toda ação que seus agentes executam, separa o que é reversível do que não é, e aponta onde você está exposto agora. Copia o conteúdo abaixo, salva como .md em .claude/skills/ do teu projeto, e roda.",
-    blocos: [
-      { titulo: "A skill completa (copia e salva como .md)", tipo: "codigo", conteudo: "---\nname: auditoria-reversibilidade\ndescription: |\n  Mapeia toda ação que seus agentes executam, classifica cada uma por reversibilidade, e mostra\n  quais estão rodando sem nenhuma verificação. Aplica o critério que separa demo de operação:\n  ação reversível o agente faz sozinho, ação irreversível nunca sem segundo par de olhos.\n  Use quando disser \"audita meus agentes\", \"o que roda sem verificação\", \"/auditoria-reversibilidade\".\n---\n\n# Auditoria de Reversibilidade — o que seus agentes fazem sem ninguém conferir\n\nSeu agente funciona. A pergunta é outra: quando ele erra, você consegue desfazer?\n\nUm agente que verifica o próprio trabalho carrega o mesmo viés que produziu o erro. Ele já\ndecidiu que aquilo estava certo quando escreveu. Pedir para ele revisar é pedir para ele\nconcordar consigo mesmo.\n\n> Isto é **dívida técnica**, não falha: cada semana que passa, mais ações irreversíveis entram\n> no sistema sem verificação, e mais caro fica separar o que precisa de gate do que não precisa.\n\n---\n\n## Como rodar\n\nDentro da pasta do projeto: `/auditoria-reversibilidade`\nOu peça: *\"audita a reversibilidade das ações dos meus agentes\"*.\n\n---\n\n## PASSO 1 — Mapear toda ação que o agente executa\n\nEncontre tudo que o agente faz além de gerar texto. Procure por:\n\n1. **Escrita em banco** — `INSERT`, `UPDATE`, `DELETE`, `upsert`, `.save()`, migrations\n2. **Chamadas externas que mudam estado** — `POST`, `PUT`, `PATCH`, `DELETE` para qualquer API\n3. **Comunicação com terceiros** — envio de e-mail, WhatsApp, SMS, DM, push\n4. **Dinheiro** — cobrança, reembolso, alteração de plano, emissão de nota\n5. **Arquivos** — escrever, sobrescrever, apagar, mover, upload\n6. **Deploy e infra** — push, merge, deploy, restart, alteração de env var\n7. **Permissão e acesso** — criar usuário, mudar role, revogar acesso\n\nPara cada uma registre: **arquivo**, **linha**, **o que a ação faz**, **quem dispara**\n(usuário, cron, webhook, outro agente) e **se existe alguma verificação antes**.\n\nIgnore leitura pura (`SELECT`, `GET`, ler arquivo). Ler não quebra nada.\n\n---\n\n## PASSO 2 — Classificar cada ação\n\nA pergunta que resolve é uma só: **esse erro você consegue desfazer?**\n\n### 🟢 REVERSÍVEL — o agente roda sozinho\nDá para voltar atrás sem custo relevante e sem ninguém de fora perceber.\n\n- Escrever rascunho, criar registro interno, gerar arquivo em pasta temporária\n- Alterar dado que só a sua equipe vê\n- Qualquer coisa com histórico/versionamento que permita rollback\n\n**Critério:** se der errado, você corrige em minutos e ninguém além de você soube.\n\n### 🟠 REVERSÍVEL COM CUSTO — precisa de log, não de gate\nDá para desfazer, mas alguém já viu ou já custou algo.\n\n- Alterar dado de produção que aparece na tela do cliente\n- Chamada paga a API externa (o dinheiro já saiu, mesmo desfazendo)\n- Mudar configuração que afeta outros processos\n\n**Critério:** dá para voltar, mas o estrago já aconteceu em algum grau. Exige log auditável\npara você saber o que mudou e quando.\n\n### 🔴 IRREVERSÍVEL — nunca sem segundo par de olhos\nDepois que acontece, não tem volta.\n\n- **Comunicação enviada** — e-mail, WhatsApp, DM, push. Mensagem entregue não se apaga\n- **Dinheiro movimentado** — cobrança, reembolso, transferência\n- **Dado de cliente exposto ou apagado** — vazamento, delete sem soft-delete\n- **Deploy em produção** — inclusive rollback demora e o usuário já viu\n- **Ação com terceiro** — postar publicamente, alterar dado em sistema de outro\n- **Permissão concedida** — o acesso já foi usado antes de você revogar\n\n**Critério:** se der errado, você não desfaz. Você gerencia a consequência.\n\n---\n\n## PASSO 3 — Cruzar com o que existe de verificação\n\nPara cada ação irreversível encontrada, responda:\n\n☐ Tem aprovação humana antes de executar?\n☐ Tem um segundo agente conferindo, **com contexto separado** do que executou?\n☐ Tem limite de escopo (quantidade, valor, destinatário) que impede estrago em massa?\n☐ Tem log do que foi feito, com o suficiente para reconstruir a decisão?\n☐ Tem modo de simulação (dry-run) para testar sem executar de verdade?\n\n**Ação irreversível sem nenhum desses cinco é exposição direta.**\n\n---\n\n## PASSO 4 — O relatório\n\nEntregue assim:\n\n```\nAÇÕES MAPEADAS: [n]\n  🟢 Reversíveis: [n]\n  🟠 Reversíveis com custo: [n]\n  🔴 Irreversíveis: [n]\n\n🔴 IRREVERSÍVEL SEM VERIFICAÇÃO — [n] ação(ões)\n   [arquivo:linha] — [o que faz] — disparado por [quem]\n   Consequência se errar: [concreta, não genérica]\n   Correção sugerida: [gate humano / agente verificador / limite de escopo]\n\n🟠 REVERSÍVEL COM CUSTO E SEM LOG — [n]\n   [...]\n\n🟢 OK — reversíveis, podem rodar sozinhas\n   [...]\n```\n\nOrdene pelo que dói mais: irreversível sem verificação primeiro.\n\n---\n\n## A regra que fecha\n\nVerificar custa. Dobra a chamada, dobra o token, e parece desperdício enquanto tudo funciona.\nPor isso quase todo mundo corta essa etapa.\n\nAté o dia em que o agente aprova o próprio erro e ninguém percebe por semanas.\n\n**O agente que executa nunca deve ser o mesmo que verifica.** Se for o mesmo, não é verificação.\nÉ confirmação.\n" },
-      { titulo: "Como usar", tipo: "texto", conteudo: "1. Copia o conteúdo acima.\n2. Salva como auditoria-reversibilidade.md dentro de .claude/skills/ na pasta do teu projeto.\n3. Abre o Claude Code nessa pasta.\n4. Digita /auditoria-reversibilidade e deixa ela rodar com você." },
+    resumo: "O que muda de verdade, o que levar junto e o que fazer diferente, sem recomeçar do zero.",
+    intro:
+      "Quem migra costuma repetir o mesmo erro: usar o Claude como se fosse ChatGPT com outro nome. Funciona, mas você perde o que ele faz melhor. Este guia é sobre o que muda de verdade, não sobre qual é melhor.",
+    arquivo: "/redreply/skills/migrar-chatgpt-claude.md",
+    secoes: [
+      {
+        titulo: "O que você leva junto",
+        texto:
+          "Suas Custom Instructions (com ajuste: o Claude segue regra nomeada com mais rigor que regra vaga) e o hábito de dar contexto. O resto muda.",
+      },
+      {
+        titulo: "O que muda de verdade",
+        texto:
+          "Conversa infinita vira Projects (contexto fixo que vale para todas as conversas dentro dele). Colar o documento rende mais que descrever o documento. E se você programa, o Claude Code lê os arquivos de verdade em vez de você colar trecho por trecho.",
+      },
+      {
+        titulo: "O que você vai sentir falta",
+        texto:
+          "Geração de imagem nativa (não tem) e o ecossistema de GPTs prontos (o equivalente exige montar o seu). Vale saber antes de migrar.",
+      },
     ],
   },
 ];
 
-export const getResource = (slug: string) => RESOURCES.find((r) => r.slug === slug);
+export function getResource(slug: string): Resource | undefined {
+  return RESOURCES.find((r) => r.slug === slug);
+}

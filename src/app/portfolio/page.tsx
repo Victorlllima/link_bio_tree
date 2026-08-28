@@ -34,7 +34,7 @@ const PROJECTS = [
         name: "Enterprise P&D — Agent Swarm",
         tagline: "10 agentes autônomos rodando 24/7 em infraestrutura dedicada",
         description: "10 agentes autônomos rodando 24/7: pesquisa, geração de conteúdo, SEO e análise estratégica em paralelo. A infraestrutura de inteligência que a RedPro AI Academy usa internamente para se manter na frente.",
-        stack: ["Next.js 14", "Convex Cloud", "Claude Sonnet/Haiku", "Ollama", "Tailscale", "Hetzner VPS"],
+        stack: ["Next.js 14", "Convex Cloud", "Claude Sonnet/Haiku", "Ollama", "Hetzner VPS"],
         category: "P&D — RedPro AI Academy",
         color: "from-purple-500 to-violet-500",
         accent: "#a855f7",
