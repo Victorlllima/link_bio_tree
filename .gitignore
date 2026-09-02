@@ -46,3 +46,16 @@ next-env.d.ts
 .vault-context
 .shark/
 .env.lpsg.tmp
+crop.cjs
+crop2.cjs
+s2.cjs
+shot1.cjs
+shot5.cjs
+shotall.cjs
+shotf.cjs
+shotv.cjs
+preview-5-prompts-claude.html
+tmp/
+.vscode/
+src/components/hermes-week/*.bak
+*.tsx.bak
