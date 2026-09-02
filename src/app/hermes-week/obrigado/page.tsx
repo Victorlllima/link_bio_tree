@@ -22,7 +22,7 @@ import type { Metadata } from "next";
 // ⚠️ TROCAR A CADA CICLO. Enquanto o grupo da Hermes Week não existir, aponta
 // para o do ciclo anterior seria pior que não apontar: o comprador cairia num
 // grupo de outro produto. Por isso o fallback é o suporte.
-const GRUPO_URL = "";
+const GRUPO_URL = "https://chat.whatsapp.com/F3fKDtOH98MBbgkSroDt2G";
 const SUPORTE = "suporte@redpro.com.br";
 
 export const metadata: Metadata = {
