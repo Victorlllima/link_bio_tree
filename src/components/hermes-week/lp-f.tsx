@@ -341,6 +341,118 @@ const CSS = `
   .f-dica i{animation:none;}
   .f-ov{transition:none;}
 }
+
+/* ============ CELULAR · O FILME VIRA SEQUÊNCIA DE MOMENTOS ==================
+   Abaixo de 900px o scrub não roda (o gate no JS corta antes de baixar quadro),
+   e o desenho de desktop não sobrevive à queda: as cenas eram 100svh com a
+   imagem em cover por baixo do texto, e isso no telefone dá dois problemas
+   medidos em 02/09, em 390x844:
+
+     1. CORREDOR VAZIO. A trilha guardava 4.220px de altura só pra dar percurso
+        ao canvas. Sem canvas, são 5 telas de rolagem em cima de nada.
+     2. ENQUADRAMENTO. As cenas são 1920x1080 e foram compostas em 16:9, com a
+        informação nas laterais. Em cover num viewport de 375 de largura sobra
+        25% do quadro: 563px cortados de cada lado. O que resta é uma tira do
+        meio que não conta a cena.
+
+   O desenho daqui não é o de desktop encolhido. É o formato que o público do
+   Red já consome no telefone: imagem, hora, uma frase. A imagem ganha uma
+   caixa 3:2, que preserva 84% da largura do quadro (contra 25%) sem esticar
+   nada, e o texto desce pra baixo dela em vez de ficar por cima. Cena fica em
+   torno de 60vh, então a de baixo aparece na borda e convida a rolar. */
+@media(max-width:900px){
+  /* a trilha não reserva mais altura de canvas: o height inline só entra no
+     modo cinema, e aqui ele nunca liga */
+  .f-cena{
+    min-height:0;display:block;padding:0 0 34px;overflow:visible;
+  }
+  /* o véu de gradiente existia pra dar leitura ao texto POR CIMA da foto.
+     Com o texto embaixo ele só escurece a imagem de graça. */
+  .f-cena::after{content:none;}
+
+  .f-cena-img{
+    position:relative;inset:auto;
+    width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;
+    /* o centro-alto do quadro é onde estão o Red e as telas nas 5 cenas;
+       ancorar em 50% do topo perde a bancada, ancorar no fundo perde o rosto */
+    object-position:50% 42%;
+    display:block;
+  }
+  .f-cena-txt{padding:22px 22px 0;max-width:none;}
+
+  .f-hora{font-size:.66rem;margin:0 0 12px;}
+  .f-hora::before{width:18px;}
+
+  .f-titulo{
+    font-size:clamp(1.55rem,7.2vw,2.15rem);line-height:1.1;letter-spacing:-.028em;
+    max-width:none;
+  }
+
+  .f-cena-cta{
+    margin-top:22px;width:100%;justify-content:center;
+    font-size:.9rem;padding:16px 22px;
+  }
+
+  /* a primeira cena ganha uma respiração acima: é a primeira coisa da página */
+  .f-cena:first-child{padding-top:14px;}
+  /* linha de corte entre as cenas: sem o gradiente, elas encostavam uma na
+     outra sem nada dizendo onde uma acaba */
+  .f-cena + .f-cena{border-top:1px solid var(--linha);padding-top:30px;}
+
+  /* entrada leve: a cena sobe 14px quando entra na tela. Só isso. */
+  .f-cena[data-rv="arm"]{opacity:0;transform:translateY(14px);}
+  .f-cena[data-rv="on"]{
+    opacity:1;transform:none;
+    transition:opacity .6s cubic-bezier(.4,0,.2,1),transform .6s cubic-bezier(.4,0,.2,1);
+  }
+
+  .f-faixa{padding:62px 0;}
+  .f-in{padding:0 22px;}
+  .f-caixa{padding:30px 22px;}
+  .f-bump{padding:22px 20px;}
+
+  /* ---- CTA fixo no rodapé -----------------------------------------------
+     Medido antes da correção: o primeiro botão de compra ficava em 2.374px,
+     quase 3 telas abaixo do topo, e o de fechamento em 13.347px. Num tráfego
+     que chega de Instagram e sai na primeira dúvida, a oferta precisa estar
+     a um toque de distância o tempo todo. A barra entra depois da primeira
+     cena (o React liga o data-barra) pra não cobrir a abertura. */
+  .f-barra{
+    position:fixed;left:0;right:0;bottom:0;z-index:40;
+    display:flex;align-items:center;gap:14px;
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));
+    background:rgba(6,6,7,.93);
+    -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+    border-top:1px solid var(--linha);
+    transform:translateY(102%);transition:transform .34s cubic-bezier(.4,0,.2,1);
+  }
+  .f-barra[data-on="1"]{transform:none;}
+  .f-barra-preco{
+    font-family:var(--display);font-weight:800;font-size:1.32rem;
+    color:var(--osso);line-height:1;flex:0 0 auto;
+  }
+  .f-barra-preco small{
+    display:block;font-family:var(--ui);font-weight:500;font-size:.58rem;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--osso2);
+    margin-top:5px;
+  }
+  .f-barra a{
+    flex:1;display:flex;align-items:center;justify-content:center;
+    background:var(--ambar);color:#1A1206;text-decoration:none;
+    font-family:var(--ui);font-weight:700;font-size:.88rem;letter-spacing:.01em;
+    padding:15px 12px;border-radius:2px;
+  }
+  /* o rodapé precisa caber acima da barra, senão o CNPJ fica embaixo dela */
+  .f-rodape{padding-bottom:calc(68px + 78px);}
+}
+
+/* a barra é só de celular: acima de 900px o CTA da cena já viaja com o filme */
+@media(min-width:901px){.f-barra{display:none;}}
+
+@media(prefers-reduced-motion:reduce){
+  .f-cena[data-rv="arm"]{opacity:1;transform:none;}
+  .f-barra{transition:none;}
+}
 `;
 
 /* ===========================================================================
@@ -479,6 +591,94 @@ function VideoProva() {
   );
 }
 
+/* ===========================================================================
+ *  CELULAR  ·  revelação das cenas + barra de compra
+ * ---------------------------------------------------------------------------
+ *  Um único efeito, e só abaixo de 900px, porque acima disso quem conduz a
+ *  Parte 1 é o scrub e duas coisas disputando a rolagem é exatamente o que o
+ *  arsenal proíbe.
+ *
+ *   · REVELAÇÃO: mesma primitiva do movimento.tsx (IntersectionObserver com
+ *     gatilho equivalente a "top 80%", once: true). Marca data-rv no próprio
+ *     elemento e deixa o CSS decidir o que isso significa. O estado escondido
+ *     só é aplicado DEPOIS de montar: sem JS a página fica completa.
+ *
+ *   · BARRA: liga quando a primeira cena sai da tela. Antes disso ela taparia
+ *     a abertura, que é o único momento em que a página tem uma tela inteira
+ *     pra causar. Depois, fica.
+ * ======================================================================== */
+function useMobile(raiz: React.RefObject<HTMLDivElement | null>) {
+  const [barra, setBarra] = useState(false);
+
+  useEffect(() => {
+    const el = raiz.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") return;
+    if (!window.matchMedia("(max-width: 900px)").matches) return;
+
+    const menos = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const limpar: Array<() => void> = [];
+
+    if (!menos) {
+      const cenas = Array.from(el.querySelectorAll<HTMLElement>(".f-cena"));
+      // a cena 1 já está na tela ao carregar: revelá-la seria um flash
+      for (const c of cenas.slice(1)) c.setAttribute("data-rv", "arm");
+
+      const obs = new IntersectionObserver(
+        (entradas) => {
+          for (const e of entradas) {
+            if (!e.isIntersecting) continue;
+            (e.target as HTMLElement).setAttribute("data-rv", "on");
+            obs.unobserve(e.target); // once: true
+          }
+        },
+        { threshold: 0.12, rootMargin: "0px 0px -12% 0px" },
+      );
+      for (const c of cenas.slice(1)) obs.observe(c);
+      limpar.push(() => {
+        obs.disconnect();
+        for (const c of cenas) c.removeAttribute("data-rv");
+      });
+    }
+
+    /* A barra segue a POSIÇÃO da rolagem, não a visibilidade da primeira cena.
+       Com IntersectionObserver na cena 1 ela ficava presa em aberto ao voltar
+       pro topo (testado em 02/09): a cena tem 419px, cabe inteira na tela junto
+       com parte da cena 2, e o observer não reentrega o estado de forma
+       confiável depois que a revelação mexe no transform do vizinho.
+       Comparar scrollY com a altura da primeira cena é determinístico: some
+       enquanto a abertura está em cena, aparece depois dela, sempre. */
+    const primeira = el.querySelector<HTMLElement>(".f-cena");
+    if (primeira) {
+      let pedido = 0;
+      const medir = () => {
+        pedido = 0;
+        // -80px: a barra entra um pouco antes do fim da cena 1, senão ela
+        // aparece exatamente quando o título sai e o movimento chama atenção
+        // pro lugar errado
+        setBarra(window.scrollY > primeira.offsetHeight - 80);
+      };
+      const agendar = () => {
+        if (!pedido) pedido = requestAnimationFrame(medir);
+      };
+      medir();
+      addEventListener("scroll", agendar, { passive: true });
+      addEventListener("resize", agendar);
+      limpar.push(() => {
+        removeEventListener("scroll", agendar);
+        removeEventListener("resize", agendar);
+        if (pedido) cancelAnimationFrame(pedido);
+      });
+    }
+
+    return () => {
+      for (const f of limpar) f();
+    };
+  }, [raiz]);
+
+  return barra;
+}
+
 export function LpF() {
   const raiz = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -486,6 +686,7 @@ export function LpF() {
   const [cinema, setCinema] = useState(false);
   // true quando a rolagem passou do fim da trilha: o palco solta a tela
   const [fim, setFim] = useState(false);
+  const barra = useMobile(raiz);
 
   useEffect(() => {
     /* ------------------------------------------------------------------
@@ -585,28 +786,97 @@ export function LpF() {
       ctx.drawImage(img, sx, sy, sw, sh, 0, 0, lw, lh);
     }
 
-    /* overlays: mostra o item cuja faixa contém o progresso atual */
+    /* overlays: mostra o item cuja faixa contém o progresso atual.
+       ------------------------------------------------------------------
+       Dois defeitos foram corrigidos aqui em 02/09, os dois medidos no ar:
+
+       1. A CENA 5 NUNCA APARECIA. A faixa dela é 93→100 e o teste era
+          `pct < ate`. No fim da trilha pct chega a 100 exatos, 100 < 100 é
+          falso, e o último texto da página, que é justamente o nome do
+          evento, ficava invisível. A última faixa agora fecha em <=.
+
+       2. BURACOS ENTRE AS CENAS. As faixas do roteiro têm intervalos de
+          propósito (20→23, 44→48, 69→73, 90→93): é o miolo da transição,
+          onde o vídeo está passando de uma cena pra outra. Só que ali
+          nenhum overlay ficava ligado e a tela passava alguns instantes
+          sem texto nenhum. Agora, quando o progresso cai num buraco, vale
+          a última faixa que começou. O texto sai de cena junto com a
+          imagem dele, não antes.
+       ------------------------------------------------------------------ */
     const ovs = Array.from(el.querySelectorAll<HTMLElement>("[data-ov]"));
+    const ultimo_i = ovs.length - 1;
     function overlays(pct: number) {
-      for (const o of ovs) {
-        const de = Number(o.dataset.de);
-        const ate = Number(o.dataset.ate);
-        o.dataset.on = pct >= de && pct < ate ? "1" : "0";
+      let ativo = -1;
+      for (let i = 0; i < ovs.length; i++) {
+        const de = Number(ovs[i].dataset.de);
+        const ate = Number(ovs[i].dataset.ate);
+        const dentro = i === ultimo_i ? pct >= de && pct <= ate : pct >= de && pct < ate;
+        if (dentro) {
+          ativo = i;
+          break;
+        }
+        // caiu depois do fim desta faixa: ela é a candidata a "última que
+        // começou", até que a próxima assuma
+        if (pct >= de) ativo = i;
+      }
+      for (let i = 0; i < ovs.length; i++) {
+        ovs[i].dataset.on = i === ativo ? "1" : "0";
       }
     }
 
     function calcular() {
       if (!tr) return;
       const total = tr.offsetHeight - innerHeight;
-      alvo = total <= 0 ? 0 : Math.max(0, Math.min(1, window.scrollY / total));
+      /* O progresso satura ANTES do fim da trilha, e isso é de propósito.
+         ------------------------------------------------------------------
+         Medido em 02/09, 1440x900: com o alvo mapeado linearmente até o
+         último pixel da trilha, as cenas 4 e 5 nunca chegavam a ser lidas.
+         Dois motivos somados:
+
+           · o `atual` é suavizado com lerp 0.1, então ele CHEGA no alvo
+             sempre um pouco depois. No fim da trilha o alvo já é 1, mas o
+             desenhado ainda está por volta de 0,8;
+           · o `fim` disparava no mesmo pixel em que o alvo chegava a 1 e
+             escondia a camada de texto. O overlay da cena 5 tinha, na
+             prática, zero pixel de rolagem pra aparecer.
+
+         A correção dá uma cauda de 12% da trilha: o filme termina (alvo = 1)
+         faltando ainda 12% pra rolar, e é essa sobra que o lerp usa pra
+         alcançar e a cena 5 usa pra ser lida antes do palco soltar a tela. */
+      const CAUDA = 0.12;
+      const util = total * (1 - CAUDA);
+      alvo = util <= 0 ? 0 : Math.max(0, Math.min(1, window.scrollY / util));
       // passou do fim da trilha: libera o palco pra oferta ocupar a tela
       setFim(window.scrollY >= total);
     }
 
-    function loop() {
+    /* A suavização é por TEMPO, não por quadro.
+       ---------------------------------------------------------------------
+       Era `atual += (alvo - atual) * 0.1` a cada requestAnimationFrame, o que
+       só converge rápido se o rAF estiver rodando a 60fps. Não é o caso aqui:
+       cada quadro do loop decodifica e desenha um JPEG de 1280px no canvas, e
+       isso derruba a taxa muito abaixo de 60. Medido na build de produção em
+       02/09: parado no fim da trilha, com o alvo já em 1, o filme levava mais
+       de 8 SEGUNDOS pra arrastar da cena 2 até a 4, e parava ali. Na prática
+       as cenas 4 e 5 não eram alcançáveis rolando normal, que é o mesmo
+       sintoma que parecia "imagem que não carrega".
+
+       Com o passo corrigido pelo delta de tempo, a resposta é a mesma em
+       qualquer taxa de quadros: o valor cobre ~90% da distância em 0,25s,
+       independente de o rAF estar entregando 60fps ou 15. */
+    const RESPOSTA = 0.25; // segundos para cobrir ~90% da distância
+    let tAnterior = 0;
+
+    function loop(t: number) {
       if (!vivo) return;
-      atual += (alvo - atual) * 0.1;
+      const dt = tAnterior ? Math.min((t - tAnterior) / 1000, 0.1) : 1 / 60;
+      tAnterior = t;
+
+      // fator exponencial: equivalente ao lerp, mas ancorado no relógio
+      const k = 1 - Math.exp(-dt / (RESPOSTA / 2.3));
+      atual += (alvo - atual) * k;
       if (Math.abs(alvo - atual) < 0.0004) atual = alvo;
+
       const i = Math.round(atual * (TOTAL_FRAMES - 1));
       if (i !== ultimo) {
         desenhar(i);
@@ -976,6 +1246,18 @@ export function LpF() {
             </p>
           </div>
         </footer>
+      </div>
+
+      {/* barra de compra do celular. Fora do .f-of pra não herdar o z-index
+          da oferta, e depois do rodapé pra ser o último foco do teclado. */}
+      <div className="f-barra" data-on={barra ? "1" : "0"} aria-hidden={!barra}>
+        <p className="f-barra-preco">
+          {OFERTA.preco}
+          <small>Hermes Week</small>
+        </p>
+        <a className="hw-acao" href={CHECKOUT} tabIndex={barra ? 0 : -1}>
+          Quero meu agente
+        </a>
       </div>
     </div>
   );
