@@ -138,11 +138,11 @@ export const OFERTA = {
         "São dez tarefas prontas, uma pra cada dia da semana seguinte. Cada uma vem com o texto exato pra colar e com o resultado que você deve esperar ver. Triagem da caixa de e-mail, organizar a pasta de downloads, tirar os dados de dentro de um PDF, uma rotina que roda sozinha toda manhã.",
     },
     {
-      nome: "Gerador de SOUL",
+      nome: "8 Agentes Prontos",
       preco: "R$37",
-      problema: "Sem uma identidade escrita, seu agente responde igual ao de todo mundo.",
+      problema: "Recém-instalado, seu agente responde igual ao de todo mundo.",
       texto:
-        "SOUL é o arquivo que define quem ele é: o que ele sabe sobre o seu trabalho, como ele fala com você, e o que ele tem autonomia pra decidir sem perguntar. Escrever um do zero é difícil quando você nunca viu um pronto. Aqui você responde algumas perguntas sobre o seu ofício e o sistema escreve o seu.",
+        "Oito identidades já escritas e testadas, uma pra cada ofício: advogado, contador, e-commerce, agência, clínica, consultor, infoprodutor e freelancer. Cada uma diz pro agente do que você trabalha, com quem você fala e o que ele pode decidir sem te perguntar. Você abre a do seu ramo, cola, e ele já começa sabendo. Escrever isso do zero leva dias de tentativa e erro.",
     },
     {
       nome: "Auditoria do seu agente",
@@ -172,7 +172,7 @@ export const OFERTA = {
   ],
   garantia: "7 dias. Pediu, devolvo. Sem pergunta, sem você ter que me explicar nada.",
   rodape: {
-    razao: "BUENO LIMA LTDA",
+    razao: "RedPro AI Academy",
     cnpj: "CNPJ 59.015.480/0001-07",
     suporte: "suporte@redpro.com.br",
   },

@@ -324,7 +324,7 @@ export function LpD({ v }: { v: Variante }) {
             {compartilhado.ctaTopo}
           </a>
           <ul className="d-fatos">
-            <li>5 aulas gravadas</li>
+            <li>5 encontros</li>
             <li>segunda a sexta</li>
             <li>garantia de 7 dias</li>
           </ul>

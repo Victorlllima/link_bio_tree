@@ -333,7 +333,7 @@ export function LpE({ v }: { v: Variante }) {
               {compartilhado.ctaTopo}
             </a>
             <ul className="e-fatos">
-              <li>5 aulas gravadas</li>
+              <li>5 encontros</li>
               <li>segunda a sexta</li>
               <li>garantia de 7 dias</li>
             </ul>

@@ -271,7 +271,7 @@ export function LpA({ v }: { v: Variante }) {
             <p className="a-deck">{v.hero.deck}</p>
             <Cta href={url} />
             <ul className="a-fatos">
-              <li>5 aulas gravadas</li>
+              <li>5 encontros</li>
               <li>segunda a sexta</li>
               <li>garantia de 7 dias</li>
             </ul>

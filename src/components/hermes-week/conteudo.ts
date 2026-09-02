@@ -91,7 +91,7 @@ export const compartilhado = {
     { dia: "Sexta", saida: "rotina automática rodando e uma ferramenta externa conectada" },
   ],
   rodape: {
-    razao: "BUENO LIMA LTDA",
+    razao: "RedPro AI Academy",
     cnpj: "CNPJ 59.015.480/0001-07",
     suporte: "suporte@redpro.com.br",
   },
@@ -335,7 +335,7 @@ const A: Variante = {
   praQuemNaoE: {
     tag: "pra quem não é",
     nos: [
-      { t: "p", c: "Se você usa IA duas vezes por semana pra escrever texto, não compra." },
+      { t: "p", c: "Se você só usa IA duas vezes por semana pra escrever texto, não compra." },
       {
         t: "p",
         c: "Um agente compensa quando a memória tem tempo de acumular. Se você não usa todo dia, vai dar trabalho e não vai devolver nada.",
@@ -361,10 +361,10 @@ const A: Variante = {
           "Dez tarefas prontas, uma por dia nos sete dias seguintes ao evento. Prompt escrito, habilidade pronta, e o que esperar de resultado. Resolve o problema de instalar e não saber o que pedir.",
       },
       {
-        nome: "Gerador de SOUL",
+        nome: "8 Agentes Prontos",
         preco: "R$37",
         texto:
-          "A identidade do seu agente, escrita pelo seu ofício. Você diz o que faz, o sistema gera. Advogado, e-commerce, agência, contador, clínica, consultor, freelancer, infoprodutor.",
+          "Oito identidades já escritas, uma pra cada ofício: advogado, contador, e-commerce, agência, clínica, consultor, infoprodutor e freelancer. Você escolhe a sua, cola, e o agente já sabe do que você trabalha desde o primeiro dia, em vez de responder igual ao de todo mundo.",
       },
       {
         nome: "Auditoria do seu agente",
@@ -600,7 +600,7 @@ const B: Variante = {
   praQuemNaoE: {
     tag: "pra quem não é",
     nos: [
-      { t: "p", c: "Se você abre IA duas vezes por semana, não compra." },
+      { t: "p", c: "Se você só abre IA duas vezes por semana, não compra." },
       {
         t: "p",
         c: "Isso compensa quando você usa o suficiente pra memória acumular. Quem usa pouco vai ter trabalho de montar e não vai ter retorno.",
@@ -625,10 +625,10 @@ const B: Variante = {
           "Dez tarefas prontas, uma por dia nos sete dias seguintes ao evento. Prompt escrito, habilidade pronta, e o que esperar de resultado. Resolve o problema de instalar e não saber o que pedir.",
       },
       {
-        nome: "Gerador de SOUL",
+        nome: "8 Agentes Prontos",
         preco: "R$37",
         texto:
-          "A identidade do seu agente, escrita pelo seu ofício. Você diz o que faz, o sistema gera. Advogado, e-commerce, agência, contador, clínica, consultor, freelancer, infoprodutor.",
+          "Oito identidades já escritas, uma pra cada ofício: advogado, contador, e-commerce, agência, clínica, consultor, infoprodutor e freelancer. Você escolhe a sua, cola, e o agente já sabe do que você trabalha desde o primeiro dia, em vez de responder igual ao de todo mundo.",
       },
       {
         nome: "Auditoria do seu agente",
@@ -837,7 +837,7 @@ const C: Variante = {
     nos: [
       {
         t: "p",
-        c: "Se você usa IA duas vezes por semana, não compra. Compensa quando a memória tem tempo de acumular.",
+        c: "Se você só usa IA duas vezes por semana, não compra. Compensa quando a memória tem tempo de acumular.",
       },
       {
         t: "p",
@@ -862,9 +862,9 @@ const C: Variante = {
           "Dez tarefas prontas, uma por dia nos sete dias seguintes. Prompt escrito, habilidade pronta, e o que esperar. Resolve o problema de instalar e não saber o que pedir.",
       },
       {
-        nome: "Gerador de SOUL",
+        nome: "8 Agentes Prontos",
         preco: "R$37",
-        texto: "A identidade do seu agente, escrita pelo seu ofício. Você diz o que faz, o sistema gera.",
+        texto: "Oito identidades já escritas, uma pra cada ofício: advogado, contador, e-commerce, agência, clínica, consultor, infoprodutor e freelancer. Você escolhe a sua, cola, e o agente já sabe do que você trabalha desde o primeiro dia, em vez de responder igual ao de todo mundo.",
       },
       {
         nome: "Auditoria do seu agente",
@@ -1093,9 +1093,9 @@ const D: Variante = {
           "Dez tarefas prontas, uma por dia nos sete dias seguintes. Resolve o problema de instalar e não saber o que pedir.",
       },
       {
-        nome: "Gerador de SOUL",
+        nome: "8 Agentes Prontos",
         preco: "R$37",
-        texto: "A identidade do seu agente, escrita pelo seu ofício. Você diz o que faz, o sistema gera.",
+        texto: "Oito identidades já escritas, uma pra cada ofício: advogado, contador, e-commerce, agência, clínica, consultor, infoprodutor e freelancer. Você escolhe a sua, cola, e o agente já sabe do que você trabalha desde o primeiro dia, em vez de responder igual ao de todo mundo.",
       },
       {
         nome: "Auditoria do seu agente",
@@ -1345,9 +1345,9 @@ const E: Variante = {
           "Dez tarefas prontas, uma por dia nos sete dias seguintes ao evento. Prompt escrito, habilidade pronta, e o que esperar. É literalmente a lista do que delegar primeiro.",
       },
       {
-        nome: "Gerador de SOUL",
+        nome: "8 Agentes Prontos",
         preco: "R$37",
-        texto: "A identidade do seu agente, escrita pelo seu ofício. Você diz o que faz, o sistema gera.",
+        texto: "Oito identidades já escritas, uma pra cada ofício: advogado, contador, e-commerce, agência, clínica, consultor, infoprodutor e freelancer. Você escolhe a sua, cola, e o agente já sabe do que você trabalha desde o primeiro dia, em vez de responder igual ao de todo mundo.",
       },
       {
         nome: "Auditoria do seu agente",

@@ -314,7 +314,7 @@ const CSS = `
 }
 
 /* Hermes x Alfred: um embaixo do outro, mas com a MESMA estrutura, porque a
-   simetria é o argumento (são o mesmo programa em dois momentos). */
+   simetria é o argumento (são o mesmo Agente em dois momentos). */
 .m-dupla{display:grid;gap:16px;margin:26px 0 0;}
 .m-lado{
   border:1px solid var(--linha);background:var(--carvao);padding:22px 20px;
@@ -743,7 +743,7 @@ export function LpFMobile() {
           <div className="m-in">
             <p className="m-rot">{DUPLA.rotulo}</p>
             <h2 className="m-h2">
-              O mesmo programa, em <b>dois momentos</b>
+              O mesmo Agente, em <b>dois momentos</b>
             </h2>
             <p className="m-p">{DUPLA.intro}</p>
 
@@ -833,7 +833,7 @@ export function LpFMobile() {
           <div className="m-in">
             <p className="m-rot">Pra quem não é</p>
             <h2 className="m-h2">
-              Se você usa IA duas vezes por semana, <b>não compra</b>
+              Se você só usa IA duas vezes por semana, <b>não compra</b>
             </h2>
             <p className="m-p">
               Um agente compensa quando a memória tem tempo de acumular. Se você não usa todo dia,

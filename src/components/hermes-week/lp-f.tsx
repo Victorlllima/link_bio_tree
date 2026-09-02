@@ -271,7 +271,7 @@ const CSS = `
 /* Os dois assets têm naturezas diferentes: o Hermes é a marca da NOUS RESEARCH,
    line-art preto sobre FUNDO BRANCO; o Alfred é PNG recortado, sem fundo. Solto
    no breu, o Hermes vira um retângulo branco gritando ao lado de uma figura
-   flutuando, e a assimetria destrói o argumento de que são o mesmo programa.
+   flutuando, e a assimetria destrói o argumento de que são o mesmo Agente.
    A solução é dar a AMBOS a mesma placa: mesmo tamanho, mesmo raio, mesma
    borda. O Hermes preenche a placa (o branco dele passa a ser a placa), e o
    Alfred recebe a mesma placa em tom claro para os dois pesarem igual. */
@@ -1042,7 +1042,7 @@ export function LpF() {
             <div className="f-col">
               <p className="f-rot">{DUPLA.rotulo}</p>
               <h2 className="f-h2">
-                O mesmo programa, em <b>dois momentos</b>
+                O mesmo Agente, em <b>dois momentos</b>
               </h2>
               <p className="f-p">{DUPLA.intro}</p>
             </div>
@@ -1145,7 +1145,7 @@ export function LpF() {
           <div className="f-in f-col">
             <p className="f-rot">Pra quem não é</p>
             <h2 className="f-h2">
-              Se você usa IA duas vezes por semana, <b>não compra</b>
+              Se você só usa IA duas vezes por semana, <b>não compra</b>
             </h2>
             <p className="f-p">
               Um agente compensa quando a memória tem tempo de acumular. Se você não usa todo dia,

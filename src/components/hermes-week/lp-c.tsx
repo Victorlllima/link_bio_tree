@@ -310,7 +310,7 @@ export function LpC({ v }: { v: Variante }) {
             </div>
             <div>
               <dt>Formato</dt>
-              <dd>5 aulas gravadas, mais a sessão de dúvidas de sábado</dd>
+              <dd>5 encontros, mais a sessão de dúvidas de sábado</dd>
             </div>
             <div>
               <dt>Devolução</dt>

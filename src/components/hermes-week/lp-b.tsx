@@ -295,7 +295,7 @@ export function LpB({ v }: { v: Variante }) {
           <p className="b-deck">{v.hero.deck}</p>
           <Cta href={url} texto={compartilhado.ctaTopo} />
           <ul className="b-fatos">
-            <li>5 aulas gravadas</li>
+            <li>5 encontros</li>
             <li>segunda a sexta</li>
             <li>garantia de 7 dias</li>
           </ul>
