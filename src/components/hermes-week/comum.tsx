@@ -128,7 +128,25 @@ export function pixelScript(v: VarianteId): string {
         if (typeof fbq !== 'undefined') { fbq('track', 'ViewContent', base); return; }
         if (++t < 20) setTimeout(view, 250);
       })();
+      /* Atribuicao por criativo: a Meta injeta utm_content={{ad.id}} no clique.
+         A pagina e renderizada no servidor, entao o href sai fixo — aqui no
+         cliente carimbamos o sck, que e o campo que a Hotmart devolve no
+         relatorio de vendas. Sem isso da pra saber a variante de LP, mas nao
+         qual dos anuncios vendeu. */
+      function marcarOrigem() {
+        var q = new URLSearchParams(location.search);
+        var c = q.get('utm_content') || q.get('sck') || q.get('fbclid');
+        if (!c) return;
+        var sck = (VAR + '-' + c).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 100);
+        var bs = document.querySelectorAll('.hw-acao');
+        for (var i = 0; i < bs.length; i++) {
+          var h = bs[i].getAttribute('href');
+          if (!h || h.indexOf('hotmart') === -1 || h.indexOf('sck=') !== -1) continue;
+          bs[i].setAttribute('href', h + '&sck=' + sck);
+        }
+      }
       function ligar() {
+        marcarOrigem();
         var bs = document.querySelectorAll('.hw-acao');
         for (var i = 0; i < bs.length; i++) {
           bs[i].addEventListener('click', function () {
