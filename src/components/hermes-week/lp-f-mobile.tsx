@@ -40,19 +40,37 @@
  *    · o contador "1 / 5" ao lado do horário
  *  Três sinais redundantes. Instrução escrita seria admitir que o desenho falhou.
  *
- *  IMAGENS: mantidas em 16:9, sem regerar
- *  Empilhado vertical o 16:9 era o problema (cover num viewport de 390 corta
- *  25% de cada lado). Aqui não: o slide é uma CAIXA de 16:9 com a imagem
- *  inteira dentro, sem corte. E num slide horizontal a proporção paisagem
- *  passa a trabalhar A FAVOR, porque lê como fotograma de cinema — que é
- *  literalmente o que ela é. Regerar em 4:5 vertical brigaria com o movimento
- *  lateral. Economizado: 5 gerações de imagem.
+ *  IMAGENS: recortadas em RETRATO, com o foco escolhido cena a cena
+ *
+ *  A versão anterior manteve o 16:9 do arquivo intacto, argumentando que
+ *  cortá-lo devolveria o problema da versão empilhada. Medido em produção
+ *  (390x844): quadro de 324x182, proporção 1.778 contra 1.778 do arquivo.
+ *  Geometricamente perfeito, e reprovado assim mesmo, porque o problema nunca
+ *  foi distorção. 182px de altura numa tela de 844 são 21% do celular: uma
+ *  tirinha. As cenas são noturnas e cheias de detalhe em sombra, e nessa
+ *  altura o rosto, a luz da tela e o clima viram uma mancha escura. O H2 da
+ *  oferta, logo abaixo, era fisicamente maior que a foto. Numa página cujo
+ *  argumento é "isto é um filme", o filme era a menor coisa da tela.
+ *
+ *  O 16:9 estava certo pro empilhado e errado aqui. No carrossel a imagem já
+ *  tem a largura inteira do slide: o que falta não é proporção, é ALTURA.
+ *
+ *  Então o quadro vira retrato (4:5, com piso de 4:3 em tela baixa) e o corte
+ *  é escolhido POR CENA, porque o assunto está num lugar diferente em cada
+ *  uma. Centro puro funcionaria em 1, 3 e 4 e quebraria as outras duas: na 2
+ *  cortaria o terminal âmbar (que é o ponto da cena) e na 5 partiria o homem
+ *  no meio. Ver FOCO, logo abaixo.
+ *
+ *  O que se perde: as bordas laterais, que em todas as cinco são parede vazia
+ *  ou sombra. O que se ganha: 405px de imagem em vez de 182, o dobro de
+ *  presença, e a cena vira o assunto do slide em vez da ilustração dele.
+ *  Zero geração de imagem nova.
  *
  *  A OFERTA vem depois, em HTML normal, com a MESMA copy da LP F importada de
  *  lp-f-cenas.ts. Nada aqui é reescrito: muda o desenho, não o texto.
  * ==========================================================================*/
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
 import { checkoutUrl } from "./checkout";
 import { Pixel } from "./comum";
@@ -73,6 +91,37 @@ const ui = Plus_Jakarta_Sans({
 
 const CHECKOUT = checkoutUrl("F");
 
+/* ---------------------------------------------------------------------------
+ *  FOCO · onde o corte retrato tem que cair, cena por cena
+ * ---------------------------------------------------------------------------
+ *  Os arquivos são 16:9 e o quadro do celular é retrato, então cover descarta
+ *  as laterais. Qual lateral ele descarta é decisão de enquadramento, não
+ *  default: em quatro das cinco cenas o assunto está fora do centro, e em duas
+ *  o centro puro estraga a imagem.
+ *
+ *  Mora aqui e não em lp-f-cenas.ts de propósito: o arquivo de cenas é o
+ *  contrato de copy compartilhado com o desktop, onde o quadro é 16:9 inteiro
+ *  e não há corte nenhum. Isto é decisão de layout do celular.
+ *
+ *  Conferido cena a cena em 390x844 antes de fechar o valor.
+ * ------------------------------------------------------------------------ */
+const FOCO: Record<number, string> = {
+  /* homem à esquerda, notebook à direita. Levemente à esquerda pra manter o
+     rosto respirando sem jogar o notebook pra fora. */
+  1: "46% 52%",
+  /* o assunto são DOIS polos: o terminal âmbar na esquerda e o homem na
+     direita. Centro puro reduzia o terminal a uma tira na borda, e o terminal
+     é o que a cena está contando. */
+  2: "38% 46%",
+  /* monitores à esquerda, homem à direita, janela no meio. Cabe quase inteira. */
+  3: "54% 48%",
+  /* cadeira vazia: quem carrega a cena é a tela acesa, à esquerda. */
+  4: "32% 50%",
+  /* ele de pé contra a janela, à direita. No centro, o corte partia o corpo
+     ao meio e cortava a caneca. */
+  5: "64% 42%",
+};
+
 const CSS = `
 .m{
   --breu:#060607; --carvao:#101013; --ambar:#E8A34A; --ambar-fraco:rgba(232,163,74,.12);
@@ -87,21 +136,33 @@ const CSS = `
 /* ============ PARTE 1 · O FILME EM CARROSSEL ==============================
    Uma tela. Não cinco. */
 
-/* O bloco do filme mede o CONTEÚDO, não a tela.
+/* O bloco do filme ocupa a tela, e o QUADRO fica com a folga.
    ---------------------------------------------------------------------------
-   A tentação era min-height:100svh pra abertura ocupar a tela cheia. Medido
-   em 390x844 (02/09): o conteúdo do slide dá 357px e a pista esticava pra
-   744px, deixando ~390px de breu entre o botão e a régua. Vazio desse tamanho
-   não lê como respiro, lê como imagem que não carregou.
+   Histórico, porque este bloco já errou nos dois sentidos:
 
-   Sem altura forçada, o carrossel termina em torno de 480px e a primeira
-   seção da oferta aparece no rodapé da tela. Isso resolve dois problemas de
-   uma vez: acaba o vazio, e a página passa a dizer que continua pra baixo,
-   coisa que um carrossel de tela cheia esconde. */
+   1. min-height:100svh com quadro 16:9 → o conteúdo dava 357px, a pista
+      esticava pra 744 e sobravam ~390px de breu entre o botão e a régua.
+      Vazio desse tamanho não lê como respiro, lê como imagem que não carregou.
+   2. sem altura nenhuma → some o vazio, mas o bloco inteiro fecha em 459px de
+      844 e a imagem cai pra 21% da tela. Foi a versão reprovada: a metade de
+      baixo da primeira tela virava parágrafo da oferta, e o filme, miniatura.
+
+   O erro comum às duas foi tratar o quadro como tamanho fixo e deixar a folga
+   cair no lugar errado (vazio no rodapé numa; oferta invadindo a dobra na
+   outra). Reservar a tela com min-height:100svh não resolve: só transfere o
+   buraco pra dentro do slide, porque a tela é mais alta que o conteúdo e
+   alguém tem que ficar com a diferença.
+
+   A saída é o quadro definir o tamanho do bloco, em vez do bloco definir o do
+   quadro. Sem altura forçada: o quadro sai em 4:5 (a proporção que faz a cena
+   ter presença), o texto vem colado embaixo, e o bloco fecha onde o conteúdo
+   fecha. Em 390x844 isso dá ~700px, ou seja 83% da tela: o filme domina a
+   abertura, e a oferta aparece só espiando no rodapé, dizendo que a página
+   continua. Sem buraco em lugar nenhum, porque não há folga pra distribuir. */
 .m-filme{
   position:relative;
   display:flex;flex-direction:column;
-  padding:calc(18px + env(safe-area-inset-top,0px)) 0 22px;
+  padding:calc(18px + env(safe-area-inset-top,0px)) 0 20px;
 }
 
 /* cabeçalho mínimo: a marca e o preço. Sem menu, sem nada clicável além do
@@ -150,54 +211,94 @@ const CSS = `
      teste em 390x844: o quadro e o texto no alto, e meia tela de breu embaixo.
      Vazio grande num carrossel não lê como respiro, lê como erro de carga.
 
-     Com a pista medindo o conteúdo, o stretch iguala todos os slides à altura
-     do MAIS ALTO (as frases têm 2 e 3 linhas). Sem isso a régua subiria e
-     desceria a cada deslizada, e o CTA mudaria de lugar entre um slide e
-     outro, que é o tipo de instabilidade que faz o dedo errar o botão. */
+     Com a pista medindo a tela, o stretch iguala todos os slides. Sem isso a
+     régua subiria e desceria a cada deslizada, e o CTA mudaria de lugar entre
+     um slide e outro, que é o tipo de instabilidade que faz o dedo errar o
+     botão. As frases têm 2 e 3 linhas: quem absorve a diferença é o quadro,
+     que encolhe alguns pixels no slide de frase mais longa. */
   align-self:stretch;
+  /* referência de largura pros limites do .m-quadro. inline-size só mede a
+     largura, então não cria dependência circular com a altura que o quadro
+     está justamente calculando. */
+  container-type:inline-size;
 }
 /* o último precisa de respiro à direita, senão encosta na borda ao encaixar */
 .m-slide:last-child{padding-right:20px;width:calc(100vw - 26px);}
 
 /* ---- o quadro ---------------------------------------------------------
-   Caixa 16:9 com a imagem INTEIRA dentro (cover na caixa própria, não no
-   viewport: a caixa já tem a proporção do arquivo, então não corta nada).
+   RETRATO, e é ele quem come a folga vertical do slide.
+
+   flex:1 1 auto com aspect-ratio 4/5 significa: a proporção é o ALVO, e a
+   altura real sai do que sobrar na pista depois do texto. Os dois limites
+   impedem que isso degenere:
+     · min-height 4/3 da largura → em tela baixa (360x740) o quadro para de
+       encolher antes de virar tirinha de novo. É o piso do problema que
+       estamos consertando.
+     · max-height 5/4 da largura → teto em 4:5. Sem teto o quadro comia a tela
+       inteira: medido em 581px de altura sobre 324 de largura, proporção 0.56,
+       mais estreito que 9:16. O rosto ficava enorme e a tela do notebook (o
+       brilho azul que motiva a cena) era espremida pro canto. Deixava de ser
+       fotograma e virava recorte de retrato.
+   Entre os dois, o quadro respira com o aparelho em vez de brigar com ele.
+
+   A sobra que o teto deixa NÃO cai no chão: quem a distribui é o .m-texto
+   (ver abaixo). Deixá-la no rodapé foi o erro das duas tentativas anteriores,
+   e produziu 380px de breu entre o CTA e a régua nas duas.
+
    Borda de 1px porque no breu uma imagem sem moldura não tem onde terminar. */
 .m-quadro{
-  position:relative;width:100%;aspect-ratio:16/9;
+  position:relative;width:100%;
+  /* 4:5 é o alvo, e o segundo termo do min() é o freio de tela baixa: num
+     360x740 o 4:5 puro daria 368px e, somado ao texto e à régua, empurraria a
+     régua pra fora da tela. 52svh mantém a proporção entre ~4:5 e ~4:3
+     conforme o aparelho, sem nunca voltar pra tirinha. */
+  height:min(calc((100cqw - 20px) * 1.25), 52svh);
+  min-height:calc((100cqw - 20px) * 0.75);
+  flex:0 0 auto;
   border:1px solid var(--linha);border-radius:3px;overflow:hidden;
-  background:var(--carvao);flex:0 0 auto;
+  background:var(--carvao);
 }
-/* O quadro fica em 16:9 EXATO e não estica: é o fotograma, cortá-lo pra
-   preencher altura devolveria o problema da versão empilhada (16:9 em cover
-   num viewport estreito perde 25% de cada lado). Quem ocupa a altura que
-   sobra é o texto, logo abaixo. */
+/* cover corta as laterais do 16:9, e QUAL lateral ele corta é escolha: o
+   object-position sai do FOCO, cena a cena (ver o mapa no topo do arquivo).
+   Sem isso o centro cortaria o terminal da cena 2 e partiria o homem na 5. */
 .m-quadro img{
   width:100%;height:100%;display:block;object-fit:cover;
+  object-position:var(--foco,50% 50%);
   background:var(--breu);
 }
-/* vinheta de baixo: dá assento pro número da cena e liga o quadro ao texto */
+/* Vinheta de baixo: liga o quadro ao texto, pra imagem não terminar num
+   corte duro contra o breu. Mais curta e mais fraca que a anterior (38%/.72),
+   que existia pra dar assento ao "1 / 5" no canto. Aquele contador saiu: com
+   a hora, o "Cena 1 de 5" ao lado dela e os cinco pontinhos, eram QUATRO
+   marcadores da mesma posição na mesma tela. Agora a vinheta só assenta a
+   imagem, e come menos do rosto na cena 1. */
 .m-quadro::after{
-  content:"";position:absolute;inset:auto 0 0 0;height:38%;
-  background:linear-gradient(180deg,rgba(6,6,7,0) 0%,rgba(6,6,7,.72) 100%);
-}
-.m-quadro-n{
-  position:absolute;left:12px;bottom:9px;z-index:2;
-  font-family:var(--display);font-weight:800;font-size:.62rem;letter-spacing:.22em;
-  color:var(--osso);opacity:.62;margin:0;
+  content:"";position:absolute;inset:auto 0 0 0;height:24%;
+  background:linear-gradient(180deg,rgba(6,6,7,0) 0%,rgba(6,6,7,.55) 100%);
+  pointer-events:none;
 }
 
 /* ---- o texto ocupa o que sobra ---------------------------------------
    O bloco cresce até o fim do slide e distribui: hora e frase logo abaixo da
    imagem, CTA colado no rodapé do slide. É o que fecha o vazio sem inventar
    enfeite pra preencher. */
+/* O texto mede o que precisa e para. Nada de margin-top:auto aqui.
+   ---------------------------------------------------------------------------
+   Tentei empurrar o CTA pro rodapé do slide com margin-top:auto, achando que
+   assim a folga viraria respiro. Virou buraco: 400px entre a frase e o botão,
+   o mesmo vazio de antes mudado de lugar. Num slide de carrossel a leitura é
+   de cima pra baixo em bloco único (imagem, hora, frase, botão); espalhar
+   esses quatro pela tela quebra a leitura e faz o dedo procurar o botão.
+
+   A hora e a frase ficam coladas na imagem, e o CTA logo abaixo delas: é o
+   horário que faz as cinco cenas lerem como uma noite só, e ele só funciona
+   como legenda se estiver junto do fotograma. */
 .m-texto{
-  flex:1 1 auto;display:flex;flex-direction:column;
-  padding-bottom:4px;min-height:0;
+  flex:0 0 auto;display:flex;flex-direction:column;
+  padding-bottom:2px;
 }
 .m-texto-topo{flex:0 0 auto;}
-/* o empurrão que joga o CTA pro fim do slide */
-.m-texto-fim{margin-top:auto;flex:0 0 auto;padding-top:20px;}
+.m-texto-fim{flex:0 0 auto;padding-top:18px;}
 
 /* CTA dentro do slide: a oferta a um toque desde o primeiro quadro da página.
    Contorno, não preenchido: o botão sólido é o da barra fixa e o da oferta, e
@@ -213,7 +314,7 @@ const CSS = `
 /* ---- o horário: o eixo que faz disso uma história -----------------------
    Grande, âmbar, no alto do texto. Sem ele, cinco imagens. Com ele, uma noite. */
 .m-hora{
-  display:flex;align-items:baseline;gap:12px;margin:18px 0 10px;
+  display:flex;align-items:baseline;gap:12px;margin:14px 0 8px;
 }
 .m-hora b{
   font-family:var(--display);font-weight:800;font-size:1.62rem;line-height:1;
@@ -432,6 +533,14 @@ const CSS = `
 @media(min-width:680px){
   .m-slide{width:min(560px,calc(100vw - 96px));padding-left:28px;}
   .m-slide:last-child{width:min(560px,calc(100vw - 68px));padding-right:28px;}
+  /* No tablet o slide chega a 560 de largura, e 4/5 disso daria 700px de
+     altura: o quadro sozinho passaria da dobra. Aqui a largura já é
+     suficiente pro assunto aparecer, então o retrato afrouxa pra 1:1 e o
+     piso volta pro 16:9, que é a proporção nativa do arquivo. */
+  .m-quadro{
+    height:min(calc((100cqw - 28px) * 1), 56svh);
+    min-height:calc((100cqw - 28px) * 0.5625);
+  }
   .m-topo{padding:0 28px 20px;}
   .m-in{padding:0 28px;}
   .m-dupla{grid-template-columns:1fr 1fr;}
@@ -607,15 +716,15 @@ function Carrossel() {
                 alt={c.alt}
                 width={1920}
                 height={1080}
+                /* o corte retrato descarta as laterais do 16:9; o FOCO diz
+                   quais, cena a cena (mapa no topo do arquivo) */
+                style={{ "--foco": FOCO[c.n] } as React.CSSProperties}
                 /* as duas primeiras já estão em cena (a 2ª espia na borda);
                    as outras esperam o dedo */
                 loading={i < 2 ? "eager" : "lazy"}
                 fetchPriority={i === 0 ? "high" : "low"}
                 decoding={i === 0 ? "sync" : "async"}
               />
-              <p className="m-quadro-n" aria-hidden="true">
-                {c.n} / {CENAS.length}
-              </p>
             </div>
 
             <div className="m-texto">
