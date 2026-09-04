@@ -3,6 +3,8 @@ import crypto from "crypto";
 import { enviarMensagem } from "@/lib/whatsapp";
 import { estadoInstancia } from "@/lib/evolution";
 import { confirmarEmail, emailBoasVindas } from "@/lib/mensagens-crmweek";
+import { emailConfirmacao as emailConfirmacaoHermesWeek, emailBoasVindas as emailBoasVindasHermesWeek } from "@/lib/mensagens-hermesweek";
+import { lerCicloAtual } from "@/lib/ciclo-atual";
 import { enfileirar } from "@/lib/wpp-fila";
 
 /**
@@ -41,10 +43,12 @@ const PRODUTOS: Record<string, string> = {
     "8039631": "IAA — Introdução à Automação (R$17)",
     "8124888": "Ingresso — Desafio CRM em 5 Dias (R$44)",
     "7646318": "Claude for Business",
+    "8443182": "Ingresso — Hermes Week (R$62)",
 };
 
 // Quem compra o ingresso recebe as boas-vindas por WhatsApp (3 passos do Tabari).
 const PRODUTO_INGRESSO = "8124888";
+const PRODUTO_HERMES_WEEK = "8443182";
 
 const sha256 = (v: string) => crypto.createHash("sha256").update(v.trim().toLowerCase()).digest("hex");
 
@@ -117,6 +121,7 @@ async function metaCapi(email: string, nome: string, fone: string, valor: number
 const AUDIENCIA_POR_PRODUTO: Record<string, string | undefined> = {
     "8124888": process.env.RESEND_CRMWEEK_AUDIENCE_ID,   // Ingresso → crm-week-ingresso
     "8039631": process.env.RESEND_IAA_AUDIENCE_ID,       // IAA → compradores-r17
+    "8443182": process.env.RESEND_HERMESWEEK_AUDIENCE_ID, // Ingresso → Hermes Week (criar audiência nova no Resend, ver HERMES/CHECKLIST-VIRADA-CICLO.md)
 };
 
 async function resend(email: string, nome: string, produtoId: string) {
@@ -146,6 +151,47 @@ async function enviarEmailBoasVindas(email: string, nome: string) {
     const key = process.env.RESEND_API_KEY;
     if (!key || !email) return { ok: false, erro: "sem RESEND_API_KEY ou email" };
     const { subject, html } = emailBoasVindas(nome);
+    try {
+        const res = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ from: "Red · RedPro Academy <red@redpro.com.br>", to: [email], subject, html }),
+        });
+        if (!res.ok) return { ok: false, erro: `${res.status} ${await res.text()}` };
+        return { ok: true };
+    } catch (e) {
+        return { ok: false, erro: String(e) };
+    }
+}
+
+// E-MAIL 1 da Hermes Week — confirmação de compra (disparado no PURCHASE_APPROVED).
+// Lê data_inicio/link_grupo da tabela ciclo_atual (Alfred escreve toda sexta).
+async function enviarEmailConfirmacaoHermesWeek(email: string, nome: string) {
+    const key = process.env.RESEND_API_KEY;
+    if (!key || !email) return { ok: false, erro: "sem RESEND_API_KEY ou email" };
+    const ciclo = await lerCicloAtual();
+    const { subject, html } = emailConfirmacaoHermesWeek(nome, ciclo);
+    try {
+        const res = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ from: "Red · RedPro Academy <red@redpro.com.br>", to: [email], subject, html }),
+        });
+        if (!res.ok) return { ok: false, erro: `${res.status} ${await res.text()}` };
+        return { ok: true };
+    } catch (e) {
+        return { ok: false, erro: String(e) };
+    }
+}
+
+// E-MAIL 2 da Hermes Week — boas-vindas + contexto, D+1 após compra.
+// Hoje disparado junto com o e-mail 1 no PURCHASE_APPROVED (sem scheduler de
+// D+1 implementado ainda) — ver pendência no CHECKLIST-VIRADA-CICLO.md.
+async function enviarEmailBoasVindasHermesWeek(email: string, nome: string) {
+    const key = process.env.RESEND_API_KEY;
+    if (!key || !email) return { ok: false, erro: "sem RESEND_API_KEY ou email" };
+    const ciclo = await lerCicloAtual();
+    const { subject, html } = emailBoasVindasHermesWeek(nome, ciclo);
     try {
         const res = await fetch("https://api.resend.com/emails", {
             method: "POST",
@@ -236,9 +282,10 @@ export async function POST(req: NextRequest) {
         // Os passos 2 e 3 saem em /api/webhooks/evolution, quando a pessoa responde —
         // resposta primeiro abre a janela de 24h e protege o número do banimento.
         const ehIngresso = produtoId === PRODUTO_INGRESSO;
+        const ehHermesWeek = produtoId === PRODUTO_HERMES_WEEK;
         const enviarWpp = ehIngresso && Boolean(fone);
 
-        const [capi, lista, wpp, mail] = await Promise.all([
+        const [capi, lista, wpp, mail, mailHW1, mailHW2] = await Promise.all([
             metaCapi(email, nome, fone, valor, moeda, transacao),
             resend(email, nome, produtoId),
             enviarWpp
@@ -246,11 +293,17 @@ export async function POST(req: NextRequest) {
                 : Promise.resolve(null),
             // E-mail de boas-vindas (rede de segurança grupo+ficha) só pro ingresso.
             ehIngresso ? enviarEmailBoasVindas(email, nome) : Promise.resolve(null),
+            // Hermes Week — e-mail 1 (confirmação) e e-mail 2 (boas-vindas) juntos por
+            // enquanto: sem scheduler de D+1 implementado ainda, ver CHECKLIST-VIRADA-CICLO.md.
+            ehHermesWeek ? enviarEmailConfirmacaoHermesWeek(email, nome) : Promise.resolve(null),
+            ehHermesWeek ? enviarEmailBoasVindasHermesWeek(email, nome) : Promise.resolve(null),
         ]);
         if (!capi.ok) console.error("[hotmart] CAPI:", capi.erro);
         if (!lista.ok) console.error("[hotmart] Resend audiência:", lista.erro);
         if (wpp && !wpp.ok) console.error("[hotmart] WhatsApp:", wpp.erro);
         if (mail && !mail.ok) console.error("[hotmart] e-mail boas-vindas:", mail.erro);
+        if (mailHW1 && !mailHW1.ok) console.error("[hotmart] e-mail 1 Hermes Week:", mailHW1.erro);
+        if (mailHW2 && !mailHW2.ok) console.error("[hotmart] e-mail 2 Hermes Week:", mailHW2.erro);
 
         // 🔴 ALERTA ANTI-SILÊNCIO — dispara ANTES do resumo de venda e SEPARADO dele.
         // Contexto (25/07/2026, ION): a 1ª venda real do CRM Week saiu, mas o WhatsApp
@@ -295,6 +348,10 @@ export async function POST(req: NextRequest) {
                     ? " · ✅ WhatsApp"
                     : " · ⚠️ WhatsApp falhou";
 
+        const statusEmailHW = !ehHermesWeek
+            ? ""
+            : ` · ${mailHW1?.ok ? "✅" : "⚠️"} e-mail 1 · ${mailHW2?.ok ? "✅" : "⚠️"} e-mail 2`;
+
         await telegram([
             `💰 *VENDA — ${produtoNome}*`,
             "",
@@ -303,12 +360,13 @@ export async function POST(req: NextRequest) {
             fone ? `📱 ${fone}` : "",
             `💵 ${moeda} ${valor.toFixed(2)}`,
             "",
-            `${gravou.ok ? "✅" : "⚠️"} banco · ${capi.ok ? "✅" : "⚠️"} Meta CAPI · ${lista.ok ? "✅" : "⚠️"} Resend${statusWpp}${ehIngresso ? ` · ${mail?.ok ? "✅" : "⚠️"} e-mail` : ""}`,
+            `${gravou.ok ? "✅" : "⚠️"} banco · ${capi.ok ? "✅" : "⚠️"} Meta CAPI · ${lista.ok ? "✅" : "⚠️"} Resend${statusWpp}${ehIngresso ? ` · ${mail?.ok ? "✅" : "⚠️"} e-mail` : ""}${statusEmailHW}`,
         ].filter(Boolean).join("\n"));
 
         return NextResponse.json({
             ok: true, evento, gravou: gravou.ok, capi: capi.ok, resend: lista.ok,
             email_boas_vindas: ehIngresso ? (mail?.ok ?? false) : null,
+            email_hermes_week: ehHermesWeek ? { e1: mailHW1?.ok ?? false, e2: mailHW2?.ok ?? false } : null,
             whatsapp: wpp ? wpp.ok : null,
         });
     }
