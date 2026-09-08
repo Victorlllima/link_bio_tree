@@ -25,8 +25,9 @@ import { enfileirar } from "@/lib/wpp-fila";
  * ENV (nomes alinhados com o que já existe na Vercel — ver /api/meta-capi):
  *   HOTMART_HOTTOK ✅ · SUPABASE_SERVICE_KEY ✅ · TELEGRAM_BOT_TOKEN ✅ · TELEGRAM_CHAT_ID ✅
  *   META_CAPI_ACCESS_TOKEN ✅ (pixel é hardcoded, igual /api/meta-capi)
- *   RESEND_API_KEY ⚠️ não está na Vercel — sem ela o comprador não entra na lista
- *   RESEND_CRMWEEK_AUDIENCE_ID → RESEND_AUDIENCE_ID → RESEND_SHARK_AUDIENCE_ID (fallback)
+ *   RESEND_API_KEY ✅ (conferido na API da Vercel em 06/09/2026 — o aviso antigo de que
+ *     não estava lá era falso e induzia erro em quem lia)
+ *   RESEND_CRMWEEK_AUDIENCE_ID ✅ · RESEND_IAA_AUDIENCE_ID ✅ · RESEND_HERMESWEEK_AUDIENCE_ID ✅
  *
  * Nada disso derruba o webhook: cada serviço falha isolado, loga, e o Telegram avisa com ⚠️.
  */
@@ -145,6 +146,13 @@ async function resend(email: string, nome: string, produtoId: string) {
     }
 }
 
+// Remetente único de todo e-mail transacional da Academy.
+// O NOME é o que aparece na caixa de entrada; o endereço continua o mesmo
+// (red@redpro.com.br, domínio verificado no Resend em sa-east-1).
+// ⚠️ A FOTO do remetente não se define aqui: o Gmail puxa de Gravatar no
+// endereço, ou de um registro BIMI no DNS. Trocar esta string não muda o avatar.
+const REMETENTE = "RedPro AI Academy <red@redpro.com.br>";
+
 // ENVIA o e-mail de boas-vindas (rede de segurança: grupo + ficha). Diferente de resend(),
 // que só inscreve na audiência sem disparar nada.
 async function enviarEmailBoasVindas(email: string, nome: string) {
@@ -155,7 +163,7 @@ async function enviarEmailBoasVindas(email: string, nome: string) {
         const res = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ from: "Red · RedPro Academy <red@redpro.com.br>", to: [email], subject, html }),
+            body: JSON.stringify({ from: REMETENTE, to: [email], subject, html }),
         });
         if (!res.ok) return { ok: false, erro: `${res.status} ${await res.text()}` };
         return { ok: true };
@@ -164,7 +172,29 @@ async function enviarEmailBoasVindas(email: string, nome: string) {
     }
 }
 
-// E-MAIL 1 da Hermes Week — confirmação de compra (disparado no PURCHASE_APPROVED).
+/**
+ * Data/hora do e-mail D+1: 09h BRT do dia seguinte à compra.
+ *
+ * Não é "agora + 24h" de propósito. Quem compra 3h da manhã receberia o
+ * segundo e-mail 3h da manhã seguinte, no pior horário possível de abertura.
+ * Ancorar num horário fixo protege a taxa de abertura e mantém a cadência
+ * previsível independente da hora da venda.
+ *
+ * Formato: ISO 8601 com offset -03:00, que é o que o `scheduled_at` do Resend
+ * aceita. O Brasil não tem horário de verão desde 2019, então o offset é fixo.
+ */
+function agendamentoD1(): string {
+    const agoraBrt = new Date(Date.now() - 3 * 3600_000); // desloca UTC → BRT
+    const amanha = new Date(agoraBrt);
+    amanha.setUTCDate(amanha.getUTCDate() + 1);
+    const y = amanha.getUTCFullYear();
+    const m = String(amanha.getUTCMonth() + 1).padStart(2, "0");
+    const d = String(amanha.getUTCDate()).padStart(2, "0");
+    return `${y}-${m}-${d}T09:00:00-03:00`;
+}
+
+// E-MAIL 1 da Hermes Week — confirmação de compra, IMEDIATA no PURCHASE_APPROVED.
+// Leva a ficha de matrícula (ação 1) e o grupo (ação 2), nessa ordem.
 // Lê data_inicio/link_grupo da tabela ciclo_atual (Alfred escreve toda sexta).
 async function enviarEmailConfirmacaoHermesWeek(email: string, nome: string) {
     const key = process.env.RESEND_API_KEY;
@@ -175,7 +205,7 @@ async function enviarEmailConfirmacaoHermesWeek(email: string, nome: string) {
         const res = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ from: "Red · RedPro Academy <red@redpro.com.br>", to: [email], subject, html }),
+            body: JSON.stringify({ from: REMETENTE, to: [email], subject, html }),
         });
         if (!res.ok) return { ok: false, erro: `${res.status} ${await res.text()}` };
         return { ok: true };
@@ -184,22 +214,24 @@ async function enviarEmailConfirmacaoHermesWeek(email: string, nome: string) {
     }
 }
 
-// E-MAIL 2 da Hermes Week — boas-vindas + contexto, D+1 após compra.
-// Hoje disparado junto com o e-mail 1 no PURCHASE_APPROVED (sem scheduler de
-// D+1 implementado ainda) — ver pendência no CHECKLIST-VIRADA-CICLO.md.
+// E-MAIL 2 da Hermes Week — boas-vindas + contexto, AGENDADO para D+1 09h BRT.
+// Até 06/09/2026 saía junto com o e-mail 1 e chegava fora de ordem (o teste
+// daquele dia registrou o e-mail 2 saindo 54ms antes do 1). Agora usa o
+// `scheduled_at` nativo do Resend: nada de cron nem de fila própria.
 async function enviarEmailBoasVindasHermesWeek(email: string, nome: string) {
     const key = process.env.RESEND_API_KEY;
     if (!key || !email) return { ok: false, erro: "sem RESEND_API_KEY ou email" };
     const ciclo = await lerCicloAtual();
     const { subject, html } = emailBoasVindasHermesWeek(nome, ciclo);
+    const quando = agendamentoD1();
     try {
         const res = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ from: "Red · RedPro Academy <red@redpro.com.br>", to: [email], subject, html }),
+            body: JSON.stringify({ from: REMETENTE, to: [email], subject, html, scheduled_at: quando }),
         });
         if (!res.ok) return { ok: false, erro: `${res.status} ${await res.text()}` };
-        return { ok: true };
+        return { ok: true, agendado_para: quando };
     } catch (e) {
         return { ok: false, erro: String(e) };
     }
@@ -285,20 +317,47 @@ export async function POST(req: NextRequest) {
         const ehHermesWeek = produtoId === PRODUTO_HERMES_WEEK;
         const enviarWpp = ehIngresso && Boolean(fone);
 
-        const [capi, lista, wpp, mail, mailHW1, mailHW2] = await Promise.all([
-            metaCapi(email, nome, fone, valor, moeda, transacao),
+        // 🔴 GATE DE PRODUTO NO CAPI (08/09/2026). O botão "testar" do painel da
+        // Hotmart manda um PURCHASE_APPROVED completo, com produto id "0", e-mail
+        // @example.com e valor R$1.500. Sem este gate, esse teste vira um evento
+        // Purchase de R$1.500 no pixel — foi o que aconteceu hoje às 15h03, e um
+        // evento de compra falso envenena justamente o sinal que a campanha usa
+        // pra otimizar. O CAPI agora só dispara pra produto que existe no mapa.
+        const produtoConhecido = Boolean(PRODUTOS[produtoId]);
+
+        const [capi, lista, wpp, mail] = await Promise.all([
+            produtoConhecido
+                ? metaCapi(email, nome, fone, valor, moeda, transacao)
+                : Promise.resolve({ ok: true as const }),
             resend(email, nome, produtoId),
             enviarWpp
                 ? enviarMensagem(fone, confirmarEmail(nome, email, fone))
                 : Promise.resolve(null),
             // E-mail de boas-vindas (rede de segurança grupo+ficha) só pro ingresso.
             ehIngresso ? enviarEmailBoasVindas(email, nome) : Promise.resolve(null),
-            // Hermes Week — e-mail 1 (confirmação) e e-mail 2 (boas-vindas) juntos por
-            // enquanto: sem scheduler de D+1 implementado ainda, ver CHECKLIST-VIRADA-CICLO.md.
-            ehHermesWeek ? enviarEmailConfirmacaoHermesWeek(email, nome) : Promise.resolve(null),
-            ehHermesWeek ? enviarEmailBoasVindasHermesWeek(email, nome) : Promise.resolve(null),
         ]);
-        if (!capi.ok) console.error("[hotmart] CAPI:", capi.erro);
+
+        /* ------------------------------------------------------------------
+         * OS DOIS E-MAILS DA HERMES WEEK SAEM EM SÉRIE, NÃO EM PARALELO.
+         * ------------------------------------------------------------------
+         * O e-mail 2 já é agendado pra D+1 09h (`scheduled_at`), então em
+         * condições normais nem competiria com o 1. Mas enquanto os dois
+         * viviam no mesmo Promise.all, quem chegava primeiro na fila do Resend
+         * era sorteio, e isso já mordeu duas vezes: em 06/09 o e-mail 2 saiu
+         * 54ms antes do 1, e na simulação de 08/09 saiu 29ms antes. O comprador
+         * recebia "O que esperar da Hermes Week" antes de "Você tá dentro".
+         *
+         * Em série, o e-mail 1 só é dado por enviado quando o Resend confirma,
+         * e só então o 2 é agendado. Custa uma ida e volta a mais no webhook
+         * (a Hotmart aceita bem: a resposta inteira leva ~3s), e em troca a
+         * ordem deixa de depender de sorte ou de o agendamento funcionar.
+         * ---------------------------------------------------------------- */
+        const mailHW1 = ehHermesWeek ? await enviarEmailConfirmacaoHermesWeek(email, nome) : null;
+        const mailHW2 = ehHermesWeek ? await enviarEmailBoasVindasHermesWeek(email, nome) : null;
+        if (!produtoConhecido) {
+            console.warn(`[hotmart] produto ${produtoId} fora do mapa — CAPI ignorado (evento de teste?)`);
+        }
+        if (!capi.ok) console.error("[hotmart] CAPI:", "erro" in capi ? capi.erro : "");
         if (!lista.ok) console.error("[hotmart] Resend audiência:", lista.erro);
         if (wpp && !wpp.ok) console.error("[hotmart] WhatsApp:", wpp.erro);
         if (mail && !mail.ok) console.error("[hotmart] e-mail boas-vindas:", mail.erro);
@@ -348,9 +407,11 @@ export async function POST(req: NextRequest) {
                     ? " · ✅ WhatsApp"
                     : " · ⚠️ WhatsApp falhou";
 
+        // O e-mail 2 é AGENDADO pra D+1 09h BRT, não enviado agora — o texto precisa
+        // dizer isso, senão o Red procura na caixa de entrada uma coisa que só sai amanhã.
         const statusEmailHW = !ehHermesWeek
             ? ""
-            : ` · ${mailHW1?.ok ? "✅" : "⚠️"} e-mail 1 · ${mailHW2?.ok ? "✅" : "⚠️"} e-mail 2`;
+            : ` · ${mailHW1?.ok ? "✅" : "⚠️"} e-mail 1 · ${mailHW2?.ok ? `🗓️ e-mail 2 agendado ${(mailHW2 as { agendado_para?: string }).agendado_para ?? "D+1"}` : "⚠️ e-mail 2 não agendou"}`;
 
         await telegram([
             `💰 *VENDA — ${produtoNome}*`,
