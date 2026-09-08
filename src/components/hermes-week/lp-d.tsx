@@ -30,6 +30,7 @@ import { Archivo_Black, Space_Grotesk } from "next/font/google";
 import { checkoutUrl } from "./checkout";
 import { ImgReal, inline, legendaImg, PAPEL_IMG, Pixel } from "./comum";
 import { compartilhado, type Bloco, type Img, type No, type Variante } from "./conteudo";
+import type { CicloFormatado } from "@/lib/ciclo-atual";
 import { Revela } from "./movimento";
 
 const black = Archivo_Black({ subsets: ["latin"], weight: "400", variable: "--d-black", display: "swap" });
@@ -59,6 +60,7 @@ const CSS = `
   letter-spacing:.18em;text-transform:uppercase;background:var(--tinta);color:var(--osso);
   padding:8px 12px;margin:0 0 26px;
 }
+.d-data{font-family:var(--mono);font-weight:700;font-size:clamp(1.02rem,3.3vw,1.45rem);line-height:1.25;letter-spacing:-.01em;color:var(--sinal);margin:0 0 20px;}
 .d-h1{
   font-family:var(--black);font-weight:400;text-transform:uppercase;
   font-size:clamp(2.05rem,8.6vw,5rem);line-height:.93;letter-spacing:-.045em;
@@ -305,7 +307,7 @@ function Escada({ b }: { b: Bloco }) {
 
 /* ========================================================================= */
 
-export function LpD({ v }: { v: Variante }) {
+export function LpD({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
   const url = checkoutUrl(v.id);
   const escada = v.antes.find((b) => b.tag === "a escada");
   const resto = v.antes.filter((b) => b !== escada);
@@ -317,8 +319,9 @@ export function LpD({ v }: { v: Variante }) {
 
       <main className="d-wrap">
         <header className="d-hero">
-          <p className="d-eyebrow">{compartilhado.evento}</p>
+          <p className="d-eyebrow">{compartilhado.evento} · {ciclo.faixa}, 20h</p>
           <h1 className="d-h1">{inline(v.hero.h1, "h1")}</h1>
+          <p className="d-data">{`De ${ciclo.faixa}, 20h`}</p>
           <p className="d-deck">{v.hero.deck}</p>
           <a className="d-cta hw-acao" href={url}>
             {compartilhado.ctaTopo}
@@ -353,9 +356,9 @@ export function LpD({ v }: { v: Variante }) {
             <p className="d-p">{v.saiCom.intro}</p>
           </div>
           <dl className="d-dias">
-            {compartilhado.dias.map((d) => (
+            {compartilhado.dias.map((d, i) => (
               <div className="d-dia" key={d.dia}>
-                <dt>{d.dia}</dt>
+                <dt>{d.dia} {ciclo.aulas[i]}</dt>
                 <dd>{d.saida}</dd>
               </div>
             ))}

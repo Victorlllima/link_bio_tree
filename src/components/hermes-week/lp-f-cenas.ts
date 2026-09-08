@@ -81,8 +81,12 @@ export const CENAS: Cena[] = [
 export const OFERTA = {
   produto: "Hermes Week | Seu Agente do Zero à Produção",
   preco: "R$62",
-  /* Sem data: a Hermes Week é evento SEMANAL. Uma data fixa aqui envelhece a
-     página em sete dias e contradiz o "segunda que vem" do resto da copy. */
+  /* A data NÃO é escrita aqui, mas a página CRAVA data (Red, 08/09/2026): a LP
+     é onde a pessoa decide comprar, e "segunda que vem" não responde "qual
+     segunda?" pra quem cai de anúncio numa sexta. A regra que proíbe data
+     cravada vale pro CRIATIVO, que é reaproveitado entre ciclos sem reedição.
+     A data vem de `ciclo_atual` via prop `ciclo`, então a página acompanha o
+     ciclo semanal sozinha e ninguém precisa reeditar .tsx toda segunda. */
   evento: "Hermes Week · Seu Hermes Agent do zero à produção · segunda a sexta, 20h",
   ctaTopo: "QUERO MEU AGENTE POR R$62",
   ctaOferta: "GARANTIR MEU INGRESSO POR R$62",

@@ -46,6 +46,7 @@ import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
 import { checkoutUrl } from "./checkout";
 import { Pixel } from "./comum";
 import { CENAS, DUPLA, OFERTA } from "./lp-f-cenas";
+import type { CicloFormatado } from "@/lib/ciclo-atual";
 
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -126,6 +127,14 @@ const CSS = `
 }
 .f-cena-cta:hover{background:#F2B667;}
 
+/* ---- data do ciclo, logo abaixo do filme (Red, 08/09/2026) ---- */
+.f-data{
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(1.45rem,4.4vw,2.5rem);line-height:1.15;letter-spacing:-.02em;
+  color:var(--ambar);text-align:center;margin:0;padding:34px 20px 6px;
+}
+.f-data span{display:block;font-family:var(--ui);font-weight:400;
+  font-size:clamp(.82rem,2vw,1rem);letter-spacing:.04em;color:var(--frio);margin-top:10px;}
 /* ---- modo cinema: canvas fixo por cima da trilha ---- */
 .f-palco{position:fixed;inset:0;z-index:1;display:none;}
 .f-tela{width:100%;height:100%;display:block;}
@@ -679,7 +688,7 @@ function useMobile(raiz: React.RefObject<HTMLDivElement | null>) {
   return barra;
 }
 
-export function LpF() {
+export function LpF({ ciclo }: { ciclo: CicloFormatado }) {
   const raiz = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const trilha = useRef<HTMLDivElement>(null);
@@ -1013,6 +1022,11 @@ export function LpF() {
         </div>
       </div>
 
+      <p className="f-data">
+        {`De ${ciclo.faixa}`}
+        <span>{`Cinco aulas, segunda a sexta, 20h · começa ${ciclo.inicio}`}</span>
+      </p>
+
       {/* ============ PARTE 2 · A OFERTA ============ */}
       <div className="f-of">
         <section className="f-faixa">
@@ -1088,9 +1102,9 @@ export function LpF() {
               </h2>
             </div>
             <dl className="f-dias">
-              {OFERTA.dias.map((d) => (
+              {OFERTA.dias.map((d, i) => (
                 <div className="f-dia" key={d.dia}>
-                  <dt>{d.dia}</dt>
+                  <dt>{d.dia} {ciclo.aulas[i]}</dt>
                   <dd>{d.saida}</dd>
                 </div>
               ))}
@@ -1230,7 +1244,7 @@ export function LpF() {
               Quem tem uma que trabalha não sabe mais programar que você. Tem uma{" "}
               <b>instalação bem feita</b>
             </h2>
-            <p className="f-p">Segunda que vem, às 20h, a gente começa.</p>
+            <p className="f-p">{`Segunda, ${ciclo.inicio}, às 20h, a gente começa.`}</p>
             <a className="f-cta hw-acao" href={CHECKOUT} style={{ maxWidth: 460 }}>
               {OFERTA.ctaTopo}
             </a>
@@ -1240,7 +1254,7 @@ export function LpF() {
         <footer className="f-rodape">
           <div className="f-in">
             <p>
-              {OFERTA.evento}
+              {`${OFERTA.evento} · ${ciclo.faixa}`}
               <br />
               {OFERTA.rodape.razao} · {OFERTA.rodape.cnpj} · {OFERTA.rodape.suporte}
             </p>

@@ -24,6 +24,7 @@ import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import { checkoutUrl } from "./checkout";
 import { ImgReal, inline, legendaImg, PAPEL_IMG, Pixel } from "./comum";
 import { compartilhado, type Bloco, type Img, type No, type Variante } from "./conteudo";
+import type { CicloFormatado } from "@/lib/ciclo-atual";
 import { Revela } from "./movimento";
 
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "700"], variable: "--a-mono", display: "swap" });
@@ -48,6 +49,7 @@ const CSS = `
 /* ---------- hero ---------- */
 .a-hero{padding:64px 0 40px;max-width:640px;}
 .a-eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--menta);margin:0 0 26px;}
+.a-data{font-family:var(--mono);font-weight:700;font-size:clamp(1.02rem,3.3vw,1.45rem);line-height:1.25;letter-spacing:-.01em;color:var(--menta);margin:0 0 20px;}
 .a-h1{
   font-family:var(--mono);font-weight:700;
   font-size:clamp(1.85rem,6.2vw,3.15rem);line-height:1.1;letter-spacing:-.035em;
@@ -255,7 +257,7 @@ function Cta({ href }: { href: string }) {
 
 /* ========================================================================= */
 
-export function LpA({ v }: { v: Variante }) {
+export function LpA({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
   const url = checkoutUrl(v.id);
 
   return (
@@ -266,8 +268,9 @@ export function LpA({ v }: { v: Variante }) {
       <div className="a-ceu">
         <main className="a-wrap">
           <header className="a-hero">
-            <p className="a-eyebrow">{compartilhado.evento}</p>
+            <p className="a-eyebrow">{compartilhado.evento} · {ciclo.faixa}, 20h</p>
             <h1 className="a-h1">{inline(v.hero.h1, "h1")}</h1>
+          <p className="a-data">{`De ${ciclo.faixa}, 20h`}</p>
             <p className="a-deck">{v.hero.deck}</p>
             <Cta href={url} />
             <ul className="a-fatos">
@@ -287,9 +290,9 @@ export function LpA({ v }: { v: Variante }) {
             <div className="a-col">
               <p className="a-forte">{v.saiCom.intro}</p>
               <dl className="a-dias">
-                {compartilhado.dias.map((d) => (
+                {compartilhado.dias.map((d, i) => (
                   <div className="a-dia" key={d.dia}>
-                    <dt>{d.dia}</dt>
+                    <dt>{d.dia} {ciclo.aulas[i]}</dt>
                     <dd>{d.saida}</dd>
                   </div>
                 ))}

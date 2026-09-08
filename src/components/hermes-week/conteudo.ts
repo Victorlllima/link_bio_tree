@@ -34,6 +34,8 @@ import type { VarianteId } from "./checkout";
  *  página tem sua própria distribuição, decidida no briefing.
  * ------------------------------------------------------------------------*/
 
+import type { CicloFormatado } from "@/lib/ciclo-atual";
+
 export type ImgTipo = "RED" | "ALFRED" | "HERMES";
 export type ImgFormato = "retrato" | "wide" | "celular" | "quadrado";
 
@@ -424,7 +426,7 @@ const A: Variante = {
         t: "p",
         c: "Quem tem uma que trabalha não tem mais dinheiro nem sabe mais programar que você. Tem uma instalação bem feita e cinco dias de método.",
       },
-      { t: "forte", c: "Segunda que vem, às 20h, a gente começa." },
+      { t: "forte", c: "Segunda, {{INICIO}}, às 20h, a gente começa." },
     ],
     foto: {
       tipo: "RED",
@@ -682,7 +684,7 @@ const B: Variante = {
     nos: [
       { t: "p", c: "Você não precisa de mais uma ferramenta de IA. Você tem quatro." },
       { t: "p", c: "Precisa de uma que faça, em vez de responder." },
-      { t: "forte", c: "Segunda que vem, 20h." },
+      { t: "forte", c: "Segunda, {{INICIO}}, 20h." },
     ],
     foto: IMG_RED_MANHA,
   },
@@ -697,7 +699,7 @@ const C: Variante = {
   seo: {
     titulo: "Hermes Week · A categoria de IA que quase ninguém no Brasil usa",
     descricao:
-      "Feita pelo laboratório que treina os modelos, aberta, gratuita, e sem plataforma nenhuma no meio. Rodando na sua máquina em cinco dias, 14 a 18 de setembro.",
+      "Feita pelo laboratório que treina os modelos, aberta, gratuita, e sem plataforma nenhuma no meio. Rodando na sua máquina em cinco dias, {{FAIXA}}.",
   },
   hero: {
     h1: "A categoria de IA que **quase ninguém no Brasil usa** ainda, rodando na sua máquina em cinco dias",
@@ -911,7 +913,7 @@ const C: Variante = {
     nos: [
       { t: "p", c: "Toda categoria tem uma janela em que ela funciona e quase ninguém sabe." },
       { t: "p", c: "Depois ela vira óbvia, e aí você é mais um." },
-      { t: "forte", c: "Segunda que vem, 20h." },
+      { t: "forte", c: "Segunda, {{INICIO}}, 20h." },
     ],
     /* C não repete a foto do Red no fecho: nesta variação ele aparece uma vez
        só, ao lado do resumo. O argumento aqui é o documento, não o autor. */
@@ -1142,7 +1144,7 @@ const D: Variante = {
         c: "Quem tem IA trabalhando não tem mais dinheiro que você e não sabe mais programar que você.",
       },
       { t: "p", c: "O que essa pessoa tem é um degrau de distância, e uma semana de método." },
-      { t: "forte", c: "Segunda que vem, 20h." },
+      { t: "forte", c: "Segunda, {{INICIO}}, 20h." },
     ],
     foto: IMG_RED_MANHA,
   },
@@ -1391,7 +1393,7 @@ const E: Variante = {
         t: "p",
         c: "Você pode passar ele checando e-mail no celular, ou pode passar ele fazendo outra coisa enquanto alguém checa por você.",
       },
-      { t: "forte", c: "Segunda que vem, 20h." },
+      { t: "forte", c: "Segunda, {{INICIO}}, 20h." },
     ],
     /* ⚠️ SEM src, mesmo motivo do hero desta página: não existe foto do Red
        fora do ambiente de trabalho. Ver nota no hero da LP E. */
@@ -1412,3 +1414,37 @@ const E: Variante = {
 export type VarianteTextualId = Exclude<VarianteId, "F">;
 
 export const VARIANTES: Record<VarianteTextualId, Variante> = { A, B, C, D, E };
+
+/* --------------------------------------------------------------------------
+ *  DATA CRAVADA NA COPY
+ * ----------------------------------------------------------------------------
+ *  A copy escreve `{{INICIO}}` / `{{FAIXA}}` / `{{DUVIDAS}}` / `{{APRESENTACAO}}`
+ *  e a página resolve na renderização, com a data que está em `ciclo_atual`.
+ *
+ *  Por que token e não a data escrita direto: a LP PRECISA cravar data (Red,
+ *  08/09/2026), porque quem cai de anúncio numa sexta não sabe qual é "segunda
+ *  que vem". Mas o evento roda toda semana, e data escrita em .tsx obriga
+ *  alguém a reeditar cinco páginas toda segunda. Foi o bug de 27/07, quando a
+ *  LP do Desafio anunciava uma semana que já tinha sido adiada.
+ * ------------------------------------------------------------------------*/
+
+export function comDatas<T>(no: T, ciclo: CicloFormatado): T {
+  const mapa: Record<string, string> = {
+    "{{INICIO}}": ciclo.inicio,
+    "{{FAIXA}}": ciclo.faixa,
+    "{{DUVIDAS}}": ciclo.duvidas,
+    "{{APRESENTACAO}}": ciclo.apresentacao,
+  };
+  const troca = (txt: string) =>
+    Object.entries(mapa).reduce((acc, [k, val]) => acc.split(k).join(val), txt);
+
+  const anda = (x: unknown): unknown => {
+    if (typeof x === "string") return troca(x);
+    if (Array.isArray(x)) return x.map(anda);
+    if (x && typeof x === "object") {
+      return Object.fromEntries(Object.entries(x).map(([k, val]) => [k, anda(val)]));
+    }
+    return x;
+  };
+  return anda(no) as T;
+}

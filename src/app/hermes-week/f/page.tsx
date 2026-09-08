@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LpF } from "@/components/hermes-week/lp-f";
+import { lerCicloAtual, formatarCiclo } from "@/lib/ciclo-atual";
 
 /* /hermes-week/f · variação F (a jornada) · cinemática, skill cine-scroll
    Roteiro aprovado: Starlight/HERMES/05-paginas/lp-F-cinematica-ROTEIRO.md */
@@ -24,6 +25,10 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: TITULO, description: DESCRICAO },
 };
 
-export default function Page() {
-  return <LpF />;
+/* A data do ciclo muda uma vez por semana: 10 min de cache é folga. */
+export const revalidate = 600;
+
+export default async function Page() {
+  const ciclo = formatarCiclo((await lerCicloAtual({ revalidar: 600 })).dataInicio);
+  return <LpF ciclo={ciclo} />;
 }

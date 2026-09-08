@@ -18,9 +18,9 @@ alter table ciclo_atual enable row level security;
 -- Sem policy: só a service key lê/escreve, mesmo padrão de garantia_marcos
 -- e wpp_health_state. RLS ligado bloqueia anon/authenticated por padrão.
 
--- Seed inicial do ciclo 1 (14/09/2026) — ajustar antes de rodar se a data mudou.
+-- Seed inicial do ciclo 1 (21/09/2026, adiado de 14/09 em 08/09) — ajustar antes de rodar se a data mudou.
 insert into ciclo_atual (id, data_inicio, link_grupo)
-values (true, '2026-09-14', 'https://chat.whatsapp.com/F3fKDtOH98MBbgkSroDt2G')
+values (true, '2026-09-21', 'https://chat.whatsapp.com/F3fKDtOH98MBbgkSroDt2G')
 on conflict (id) do update set
   data_inicio = excluded.data_inicio,
   link_grupo = excluded.link_grupo,

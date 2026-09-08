@@ -29,6 +29,7 @@ import { IBM_Plex_Mono, Source_Serif_4 } from "next/font/google";
 import { checkoutUrl } from "./checkout";
 import { ImgReal, inline, legendaImg, PAPEL_IMG, Pixel } from "./comum";
 import { compartilhado, type Img, type No, type Variante } from "./conteudo";
+import type { CicloFormatado } from "@/lib/ciclo-atual";
 
 const serif = Source_Serif_4({
   subsets: ["latin"],
@@ -56,6 +57,7 @@ const CSS = `
 /* ---------- cabeçalho do documento ---------- */
 .c-cab{border-bottom:3px double var(--tinta);padding:44px 0 18px;margin-bottom:36px;}
 .c-selo{font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--marca);margin:0 0 22px;}
+.c-data{font-family:var(--mono);font-weight:700;font-size:clamp(1.02rem,3.3vw,1.45rem);line-height:1.25;letter-spacing:-.01em;color:var(--marca);margin:0 0 20px;}
 .c-h1{
   font-family:var(--serif);font-weight:700;
   font-size:clamp(1.9rem,5.4vw,3.05rem);line-height:1.12;letter-spacing:-.02em;
@@ -270,7 +272,7 @@ function Nos({ nos, k, figs }: { nos: readonly No[]; k: string; figs: Map<Img, n
 
 /* ========================================================================= */
 
-export function LpC({ v }: { v: Variante }) {
+export function LpC({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
   const url = checkoutUrl(v.id);
   const figs = mapaDeFiguras(v);
 
@@ -299,6 +301,7 @@ export function LpC({ v }: { v: Variante }) {
         <header className="c-cab">
           <p className="c-selo">Hermes Week · relatório de campo · RedPro AI Academy</p>
           <h1 className="c-h1">{inline(v.hero.h1, "h1")}</h1>
+          <p className="c-data">{`De ${ciclo.faixa}, 20h`}</p>
           <p className="c-deck">{v.hero.deck}</p>
           {/* Ficha do documento sem rótulo-dois-pontos: o rótulo fica acima,
               em versalete, e o dado embaixo. É como uma ficha catalográfica
@@ -381,9 +384,9 @@ export function LpC({ v }: { v: Variante }) {
                 </tr>
               </thead>
               <tbody>
-                {compartilhado.dias.map((d) => (
+                {compartilhado.dias.map((d, i) => (
                   <tr key={d.dia}>
-                    <td>{d.dia}</td>
+                    <td>{d.dia} {ciclo.aulas[i]}</td>
                     <td>{d.saida}</td>
                   </tr>
                 ))}
@@ -440,7 +443,7 @@ export function LpC({ v }: { v: Variante }) {
           </div>
           <div className="c-col">
             <div className="c-quadro">
-              <div className="c-quadro-cab">{compartilhado.evento}</div>
+              <div className="c-quadro-cab">{compartilhado.evento} · {ciclo.faixa}, 20h</div>
               <div className="c-quadro-corpo">
                 <h3 className="c-produto">{compartilhado.produto}</h3>
                 <p className="c-preco">{compartilhado.preco}</p>

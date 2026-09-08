@@ -28,6 +28,7 @@ import { Manrope, Sora, Space_Mono } from "next/font/google";
 import { checkoutUrl } from "./checkout";
 import { ImgReal, inline, legendaImg, PAPEL_IMG, Pixel } from "./comum";
 import { compartilhado, type Bloco, type Img, type No, type Variante } from "./conteudo";
+import type { CicloFormatado } from "@/lib/ciclo-atual";
 import { Revela } from "./movimento";
 
 const display = Sora({ subsets: ["latin"], weight: ["600", "800"], variable: "--b-display", display: "swap" });
@@ -65,6 +66,7 @@ const CSS = `
 /* ---------- hero ---------- */
 .b-hero{padding:52px 0 8px;}
 .b-eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--viva);margin:0 0 22px;}
+.b-data{font-family:var(--mono);font-weight:700;font-size:clamp(1.02rem,3.3vw,1.45rem);line-height:1.25;letter-spacing:-.01em;color:var(--viva);margin:0 0 20px;}
 .b-h1{
   font-family:var(--display);font-weight:800;
   font-size:clamp(2rem,6.6vw,3.6rem);line-height:1.04;letter-spacing:-.045em;
@@ -271,7 +273,7 @@ function Cta({ href, texto }: { href: string; texto: string }) {
 
 /* ========================================================================= */
 
-export function LpB({ v }: { v: Variante }) {
+export function LpB({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
   const url = checkoutUrl(v.id);
 
   const inventario = v.antes.find((b) => b.tag === "o inventário");
@@ -290,8 +292,9 @@ export function LpB({ v }: { v: Variante }) {
 
       <main className="b-wrap">
         <header className="b-hero">
-          <p className="b-eyebrow">{compartilhado.evento}</p>
+          <p className="b-eyebrow">{compartilhado.evento} · {ciclo.faixa}, 20h</p>
           <h1 className="b-h1">{inline(v.hero.h1, "h1")}</h1>
+          <p className="b-data">{`De ${ciclo.faixa}, 20h`}</p>
           <p className="b-deck">{v.hero.deck}</p>
           <Cta href={url} texto={compartilhado.ctaTopo} />
           <ul className="b-fatos">
@@ -360,9 +363,9 @@ export function LpB({ v }: { v: Variante }) {
         <section className="b-sec">
           <h2 className="b-sec-tit">{v.saiCom.intro}</h2>
           <div className="b-grade">
-            {compartilhado.dias.map((d) => (
+            {compartilhado.dias.map((d, i) => (
               <div className="b-cel b-dia" key={d.dia}>
-                <p className="b-dia-n">{d.dia}</p>
+                <p className="b-dia-n">{d.dia} {ciclo.aulas[i]}</p>
                 <p className="b-dia-t">{d.saida}</p>
               </div>
             ))}

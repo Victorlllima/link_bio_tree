@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { LpF } from "@/components/hermes-week/lp-f";
 import { LpFMobile } from "@/components/hermes-week/lp-f-mobile";
+import { lerCicloAtual, formatarCiclo } from "@/lib/ciclo-atual";
 
 /* ============================================================================
  *  /hermes-week  ·  VARIAÇÃO F (a jornada) — cinemática, a canônica
@@ -81,7 +82,11 @@ export const metadata: Metadata = {
 const CELULAR =
   /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Silk|FBAN|FBAV|Instagram/i;
 
+/* A data do ciclo muda uma vez por semana: 10 min de cache é folga. */
+export const revalidate = 600;
+
 export default async function Page() {
   const ua = (await headers()).get("user-agent") ?? "";
-  return CELULAR.test(ua) ? <LpFMobile /> : <LpF />;
+  const ciclo = formatarCiclo((await lerCicloAtual({ revalidar: 600 })).dataInicio);
+  return CELULAR.test(ua) ? <LpFMobile ciclo={ciclo} /> : <LpF ciclo={ciclo} />;
 }

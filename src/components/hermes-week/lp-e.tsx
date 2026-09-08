@@ -31,6 +31,7 @@ import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import { checkoutUrl } from "./checkout";
 import { ImgReal, inline, legendaImg, PAPEL_IMG, Pixel } from "./comum";
 import { compartilhado, type Bloco, type Img, type No, type Variante } from "./conteudo";
+import type { CicloFormatado } from "@/lib/ciclo-atual";
 import { Paralaxe } from "./movimento";
 
 const fraunces = Fraunces({
@@ -68,6 +69,7 @@ const CSS = `
 
 /* ---------- hero ---------- */
 .e-hero{padding:70px 0 0;}
+.e-data{font-family:var(--mono);font-weight:700;font-size:clamp(1.02rem,3.3vw,1.45rem);line-height:1.25;letter-spacing:-.01em;color:var(--oliva);margin:0 0 20px;}
 .e-h1{
   font-family:var(--display);font-weight:300;font-optical-sizing:auto;
   font-size:clamp(2.35rem,7.4vw,4.6rem);line-height:1.06;letter-spacing:-.022em;
@@ -312,7 +314,7 @@ function Celebram({ b }: { b: Bloco }) {
 
 /* ========================================================================= */
 
-export function LpE({ v }: { v: Variante }) {
+export function LpE({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
   const url = checkoutUrl(v.id);
   const celebram = v.antes.find((b) => b.tag === "o que essas pessoas celebram");
 
@@ -326,8 +328,9 @@ export function LpE({ v }: { v: Variante }) {
       <main>
         <header className="e-hero">
           <div className="e-in">
-            <p className="e-rot">{compartilhado.evento}</p>
+            <p className="e-rot">{compartilhado.evento} · {ciclo.faixa}, 20h</p>
             <h1 className="e-h1">{inline(v.hero.h1, "h1")}</h1>
+          <p className="e-data">{`De ${ciclo.faixa}, 20h`}</p>
             <p className="e-deck">{v.hero.deck}</p>
             <a className="e-cta hw-acao" href={url}>
               {compartilhado.ctaTopo}
@@ -366,9 +369,9 @@ export function LpE({ v }: { v: Variante }) {
             <p className="e-rot">a semana</p>
             <h2 className="e-h2">{v.saiCom.intro}</h2>
             <dl className="e-dias">
-              {compartilhado.dias.map((d) => (
+              {compartilhado.dias.map((d, i) => (
                 <div className="e-dia" key={d.dia}>
-                  <dt>{d.dia}</dt>
+                  <dt>{d.dia} {ciclo.aulas[i]}</dt>
                   <dd>{d.saida}</dd>
                 </div>
               ))}

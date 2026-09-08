@@ -75,6 +75,7 @@ import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
 import { checkoutUrl } from "./checkout";
 import { Pixel } from "./comum";
 import { CENAS, DUPLA, OFERTA } from "./lp-f-cenas";
+import type { CicloFormatado } from "@/lib/ciclo-atual";
 
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -352,6 +353,14 @@ const CSS = `
    fecho do bloco Hermes x Alfred ("O seu vai ter o nome que você quiser")
    sempre que a rolagem parava naquele ponto. A barra é fixa: ela pode cobrir
    qualquer coisa, então quem reserva o espaço é o documento inteiro. */
+/* ---- data do ciclo, logo abaixo do carrossel (Red, 08/09/2026) ---- */
+.m-data{
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(1.3rem,6.4vw,1.9rem);line-height:1.15;letter-spacing:-.02em;
+  color:var(--ambar);text-align:center;margin:0;padding:26px 18px 4px;
+}
+.m-data span{display:block;font-family:var(--ui);font-weight:400;
+  font-size:.84rem;letter-spacing:.03em;color:var(--frio);margin-top:8px;}
 .m-of{
   position:relative;background:var(--breu);
   padding-bottom:calc(74px + env(safe-area-inset-bottom,0px));
@@ -808,7 +817,7 @@ function useBarra(alvo: React.RefObject<HTMLDivElement | null>) {
   return on;
 }
 
-export function LpFMobile() {
+export function LpFMobile({ ciclo }: { ciclo: CicloFormatado }) {
   const filme = useRef<HTMLDivElement>(null);
   const barra = useBarra(filme);
 
@@ -829,6 +838,11 @@ export function LpFMobile() {
       </div>
 
       {/* ============ PARTE 2 · A OFERTA ============ */}
+      <p className="m-data">
+        {`De ${ciclo.faixa}`}
+        <span>{`Cinco aulas, segunda a sexta, 20h · começa ${ciclo.inicio}`}</span>
+      </p>
+
       <div className="m-of">
         <section className="m-faixa">
           <div className="m-in">
@@ -895,9 +909,9 @@ export function LpFMobile() {
               Cinco aulas, uma por dia, das <b>20h às 20h50</b>
             </h2>
             <dl className="m-dias">
-              {OFERTA.dias.map((d) => (
+              {OFERTA.dias.map((d, i) => (
                 <div className="m-dia" key={d.dia}>
-                  <dt>{d.dia}</dt>
+                  <dt>{d.dia} {ciclo.aulas[i]}</dt>
                   <dd>{d.saida}</dd>
                 </div>
               ))}
@@ -1027,7 +1041,7 @@ export function LpFMobile() {
               Quem tem uma que trabalha não sabe mais programar que você. Tem uma{" "}
               <b>instalação bem feita</b>
             </h2>
-            <p className="m-p">Segunda que vem, às 20h, a gente começa.</p>
+            <p className="m-p">{`Segunda, ${ciclo.inicio}, às 20h, a gente começa.`}</p>
             <a className="m-cta hw-acao" href={CHECKOUT}>
               {OFERTA.ctaTopo}
             </a>
@@ -1037,7 +1051,7 @@ export function LpFMobile() {
         <footer className="m-rodape">
           <div className="m-in">
             <p>
-              {OFERTA.evento}
+              {`${OFERTA.evento} · ${ciclo.faixa}`}
               <br />
               {OFERTA.rodape.razao} · {OFERTA.rodape.cnpj} · {OFERTA.rodape.suporte}
             </p>
