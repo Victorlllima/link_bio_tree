@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { lerCicloAtual, formatarCiclo, type CicloFormatado } from "@/lib/ciclo-atual";
 
 /* ============================================================================
  *  /hermes-week/obrigado  ·  página pós-compra da Hermes Week
@@ -18,11 +19,12 @@ import type { Metadata } from "next";
  *     apontar para um checklist que ainda não existe.
  * ==========================================================================*/
 
-// Link do grupo do ciclo atual — recriado a cada semana.
-// ⚠️ TROCAR A CADA CICLO. Enquanto o grupo da Hermes Week não existir, aponta
-// para o do ciclo anterior seria pior que não apontar: o comprador cairia num
-// grupo de outro produto. Por isso o fallback é o suporte.
-const GRUPO_URL = "https://chat.whatsapp.com/F3fKDtOH98MBbgkSroDt2G";
+// O link do grupo NÃO mora mais aqui (Red, 08/09/2026). Ele muda toda semana,
+// junto com o ciclo, e constante em .tsx obriga alguém a lembrar de reeditar a
+// página a cada segunda. Agora vem de `ciclo_atual.link_grupo`, a mesma linha do
+// banco que já carrega a data — uma atualização semanal resolve os dois.
+// Se a coluna vier vazia, cai no aviso com o suporte: mandar o comprador pro
+// grupo do ciclo anterior seria pior que não mandar pra lugar nenhum.
 const SUPORTE = "suporte@redpro.com.br";
 
 export const metadata: Metadata = {
@@ -31,7 +33,7 @@ export const metadata: Metadata = {
   description: "Sua vaga na Hermes Week está garantida. Veja o que fazer antes da primeira aula.",
 };
 
-const html = `
+const html = (ciclo: CicloFormatado, GRUPO_URL: string) => `
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@200;400;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -60,6 +62,16 @@ const html = `
   .ob-root .card {
     max-width: 620px; width: 100%; text-align: center;
     background: radial-gradient(ellipse at top, var(--ambar-glow), transparent 65%);
+  }
+  /* Logo da marca acima do selo de confirmação (Red, 08/09/2026). A página é a
+     primeira coisa que o comprador vê depois de pagar, e até agora não dizia de
+     quem ela é. Tamanho subiu de 44px pra 220px a pedido do Red (08/09, 5x).
+     O clamp existe porque o card tem 620px: em tela estreita uma altura fixa de
+     220px comeria metade da primeira dobra e empurraria o botão do grupo, que é
+     a única ação da página, pra fora do campo de visão. */
+  .ob-root .marca {
+    height: clamp(180px, 38vw, 220px); width: auto; display: block;
+    margin: 0 auto 28px; opacity: .95;
   }
   .ob-root .check {
     width: 72px; height: 72px; margin: 0 auto 24px; border-radius: 50%;
@@ -102,6 +114,9 @@ const html = `
     transition: transform .15s;
   }
   .ob-root .btn:hover { transform: translateY(-2px); }
+  /* O bloco é alinhado à esquerda pra leitura, mas o botão é o único ponto de
+     ação da página e fica centralizado, destacado do texto (Red, 08/09/2026). */
+  .ob-root .acao-cta { text-align: center; }
 
   .ob-root .aviso {
     border: 1px dashed rgba(232,163,61,.5); border-radius: 8px; padding: 14px;
@@ -114,30 +129,25 @@ const html = `
 
 <div class="ob-root">
   <div class="card">
+    <img src="/logo-academy.png" alt="RedPro AI Academy" class="marca" width="220" height="220" />
     <div class="check">✓</div>
-    <h1>Tá dentro. Agora <em>o primeiro passo.</em></h1>
-    <p class="lead">Sua vaga na Hermes Week está garantida. Antes da primeira aula, três coisas.</p>
+    <h1>Você está <em>dentro.</em></h1>
+    <p class="lead">Sua vaga na Hermes Week está garantida. Mas antes da primeira aula, duas coisas.</p>
 
     <div class="bloco acao">
-      <div class="tit"><span class="num">1</span> Entra no grupo agora</div>
-      <p>É pelo grupo que eu mando o link de cada aula, respondo dúvida durante a semana e aviso quando a sessão de sábado começa. <strong>Quem não entra no grupo não recebe os links.</strong></p>
+      <div class="tit"><span class="num">1</span> Entra no nosso grupo</div>
+      <p>É pelo grupo que eu mando o link de cada aula e os avisos importantes pra você. <strong>Quem não entra no grupo não recebe os links.</strong></p>
       ${
         GRUPO_URL
-          ? `<a href="${GRUPO_URL}" class="btn">Entrar no grupo do WhatsApp</a>`
+          ? `<div class="acao-cta"><a href="${GRUPO_URL}" class="btn">Entrar no grupo do WhatsApp</a></div>`
           : `<div class="aviso">O grupo deste ciclo abre pouco antes da primeira aula, e o link chega no seu e-mail. Se não tiver chegado até domingo, me escreve em <a class="txt" href="mailto:${SUPORTE}">${SUPORTE}</a> que eu te coloco na mão.</div>`
       }
     </div>
 
     <div class="bloco">
-      <div class="tit"><span class="num">2</span> Segunda, 20h. Todo dia até sexta</div>
-      <p>Cinco encontros, um por dia, das 20h às 20h50. No sábado às 10h tem uma sessão ao vivo só de dúvidas, pra destravar quem travou.</p>
+      <div class="tit"><span class="num">2</span> Segunda, dia ${ciclo.inicioExtenso}, a gente começa</div>
+      <p>Cinco encontros, um por dia, das 20h às 20h50. No sábado às 10h eu abro o grupo pra quem quiser tirar dúvidas pra destravar em algum ponto específico.</p>
       <p><strong>Deixa o computador do lado.</strong> Desde a primeira aula você constrói junto comigo, então acompanhar pelo celular não funciona.</p>
-    </div>
-
-    <div class="bloco">
-      <div class="tit"><span class="num">3</span> Prepara uma conta de IA antes</div>
-      <p>Seu agente precisa de um modelo por trás pra pensar. Se você já paga ChatGPT, Claude ou Gemini, está resolvido e a gente usa a sua assinatura, sem custo novo.</p>
-      <p>Se não paga nenhum, também dá: na primeira aula eu mostro o caminho gratuito e como sair do zero de API por mês.</p>
     </div>
 
     <p class="rodape">
@@ -148,6 +158,11 @@ const html = `
 </div>
 `;
 
-export default function HermesWeekObrigadoPage() {
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+/* A data do ciclo muda uma vez por semana: 10 min de cache é folga. */
+export const revalidate = 600;
+
+export default async function HermesWeekObrigadoPage() {
+  const atual = await lerCicloAtual({ revalidar: 600 });
+  const ciclo = formatarCiclo(atual.dataInicio);
+  return <div dangerouslySetInnerHTML={{ __html: html(ciclo, atual.linkGrupo) }} />;
 }
