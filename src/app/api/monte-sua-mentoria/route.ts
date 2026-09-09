@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { avisarRed } from "@/lib/notificar";
 
 export const dynamic = "force-dynamic";
 
@@ -76,25 +77,7 @@ export async function POST(req: NextRequest) {
                       .join("")}</ul>`
                 : "<p>—</p>";
 
-            await resend.emails.send({
-                from: "Monte sua Mentoria <noreply@redpro.com.br>",
-                to: "contato@redpro.com.br",
-                subject: `🎯 Novo pedido — ${nome} — R$ ${fmt(total)}`,
-                html: `
-                    <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#222">
-                        <h2 style="color:#F97316;margin:0 0 16px">Novo pedido — Monte sua mentoria</h2>
-                        ${gravou.ok ? "" : '<p style="color:#b91c1c"><strong>⚠️ Não gravou no banco — ver logs.</strong></p>'}
-                        <p><strong>Nome:</strong> ${nome}</p>
-                        <p><strong>E-mail:</strong> ${email}</p>
-                        <p><strong>WhatsApp:</strong> ${whatsapp}</p>
-                        <p style="margin-top:18px"><strong>Módulos escolhidos (${modulos.length}):</strong></p>
-                        ${listaHtml}
-                        <p style="margin-top:18px;font-size:20px"><strong>Total: R$ ${fmt(total)}</strong></p>
-                        ${sugestao ? `<div style="margin-top:18px;padding:12px 14px;background:#FFF7ED;border-left:3px solid #F97316;border-radius:6px"><strong style="color:#F97316">💡 Sugestão de tema (não estava na página):</strong><p style="margin:6px 0 0;color:#333">${sugestao.replace(/</g, "&lt;")}</p></div>` : ""}
-                        <p style="color:#888;font-size:12px;margin-top:24px">${new Date().toLocaleString("pt-BR")}</p>
-                    </div>
-                `,
-            });
+            await avisarRed("🎯 Monte sua Mentoria: pedido novo", { Nome: nome, Email: email, WhatsApp: whatsapp, Total: `R$ ${fmt(total)}`, "Módulos": modulos.join(", ") || "—", Banco: gravou.ok ? "gravou" : "NÃO GRAVOU, ver logs" });
         } catch (e) {
             console.error("monte-sua-mentoria: falha no Resend —", e);
         }

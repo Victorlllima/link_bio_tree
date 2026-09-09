@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { emailSharkListaEspera } from "@/lib/email-templates";
 
 import { limitarFormulario } from "@/lib/rate-limit";
+import { avisarRed } from "@/lib/notificar";
 export const dynamic = "force-dynamic";
 
 
@@ -33,12 +34,7 @@ export async function POST(req: Request) {
 
     const [notify, welcome] = await Promise.allSettled([
         // Notificação interna
-        resend.emails.send({
-            from: "RedPro Site <noreply@redpro.com.br>",
-            to: "contato@redpro.com.br",
-            subject: `[SHARK] Novo lead — ${email}`,
-            html: `<p><strong>Nome:</strong> ${nome}</p><p><strong>Email:</strong> ${email}</p><p><em>${agora}</em></p>`
-        }),
+        avisarRed("🦈 Lead da Formação S.H.A.R.K.", { Nome: nome, Email: email }),
         // E-mail de boas-vindas D0 para o lead
         resend.emails.send({
             from: "Red — RedPro AI Academy <noreply@redpro.com.br>",

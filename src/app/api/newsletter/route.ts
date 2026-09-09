@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { emailNewsletter } from "@/lib/email-templates";
 
 import { limitarFormulario } from "@/lib/rate-limit";
+import { avisarRed } from "@/lib/notificar";
 export const dynamic = "force-dynamic";
 
 
@@ -20,12 +21,7 @@ export async function POST(req: Request) {
     }
 
     const [notify, welcome] = await Promise.allSettled([
-        resend.emails.send({
-            from: "RedPro Site <noreply@redpro.com.br>",
-            to: "contato@redpro.com.br",
-            subject: `[REDSHIFT] Nova inscrição — ${email}`,
-            html: `<p>Nova inscrição na newsletter REDSHIFT.</p><p><strong>Email:</strong> ${email}</p><p><em>${new Date().toLocaleString("pt-BR")}</em></p>`
-        }),
+        avisarRed("📰 Inscrição na REDSHIFT", { Email: email }),
         resend.emails.send({
             from: "Red — RedPro AI Academy <noreply@redpro.com.br>",
             to: email,

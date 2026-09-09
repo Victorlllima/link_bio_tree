@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
 import { limitarFormulario } from "@/lib/rate-limit";
+import { avisarRed } from "@/lib/notificar";
 
 export const dynamic = "force-dynamic";
 
@@ -28,12 +29,7 @@ export async function POST(req: Request) {
 
   await Promise.allSettled([
     // notifica o Red
-    resend.emails.send({
-      from: "RedPro Site <noreply@redpro.com.br>",
-      to: "contato@redpro.com.br",
-      subject: `[REDVAULT] Novo acesso — ${email}`,
-      html: `<p>Novo acesso ao RedVault.</p><p><strong>Email:</strong> ${email}</p><p><strong>Veio do resource:</strong> ${resource || "(direto)"}</p><p><em>${new Date().toLocaleString("pt-BR")}</em></p>`,
-    }),
+    avisarRed("🔓 Acesso ao RedVault", { Email: email, Resource: resource || "(direto)" }),
     // welcome pro lead
     resend.emails.send({
       from: "Red — RedPro AI Academy <noreply@redpro.com.br>",

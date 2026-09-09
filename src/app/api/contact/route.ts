@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { emailContato } from "@/lib/email-templates";
 
 import { limitarFormulario } from "@/lib/rate-limit";
+import { avisarRed } from "@/lib/notificar";
 export const dynamic = "force-dynamic";
 
 const AUDIENCE_ID = "772bf76a-410e-49c0-8737-76f1c1279114";
@@ -20,21 +21,7 @@ export async function POST(req: Request) {
     }
 
     const [notify, confirm] = await Promise.allSettled([
-        resend.emails.send({
-            from: "RedPro Site <noreply@redpro.com.br>",
-            to: "contato@redpro.com.br",
-            replyTo: email,
-            subject: `[Contato] ${topic || "Mensagem"} — ${name}`,
-            html: `
-                <h2>Nova mensagem via Fale com o RedPro</h2>
-                <p><strong>Nome:</strong> ${name}</p>
-                <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Assunto:</strong> ${topic || "Não informado"}</p>
-                <hr/>
-                <p><strong>Mensagem:</strong></p>
-                <p>${message.replace(/\n/g, "<br/>")}</p>
-            `
-        }),
+        avisarRed("📬 Contato pelo site", { Nome: name, Email: email, Assunto: topic, Mensagem: message }),
         resend.emails.send({
             from: "Red — RedPro AI Academy <noreply@redpro.com.br>",
             to: email,

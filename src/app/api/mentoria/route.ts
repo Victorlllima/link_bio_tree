@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { emailMentoria } from "@/lib/email-templates";
 
 import { limitarFormulario } from "@/lib/rate-limit";
+import { avisarRed } from "@/lib/notificar";
 export const dynamic = "force-dynamic";
 
 
@@ -20,22 +21,7 @@ export async function POST(req: Request) {
     }
 
     const [notify, confirm] = await Promise.allSettled([
-        resend.emails.send({
-            from: "RedPro Site <noreply@redpro.com.br>",
-            to: "contato@redpro.com.br",
-            replyTo: email,
-            subject: `[Mentoria] Aplicação — ${name}`,
-            html: `
-                <h2>Nova aplicação à Mentoria RedPro</h2>
-                <p><strong>Nome:</strong> ${name}</p>
-                <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Área:</strong> ${area || "Não informado"}</p>
-                <p><strong>Nível:</strong> ${level || "Não informado"}</p>
-                <hr/>
-                <p><strong>Maior obstáculo:</strong></p>
-                <p>${(challenge || "Não informado").replace(/\n/g, "<br/>")}</p>
-            `
-        }),
+        avisarRed("🎯 Aplicação para a Mentoria", { Nome: name, Email: email, "Área": area, "Nível": level, "Obstáculo": challenge }),
         resend.emails.send({
             from: "Red — RedPro AI Academy <noreply@redpro.com.br>",
             to: email,
