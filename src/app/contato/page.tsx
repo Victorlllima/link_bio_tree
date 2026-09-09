@@ -23,9 +23,9 @@ const CHANNELS = [
             </svg>
         ),
         label: "Email",
-        value: "contato@redpro.com.br",
+        value: "suporte@redpro.com.br",
         action: "Enviar email",
-        href: "mailto:contato@redpro.com.br"
+        href: "mailto:suporte@redpro.com.br"
     },
     {
         icon: (

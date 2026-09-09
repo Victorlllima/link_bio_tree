@@ -110,7 +110,7 @@ export default function ObrigadoPage() {
 
       {/* Footer */}
       <p style={{ marginTop: 48, fontSize: 13, color: "#333", textAlign: "center" }}>
-        Dúvidas? Fale com a gente: <a href="mailto:contato@redpro.com.br" style={{ color: "#f97316", textDecoration: "none" }}>contato@redpro.com.br</a>
+        Dúvidas? Fale com a gente: <a href="mailto:suporte@redpro.com.br" style={{ color: "#f97316", textDecoration: "none" }}>suporte@redpro.com.br</a>
       </p>
     </main>
   );

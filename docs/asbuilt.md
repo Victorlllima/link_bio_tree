@@ -68,7 +68,7 @@
 **Detalhes das páginas concluídas:**
 - `/mentoria` — QualificationFlow em modal (5 steps), 3 planos de preço, timeline 30 dias
 - `/in-company` — two-column layout, 4 módulos, 3 formatos (Workshop/Programa/Consultoria), formulário → `solutions@redpro.com.br`
-- `/contato` — 5-column grid, seletor de tópicos, formulário → `contato@redpro.com.br`
+- `/contato` — 5-column grid, seletor de tópicos, formulário → `suporte@redpro.com.br`
 - `/newsletter` — Hero tipográfico "RED/SHI/FT", capture simples, sem número exposto
 - `/contrate` — Hero + how-it-works + SharkCarousel reutilizado
 
@@ -91,7 +91,7 @@
 #### `/eventos` — Eventos e Palestras
 - [ ] Criar `src/app/eventos/page.tsx`
 - [ ] Seções: hero palestrante, temas de palestra, formatos (presencial/online/híbrido), depoimentos, CTA para contratar
-- [ ] Formulário de contratação → `contato@redpro.com.br` via Resend
+- [ ] Formulário de contratação → `suporte@redpro.com.br` via Resend
 - [ ] Adicionar card como ativo em `cards-section.tsx`
 
 #### `/redflix` — Catálogo de Projetos
