@@ -13,6 +13,8 @@ function SecaoView({ secao }: { secao: Secao }) {
 
 export default function ResourceView({ resource }: { resource: Resource }) {
   const nomeArquivo = resource.arquivo.split("/").pop() ?? "skill.md";
+  const ext = (nomeArquivo.split(".").pop() ?? "md").toLowerCase();
+  const rotuloDownload = ext === "pdf" ? "Baixar PDF ↓" : `Baixar .${ext} ↓`;
 
   return (
     <main style={s.page}>
@@ -38,7 +40,7 @@ export default function ResourceView({ resource }: { resource: Resource }) {
             <div style={s.downloadFile}>{nomeArquivo}</div>
           </div>
           <a href={resource.arquivo} download style={s.downloadBtn}>
-            Baixar .md ↓
+            {rotuloDownload}
           </a>
         </div>
 

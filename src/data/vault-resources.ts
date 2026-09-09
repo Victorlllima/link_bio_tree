@@ -329,6 +329,46 @@ export const RESOURCES: Resource[] = [
       },
     ],
   },
+  {
+    slug: "hermes-para-estudos",
+    titulo: "Hermes para estudos",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "18 capacidades de um agente que roda na sua máquina, com o comando de cada uma e o jeito de conferir se funcionou.",
+    intro:
+      "Você provavelmente já comprou um curso que não terminou. O problema quase nunca é o conteúdo: é que ninguém aparece às 6h50 para cobrar. Este guia mostra como um agente instalado na sua máquina abre o seu material, monta a sessão do dia, corrige o que você errou e volta a cobrar no sábado. Cada capacidade vem com o comando em português e com o jeito de conferir se funcionou.",
+    arquivo: "/redreply/pdfs/hermes-para-estudos.pdf",
+    secoes: [
+      {
+        titulo: "As 8 que montam a rotina",
+        texto:
+          "• O plano de estudos vira arquivo, não conversa (skills)\n" +
+          "• Ele descobre o seu nível e guarda isso (USER.md)\n" +
+          "• O estudo de hoje sai do seu próprio material (workdir + AGENTS.md)\n" +
+          "• O seu professor é outro agente, não o do dia a dia (profile)\n" +
+          "• A sessão do dia chega em áudio, no horário que você não escolheria (cron + tts)\n" +
+          "• Seu boletim de desempenho sobrevive à conversa (cron notepad)\n" +
+          "• A prova é corrigida por quem não te viu estudar (subagente)\n" +
+          "• A revisão volta sozinha, sabendo o que já cobrou (cron com continuity)",
+      },
+      {
+        titulo: "As 10 que entram depois",
+        texto:
+          "Terminal para rodar o seu projeto e ver o erro junto com você, vision para corrigir a foto do exercício feito no papel, stt para escutar você explicando a matéria, browser para ler a documentação oficial e citar a página, kanban para o projeto final, journey para a linha do tempo do que você aprendeu, moa para o mesmo conceito explicado por vários modelos, mcp para conectar Notion e Drive, sessions import para trazer a conversa de outro agente, e memória com curator para guardar o que ficou.",
+      },
+      {
+        titulo: "O que você precisa antes de começar",
+        texto:
+          "O Hermes instalado e um provedor de modelo autenticado, por assinatura ou por chave de API. O gateway rodando, que é o processo que faz os agendamentos dispararem sozinhos. E uma pasta sua para estudo, sempre a mesma.",
+      },
+      {
+        titulo: "Como usar este guia",
+        texto:
+          "Ligue uma capacidade por semana, na ordem em que estão. Ligar as cinco no primeiro dia é a forma mais rápida de abandonar tudo na quinta-feira. Comece pelo agendamento da manhã, viva uma semana com ele, e só então acrescente a próxima. Cada capacidade tem um bloco de verificação para você saber se funcionou de verdade, em vez de descobrir três dias depois que nada disparou.",
+      },
+    ],
+  },
 ];
 
 export function getResource(slug: string): Resource | undefined {
