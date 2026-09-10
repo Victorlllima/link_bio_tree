@@ -330,6 +330,59 @@ export const RESOURCES: Resource[] = [
     ],
   },
   {
+    slug: "entrevista-memoria-hermes",
+    titulo: "Entrevista de memória do Hermes",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "Uma página que faz o seu agente te entrevistar em dez perguntas e gravar, hoje, as memórias que ele levaria meses para construir sozinho.",
+    intro:
+      "O seu agente aprende sozinho, mas aprende no tranco: ele descobre que você odeia texto longo depois de te entregar texto longo cinco vezes, e cada uma dessas vezes custou o seu tempo. A memória dele são dois arquivos de texto que somados não chegam a quatro mil caracteres. Esta página é o texto que você cola numa conversa nova para inverter a ordem: em vez de esperar ele descobrir, ele te pergunta.",
+    arquivo: "/redreply/pdfs/entrevista-memoria-hermes.pdf",
+    secoes: [
+      {
+        titulo: "Como usar (1 minuto)",
+        texto:
+          "1. Baixa o PDF no botão acima.\n" +
+          "2. Abre uma conversa NOVA com o seu agente. Conversa antiga não serve, e o motivo está no fim desta página.\n" +
+          "3. Cola o texto do prompt, ou manda o print da página inteira.\n" +
+          "4. Responde as dez perguntas. Leva uns dez minutos.\n" +
+          "5. Abre outra conversa nova quando terminar, senão o que ele gravou ainda não vale.",
+      },
+      {
+        titulo: "Os dois arquivos, e por que eles não se misturam",
+        texto:
+          "O USER.md guarda quem VOCÊ é: seu papel, como você quer ser tratado, seu nível técnico, o que ele nunca deve fazer. Teto de 1.375 caracteres.\n\n" +
+          "O MEMORY.md guarda como o TRABALHO funciona: seus projetos, seu ambiente, suas convenções, as correções que você já teve que fazer nele. Teto de 2.200 caracteres.\n\n" +
+          "A entrevista roteia cada resposta sua para o arquivo certo. Sem isso, identidade e trabalho viram uma papa só e o agente perde a referência de qual é qual.",
+      },
+      {
+        titulo: "O teto apertado é a funcionalidade",
+        texto:
+          "Quando o arquivo enche, a ferramenta de escrita dá erro e o agente é obrigado a decidir o que ali dentro vale menos que a coisa nova. Aí ele funde entradas parecidas, apaga duplicata e condensa. O arquivo fica melhor com o tempo em vez de inchar.\n\n" +
+          "Memória sem limite vira gaveta de bagunça e, pior, entope o começo de toda conversa com lixo, gastando janela e dinheiro. Por isso o prompt manda condensar em vez de truncar, e manda parar e perguntar quando não couber.",
+      },
+      {
+        titulo: "A pergunta 5 é a que paga a entrevista",
+        texto:
+          "As dez perguntas estão em ordem de valor, de propósito: se você abandonar na metade, o que ficou gravado já é o que mais importa.\n\n" +
+          "A de maior retorno é a quinta, que pergunta quais correções você já teve que fazer nele mais de uma vez. Esse é o fato que mais se perde, porque nasce no meio de uma conversa irritada e nunca é formalizado. Cada correção que vira linha de memória é um erro que não volta.",
+      },
+      {
+        titulo: "Por que ele parece esquecer o que acabou de aprender",
+        texto:
+          "Quando uma conversa começa, os dois arquivos são lidos e colocados no bloco de instruções. Uma vez. Se ele anotar algo no meio da conversa, aquilo grava no disco na hora, mas só aparece na conversa seguinte.\n\n" +
+          "O motivo é custo: o bloco de instruções é o trecho que se repete a cada mensagem e é justamente ele que recebe desconto de cache. Se mudasse a cada anotação, conversa longa custaria várias vezes mais. Por isso a última instrução do prompt manda ele te lembrar de abrir uma conversa nova no fim.",
+      },
+      {
+        titulo: "O que ele não pode tocar",
+        texto:
+          "O prompt trava o agente nesses dois arquivos e em mais nada. Nada de SOUL.md, config, skills ou agendamentos.\n\n" +
+          "O SOUL.md fica de fora por um motivo específico: ele é a identidade do agente, é escrito por você à mão, e é a primeira coisa que o modelo lê em toda sessão. Agente que reescreve a própria alma deixa de ser previsível.",
+      },
+    ],
+  },
+  {
     slug: "hermes-para-estudos",
     titulo: "Hermes para estudos",
     categoria: "Guias",
