@@ -28,7 +28,7 @@
 
 import { Archivo_Black, Space_Grotesk } from "next/font/google";
 import { checkoutUrl } from "./checkout";
-import { ImgReal, inline, legendaImg, PAPEL_IMG, Pixel } from "./comum";
+import { ImgReal, inline, legendaImg, MOSTRAR_PLACEHOLDER, PAPEL_IMG, Pixel } from "./comum";
 import { compartilhado, type Bloco, type Img, type No, type Variante } from "./conteudo";
 import type { CicloFormatado } from "@/lib/ciclo-atual";
 import { Revela } from "./movimento";
@@ -80,6 +80,27 @@ const CSS = `
 
 /* ---------- seção ---------- */
 .d-sec{padding:44px 0;border-top:3px solid var(--tinta);}
+
+/* ---------- qualificação dupla: as duas metades lado a lado ----------
+   Empilha no celular porque a 390px duas colunas de 3px de borda comem a
+   linha de texto. A partir de 760px elas dividem a largura e o contraste
+   entre "é" e "não é" passa a acontecer numa olhada só, que é o que faz o
+   bloco funcionar. A caixa que repele fica em tinta cheia: quem não se
+   encaixa precisa ver de longe que aquilo não é pra ele. */
+.d-dupla{display:grid;gap:0;margin-top:26px;}
+@media(min-width:760px){.d-dupla{grid-template-columns:1fr 1fr;}}
+.d-meia{border:3px solid var(--tinta);padding:20px;margin:0 0 -3px 0;}
+@media(min-width:760px){.d-meia{margin:0 -3px 0 0;}}
+.d-meia[data-lado="nao"]{background:var(--tinta);color:var(--osso);}
+.d-meia[data-lado="nao"] .d-p{color:var(--osso);}
+.d-meia[data-lado="nao"] b{color:var(--sinal);}
+.d-meia-tit{
+  font-family:var(--black);font-weight:400;text-transform:uppercase;
+  font-size:1.12rem;letter-spacing:-.03em;margin:0 0 14px;line-height:1;
+}
+.d-meia[data-lado="sim"] .d-meia-tit{color:var(--sinal);}
+.d-meia .d-p{font-size:.99rem;line-height:1.55;margin:0 0 .85em;}
+.d-meia .d-p:last-child{margin-bottom:0;}
 .d-sec-tit{
   font-family:var(--black);font-weight:400;text-transform:uppercase;
   font-size:clamp(1.5rem,5.4vw,2.6rem);line-height:1;letter-spacing:-.04em;margin:0 0 24px;
@@ -205,6 +226,8 @@ const CSS = `
 .d-cta:hover{background:var(--sinal);color:var(--tinta);box-shadow:8px 8px 0 var(--tinta);transform:translate(-2px,-2px);}
 .d-cta:focus-visible{outline:3px solid var(--sinal);outline-offset:4px;}
 .d-cta-linha{margin:30px 0 0;}
+.d-humano{font-size:.88rem;line-height:1.6;font-weight:300;color:var(--cinza);margin:16px 0 0;max-width:46ch;}
+.d-humano a{color:var(--tinta);text-decoration:underline;text-underline-offset:3px;}
 
 @media (prefers-reduced-motion: reduce){
   .d *,.d *::before,.d *::after{transition-duration:.01ms !important;animation-duration:.01ms !important;}
@@ -214,12 +237,17 @@ const CSS = `
 /* ---------- pedaços ------------------------------------------------------ */
 
 function Foto({ img, prioridade = false }: { img: Img; prioridade?: boolean }) {
+  // buraco sem foto não vai ao ar: ver MOSTRAR_PLACEHOLDER em comum.tsx
+  if (!img.src && !MOSTRAR_PLACEHOLDER) return null;
   return (
     <figure className="d-img" data-f={img.formato}>
-      <figcaption className="d-img-cab">
-        <span>{legendaImg(img)}</span>
-        <span className="d-img-papel">{PAPEL_IMG[img.tipo]}</span>
-      </figcaption>
+      {/* legenda = instrução de produção; sai quando a foto chega (ver lp-a) */}
+      {img.src ? null : (
+        <figcaption className="d-img-cab">
+          <span>{legendaImg(img)}</span>
+          <span className="d-img-papel">{PAPEL_IMG[img.tipo]}</span>
+        </figcaption>
+      )}
       {img.src ? (
         <ImgReal
           img={img}
@@ -383,6 +411,18 @@ export function LpD({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
           </section>
         ))}
 
+        {/* Autoridade ANTES da prova, e não depois: o log do Alfred só vale
+            como prova para quem já sabe de quem é o log. Invertido, o visitante
+            lê um print de estranho. */}
+        {v.autoridade ? (
+          <section className="d-sec">
+            <h2 className="d-sec-tit">{v.autoridade.tag}</h2>
+            <div className="d-col">
+              <Nos nos={v.autoridade.nos} k="aut" />
+            </div>
+          </section>
+        ) : null}
+
         <section className="d-sec">
           <h2 className="d-sec-tit">A prova</h2>
           <div className="d-col">
@@ -391,10 +431,23 @@ export function LpD({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
         </section>
 
         <section className="d-sec">
-          <h2 className="d-sec-tit">Pra quem não é</h2>
-          <div className="d-col">
-            <Nos nos={v.praQuemNaoE.nos} k="pq" />
-          </div>
+          <h2 className="d-sec-tit">Pra quem é e pra quem não é</h2>
+          {v.praQuemE ? (
+            <div className="d-dupla">
+              <div className="d-meia" data-lado="sim">
+                <p className="d-meia-tit">{v.praQuemE.tag}</p>
+                <Nos nos={v.praQuemE.nos} k="pqe" />
+              </div>
+              <div className="d-meia" data-lado="nao">
+                <p className="d-meia-tit">{v.praQuemNaoE.tag}</p>
+                <Nos nos={v.praQuemNaoE.nos} k="pq" />
+              </div>
+            </div>
+          ) : (
+            <div className="d-col">
+              <Nos nos={v.praQuemNaoE.nos} k="pq" />
+            </div>
+          )}
         </section>
 
         <section className="d-sec">
@@ -465,6 +518,14 @@ export function LpD({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
             <a className="d-cta hw-acao" href={url}>
               {compartilhado.ctaTopo}
             </a>
+            {/* Bloco 14 da anatomia. Captura quem não fecha sozinho mas fecha
+                com um empurrão humano, e custa uma linha. O endereço é o mesmo
+                do rodapé, então não cria canal novo pra ninguém manter. */}
+            <p className="d-humano">
+              Ficou com dúvida que a página não respondeu? Escreve pra{" "}
+              <a href={`mailto:${compartilhado.rodape.suporte}`}>{compartilhado.rodape.suporte}</a>{" "}
+              que quem responde sou eu.
+            </p>
           </div>
         </section>
       </main>

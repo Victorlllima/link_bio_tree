@@ -40,6 +40,20 @@ export const PAPEL_IMG: Record<ImgTipo, string> = {
   HERMES: "captura técnica",
 };
 
+/* ---------- o buraco só aparece para quem produz -------------------------
+   A caixa de placeholder existe para o Red e para a LUA: ela diz, na tela,
+   qual captura ainda falta. Em produção ela não tem esse leitor — tem o
+   visitante que veio de um anúncio pago, e para ele a caixa é uma página
+   inacabada no exato ponto em que a página pede confiança. O caso concreto
+   que obrigou esta regra (IRIS, 11/09/2026): as quatro LPs que recebiam
+   tráfego exibiam, DENTRO da seção "a prova", o texto "conversa do Telegram
+   com o Alfred [...] Mascarar nomes e assuntos sensíveis". Instrução de
+   bastidor, impressa no lugar da prova.
+
+   Some em produção, continua em dev. O que não muda é a pendência: enquanto
+   `IMG_TELEGRAM` não tiver `src`, a seção da prova roda sem imagem. */
+export const MOSTRAR_PLACEHOLDER = process.env.NODE_ENV !== "production";
+
 export function legendaImg(img: Img): string {
   return `${img.tipo} · ${img.formato}`;
 }

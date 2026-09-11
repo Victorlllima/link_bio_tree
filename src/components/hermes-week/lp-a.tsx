@@ -22,7 +22,7 @@
 
 import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import { checkoutUrl } from "./checkout";
-import { ImgReal, inline, legendaImg, PAPEL_IMG, Pixel } from "./comum";
+import { ImgReal, inline, legendaImg, MOSTRAR_PLACEHOLDER, PAPEL_IMG, Pixel } from "./comum";
 import { compartilhado, type Bloco, type Img, type No, type Variante } from "./conteudo";
 import type { CicloFormatado } from "@/lib/ciclo-atual";
 import { Revela } from "./movimento";
@@ -184,13 +184,21 @@ const CSS = `
 
 function Foto({ img, prioridade = false }: { img: Img; prioridade?: boolean }) {
   const pronta = Boolean(img.src);
+  // buraco sem foto não vai ao ar: ver MOSTRAR_PLACEHOLDER em comum.tsx
+  if (!pronta && !MOSTRAR_PLACEHOLDER) return null;
   return (
     <Revela className="a-fade" como="foto">
       <figure className="a-img" data-f={img.formato} data-pronta={pronta ? "sim" : "nao"}>
-        <figcaption className="a-img-cab">
-          <span>{legendaImg(img)}</span>
-          <span className="a-img-papel">{PAPEL_IMG[img.tipo]}</span>
-        </figcaption>
+        {/* A legenda é instrução de PRODUÇÃO ("RED · quadrado", "foto do Red"),
+            escrita para quem vai capturar a imagem. Quando a foto existe ela não
+            tem mais leitor: some. Enquanto o buraco existe ela fica, porque é
+            ela que diz o que falta. */}
+        {pronta ? null : (
+          <figcaption className="a-img-cab">
+            <span>{legendaImg(img)}</span>
+            <span className="a-img-papel">{PAPEL_IMG[img.tipo]}</span>
+          </figcaption>
+        )}
         {pronta ? (
           <ImgReal
             img={img}

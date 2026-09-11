@@ -26,7 +26,7 @@
 
 import { Manrope, Sora, Space_Mono } from "next/font/google";
 import { checkoutUrl } from "./checkout";
-import { ImgReal, inline, legendaImg, PAPEL_IMG, Pixel } from "./comum";
+import { ImgReal, inline, legendaImg, MOSTRAR_PLACEHOLDER, PAPEL_IMG, Pixel } from "./comum";
 import { compartilhado, type Bloco, type Img, type No, type Variante } from "./conteudo";
 import type { CicloFormatado } from "@/lib/ciclo-atual";
 import { Revela } from "./movimento";
@@ -195,12 +195,17 @@ function Foto({
   solta?: boolean;
   prioridade?: boolean;
 }) {
+  // buraco sem foto não vai ao ar: ver MOSTRAR_PLACEHOLDER em comum.tsx
+  if (!img.src && !MOSTRAR_PLACEHOLDER) return null;
   return (
     <figure className={`b-img${solta ? " b-solta" : ""}`} data-f={img.formato}>
-      <figcaption className="b-img-cab">
-        <span>{legendaImg(img)}</span>
-        <span className="b-img-papel">{PAPEL_IMG[img.tipo]}</span>
-      </figcaption>
+      {/* legenda = instrução de produção; sai quando a foto chega (ver lp-a) */}
+      {img.src ? null : (
+        <figcaption className="b-img-cab">
+          <span>{legendaImg(img)}</span>
+          <span className="b-img-papel">{PAPEL_IMG[img.tipo]}</span>
+        </figcaption>
+      )}
       {img.src ? (
         <ImgReal
           img={img}

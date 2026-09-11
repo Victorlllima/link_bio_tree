@@ -27,7 +27,7 @@
 
 import { IBM_Plex_Mono, Source_Serif_4 } from "next/font/google";
 import { checkoutUrl } from "./checkout";
-import { ImgReal, inline, legendaImg, PAPEL_IMG, Pixel } from "./comum";
+import { ImgReal, inline, legendaImg, MOSTRAR_PLACEHOLDER, PAPEL_IMG, Pixel } from "./comum";
 import { compartilhado, type Img, type No, type Variante } from "./conteudo";
 import type { CicloFormatado } from "@/lib/ciclo-atual";
 
@@ -216,6 +216,8 @@ function mapaDeFiguras(v: Variante): Map<Img, number> {
 }
 
 function Figura({ img, n, mestra = false }: { img: Img; n: number; mestra?: boolean }) {
+  // buraco sem foto não vai ao ar: ver MOSTRAR_PLACEHOLDER em comum.tsx
+  if (!img.src && !MOSTRAR_PLACEHOLDER) return null;
   return (
     <figure className={`c-fig${mestra ? " c-fig-mestra" : ""}`} data-f={img.formato}>
       {img.src ? (
@@ -231,8 +233,14 @@ function Figura({ img, n, mestra = false }: { img: Img; n: number; mestra?: bool
       )}
       <figcaption className="c-fig-leg">
         <span className="c-fig-num">Figura {n}.</span>
-        <span>{PAPEL_IMG[img.tipo]}</span>
-        <span className="c-fig-papel">{legendaImg(img)}</span>
+        {/* o par tipo/formato é instrução de produção e só serve enquanto o
+            buraco existe; a numeração é do arquétipo documento e fica sempre */}
+        {img.src ? null : (
+          <>
+            <span>{PAPEL_IMG[img.tipo]}</span>
+            <span className="c-fig-papel">{legendaImg(img)}</span>
+          </>
+        )}
       </figcaption>
     </figure>
   );

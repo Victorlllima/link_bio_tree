@@ -29,7 +29,7 @@
 
 import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import { checkoutUrl } from "./checkout";
-import { ImgReal, inline, legendaImg, PAPEL_IMG, Pixel } from "./comum";
+import { ImgReal, inline, legendaImg, MOSTRAR_PLACEHOLDER, PAPEL_IMG, Pixel } from "./comum";
 import { compartilhado, type Bloco, type Img, type No, type Variante } from "./conteudo";
 import type { CicloFormatado } from "@/lib/ciclo-atual";
 import { Paralaxe } from "./movimento";
@@ -235,6 +235,8 @@ function Foto({
   comParalaxe?: boolean;
   prioridade?: boolean;
 }) {
+  // buraco sem foto não vai ao ar: ver MOSTRAR_PLACEHOLDER em comum.tsx
+  if (!img.src && !MOSTRAR_PLACEHOLDER) return null;
   const corpo = img.src ? (
     <div className={`e-moldura${comParalaxe ? "" : " e-parada"}`} data-f={img.formato}>
       <ImgReal
@@ -252,10 +254,13 @@ function Foto({
   return (
     <figure className={`e-palco${menor ? " e-menor" : ""}`} style={{ margin: menor ? "34px 0 0" : undefined }}>
       {comParalaxe ? <Paralaxe velocidade={0.62}>{corpo}</Paralaxe> : corpo}
-      <figcaption className="e-leg">
-        <b>{legendaImg(img)}</b>
-        <span>{PAPEL_IMG[img.tipo]}</span>
-      </figcaption>
+      {/* legenda = instrução de produção; sai quando a foto chega (ver lp-a) */}
+      {img.src ? null : (
+        <figcaption className="e-leg">
+          <b>{legendaImg(img)}</b>
+          <span>{PAPEL_IMG[img.tipo]}</span>
+        </figcaption>
+      )}
     </figure>
   );
 }

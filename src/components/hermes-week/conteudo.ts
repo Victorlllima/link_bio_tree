@@ -121,6 +121,13 @@ export type Variante = {
   /** dobras entre a tabela e a prova (só a LP E usa) */
   entre: Bloco[];
   prova: Bloco;
+  /** quem conduz. Anatomia de 14 blocos do Tabari, bloco 8: uma página que
+      pede dinheiro a um estranho precisa dizer quem está do outro lado, e com
+      número no lugar de adjetivo. Opcional porque só a D tem até agora. */
+  autoridade?: Bloco;
+  /** a metade positiva da qualificação dupla (bloco 5). A negativa sozinha
+      filtra sem convidar: quem se encaixa sai sem ter lido que se encaixa. */
+  praQuemE?: Bloco;
   praQuemNaoE: Bloco;
   oferta: { linhas: string[]; foto?: Img };
   bumps: { intro?: string; itens: Bump[] };
@@ -929,11 +936,11 @@ const D: Variante = {
   seo: {
     titulo: "Hermes Week · Sair do chat e ter uma IA que age sem você mandar",
     descricao:
-      "Do zero à produção: instalação, memória, habilidades próprias e rotina automática. Cinco dias, segunda a sexta, 20h.",
+      "Instalação, memória, habilidades próprias e rotina automática, do zero à produção. Cinco dias, segunda a sexta, 20h.",
   },
   hero: {
     h1: "Cinco dias pra sair do chat e ter uma IA que **age sem você mandar**",
-    deck: "Do zero à produção: instalação, memória, habilidades próprias e rotina automática.",
+    deck: "Instalação, memória, habilidades próprias e rotina automática. Do zero à produção em cinco noites.",
     foto: {
       tipo: "RED",
       formato: "quadrado",
@@ -953,11 +960,11 @@ const D: Variante = {
         },
         {
           t: "p",
-          c: "**Degrau 1: chatbot.** Você digita, ele responde. Fecha a aba, morreu. Abre amanhã e começa do zero.",
+          c: "**Degrau 1: chatbot.** Você digita, ele responde. Ele lembra de você, mas quem executa é você. Fechou a aba, parou.",
         },
         {
           t: "p",
-          c: "**Degrau 2: automação.** Se isso acontece aqui, faz aquilo ali. Funciona, mas é rígido. Apareceu uma situação que você não previu, trava.",
+          c: "**Degrau 2: automação.** Se isso acontece aqui, faz aquilo ali. Funciona, mas é rígido. Apareceu um caso que a regra não previa, ele para e espera você.",
         },
         {
           t: "p",
@@ -1066,6 +1073,58 @@ const D: Variante = {
       },
       { t: "p", c: "**R$0 de API por mês**, usando assinatura em vez de cobrança por uso." },
       { t: "p", c: "**184 habilidades escritas por ele mesmo.**" },
+    ],
+  },
+  /* Bloco 8 da anatomia de 14 do Tabari. A página não dizia em lugar nenhum
+     quem é a pessoa que está pedindo R$62 a um estranho que a conheceu num
+     anúncio quarenta segundos atrás. Autoridade aqui é por resultado e por
+     risco assumido, nunca por credencial (regra do brief da IRIS e do frame
+     proibido em CLAUDE.md). Todo fato daqui já é afirmado em outro ponto da
+     página ou está em CORE/CONTEXT.md. */
+  autoridade: {
+    tag: "quem está do outro lado",
+    nos: [
+      {
+        t: "p",
+        c: "Eu toco duas coisas. Uma escola de IA, e uma empresa que constrói sistema agêntico pra quem prefere pagar a montar sozinho.",
+      },
+      {
+        t: "p",
+        c: "O Alfred organiza o meu dia. As **184 habilidades** dele saíram de tarefa real que eu precisava resolver.",
+      },
+      { t: "p", c: "Minha credencial é o log que está aqui em cima." },
+      {
+        t: "forte",
+        c: "**Eu rodo isso todo dia.** Se a base que eu ensino fosse torta, o primeiro a quebrar a semana seria eu.",
+      },
+    ],
+  },
+  /* Bloco 5, metade positiva. A página tinha só a metade que repele. A
+     anatomia pede as duas, e pede de 4 a 6 recortes: menos parece raso, mais
+     perde foco. Os cinco saem de falas reais do icp-falas-reais.md. */
+  praQuemE: {
+    tag: "pra quem é",
+    nos: [
+      {
+        t: "p",
+        c: "Pra você que usa IA todo dia e já reparou que gasta boa parte do tempo levando a resposta dela de um lugar pro outro.",
+      },
+      {
+        t: "p",
+        c: "Pra você que tem uma tarefa que se repete toda semana e continua fazendo na mão, porque montar automação pra ela dá mais trabalho do que fazer.",
+      },
+      {
+        t: "p",
+        c: "Pra você que já montou automação de regra fixa e viu ela parar no primeiro caso que fugia da regra.",
+      },
+      {
+        t: "p",
+        c: "Pra você que quer o que a IA aprendeu sobre o seu trabalho guardado em arquivo seu, e não numa conta que você aluga.",
+      },
+      {
+        t: "p",
+        c: "E pra quem pretende montar isso pra empresa dos outros, o caminho começa montando pro próprio trabalho primeiro.",
+      },
     ],
   },
   praQuemNaoE: {
