@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
     const [notify, confirm] = await Promise.allSettled([
         resend.emails.send({
-            from: "RedPro Site <noreply@redpro.com.br>",
+            from: "RedPro AI Academy <suporte@redpro.com.br>",
             to: "solutions@redpro.com.br",
             replyTo: email,
             subject: `[In Company] ${company} — ${name} (${role})`,
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
             `
         }),
         resend.emails.send({
-            from: "Equipe RedPro <noreply@redpro.com.br>",
+            from: "RedPro AI Academy <suporte@redpro.com.br>",
             to: email,
             subject: "Solicitação In Company recebida.",
             html: emailInCompany(name, company)

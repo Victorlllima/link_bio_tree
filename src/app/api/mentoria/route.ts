@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     const [notify, confirm] = await Promise.allSettled([
         avisarRed("🎯 Aplicação para a Mentoria", { Nome: name, Email: email, "Área": area, "Nível": level, "Obstáculo": challenge }),
         resend.emails.send({
-            from: "Red — RedPro AI Academy <noreply@redpro.com.br>",
+            from: "RedPro AI Academy <suporte@redpro.com.br>",
             to: email,
             subject: "Aplicação recebida — próximos passos.",
             html: emailMentoria(name)

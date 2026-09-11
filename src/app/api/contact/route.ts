@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     const [notify, confirm] = await Promise.allSettled([
         avisarRed("📬 Contato pelo site", { Nome: name, Email: email, Assunto: topic, Mensagem: message }),
         resend.emails.send({
-            from: "Red — RedPro AI Academy <noreply@redpro.com.br>",
+            from: "RedPro AI Academy <suporte@redpro.com.br>",
             to: email,
             subject: "Mensagem recebida.",
             html: emailContato(name)

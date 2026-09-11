@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     avisarRed("🔓 Acesso ao RedVault", { Email: email, Resource: resource || "(direto)" }),
     // welcome pro lead
     resend.emails.send({
-      from: "Red — RedPro AI Academy <noreply@redpro.com.br>",
+      from: "RedPro AI Academy <suporte@redpro.com.br>",
       to: email,
       subject: "Seu acesso ao RedVault tá liberado.",
       html: `

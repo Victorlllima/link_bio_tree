@@ -37,7 +37,7 @@ export async function POST(req: Request) {
         avisarRed("🦈 Lead da Formação S.H.A.R.K.", { Nome: nome, Email: email }),
         // E-mail de boas-vindas D0 para o lead
         resend.emails.send({
-            from: "Red — RedPro AI Academy <noreply@redpro.com.br>",
+            from: "RedPro AI Academy <suporte@redpro.com.br>",
             to: email,
             subject: "[Formação S.H.A.R.K.] Você está na lista — carrinho abre 23/jul",
             html: emailSharkListaEspera(primeiroNome)
