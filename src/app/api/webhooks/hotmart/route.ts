@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { enviarMensagem } from "@/lib/whatsapp";
 import { estadoInstancia } from "@/lib/evolution";
 import { confirmarEmail, emailBoasVindas } from "@/lib/mensagens-crmweek";
-import { emailConfirmacao as emailConfirmacaoHermesWeek, emailBoasVindas as emailBoasVindasHermesWeek } from "@/lib/mensagens-hermesweek";
+import { emailConfirmacao as emailConfirmacaoHermesWeek, emailBoasVindas as emailBoasVindasHermesWeek, emailRecuperacao as emailRecuperacaoHermesWeek } from "@/lib/mensagens-hermesweek";
 import { lerCicloAtual } from "@/lib/ciclo-atual";
 import { enfileirar } from "@/lib/wpp-fila";
 
@@ -116,6 +116,61 @@ async function metaCapi(email: string, nome: string, fone: string, valor: number
     }
 }
 
+/* ----------------------------------------------------------------------------
+ * RECUPERAÇÃO DE CARRINHO (ORION, 11/09/2026)
+ * ----------------------------------------------------------------------------
+ * Perda real que originou isto: em 10/09 um comprador gerou o Pix da Hermes
+ * Week e o `PURCHASE_EXPIRED` entrou na madrugada seguinte. Os dois eventos
+ * foram gravados e nada disparou.
+ * -------------------------------------------------------------------------*/
+
+/** Já existe compra APROVADA desse e-mail neste produto?
+ *
+ * Existe pra evitar o pior e-mail possível: dizer "seu pagamento não foi
+ * concluído" pra quem gerou um Pix, deixou expirar e pagou de outro jeito (ou
+ * comprou de novo). Na dúvida — se a consulta falhar — devolve `true` e o
+ * e-mail NÃO sai: é melhor perder uma recuperação do que acusar um cliente. */
+async function jaComprou(email: string, produtoId: string): Promise<boolean> {
+    if (!email) return true;
+    try {
+        const url =
+            `${SUPABASE_URL}/rest/v1/hotmart_compras` +
+            `?email=eq.${encodeURIComponent(email)}` +
+            `&produto_id=eq.${encodeURIComponent(produtoId)}` +
+            `&evento=eq.PURCHASE_APPROVED&select=id&limit=1`;
+        const key = process.env.SUPABASE_SERVICE_KEY;
+        if (!key) return true;
+        const res = await fetch(url, {
+            headers: { apikey: key, Authorization: `Bearer ${key}` },
+            cache: "no-store",
+        });
+        if (!res.ok) return true;
+        const linhas = (await res.json()) as unknown[];
+        return linhas.length > 0;
+    } catch {
+        return true;
+    }
+}
+
+/** E-mail de recuperação. Lê o ciclo na hora, como os outros. */
+async function enviarEmailRecuperacao(email: string, nome: string) {
+    const key = process.env.RESEND_API_KEY;
+    if (!key || !email) return { ok: false, erro: "sem RESEND_API_KEY ou email" };
+    const ciclo = await lerCicloAtual();
+    const { subject, html } = emailRecuperacaoHermesWeek(nome, ciclo);
+    try {
+        const res = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ from: REMETENTE, to: [email], subject, html }),
+        });
+        if (!res.ok) return { ok: false, erro: `${res.status} ${await res.text()}` };
+        return { ok: true };
+    } catch (e) {
+        return { ok: false, erro: String(e) };
+    }
+}
+
 // Cada produto tem sua audiência no Resend — segmentação por produto, igual ao
 // WhatsApp. Antes TODO comprador caía na lista do CRM Week (bug): quem comprava
 // só o IAA recebia o e-mail de aluno do evento. IDs verificados na API 23/07.
@@ -151,7 +206,13 @@ async function resend(email: string, nome: string, produtoId: string) {
 // (red@redpro.com.br, domínio verificado no Resend em sa-east-1).
 // ⚠️ A FOTO do remetente não se define aqui: o Gmail puxa de Gravatar no
 // endereço, ou de um registro BIMI no DNS. Trocar esta string não muda o avatar.
-const REMETENTE = "RedPro AI Academy <red@redpro.com.br>";
+/* Remetente único de toda a operação (Red, 11/09/2026): centralizado em
+ * `suporte@`, que é o ÚNICO endereço do domínio que também RECEBE.
+ * Teste SMTP em 11/09 contra mx1.hostinger.com: `suporte@` e `victor.lima@`
+ * aceitam (250); `red@`, `noreply@` e `contato@` rejeitam com 550 5.1.1.
+ * Enquanto o remetente era `red@`, toda resposta de comprador voltava com
+ * erro e ninguém ficava sabendo. */
+const REMETENTE = "RedPro AI Academy <suporte@redpro.com.br>";
 
 // ENVIA o e-mail de boas-vindas (rede de segurança: grupo + ficha). Diferente de resend(),
 // que só inscreve na audiência sem disparar nada.
@@ -457,6 +518,47 @@ export async function POST(req: NextRequest) {
         }
 
         return NextResponse.json({ ok: true, evento, gravou: gravou.ok, enfileirado: ehIngressoAbandono && Boolean(fone) });
+    }
+
+    /* ------------------------------------------------------------------
+     * CARRINHO QUE NÃO FECHOU — Hermes Week
+     * ------------------------------------------------------------------
+     * Dois eventos entram aqui:
+     *   PURCHASE_EXPIRED            → gerou Pix/boleto e o código venceu
+     *   PURCHASE_OUT_OF_SHOPPING_CART → abandonou o checkout (Hermes Week)
+     *
+     * O abandono do ingresso da CRM Week continua no bloco abaixo, por
+     * WhatsApp. Aqui é e-mail, porque a instância da Evolution está
+     * desconectada e e-mail é o único canal da Hermes Week que está provado.
+     * ---------------------------------------------------------------- */
+    const recuperavel =
+        evento === "PURCHASE_EXPIRED" ||
+        (evento === "PURCHASE_OUT_OF_SHOPPING_CART" && produtoId === PRODUTO_HERMES_WEEK);
+
+    if (recuperavel && produtoId === PRODUTO_HERMES_WEEK) {
+        const comprou = await jaComprou(email, produtoId);
+
+        if (comprou) {
+            // Já pagou (ou a consulta falhou). Não manda nada: dizer "você não
+            // concluiu" pra quem concluiu é pior que não mandar.
+            await telegram(
+                `🟡 *${evento}* — ${produtoNome}\n\n👤 ${nome || "—"}\n📧 ${email || "—"}\n\n` +
+                `↩️ recuperação NÃO enviada: já existe compra aprovada desse e-mail (ou a checagem falhou)`,
+            );
+            return NextResponse.json({ ok: true, evento, gravou: gravou.ok, recuperacao: "ignorada" });
+        }
+
+        const rec = await enviarEmailRecuperacao(email, nome);
+        if (!rec.ok) console.error("[hotmart] e-mail de recuperação:", rec.erro);
+
+        await telegram(
+            `🛒 *Carrinho não fechou* — ${produtoNome}\n\n` +
+            `👤 ${nome || "—"}\n📧 ${email || "—"}\n💵 ${moeda} ${valor.toFixed(2)}\n` +
+            `📌 evento: ${evento}\n\n` +
+            `${rec.ok ? "✅ e-mail de recuperação enviado" : `⚠️ falha no e-mail: ${rec.erro}`}`,
+        );
+
+        return NextResponse.json({ ok: true, evento, gravou: gravou.ok, recuperacao: rec.ok });
     }
 
     if (evento === "PURCHASE_CANCELED" || evento === "PURCHASE_REFUNDED" || evento === "PURCHASE_CHARGEBACK") {
