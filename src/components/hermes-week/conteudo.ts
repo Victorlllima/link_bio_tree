@@ -1470,7 +1470,10 @@ const E: Variante = {
    dobra de texto (roteiro em Starlight/HERMES/05-paginas/lp-F-cinematica-ROTEIRO.md,
    conteúdo em ./lp-f-cenas.ts). Forçá-la neste Record obrigaria a inventar
    campos que ela não usa. Por isso o tipo aqui é o subconjunto A-E. */
-export type VarianteTextualId = Exclude<VarianteId, "F">;
+/* A G também fica de fora: ela não tem copy própria. É a copy da D com outro
+   desenho (painel preto-piano), então lê `VARIANTES.D` e renderiza com
+   `lp-g.tsx`. Se um dia ela ganhar ângulo próprio, entra aqui como as outras. */
+export type VarianteTextualId = Exclude<VarianteId, "F" | "G">;
 
 export const VARIANTES: Record<VarianteTextualId, Variante> = { A, B, C, D, E };
 

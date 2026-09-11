@@ -19,7 +19,7 @@
  *  `pixelScript` de `comum.tsx`, que reescreve o href de todo `.hw-acao`.
  * ==========================================================================*/
 
-export type VarianteId = "A" | "B" | "C" | "D" | "E" | "F";
+export type VarianteId = "A" | "B" | "C" | "D" | "E" | "F" | "G";
 
 /** TROCAR AQUI quando o produto existir. Único lugar. */
 export const CHECKOUT_BASE = "https://pay.hotmart.com/J107439791C";
