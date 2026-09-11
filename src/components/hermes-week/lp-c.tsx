@@ -349,9 +349,13 @@ export function LpC({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
                 <p className="c-autor-txt">{v.hero.foto.c}</p>
               </div>
             )}
-            <p className="c-autor-leg">
-              {legendaImg(v.hero.foto)} · {PAPEL_IMG[v.hero.foto.tipo]}
-            </p>
+            {/* mesma regra das figuras: a legenda é instrução de produção e
+                só serve enquanto o buraco existe (ver MOSTRAR_PLACEHOLDER) */}
+            {v.hero.foto.src ? null : (
+              <p className="c-autor-leg">
+                {legendaImg(v.hero.foto)} · {PAPEL_IMG[v.hero.foto.tipo]}
+              </p>
+            )}
           </div>
           <div className="c-col">
             {/* Única linha de texto que a IRIS escreveu nesta página, e ela é
