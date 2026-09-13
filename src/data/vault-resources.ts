@@ -330,6 +330,59 @@ export const RESOURCES: Resource[] = [
     ],
   },
   {
+    slug: "vps-hardening",
+    titulo: "Auditoria de VPS",
+    categoria: "Skills",
+    destaque: true,
+    novo: true,
+    resumo: "Percorre dez pontos de exposição do servidor onde o seu agente roda e diz o estado de cada um, com o comando que provou aquilo.",
+    intro:
+      "A Auditoria de Segurança olha o que você construiu. Esta aqui olha onde aquilo está rodando. São camadas diferentes: dá pra ter o código impecável e mesmo assim deixar a porta do banco publicada pra internet, o SSH aceitando senha e o log só na máquina que o invasor acabou de entrar. Esta skill percorre dez pontos do servidor e devolve o estado de cada um, sem alterar nada.",
+    arquivo: "/redreply/skills/vps-hardening.md",
+    comando: "/vps-hardening",
+    secoes: [
+      {
+        titulo: "Os dez pontos",
+        texto:
+          "• Política do firewall, e se ela nega entrada por padrão\n" +
+          "• SSH aceitando senha ou login de root\n" +
+          "• Renovação de TLS sem o hook que recarrega o servidor\n" +
+          "• Porta de banco publicada na interface pública, quase sempre pelo Docker\n" +
+          "• Segredo no histórico do Git, que apagar o arquivo não resolve\n" +
+          "• Imagem de container em latest, sem digest fixado\n" +
+          "• Ausência de rate limit no proxy reverso\n" +
+          "• Autenticação sem autorização por objeto, que é o IDOR\n" +
+          "• Log só na máquina, sem agregação fora dela\n" +
+          "• Backup sem teste de restore, e o tempo de volta desconhecido",
+      },
+      {
+        titulo: "Ela não muda nada",
+        texto:
+          "Nenhuma regra de firewall, nenhuma linha de sshd_config, nenhum container reiniciado. A skill lê, cruza e entrega o laudo. Quem decide o que mexer é você, com o comando na mão.",
+      },
+      {
+        titulo: "Dois detalhes que mudam o resultado",
+        texto:
+          "Ela lê o SSH com sshd -T, não abrindo o sshd_config. O arquivo mente quando existe Include ou bloco Match; o -T mostra a configuração que está valendo de verdade.\n\n" +
+          "E termina sempre com um ss -ltnp filtrando 0.0.0.0. É a prova final do que está aberto pra internet naquela máquina, independente do que a configuração de cada serviço diga.",
+      },
+      {
+        titulo: "Como usar",
+        texto:
+          "1. Baixa o arquivo no botão acima.\n" +
+          "2. Salva em ~/.hermes/skills/devops/vps-hardening/SKILL.md\n" +
+          "3. Conecta no servidor que você quer auditar, pelo terminal do agente.\n" +
+          "4. Pede a auditoria, ou chama /vps-hardening.\n" +
+          "5. Confere o hostname antes de ler o laudo: auditar a máquina errada é o engano mais comum.",
+      },
+      {
+        titulo: "Precisa de sudo",
+        texto:
+          "Sem sudo, as checagens de firewall e de SSH voltam como não verificável em vez de passar. É proposital: dizer que está tudo certo sem ter conseguido olhar seria pior que não checar.",
+      },
+    ],
+  },
+  {
     slug: "auditoria-hermes",
     titulo: "Auditoria do seu Hermes",
     categoria: "Guias",
