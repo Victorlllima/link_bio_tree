@@ -330,6 +330,57 @@ export const RESOURCES: Resource[] = [
     ],
   },
   {
+    slug: "auditoria-hermes",
+    titulo: "Auditoria do seu Hermes",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "Uma página que faz o seu agente diagnosticar a própria instalação e voltar com três mudanças, cada uma com o comando exato e o custo de não fazer.",
+    intro:
+      "O seu agente já vem com dois comandos que leem a saúde da instalação dele. O problema nunca foi rodar: é que a resposta sai em dezenas de linhas verdes e amarelas e você fecha o terminal sem saber o que fazer com aquilo. Esta página é o texto que você cola numa conversa nova para mudar a ordem: ele roda, lê, cruza com o jeito como você usa ele, e volta com três mudanças em português.",
+    arquivo: "/redreply/pdfs/auditoria-hermes.pdf",
+    secoes: [
+      {
+        titulo: "Como usar (1 minuto)",
+        texto:
+          "1. Baixa o PDF no botão acima.\n" +
+          "2. Abre uma conversa NOVA com o seu agente. O motivo está no fim desta página.\n" +
+          "3. Cola o texto do prompt, ou manda o print da página inteira.\n" +
+          "4. Espera ele rodar os dois comandos e voltar com a lista.\n" +
+          "5. Lê os três, decide quais valem, e roda os comandos você mesmo.",
+      },
+      {
+        titulo: "Os dois comandos que ele roda",
+        texto:
+          "O hermes doctor faz o diagnóstico: ele percorre ambiente, certificados, ferramentas, skills e memória, e marca cada checagem como passou ou não passou.\n\n" +
+          "O hermes dump despeja a configuração que está valendo de verdade, incluindo o modelo, o provedor e tudo que está diferente do padrão.\n\n" +
+          "Os dois são somente leitura. O doctor tem um modo que corrige sozinho, o --fix, e o prompt não usa ele de propósito.",
+      },
+      {
+        titulo: "Por que três, e não a lista inteira",
+        texto:
+          "Um diagnóstico completo devolve dezenas de apontamentos, e a maioria não muda nada no seu dia. Uma instalação saudável convive bem com avisos amarelos de ferramenta que você nunca vai usar.\n\n" +
+          "O prompt obriga a escolher os três que importam para o jeito como você usa o agente, olhando o histórico da sua conversa. O resto vira rodapé.",
+      },
+      {
+        titulo: "A regra que dá o valor: o custo de não fazer",
+        texto:
+          "Para cada uma das três mudanças, o agente precisa dizer numa frase o que acontece se você deixar como está. Se a resposta for \"nada demais\", ele é obrigado a trocar o achado por outro.\n\n" +
+          "Sem essa regra, a lista vira higiene genérica. Com ela, sobra só o que tem consequência.",
+      },
+      {
+        titulo: "Por que conversa nova",
+        texto:
+          "Numa conversa longa o agente já está carregado do assunto anterior, e ele vai ler o diagnóstico através daquele contexto. Numa conversa nova, o único contexto é a saída dos comandos e o histórico de como você usa ele.",
+      },
+      {
+        titulo: "Ele não mexe em nada",
+        texto:
+          "A primeira regra do texto é ler e parar. Nada de arquivo alterado, nada de config mudada, nada instalado. Ele entrega a lista e espera. Quem roda os comandos é você, depois de ler os três e decidir.",
+      },
+    ],
+  },
+  {
     slug: "entrevista-memoria-hermes",
     titulo: "Entrevista de memória do Hermes",
     categoria: "Guias",
