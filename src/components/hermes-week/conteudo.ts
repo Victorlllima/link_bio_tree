@@ -1539,11 +1539,11 @@ const G: Variante = {
          morto. O Red corrigiu em 13/09. A premissa certa é a máquina LIGADA
          trabalhando enquanto você não está na frente dela, e foi isso que
          transformou o bloco em cena com hora marcada. */
-      tag: "o que ele está fazendo enquanto você não está na frente da máquina",
+      tag: "o que o Hermes faz enquanto você não está na frente do computador",
       nos: [
         {
           t: "p",
-          c: "Você sai pra uma reunião. A máquina fica ligada em casa. Ele não fica esperando você voltar.",
+          c: "Você sai pra uma reunião. O computador fica ligado em casa. Ele não fica esperando você voltar.",
         },
         {
           t: "p",
@@ -1590,7 +1590,7 @@ const G: Variante = {
       nos: [
         {
           t: "p",
-          c: "Eu poderia abrir essa seção dizendo que o Hermes é open source, aberto, gratuito. E é verdade, é isso que todo mundo faz.",
+          c: "Eu poderia abrir essa seção dizendo que o Hermes é open source, aberto, gratuito. E é verdade, é isso que todo mundo fala.",
         },
         {
           t: "p",
@@ -1613,7 +1613,7 @@ const G: Variante = {
       dia: "Segunda",
       aula: "As três peças e a instalação",
       temas:
-        "O que ele tem que um chat não tem · as peças do sistema e onde cada uma mora na sua máquina · instalação no Windows e no Mac · o que fazer quando ele não sobe · **o custo de cada mensagem, medido antes da primeira** · trazendo pra dentro o que você já montou em outra ferramenta",
+        "O que ele tem que um chatbot não tem · as peças do sistema e onde cada uma mora · instalação · o que fazer quando ele não sobe · **o custo de cada mensagem, medido antes da primeira** · trazendo pra dentro o que você já montou em outra ferramenta",
       saida: "o agente instalado e respondendo você",
     },
     {
@@ -1634,7 +1634,7 @@ const G: Variante = {
       dia: "Quinta",
       aula: "O agente que se reescreve",
       temas:
-        "Virando manual uma pasta, um site ou um fluxo que você acabou de rodar · onde esse manual mora e por que ele só entra quando a tarefa pede · **a armadilha da descrição que pesa em toda conversa** · o que ele já sabe fazer sozinho antes de você instalar qualquer coisa · a faxina automática do que você não usa · **o custo escondido de cada página que ele lê** · o que revisar no que ele escreveu sobre você",
+        "Transformando em skill uma pasta, um site ou um fluxo que você acabou de rodar · onde essa skill mora e por que ela só entra quando a tarefa pede · **a armadilha da descrição que pesa em toda conversa** · o que ele já sabe fazer sozinho antes de você instalar qualquer coisa · a faxina automática do que você não usa · **o custo escondido de cada página que ele lê** · o que revisar no que ele escreveu sobre você",
       saida: "uma skill escrita pelo próprio agente, rodando",
     },
     {
@@ -1655,33 +1655,47 @@ const G: Variante = {
       nos: [
         {
           t: "p",
-          c: "Tem tutorial bom e de graça. Eu assisti os cinco mais vistos do nicho, somando mais de meio milhão de visualizações, e anotei tudo que eles ensinam.",
+          c: "Tem muito tutorial bom e de graça. Eu assisti dezenas deles, e compilei tudo que eles ensinam.",
         },
         {
           t: "p",
-          c: "Eles param todos no mesmo lugar. Instalação, Telegram, os mesmos seis casos de uso, e um *pronto, agora é com você*.",
+          c: "O problema é que eles param todos no mesmo lugar. Instalação, Telegram, os mesmos seis casos de uso, e um *pronto, agora é com você*.",
         },
         {
           t: "p",
-          c: "O que ninguém responde é o depois: o que fazer quando dois manuais dele se contradizem, como perceber que ele está fazendo besteira sozinho, o que acontece quando a memória estoura, como desfazer o que ele fez, e o que revisar no que ele escreveu sobre você.",
+          c: "O que ninguém responde é o depois: o que fazer quando ele buga, como perceber que ele está fazendo besteira sozinho, o que acontece quando a memória estoura, como desfazer o que ele fez, e o que revisar no que ele escreveu sobre você.",
         },
         {
           t: "p",
-          c: "Quando a parte boa existe, ela está atrás de uma assinatura ou de uma comunidade paga. **Aqui ela está nas cinco aulas.**",
+          c: "No YouTube, quando a parte mais técnica existe, ela está atrás de uma assinatura ou de uma comunidade paga. **Aqui ela está nas cinco aulas.**",
         },
       ],
     },
   ],
+  /* Reescrita em 13/09 a pedido do Red: "essa seção é sobre mim e não sobre o
+     Alfred". Material vindo do CV de Automação & IA em
+     `GlobalCareer/curriculo/Automacao e IA/`.
+
+     ⚠️ SELEÇÃO DELIBERADA, e o que ficou de fora importa. O CV traz vinte anos
+     de ANTT, o incidente de invasão com recuperação em 14h09, R$64,3 milhões de
+     execução em 2023 e a graduação em Engenharia Elétrica com ênfase em
+     Telecomunicações. Nada disso entrou: `VOZ.md` §10 proíbe o frame
+     "ex-servidor público / engenheiro de telecom". O que entrou é só o que
+     corrobora ESTA promessa, que é a lição 10 das análises de LP. */
   autoridade: {
     tag: "quem está do outro lado",
     nos: [
       {
         t: "p",
-        c: "O meu agente se chama Alfred e faz exatamente o que esta página promete. Lê meu e-mail e minha agenda **sem plataforma de integração no meio**, com a credencial na minha máquina. E reescreve o próprio manual conforme aprende a trabalhar comigo.",
+        c: "Meu nome é **Victor Lima**. Desde 2024 eu construo e opero agente de IA em produção para clientes de saúde, jurídico e serviços, pela RedPro AI Solutions. Coisa que precisa estar de pé na segunda de manhã, com cliente pagando pra isso.",
       },
       {
         t: "p",
-        c: "Eu meço a conta dele todo dia. A primeira aula é literalmente o que eu faço antes de deixar qualquer agente meu rodando solto.",
+        c: "Boa parte do meu trabalho hoje é **diagnosticar automação quebrada dos outros** e escrever o laudo dizendo qual foi a causa raiz. É o jeito mais rápido que existe de aprender o que quebra, e é isso que eu passo na semana.",
+      },
+      {
+        t: "p",
+        c: "Antes disso foram vinte anos em infraestrutura: servidor, rede, banco de dados e continuidade de serviço. É de lá que vem a parte da sexta-feira que fala sobre o que o agente pode tocar e o que precisa passar por você. Tenho **pós-graduação em Segurança da Informação** e **MBA em Inteligência Artificial para Negócios**.",
       },
       {
         t: "forte",

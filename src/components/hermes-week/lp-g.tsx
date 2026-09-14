@@ -633,7 +633,7 @@ export function LpG({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
                 No desktop ele volta pra coluna da direita (ver .g-mostrador-lado)
                 e este some, senão a data apareceria duas vezes. */}
             <div className="g-mostrador g-vidro g-mostrador-topo">
-              <p className="g-mostrador-rot">as cinco noites</p>
+              <p className="g-mostrador-rot">os cinco encontros</p>
               <p className="g-mostrador-data">{ciclo.faixa}</p>
               <p className="g-mostrador-pe">{`Começa segunda, ${ciclo.inicioExtenso}, às 20h.`}</p>
             </div>
@@ -654,7 +654,7 @@ export function LpG({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
 
           <div>
             <div className="g-mostrador g-vidro g-mostrador-lado">
-              <p className="g-mostrador-rot">as cinco noites</p>
+              <p className="g-mostrador-rot">os cinco encontros</p>
               <p className="g-mostrador-data">{ciclo.faixa}</p>
               <p className="g-mostrador-pe">{`Começa segunda, ${ciclo.inicioExtenso}, às 20h.`}</p>
             </div>
