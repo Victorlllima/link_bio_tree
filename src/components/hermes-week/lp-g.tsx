@@ -147,6 +147,14 @@ const CSS = `
 .g-h2 b{font-weight:400; font-style:italic; color:var(--champ);}
 .g-p{font-size:1.05rem; line-height:1.68; margin:0 0 1.05em; color:var(--texto);}
 .g-p b{font-weight:600; color:#fff;}
+/* Nome de comando. Monoespaçada aqui é DADO, e a lista de proibições veta
+   mono só no corpo do texto. Sem caixa de fundo: filete embaixo, como
+   marcação de mostrador. */
+.g code{
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:.9em; color:var(--champ); letter-spacing:-.01em;
+  border-bottom:1px solid rgba(232,213,183,.32); padding-bottom:1px;
+}
 .g-forte{
   font-family:var(--display); font-weight:400; font-size:clamp(1.3rem,3.9vw,1.85rem);
   line-height:1.3; margin:1.5em 0; color:var(--texto);
@@ -201,6 +209,13 @@ const CSS = `
    dobra, mas como janela de data de relógio: placa de vidro, filete, numeral
    tabular grande. No desktop ele sobe pra coluna da direita. */
 .g-mostrador{padding:20px 22px 18px; margin:0 0 32px;}
+/* um mostrador por viewport: o do topo é o do celular, o do lado é o do
+   desktop. Os dois no DOM, um visível por vez. */
+.g-mostrador-lado{display:none;}
+@media(min-width:900px){
+  .g-mostrador-topo{display:none;}
+  .g-mostrador-lado{display:block;}
+}
 .g-mostrador-rot{
   font-size:.7rem; letter-spacing:.17em; text-transform:uppercase;
   color:var(--champ-dim); font-weight:600; margin:0 0 9px;
@@ -304,6 +319,35 @@ const CSS = `
 }
 .g-dia dd{margin:0; font-size:1.03rem; line-height:1.55; color:var(--texto);}
 
+/* ---------- os cinco encontros, versão densa ----------
+   A lista de uma linha por dia entregava pouco (Red, 13/09). Cada encontro
+   agora é um bloco com data, nome da aula, os temas e o marco do dia. */
+.g-enc{margin:30px 0 0; display:grid; gap:0;}
+.g-enc-item{padding:26px 0; border-top:1px solid var(--filete2);}
+.g-enc-item:last-child{border-bottom:1px solid var(--filete2);}
+.g-enc-dia{
+  font-size:.77rem; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--champ-dim); font-weight:600; margin:0 0 6px;
+}
+.g-enc-aula{
+  font-family:var(--display); font-weight:400; font-style:italic;
+  font-size:clamp(1.3rem,4.2vw,1.7rem); line-height:1.15; color:var(--champ);
+  margin:0 0 12px;
+}
+.g-enc-temas{font-size:.99rem; line-height:1.62; color:var(--texto); margin:0 0 14px; max-width:62ch;}
+.g-enc-temas b{font-weight:600; color:#fff;}
+.g-enc-saida{
+  font-size:.94rem; line-height:1.5; color:var(--texto2); margin:0;
+  padding-left:20px; position:relative; font-style:italic;
+}
+.g-enc-saida::before{
+  content:""; position:absolute; left:0; top:11px; width:12px; height:1px; background:var(--champ);
+}
+.g-dia-aula{
+  display:block; font-family:var(--display); font-weight:400; font-style:italic;
+  font-size:1.18rem; line-height:1.2; color:var(--champ); margin:0 0 5px;
+}
+
 /* ---------- qualificação dupla ---------- */
 .g-dupla{display:grid; gap:16px; margin:26px 0 0;}
 @media(min-width:820px){.g-dupla{grid-template-columns:1fr 1fr; gap:20px;}}
@@ -383,6 +427,13 @@ const CSS = `
 .g-retrato{max-width:340px;}
 
 /* ---------- fecho e rodapé ---------- */
+.g-repo{
+  display:inline-block; margin:8px 0 0; padding:13px 20px; border-radius:4px;
+  border:1px solid rgba(232,213,183,.3); color:var(--champ); text-decoration:none;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:.92rem;
+  transition:border-color .18s ease, background .18s ease;
+}
+.g-repo:hover{border-color:var(--champ); background:rgba(232,213,183,.06);}
 .g-humano{font-size:.9rem; line-height:1.6; color:var(--texto2); margin:16px 0 0; max-width:46ch;}
 .g-humano a{color:var(--champ); text-decoration:underline; text-underline-offset:3px;}
 .g-rodape{
@@ -576,8 +627,24 @@ export function LpG({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
             <p className="g-marca">{compartilhado.evento}</p>
             <h1 className="g-h1">{inline(v.hero.h1, "h1")}</h1>
             <p className="g-deck">{v.hero.deck}</p>
+
+            {/* No celular o mostrador sobe pra cá, ANTES do botão: a ordem de
+                leitura que o Tabari exige na 1ª dobra é data, CTA, garantia.
+                No desktop ele volta pra coluna da direita (ver .g-mostrador-lado)
+                e este some, senão a data apareceria duas vezes. */}
+            <div className="g-mostrador g-vidro g-mostrador-topo">
+              <p className="g-mostrador-rot">as cinco noites</p>
+              <p className="g-mostrador-data">{ciclo.faixa}</p>
+              <p className="g-mostrador-pe">{`Começa segunda, ${ciclo.inicioExtenso}, às 20h.`}</p>
+            </div>
+
             <Cta href={url} texto={compartilhado.ctaTopo} />
-            <p className="g-garantia-cta">{inline(`Garantia de ${v.garantia}`, "gar-hero")}</p>
+            {/* curta de propósito: aqui ela precisa ser lida de relance. O
+                argumento de que os 7 dias cobrem a semana inteira está por
+                extenso na seção da garantia. */}
+            <p className="g-garantia-cta">
+              <b>Garantia de 7 dias.</b> Pediu, devolvo. Sem pergunta.
+            </p>
             <ul className="g-fatos">
               <li>5 encontros</li>
               <li>segunda a sexta</li>
@@ -586,7 +653,7 @@ export function LpG({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
           </div>
 
           <div>
-            <div className="g-mostrador g-vidro">
+            <div className="g-mostrador g-vidro g-mostrador-lado">
               <p className="g-mostrador-rot">as cinco noites</p>
               <p className="g-mostrador-data">{ciclo.faixa}</p>
               <p className="g-mostrador-pe">{`Começa segunda, ${ciclo.inicioExtenso}, às 20h.`}</p>
@@ -616,14 +683,27 @@ export function LpG({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
         <section className="g-sec">
           <p className="g-rot">o que você sai com</p>
           <h2 className="g-h2">{v.saiCom.intro}</h2>
-          <dl className="g-dias">
-            {compartilhado.dias.map((d, i) => (
-              <div className="g-dia" key={d.dia}>
-                <dt>{`${d.dia} ${ciclo.aulas[i]}`}</dt>
-                <dd>{d.saida}</dd>
-              </div>
-            ))}
-          </dl>
+          {v.encontros ? (
+            <div className="g-enc">
+              {v.encontros.map((e, i) => (
+                <div className="g-enc-item" key={e.dia}>
+                  <p className="g-enc-dia">{`${e.dia} ${ciclo.aulas[i]}`}</p>
+                  <h3 className="g-enc-aula">{e.aula}</h3>
+                  <p className="g-enc-temas">{inline(e.temas, `enc-${i}`)}</p>
+                  <p className="g-enc-saida">{e.saida}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <dl className="g-dias">
+              {compartilhado.dias.map((d, i) => (
+                <div className="g-dia" key={d.dia}>
+                  <dt>{`${d.dia} ${ciclo.aulas[i]}`}</dt>
+                  <dd>{d.saida}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
           <div className="g-col" style={{ marginTop: 26 }}>
             <p className="g-p">{v.saiCom.sabado}</p>
             {v.saiCom.extra ? <p className="g-p">{inline(v.saiCom.extra, "extra")}</p> : null}
@@ -652,10 +732,22 @@ export function LpG({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
           </section>
         ) : null}
 
+        {/* O bloco que manda o leitor embora de propósito. Ele é a prova mais
+            forte da página justamente por isso: quem escreve o endereço do
+            download na própria página de venda não está com medo de ser
+            conferido. Texto e link definidos pelo Red em 13/09. */}
         <section className="g-sec">
           <p className="g-rot">{v.prova.tag}</p>
           <div className="g-col">
             <Nos nos={v.prova.nos} k="prova" />
+            <a
+              className="g-repo"
+              href="https://github.com/NousResearch/hermes-agent"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              github.com/NousResearch/hermes-agent
+            </a>
           </div>
         </section>
 
@@ -696,34 +788,9 @@ export function LpG({ v, ciclo }: { v: Variante; ciclo: CicloFormatado }) {
           </div>
         </section>
 
-        <section className="g-sec">
-          <p className="g-rot">complementos opcionais</p>
-          <h2 className="g-h2">Os três complementos</h2>
-          {v.bumps.intro ? (
-            <div className="g-col">
-              <p className="g-p">{v.bumps.intro}</p>
-            </div>
-          ) : null}
-          <div className="g-bumps">
-            {v.bumps.itens.map((b) => (
-              <div className="g-bump" key={b.nome}>
-                <div className="g-bump-cab">
-                  <span className="g-bump-nome">{b.nome}</span>
-                  <span className="g-bump-preco">{b.preco}</span>
-                </div>
-                <p className="g-bump-txt">{inline(b.texto, `bp-${b.nome}`)}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="g-sec">
-          <p className="g-rot">{v.escassez.tag}</p>
-          <div className="g-col">
-            <Nos nos={v.escassez.nos} k="esc" />
-          </div>
-        </section>
-
+        {/* Bumps e escassez saíram da LP em 13/09 por decisão do Red: os bumps
+            vivem só no checkout, e a seção de escassez foi removida inteira. Os
+            dados seguem em `conteudo.ts` porque o tipo é compartilhado. */}
         <section className="g-sec">
           <p className="g-rot">garantia</p>
           <h2 className="g-h2">{inline(v.garantia, "gar")}</h2>

@@ -5,15 +5,16 @@ import { VARIANTES, comDatas } from "@/components/hermes-week/conteudo";
 
 /* /hermes-week/g · variação G (o painel) · preto piano, vidro, champanhe
  *
- * A G NÃO TEM COPY PRÓPRIA. Ela lê a copy da D, que o Red aprovou com nota 10
- * em 11/09/2026 na mesma conversa em que deu nota 1 para o design da D. O que
- * está sendo testado aqui é desenho contra desenho, com o texto fixo — que é
- * a única forma do resultado dizer alguma coisa sobre o desenho.
+ * Copy PRÓPRIA desde 13/09/2026. A G nasceu servindo a copy da D, e deixou de
+ * servir quando a auditoria independente da VEGA mostrou que o eixo da D tinha
+ * sido revogado pelo Red em 03/09, dois dias depois de a copy ser escrita.
  *
- * Por isso o SEO também é o da D: mesma promessa, mesma página, outra roupa.
+ * A espinha da G é a conta: a objeção real do ICP não está em "não sei fazer",
+ * está em "não vale o custo e o trabalho" (`curriculo-week-e-squad.md`). O
+ * detalhe do que mudou e por quê está no bloco da G em `conteudo.ts`.
  */
 
-const v = VARIANTES.D;
+const v = VARIANTES.G;
 
 export const metadata: Metadata = {
   title: v.seo.titulo,

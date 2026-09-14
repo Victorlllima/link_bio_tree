@@ -81,16 +81,19 @@ export type Bump = { nome: string; preco: string; texto: string };
 export const compartilhado = {
   produto: "Hermes Week | Seu Agente do Zero à Produção",
   preco: "R$62",
-  evento: "Hermes Week · Seu Hermes Agent do zero à produção",
-  eventoCurto: "Hermes Week · Seu Hermes Agent do zero à produção",
-  ctaTopo: "QUERO MEU AGENTE POR R$62",
-  ctaOferta: "GARANTIR MEU INGRESSO POR R$62",
+  /* "Seu Hermes Agent" quebrava VOZ §13.10 (Red, 12/09): a forma é sempre
+     "o Hermes", nunca "o seu Hermes". A forma abaixo é a que o
+     icp-falas-reais.md trava para o CTA. */
+  evento: "Hermes Week · Seu agente pessoal em 5 aulas",
+  eventoCurto: "Hermes Week · Seu agente pessoal em 5 aulas",
+  ctaTopo: "QUERO MEU HERMES POR R$62",
+  ctaOferta: "GARANTIR MEU HERMES POR R$62",
   dias: [
-    { dia: "Segunda", saida: "agente instalado e conversando com você pelo Telegram" },
-    { dia: "Terça", saida: "ele sobe sozinho quando você liga o computador, e te avisa quando cai" },
-    { dia: "Quarta", saida: "memória funcionando: ele lembra de você, do seu trabalho, do seu jeito" },
-    { dia: "Quinta", saida: "ele escrevendo as próprias habilidades, sem você pedir" },
-    { dia: "Sexta", saida: "rotina automática rodando e uma ferramenta externa conectada" },
+    { dia: "Segunda", aula: "As três peças e a instalação", saida: "o agente instalado e respondendo você" },
+    { dia: "Terça", aula: "App, gateway e sessão", saida: "você manda mensagem do celular e ele responde" },
+    { dia: "Quarta", aula: "Memória em quatro camadas", saida: "ele lembra de você na sessão seguinte, sem você repetir nada" },
+    { dia: "Quinta", aula: "O agente que se reescreve", saida: "uma skill escrita pelo próprio agente, rodando" },
+    { dia: "Sexta", aula: "Ferramentas externas e execução agendada", saida: "a rotina dispara sozinha e a mensagem chega no seu celular" },
   ],
   rodape: {
     razao: "RedPro AI Academy",
@@ -128,6 +131,12 @@ export type Variante = {
   /** a metade positiva da qualificação dupla (bloco 5). A negativa sozinha
       filtra sem convidar: quem se encaixa sai sem ter lido que se encaixa. */
   praQuemE?: Bloco;
+  /** A tabela densa dos cinco encontros. Nasceu em 13/09, quando o Red apontou
+      que a lista de uma linha por dia entregava pouco: "tem pouco conteúdo por
+      dia e conteúdo muito simples". Os temas saem dos 21 capítulos de
+      `HERMES/1-ESTUDO/curso-hermes/`, respeitando o corte Week/DUAAUS.
+      Regra do Red na mesma data: **nenhum nome de comando aqui.** */
+  encontros?: { dia: string; aula: string; temas: string; saida: string }[];
   praQuemNaoE: Bloco;
   oferta: { linhas: string[]; foto?: Img };
   bumps: { intro?: string; itens: Bump[] };
@@ -315,7 +324,7 @@ const A: Variante = {
   ],
   saiCom: {
     intro: "Cinco aulas, uma por dia, das 20h às 20h50.",
-    sabado: "Sábado 10h tem uma sessão só de dúvidas, ao vivo, pra destravar quem travou.",
+    sabado: "Sábado, das 10h às 12h, eu abro o grupo pra quem quiser tirar dúvida e sair do ponto onde parou.",
   },
   entre: [],
   prova: {
@@ -355,7 +364,7 @@ const A: Variante = {
   oferta: {
     linhas: [
       "Cinco aulas, uma por dia, 20h.",
-      "Sessão de dúvidas ao vivo no sábado, 10h.",
+      "Grupo aberto no sábado, das 10h às 12h, pra dúvida.",
       "Grupo no WhatsApp com o Red respondendo durante a semana inteira.",
       "As aulas ficam disponíveis por um ano.",
     ],
@@ -578,7 +587,7 @@ const B: Variante = {
   ],
   saiCom: {
     intro: "Cinco aulas, uma por dia, das 20h às 20h50.",
-    sabado: "Sábado 10h tem uma sessão só de dúvidas, ao vivo, pra destravar quem travou.",
+    sabado: "Sábado, das 10h às 12h, eu abro o grupo pra quem quiser tirar dúvida e sair do ponto onde parou.",
   },
   entre: [],
   prova: {
@@ -619,7 +628,7 @@ const B: Variante = {
   oferta: {
     linhas: [
       "Cinco aulas, uma por dia, 20h.",
-      "Sessão de dúvidas ao vivo no sábado, 10h.",
+      "Grupo aberto no sábado, das 10h às 12h, pra dúvida.",
       "Grupo no WhatsApp com o Red respondendo durante a semana inteira.",
       "As aulas ficam disponíveis por um ano.",
     ],
@@ -825,7 +834,7 @@ const C: Variante = {
   ],
   saiCom: {
     intro: "Cinco aulas, uma por dia, das 20h às 20h50.",
-    sabado: "Sábado 10h tem uma sessão só de dúvidas, ao vivo.",
+    sabado: "Sábado, das 10h às 12h, eu abro o grupo pra quem quiser tirar dúvida e sair do ponto onde parou.",
   },
   entre: [],
   prova: {
@@ -857,7 +866,7 @@ const C: Variante = {
   oferta: {
     linhas: [
       "Cinco aulas, uma por dia, 20h.",
-      "Sessão de dúvidas ao vivo no sábado, 10h.",
+      "Grupo aberto no sábado, das 10h às 12h, pra dúvida.",
       "Grupo no WhatsApp com o Red respondendo a semana inteira.",
       "As aulas ficam disponíveis por um ano.",
     ],
@@ -1059,7 +1068,7 @@ const D: Variante = {
   ],
   saiCom: {
     intro: "Cinco aulas, uma por dia, das 20h às 20h50.",
-    sabado: "Sábado 10h tem uma sessão só de dúvidas, ao vivo.",
+    sabado: "Sábado, das 10h às 12h, eu abro o grupo pra quem quiser tirar dúvida e sair do ponto onde parou.",
   },
   entre: [],
   prova: {
@@ -1140,7 +1149,7 @@ const D: Variante = {
   oferta: {
     linhas: [
       "Cinco aulas, uma por dia, 20h.",
-      "Sessão de dúvidas ao vivo no sábado, 10h.",
+      "Grupo aberto no sábado, das 10h às 12h, pra dúvida.",
       "Grupo no WhatsApp com o Red respondendo a semana inteira.",
       "As aulas ficam disponíveis por um ano.",
     ],
@@ -1340,7 +1349,7 @@ const E: Variante = {
   ],
   saiCom: {
     intro: "Cinco aulas, uma por dia, das 20h às 20h50.",
-    sabado: "Sábado 10h tem uma sessão só de dúvidas, ao vivo.",
+    sabado: "Sábado, das 10h às 12h, eu abro o grupo pra quem quiser tirar dúvida e sair do ponto onde parou.",
     extra: "**A sexta é a aula do feriado.** É onde ele passa a trabalhar sem você mandar.",
   },
   entre: [
@@ -1389,7 +1398,7 @@ const E: Variante = {
   oferta: {
     linhas: [
       "Cinco aulas, uma por dia, 20h.",
-      "Sessão de dúvidas ao vivo no sábado, 10h.",
+      "Grupo aberto no sábado, das 10h às 12h, pra dúvida.",
       "Grupo no WhatsApp com o Red respondendo a semana inteira.",
       "As aulas ficam disponíveis por um ano.",
     ],
@@ -1470,12 +1479,306 @@ const E: Variante = {
    dobra de texto (roteiro em Starlight/HERMES/05-paginas/lp-F-cinematica-ROTEIRO.md,
    conteúdo em ./lp-f-cenas.ts). Forçá-la neste Record obrigaria a inventar
    campos que ela não usa. Por isso o tipo aqui é o subconjunto A-E. */
-/* A G também fica de fora: ela não tem copy própria. É a copy da D com outro
-   desenho (painel preto-piano), então lê `VARIANTES.D` e renderiza com
-   `lp-g.tsx`. Se um dia ela ganhar ângulo próprio, entra aqui como as outras. */
-export type VarianteTextualId = Exclude<VarianteId, "F" | "G">;
 
-export const VARIANTES: Record<VarianteTextualId, Variante> = { A, B, C, D, E };
+/* ===== G · a conta (a objeção que mata a venda) ==========================
+ *
+ * REFORMULAÇÃO INTEIRA, pedida pelo Red em 13/09/2026 depois da auditoria
+ * independente da VEGA. A copy A-E foi escrita em 01/09 e o Red revogou o eixo
+ * dela em 03/09: *"Essas comparações de memória com chatgpt [...] tudo isso é
+ * balela. Meu ICP é maior do que isso."* (`icp-falas-reais.md`). Ninguém voltou
+ * para desfazer, e a escada de degraus continuou no ar por doze dias.
+ *
+ * A ESPINHA NOVA sai do `curriculo-week-e-squad.md`: a objeção real do ICP não
+ * está em "não sei fazer", está em **"não vale o custo e o trabalho"**. O mesmo
+ * documento explica por que o custo entra na aula 1 e não no fim, e chama isso
+ * de prova viva contra a objeção que mata a venda.
+ *
+ * O QUE MUDOU EM RELAÇÃO À COPY ANTIGA, e por quê:
+ *  · a escada de 4 degraus SAIU  · era o eixo revogado, e carregava a única
+ *    afirmação falsa da página ("não faz nada às 3 da manhã" — o ChatGPT tem
+ *    tarefa agendada, e isso está na tabela de fatos proibidos do ICP)
+ *  · "184 habilidades escritas por ele mesmo" virou "o `skill_manage` rodou
+ *    184 vezes"  · o `lab-verificado.md` conta OPERAÇÕES no log, e as skills
+ *    nasceram de "transforma isso numa skill", ou seja, com pedido
+ *  · as duas menções a programar SAÍRAM  · `VOZ.md` §10 proíbe o argumento
+ *  · o FAQ do custo parou de prometer "rodo sem pagar API e mostro como"  ·
+ *    proxy, pools e assinatura × API são conteúdo do DUAAUS (teto 4), e o
+ *    currículo manda mostrar o teto, nunca anunciá-lo
+ *  · o sábado virou o que ele é de verdade  · grupo aberto das 10h às 12h,
+ *    não sessão ao vivo (correção que o Red já tinha feito na /obrigado)
+ *  · a garantia passou a dizer que cobre a semana inteira  · sempre cobriu
+ *  · a prova abre pelo verificável (repositório MIT), não pela ausência
+ *  · sumiu a linha de autoridade que não corroborava a promessa
+ * ======================================================================== */
+
+const G: Variante = {
+  id: "G",
+  slug: "g",
+  angulo: "a rotina disparando sozinha (desejo) + a conta como confiança",
+  seo: {
+    titulo: "Hermes Week · Seu Hermes trabalhando sozinho em cinco encontros",
+    descricao:
+      "Instalação, identidade, memória, skills que ele escreve sozinho e suas ferramentas conectadas. Na sexta suas rotinas disparam sem você. Cinco aulas, segunda a sexta, 20h.",
+  },
+  hero: {
+    h1: "Cinco encontros pro seu Hermes **trabalhar sozinho**, no horário que você mandar",
+    deck: "Instalação, identidade, memória, skills que ele escreve sozinho e suas ferramentas conectadas. Na sexta-feira suas rotinas estarão disparando sem você e as notificações chegando no seu celular.",
+    foto: {
+      tipo: "RED",
+      formato: "quadrado",
+      c: "Red em pé, frontal, olhando direto pra câmera. Sem sorriso, fundo liso.",
+      src: "/hermes-week/red-oferta.webp",
+      w: 1200,
+      h: 1200,
+    },
+  },
+  antes: [
+    {
+      /* O bloco de desejo. A primeira versão repetia o hero e dizia "você fecha
+         o computador", que é falso na Week: sem VPS, máquina desligada é Hermes
+         morto. O Red corrigiu em 13/09. A premissa certa é a máquina LIGADA
+         trabalhando enquanto você não está na frente dela, e foi isso que
+         transformou o bloco em cena com hora marcada. */
+      tag: "o que ele está fazendo enquanto você não está na frente da máquina",
+      nos: [
+        {
+          t: "p",
+          c: "Você sai pra uma reunião. A máquina fica ligada em casa. Ele não fica esperando você voltar.",
+        },
+        {
+          t: "p",
+          c: "**Sete da manhã.** Você ainda não sentou. Ele já leu a caixa de entrada e a agenda do dia, separou os três e-mails que precisam de você e mandou a lista no seu celular. O resto ele não te mostra, porque não precisa.",
+        },
+        {
+          t: "p",
+          c: "**Meio da tarde, no ponto de ônibus.** Você joga um insight solto no Telegram. Ele arquiva no lugar certo e te avisa que aquilo conversa com uma coisa que você anotou há três semanas e esqueceu.",
+        },
+        {
+          t: "p",
+          c: "**Reunião acabou.** Você manda o áudio. Ele devolve o resumo, as tarefas que sobraram pra você e o lembrete do que foi prometido pra quando.",
+        },
+        {
+          t: "p",
+          c: "**Seis da tarde.** Ele varre sozinho os assuntos que você acompanha e te manda só o que mudou desde ontem. O que continuou igual ele guarda pra si.",
+        },
+        {
+          t: "p",
+          c: "**Sábado à tarde, você na rua.** Pede uma coisa pelo celular. A máquina de casa executa. Quando você senta na segunda, está pronto.",
+        },
+      ],
+    },
+    {
+      tag: "a rampa de três meses",
+      nos: [
+        {
+          t: "p",
+          c: "Muita gente fala que, pro Hermes realmente começar a te conhecer, leva dois, três, às vezes até seis meses.",
+        },
+        {
+          t: "p",
+          c: "Esse período existe porque o agente leva meses juntando quem você é em migalhas de conversa. Uma preferência aqui, um jeito de trabalhar ali.",
+        },
+        {
+          t: "p",
+          c: "Aqui a gente encurta esse tempo. **Na quarta-feira eu te entrego o meu protocolo, que reduz em meses essa curva de aprendizado.**",
+        },
+        { t: "forte", c: "O processo de aprendizagem não some. A gente só **hackeia** ele." },
+      ],
+    },
+    {
+      tag: "a conta",
+      nos: [
+        {
+          t: "p",
+          c: "Eu poderia abrir essa seção dizendo que o Hermes é open source, aberto, gratuito. E é verdade, é isso que todo mundo faz.",
+        },
+        {
+          t: "p",
+          c: "Mas ninguém te conta as letras miúdas do rodapé. **O Hermes não te cobra. Quem te cobra é a LLM que você pluga nele.** E cobra de acordo com o seu uso.",
+        },
+        {
+          t: "p",
+          c: "Então eu não tenho como saber quanto vai ficar o seu custo no final do mês, e quem disser que sabe está chutando.",
+        },
+        {
+          t: "p",
+          c: "O que eu faço é te ensinar a construir o medidor, pra você saber exatamente quanto custa cada mensagem de um modelo antes mesmo de enviar a primeira. Te ensino que nem toda tarefa precisa do melhor modelo. E te ensino a ter até dez modelos gratuitos de reserva, pra você nunca ficar sem comunicação com o seu Hermes.",
+        },
+        { t: "forte", c: "**Isso é gestão de custo.** Não é adivinhação." },
+      ],
+    },
+  ],
+  encontros: [
+    {
+      dia: "Segunda",
+      aula: "As três peças e a instalação",
+      temas:
+        "O que ele tem que um chat não tem · as peças do sistema e onde cada uma mora na sua máquina · instalação no Windows e no Mac · o que fazer quando ele não sobe · **o custo de cada mensagem, medido antes da primeira** · trazendo pra dentro o que você já montou em outra ferramenta",
+      saida: "o agente instalado e respondendo você",
+    },
+    {
+      dia: "Terça",
+      aula: "App, gateway e sessão",
+      temas:
+        "As três camadas que confundem todo mundo · ele no seu celular, você falando com ele de qualquer lugar · **por que ele fica mudo no grupo** e como resolver · o que é uma sessão, quando ela acaba e o que se perde junto · separando assuntos pra não inflar o contexto nem a conta",
+      saida: "você manda mensagem do celular e ele responde",
+    },
+    {
+      dia: "Quarta",
+      aula: "Identidade e memória",
+      temas:
+        "Quem ele é, e por que sem essa camada todo agente soa igual · as quatro camadas de memória, uma a uma · **o protocolo que corta meses da curva de aprendizado** · o teto de cada arquivo e o que acontece quando estoura · a memória congelada, que é onde a maioria desiste · a camada que guarda a relação entre as coisas em vez do fato solto · o efeito composto",
+      saida: "ele lembra de você na sessão seguinte, sem você repetir nada",
+    },
+    {
+      dia: "Quinta",
+      aula: "O agente que se reescreve",
+      temas:
+        "Virando manual uma pasta, um site ou um fluxo que você acabou de rodar · onde esse manual mora e por que ele só entra quando a tarefa pede · **a armadilha da descrição que pesa em toda conversa** · o que ele já sabe fazer sozinho antes de você instalar qualquer coisa · a faxina automática do que você não usa · **o custo escondido de cada página que ele lê** · o que revisar no que ele escreveu sobre você",
+      saida: "uma skill escrita pelo próprio agente, rodando",
+    },
+    {
+      dia: "Sexta",
+      aula: "Ferramentas conectadas e execução agendada",
+      temas:
+        "A diferença entre ele saber e ele poder · conectando as suas ferramentas de verdade · rotina agendada, ele começando sem você · **vigiar o dia inteiro sem pagar pra ele acordar à toa** · os modelos de reserva pra você nunca ficar mudo · configuração e segurança: o que ele pode tocar, o que passa pela sua aprovação e o que você não entrega · como desfazer o que ele fez",
+      saida: "suas rotinas disparando sozinhas e a notificação chegando no celular",
+    },
+  ],
+  saiCom: {
+    intro: "Cinco aulas, uma por dia, das 20h às 20h50.",
+    sabado: "Sábado, das 10h às 12h, eu abro o grupo pra quem quiser tirar dúvida.",
+  },
+  entre: [
+    {
+      tag: "por que isso não está no youtube",
+      nos: [
+        {
+          t: "p",
+          c: "Tem tutorial bom e de graça. Eu assisti os cinco mais vistos do nicho, somando mais de meio milhão de visualizações, e anotei tudo que eles ensinam.",
+        },
+        {
+          t: "p",
+          c: "Eles param todos no mesmo lugar. Instalação, Telegram, os mesmos seis casos de uso, e um *pronto, agora é com você*.",
+        },
+        {
+          t: "p",
+          c: "O que ninguém responde é o depois: o que fazer quando dois manuais dele se contradizem, como perceber que ele está fazendo besteira sozinho, o que acontece quando a memória estoura, como desfazer o que ele fez, e o que revisar no que ele escreveu sobre você.",
+        },
+        {
+          t: "p",
+          c: "Quando a parte boa existe, ela está atrás de uma assinatura ou de uma comunidade paga. **Aqui ela está nas cinco aulas.**",
+        },
+      ],
+    },
+  ],
+  autoridade: {
+    tag: "quem está do outro lado",
+    nos: [
+      {
+        t: "p",
+        c: "O meu agente se chama Alfred e faz exatamente o que esta página promete. Lê meu e-mail e minha agenda **sem plataforma de integração no meio**, com a credencial na minha máquina. E reescreve o próprio manual conforme aprende a trabalhar comigo.",
+      },
+      {
+        t: "p",
+        c: "Eu meço a conta dele todo dia. A primeira aula é literalmente o que eu faço antes de deixar qualquer agente meu rodando solto.",
+      },
+      {
+        t: "forte",
+        c: "**Se a base que eu ensino fosse torta**, o primeiro a quebrar a semana seria eu.",
+      },
+    ],
+  },
+  prova: {
+    tag: "o que dá pra você fazer sem a Hermes Week",
+    nos: [
+      {
+        t: "p",
+        c: "O Hermes é feito pela Nous Research, um laboratório que treina modelos de IA. Repositório público, licença **MIT**, mais de **240 mil estrelas**, commit recente. Você pode baixar ele agora sozinho e testar.",
+      },
+    ],
+  },
+  praQuemE: {
+    tag: "pra quem é",
+    nos: [
+      { t: "p", c: "Pra você que tem tarefa que se repete toda semana e continua fazendo na mão." },
+      {
+        t: "p",
+        c: "Pra você que precisa de um assistente que te ajude com a sua agenda, seus compromissos e suas reuniões.",
+      },
+      {
+        t: "p",
+        c: "Pra você que anota insight em cinco lugares diferentes e nunca lembra onde anotou.",
+      },
+      {
+        t: "p",
+        c: "Pra você que quer um agente que ligue as áreas da sua vida entre si, com uma camada de memória que guarda a relação entre as coisas em vez do fato solto.",
+      },
+      { t: "p", c: "Pra você que quer um agente que aprende sobre você a cada interação." },
+    ],
+  },
+  praQuemNaoE: {
+    tag: "pra quem não é",
+    nos: [
+      {
+        t: "p",
+        c: "Se você usa IA duas vezes por semana pra escrever texto ou tirar dúvida, não compensa. Sério. ChatGPT, Gemini ou Claude resolvem o seu problema muito melhor que o Hermes.",
+      },
+    ],
+  },
+  oferta: {
+    linhas: [
+      "Cinco aulas, uma por dia, 20h.",
+      "Grupo aberto no sábado, das 10h às 12h.",
+      "As aulas ficam disponíveis por um ano.",
+    ],
+  },
+  /* Os bumps existem e são verdadeiros, mas NÃO aparecem na LP: regra do Red em
+     13/09, "bumps não entram no texto da LP, só no checkout". Ficam aqui porque
+     o tipo é compartilhado com as outras variações, e `lp-g.tsx` não renderiza
+     esta seção. O mesmo vale para `escassez`, que o Red mandou remover. */
+  bumps: { itens: [] },
+  escassez: { tag: "", nos: [] },
+  garantia:
+    "**7 dias, e eles cobrem a semana inteira.** As aulas vão de segunda a sexta, então dá pra assistir as cinco, você configura o seu, e ainda pede o dinheiro de volta no domingo se achar que não valeu a pena.",
+  faq: [
+    {
+      q: "Quanto vou gastar por mês?",
+      a: "Não sei, e desconfie de quem disser que sabe. Depende de quanto você usa. O que eu entrego é o medidor na primeira aula, o critério pra não gastar modelo caro em tarefa barata, e os modelos de reserva.",
+    },
+    {
+      q: "Já rodo o Hermes há meses. Serve pra mim?",
+      a: "Serve se você ainda não sabe direito o que ele está fazendo quando ninguém olha. A semana é sobre configuração fina, sobre o que ele pode tocar e o que precisa passar por você, sobre como ele guarda o que aprende, e sobre entender o funcionamento por dentro em vez de seguir tutorial. Se você já domina isso, não gasta seu dinheiro.",
+    },
+    {
+      q: "As aulas são ao vivo?",
+      a: "As cinco são gravadas e liberadas no horário, 20h, uma por dia. Ao vivo mesmo é o sábado, quando eu abro o grupo das 10h às 12h.",
+    },
+    {
+      q: "Funciona no Windows?",
+      a: "Funciona, com um passo a mais que a gente faz junto na primeira aula.",
+    },
+  ],
+  fecho: {
+    nos: [
+      {
+        t: "p",
+        c: "Você já tem a ferramenta. Ela é aberta, é gratuita e está a um download de distância.",
+      },
+      {
+        t: "p",
+        c: "O que separa quem tem um agente rodando de quem tem um programa instalado é a ordem das coisas: o que configurar primeiro, o que ensinar antes, o que deixar pra depois e o que nunca entregar pra ele.",
+      },
+      { t: "p", c: "Isso é uma semana. E eu já andei por ela." },
+      { t: "forte", c: "**Segunda, {{INICIO}}, 20h.**" },
+    ],
+    foto: IMG_RED_MANHA,
+  },
+};
+
+export type VarianteTextualId = Exclude<VarianteId, "F">;
+
+export const VARIANTES: Record<VarianteTextualId, Variante> = { A, B, C, D, E, G };
 
 /* --------------------------------------------------------------------------
  *  DATA CRAVADA NA COPY

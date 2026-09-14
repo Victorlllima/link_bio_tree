@@ -18,13 +18,19 @@ import type { Img, ImgTipo } from "./conteudo";
 
 /* ---------- marcação inline da copy: **negrito** e *itálico* ------------- */
 
+/* A crase virou marcação em 13/09/2026. Sem ela, `prompt-size` e
+   `skill_manage` saíam com a crase impressa na tela — e saíam mesmo, tanto na
+   LP G quanto na E. O público desta página escreve `cron` e `harness`, então
+   nome de comando formatado como comando é vocabulário, não enfeite. */
 export function inline(txt: string, k: string): ReactNode {
   return txt
-    .split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g)
+    .split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g)
     .filter(Boolean)
     .map((p, i) => {
       const kk = `${k}-${i}`;
       if (p.startsWith("**") && p.endsWith("**")) return <b key={kk}>{p.slice(2, -2)}</b>;
+      if (p.startsWith("`") && p.endsWith("`") && p.length > 2)
+        return <code key={kk}>{p.slice(1, -1)}</code>;
       if (p.startsWith("*") && p.endsWith("*") && p.length > 2) return <em key={kk}>{p.slice(1, -1)}</em>;
       return <Fragment key={kk}>{p}</Fragment>;
     });
