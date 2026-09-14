@@ -1553,6 +1553,12 @@ const G: Variante = {
           t: "p",
           c: "**Sete da manhã.** Você ainda não sentou. Ele já leu a caixa de entrada e a agenda do dia, separou os três e-mails que precisam de você e mandou a lista no seu celular. O resto ele não te mostra, porque não precisa.",
         },
+        /* O print entra AQUI e não na seção da prova, por um motivo: ele mostra
+           exatamente a cena de cima acontecendo. Prova colada na afirmação que
+           ela sustenta vale mais do que prova numa seção separada (lição 12
+           das análises de LP). A hora no print é 10h36, não sete da manhã; a
+           cena e o comportamento são os mesmos. */
+        { t: "img", ...IMG_TELEGRAM },
         {
           t: "p",
           c: "**Meio da tarde, no ponto de ônibus.** Você joga um insight solto no Telegram. Ele arquiva no lugar certo e te avisa que aquilo conversa com uma coisa que você anotou há três semanas e esqueceu.",
