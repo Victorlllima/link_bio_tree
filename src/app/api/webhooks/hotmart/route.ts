@@ -517,7 +517,17 @@ export async function POST(req: NextRequest) {
             await telegram(`🟡 *Abandono de checkout* — ${produtoNome}\n\n👤 ${nome || "—"}\n📧 ${email || "—"}\n\n📱 sem telefone — recuperação por WhatsApp não é possível.`);
         }
 
-        return NextResponse.json({ ok: true, evento, gravou: gravou.ok, enfileirado: ehIngressoAbandono && Boolean(fone) });
+        /* 🔴 CORRIGIDO 14/09/2026 (ZENITH): este return era incondicional e matava a
+         * recuperação da Hermes Week. O bloco abaixo trata
+         * `PURCHASE_OUT_OF_SHOPPING_CART && PRODUTO_HERMES_WEEK`, mas nunca era
+         * alcançado — o abandono da Week caía aqui, não batia em nenhum `if`
+         * (a condição compara com PRODUTO_INGRESSO, que é a CRM Week) e retornava
+         * em silêncio. Custou pelo menos uma recuperação: Gustavo Monteiro
+         * abandonou em 12/09 14:07 e não recebeu e-mail nenhum.
+         * A Week agora NÃO retorna aqui — cai no bloco de recuperação por e-mail. */
+        if (produtoId !== PRODUTO_HERMES_WEEK) {
+            return NextResponse.json({ ok: true, evento, gravou: gravou.ok, enfileirado: ehIngressoAbandono && Boolean(fone) });
+        }
     }
 
     /* ------------------------------------------------------------------
