@@ -150,10 +150,24 @@ export const CHECKOUT_URL = "https://pay.hotmart.com/J107439791C?checkoutMode=10
  *  style e Gmail ignora o atributo. */
 export const LOGO_URL = "https://www.redpro.com.br/logo-academy.png";
 
-export function emailRecuperacao(nome: string, ciclo: CicloAtual): { subject: string; html: string } {
+/** Motivo do carrinho não ter fechado. Muda UMA frase do corpo — e ela importa:
+ *  dizer "o código expirou" para quem abandonou o checkout sem gerar código
+ *  nenhum é afirmar algo falso, e este público confere. (ZENITH, 14/09/2026) */
+export type MotivoRecuperacao = "expirado" | "abandono";
+
+export function emailRecuperacao(
+    nome: string,
+    ciclo: CicloAtual,
+    motivo: MotivoRecuperacao = "expirado",
+): { subject: string; html: string } {
     const p = primeiroNome(nome) || "Arquiteto";
     const dataFmt = formatarDataInicio(ciclo.dataInicio);
-    const subject = `${p}, seu pagamento não foi concluído (a Hermes Week começa ${dataFmt})`;
+    const subject = motivo === "abandono"
+        ? `${p}, você parou no meio da inscrição (a Hermes Week começa ${dataFmt})`
+        : `${p}, seu pagamento não foi concluído (a Hermes Week começa ${dataFmt})`;
+    const abertura = motivo === "abandono"
+        ? "Você chegou até o checkout da Hermes Week e não terminou."
+        : "Você começou a compra da Hermes Week e o pagamento não foi concluído. O código expirou, então o link não vale mais.";
     const html = `
     <div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:520px;margin:0 auto;background:#080808;color:#f5f5f5;padding:36px 28px;border-radius:16px">
       <img src="${LOGO_URL}" alt="RedPro AI Academy" width="170"
@@ -162,13 +176,12 @@ export function emailRecuperacao(nome: string, ciclo: CicloAtual): { subject: st
       <h1 style="font-size:24px;font-weight:800;margin:0 0 18px;line-height:1.3">Fala, ${p}.</h1>
 
       <p style="font-size:15px;line-height:1.65;color:#d6d6d6;margin:0 0 16px">
-        Você começou a compra da Hermes Week e o pagamento não foi concluído. O código
-        expirou, então o link não vale mais.
+        ${abertura}
       </p>
 
       <p style="font-size:15px;line-height:1.65;color:#d6d6d6;margin:0 0 22px">
         Se foi desistência, tudo bem, pode ignorar esse e-mail. Mas se foi só a vida
-        acontecendo no meio do caminho, o link novo tá aqui embaixo e leva um minuto.
+        acontecendo no meio do caminho, ${motivo === "abandono" ? "o link" : "o link novo"} tá aqui embaixo e leva um minuto.
       </p>
 
       <div style="text-align:center;margin:26px 0">

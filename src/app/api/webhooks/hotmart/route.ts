@@ -153,11 +153,11 @@ async function jaComprou(email: string, produtoId: string): Promise<boolean> {
 }
 
 /** E-mail de recuperação. Lê o ciclo na hora, como os outros. */
-async function enviarEmailRecuperacao(email: string, nome: string) {
+async function enviarEmailRecuperacao(email: string, nome: string, motivo: "expirado" | "abandono" = "expirado") {
     const key = process.env.RESEND_API_KEY;
     if (!key || !email) return { ok: false, erro: "sem RESEND_API_KEY ou email" };
     const ciclo = await lerCicloAtual();
-    const { subject, html } = emailRecuperacaoHermesWeek(nome, ciclo);
+    const { subject, html } = emailRecuperacaoHermesWeek(nome, ciclo, motivo);
     try {
         const res = await fetch("https://api.resend.com/emails", {
             method: "POST",
@@ -558,7 +558,11 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ ok: true, evento, gravou: gravou.ok, recuperacao: "ignorada" });
         }
 
-        const rec = await enviarEmailRecuperacao(email, nome);
+        const rec = await enviarEmailRecuperacao(
+            email,
+            nome,
+            evento === "PURCHASE_OUT_OF_SHOPPING_CART" ? "abandono" : "expirado",
+        );
         if (!rec.ok) console.error("[hotmart] e-mail de recuperação:", rec.erro);
 
         await telegram(
