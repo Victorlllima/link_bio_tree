@@ -1614,28 +1614,28 @@ const G: Variante = {
       aula: "As três peças e a instalação",
       temas:
         "O que ele tem que um chatbot não tem · as peças do sistema e onde cada uma mora · instalação · o que fazer quando ele não sobe · **o custo de cada mensagem, medido antes da primeira** · trazendo pra dentro o que você já montou em outra ferramenta",
-      saida: "o agente instalado e respondendo você",
+      saida: "o agente de pé na sua máquina, com o custo de cada mensagem já na sua frente",
     },
     {
       dia: "Terça",
       aula: "App, gateway e sessão",
       temas:
         "As três camadas que confundem todo mundo · ele no seu celular, você falando com ele de qualquer lugar · **por que ele fica mudo no grupo** e como resolver · o que é uma sessão, quando ela acaba e o que se perde junto · separando assuntos pra não inflar o contexto nem a conta",
-      saida: "você manda mensagem do celular e ele responde",
+      saida: "você delega do celular, de onde estiver, e a máquina de casa põe pra rodar",
     },
     {
       dia: "Quarta",
       aula: "Identidade e memória",
       temas:
         "Quem ele é, e por que sem essa camada todo agente soa igual · as quatro camadas de memória, uma a uma · **o protocolo que corta meses da curva de aprendizado** · o teto de cada arquivo e o que acontece quando estoura · a memória congelada, que é onde a maioria desiste · a camada que guarda a relação entre as coisas em vez do fato solto · o efeito composto",
-      saida: "ele lembra de você na sessão seguinte, sem você repetir nada",
+      saida: "ele abre a conversa já sabendo do seu trabalho, e o que aprende numa terça ainda está lá em março",
     },
     {
       dia: "Quinta",
       aula: "O agente que se reescreve",
       temas:
         "Transformando em skill uma pasta, um site ou um fluxo que você acabou de rodar · onde essa skill mora e por que ela só entra quando a tarefa pede · **a armadilha da descrição que pesa em toda conversa** · o que ele já sabe fazer sozinho antes de você instalar qualquer coisa · a faxina automática do que você não usa · **o custo escondido de cada página que ele lê** · o que revisar no que ele escreveu sobre você",
-      saida: "uma skill escrita pelo próprio agente, rodando",
+      saida: "um processo que você executou uma vez vira procedimento dele, e você nunca mais explica aquilo",
     },
     {
       dia: "Sexta",
@@ -1687,7 +1687,7 @@ const G: Variante = {
     nos: [
       {
         t: "p",
-        c: "Meu nome é **Victor Lima**. Desde 2024 eu construo e opero agente de IA em produção para clientes de saúde, jurídico e serviços, pela RedPro AI Solutions. Coisa que precisa estar de pé na segunda de manhã, com cliente pagando pra isso.",
+        c: "Meu nome é **Victor Lima**. Desde 2024 eu construo e opero agente de IA em produção para clientes de saúde, jurídico e serviços, pela RedPro AI Solutions. **Sistemas de missão crítica**, que não podem correr o risco de caírem.",
       },
       {
         t: "p",
@@ -1699,7 +1699,7 @@ const G: Variante = {
       },
       {
         t: "forte",
-        c: "**Se a base que eu ensino fosse torta**, o primeiro a quebrar a semana seria eu.",
+        c: "Eu ensino a montar **do mesmo jeito que eu monto o que não pode cair**.",
       },
     ],
   },
