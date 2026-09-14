@@ -75,6 +75,8 @@ const ALT: Record<string, string> = {
     "Página do repositório hermes-agent da Nous Research no GitHub, com licença MIT, mais de 240 mil estrelas e o último commit recente.",
   "/hermes-week/red-oferta.webp":
     "Red de jaqueta escura, braços cruzados, olhando para a câmera, com monitores desfocados ao fundo.",
+  "/hermes-week/alfred-telegram.webp":
+    "Conversa no Telegram com o bot Alfred. O Red pede pra ele olhar o e-mail e dizer o que precisa de atenção; o Alfred responde que vai buscar os não lidos, roda um comando no terminal e devolve uma lista dos 25 e-mails não lidos, triada, com os três itens que pedem decisão dele naquele dia e o horário de cada um.",
   "/hermes-week/red-manha.webp":
     "Red de camiseta na bancada de trabalho pela manhã, luz de janela, olhando a tela do notebook, com uma xícara de café ao lado.",
 };

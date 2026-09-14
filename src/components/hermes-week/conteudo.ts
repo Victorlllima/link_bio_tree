@@ -159,15 +159,19 @@ const IMG_REPO: Img = {
   h: 851,
 };
 
-/* ⚠️ ÚNICO PLACEHOLDER QUE SOBRA. O print da conversa real do Red com o Alfred
-   ainda vai ser capturado por ele. Enquanto não tiver `src`, os cinco layouts
-   continuam desenhando a caixa com a descrição dentro — que é justamente a
-   instrução de produção. Não inventar um substituto: a força desta imagem é
-   ser uma conversa real, e uma reconstituição a mataria. */
+/* ✅ CAPTURADO PELO RED EM 13/09/2026, e ele fechou a última pendência de
+   imagem da página. É a conversa real: o Red pede pro Alfred olhar o e-mail,
+   o Alfred roda o terminal e devolve os 25 não lidos triados, dizendo o que
+   precisa dele hoje. Bate linha a linha com o que a copy afirma na seção da
+   autoridade, que é o requisito da lição 12 das análises de LP: prova sem
+   detalhe não é prova. */
 const IMG_TELEGRAM: Img = {
   tipo: "ALFRED",
   formato: "celular",
-  c: "conversa do Telegram com o Alfred. Mostra o nome do bot e uma resposta real. Mascarar nomes e assuntos sensíveis.",
+  c: "conversa do Telegram com o Alfred. Mostra o nome do bot e uma resposta real.",
+  src: "/hermes-week/alfred-telegram.webp",
+  w: 900,
+  h: 1872,
 };
 
 /* A peça do 184 existe em cinco recortes de cor, um por paleta. É a mesma
@@ -1628,7 +1632,7 @@ const G: Variante = {
       aula: "Identidade e memória",
       temas:
         "Quem ele é, e por que sem essa camada todo agente soa igual · as quatro camadas de memória, uma a uma · **o protocolo que corta meses da curva de aprendizado** · o teto de cada arquivo e o que acontece quando estoura · a memória congelada, que é onde a maioria desiste · a camada que guarda a relação entre as coisas em vez do fato solto · o efeito composto",
-      saida: "ele abre a conversa já sabendo do seu trabalho, e o que aprende numa terça ainda está lá em março",
+      saida: "ele começa toda conversa sabendo do seu trabalho, e você nunca mais recomeça do zero",
     },
     {
       dia: "Quinta",
