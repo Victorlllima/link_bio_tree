@@ -487,6 +487,63 @@ export const RESOURCES: Resource[] = [
     ],
   },
   {
+    slug: "plugins-hermes",
+    titulo: "Plugins do Hermes: o catálogo e meu top 5",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "O Hermes ganhou uma aba de plugins com catálogo oficial. O endereço, como instalar e os cinco que eu escolhi depois de olhar os 105.",
+    intro:
+      "A aba Plugins fica ao lado da de Skills, no Desktop, e o mesmo catálogo abre pelo terminal. Toda entrada é aprovada por uma pessoa da Nous e presa a um commit exato: a instalação clona o repositório e volta naquele commit, e plugin que se atualiza sozinho é recusado. São 105 hoje, 4 oficiais e 101 da comunidade. O PDF traz os cinco que eu escolhi, com o comando de cada um.",
+    arquivo: "/redreply/pdfs/plugins-hermes.pdf",
+    secoes: [
+      {
+        titulo: "O catálogo, e como instalar qualquer um",
+        texto:
+          "hermes plugins catalog\n" +
+          "hermes plugins search <termo>\n" +
+          "hermes plugins install <nome>\n" +
+          "hermes plugins list\n\n" +
+          "São 105 plugins em 9 categorias. Antes de instalar um da comunidade, abra o repositório e veja quais ferramentas e quais variáveis de ambiente ele declara.",
+      },
+      {
+        titulo: "1. hermes-office · seus agentes num escritório",
+        texto:
+          "Abre uma aba no Desktop com um escritório: cada agente em Bot Mode aparece numa mesa, com nome, e você vê quem está trabalhando em quê.\n\n" +
+          "hermes plugins install hermes-office",
+      },
+      {
+        titulo: "2. tokenwatch · freio antes da conta chegar",
+        texto:
+          "Acompanha o consumo de tokens, avisa nos limites que você definir e, no teto, congela ferramentas e gateways. O agente para em vez de continuar gastando.\n\n" +
+          "hermes plugins install tokenwatch",
+      },
+      {
+        titulo: "3. hermes-telegram-business · secretária com aprovação",
+        texto:
+          "Modo Business do Telegram: o agente escreve a resposta ao cliente, e nada é enviado sem o seu aceite. É um dos quatro oficiais da Nous.\n\n" +
+          "hermes plugins install hermes-telegram-business",
+      },
+      {
+        titulo: "4. vaultwarden · senha fora do arquivo de configuração",
+        texto:
+          "O Hermes busca chave de API e senha no seu Bitwarden ou Vaultwarden, pelo bw, em vez de ler de um arquivo.\n\n" +
+          "hermes plugins install vaultwarden",
+      },
+      {
+        titulo: "5. usage-stats · quanto sobrou em cada provedor",
+        texto:
+          "Mostra na barra de status do Desktop o uso e o saldo dos seus provedores, além de Claude, Codex, Cursor e Nous pelo gateway. Junto com o tokenwatch fecha o par: um mostra quanto ainda tem, o outro impede de estourar.\n\n" +
+          "hermes plugins install usage-stats",
+      },
+      {
+        titulo: "Comece por um",
+        texto:
+          "Instale, use alguns dias e só então ligue o próximo. Plugin instalado entra no índice de toda conversa, mesmo nas que não têm nada a ver com ele.",
+      },
+    ],
+  },
+  {
     slug: "repos-hermes",
     titulo: "5 repositórios para o Hermes",
     categoria: "Guias",
