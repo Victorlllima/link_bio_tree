@@ -487,6 +487,62 @@ export const RESOURCES: Resource[] = [
     ],
   },
   {
+    slug: "repos-hermes",
+    titulo: "5 repositórios para o Hermes",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "Memória do que passou na tela, busca nas suas notas pelo sentido e mãos no Mac. Os cinco repositórios, com o comando pra ligar cada um no Hermes.",
+    intro:
+      "O Hermes é um agente de IA open source que roda na sua máquina, e de fábrica ele já conversa, navega e executa comandos. Cada repositório desta página acrescenta uma habilidade que ele não traz sozinho. O PDF tem os cinco lado a lado, com o link, o comando de instalação e o que cada um pede em troca.",
+    arquivo: "/redreply/pdfs/repos-hermes.pdf",
+    secoes: [
+      {
+        titulo: "Screenpipe · lembrar do que passou na tela",
+        texto:
+          "Grava a tela e o áudio do computador ao longo do dia e guarda tudo na sua máquina. Ligado ao Hermes, você pergunta onde viu aquele valor ou o que foi dito na reunião, e ele procura no que ficou gravado.\n\n" +
+          "github.com/screenpipe/screenpipe\n" +
+          "npx -y screenpipe@latest agent setup hermes\n\n" +
+          "macOS e Windows. O código é liberado pra uso pessoal; o app pronto é pago, a partir de US$ 25 por mês.",
+      },
+      {
+        titulo: "QMD · achar a nota pelo sentido",
+        texto:
+          "Buscador que roda na sua máquina e lê notas, documentos e transcrições. Você descreve o que procura do seu jeito, e ele encontra mesmo quando a nota usa outras palavras. É o único dos cinco com skill oficial do Hermes.\n\n" +
+          "github.com/tobi/qmd\n" +
+          "npm install -g @tobilu/qmd\n" +
+          "hermes skills install official/research/qmd",
+      },
+      {
+        titulo: "Browser Harness · o navegador que aprende",
+        texto:
+          "O navegador padrão do Hermes já funciona em cima dele. Quando falta um passo pra terminar uma tarefa na web, o próprio agente escreve esse passo e guarda pra próxima vez. Instalar direto vale quando você quer o agente no seu Chrome, com as contas logadas.\n\n" +
+          "github.com/browser-use/browser-harness\n" +
+          "uv tool install --python 3.12 browser-harness",
+      },
+      {
+        titulo: "Peekaboo · clicar em aplicativo sem API",
+        texto:
+          "Dá ao Hermes olhos e mãos no Mac. Ele enxerga a janela aberta, encontra o botão certo e clica, digita ou rola a tela.\n\n" +
+          "github.com/openclaw/Peekaboo\n" +
+          "brew install openclaw/tap/peekaboo\n\n" +
+          "Só macOS 15 ou mais novo. Pede Gravação de Tela e Acessibilidade, que podem ser desligadas quando você quiser.",
+      },
+      {
+        titulo: "Obscura · navegador leve pra pesquisar em paralelo",
+        texto:
+          "Navegador sem janela, feito pra agentes. Segundo o próprio projeto, usa 30 MB de memória contra mais de 200 MB do Chrome rodando sem janela. No Hermes, entra por um plugin da comunidade.\n\n" +
+          "github.com/h4ckf0r0day/obscura\n" +
+          "hermes plugins install SGavrl/hermes-plugin-obscura --enable",
+      },
+      {
+        titulo: "Por onde começar",
+        texto:
+          "Numa VPS, sem tela, o QMD e o Obscura são os que encaixam. No computador que você usa todo dia, o Screenpipe e, se for Mac, o Peekaboo. Comece pelo que responde a pergunta que você mais faz durante a semana, e ligue um por vez.",
+      },
+    ],
+  },
+  {
     slug: "hermes-para-estudos",
     titulo: "Hermes para estudos",
     categoria: "Guias",
