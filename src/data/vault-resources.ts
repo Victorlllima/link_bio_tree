@@ -19,6 +19,7 @@ export interface Resource {
   intro: string;         // 1-2 parágrafos no topo da página
   arquivo: string;       // caminho do .md para download
   comando?: string;      // o comando que roda a skill (ex: /raio-x-custo)
+  extras?: { rotulo: string; arquivo: string }[]; // downloads adicionais (ex: o guia em PDF de uma skill)
   secoes: Secao[];       // explicação didática do que a skill faz
 }
 
@@ -35,6 +36,42 @@ const COMO_INSTALAR: Secao = {
 };
 
 export const RESOURCES: Resource[] = [
+  {
+    slug: "agentic-pilot-redpro",
+    titulo: "Agentic Pilot RedPro",
+    categoria: "Skills",
+    destaque: true,
+    novo: true,
+    resumo: "O Claude Code abre um Chrome só dele, entra no site e faz o cadastro por você. O guia em PDF e a skill, com a Hotmart de exemplo.",
+    intro:
+      "No vídeo, o agente criou os produtos na Hotmart enquanto eu fazia outra coisa. Com duas peças você monta o mesmo na sua máquina: o guia com o passo a passo e a skill que ensina o Claude Code a operar um Chrome separado. Você conversa em português e ele clica.",
+    arquivo: "/redreply/skills/agentic-pilot-redpro.md",
+    comando: "/agentic-pilot-redpro",
+    extras: [{ rotulo: "Guia em PDF", arquivo: "/redreply/pdfs/agentic-pilot-redpro.pdf" }],
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "O guia em PDF, com 6 páginas: o que instalar, a primeira conversa, o login e um cadastro completo de produto na Hotmart, do nome ao link do checkout.\n\n" +
+          "A skill agentic-pilot-redpro.md ensina o Claude Code a abrir um Chrome separado do seu, clicar como uma pessoa clicaria e conferir cada passo com um print.",
+      },
+      {
+        titulo: "Até onde ele vai",
+        texto:
+          "Na primeira vez ele mostra um aviso e pergunta até onde pode ir: só olhar, salvar como rascunho ou fazer tudo. Pergunta também como vai ser o login. Depois segue sem perguntar de novo dentro do que você liberou.",
+      },
+      {
+        titulo: "Como instalar",
+        texto:
+          "Baixa os dois arquivos nos botões acima. Abre o Claude Code, arrasta o agentic-pilot-redpro.md para a conversa e pede para instalar como skill pessoal. Digita /agentic-pilot-redpro e descreve a tarefa. O resto está no PDF.",
+      },
+      {
+        titulo: "Serve para mais que a Hotmart",
+        texto:
+          "Qualquer site em que você entra toda semana para fazer a mesma coisa: baixar relatório, emitir nota, cadastrar cliente, preencher formulário.",
+      },
+    ],
+  },
   {
     slug: "auditoria-seguranca",
     titulo: "Auditoria de Segurança",

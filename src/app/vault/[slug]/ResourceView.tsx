@@ -44,6 +44,18 @@ export default function ResourceView({ resource }: { resource: Resource }) {
           </a>
         </div>
 
+        {resource.extras?.map((x) => (
+          <div key={x.arquivo} style={{ ...s.downloadBox, marginTop: -20 }}>
+            <div style={s.downloadInfo}>
+              <div style={s.downloadLabel}>{x.rotulo}</div>
+              <div style={s.downloadFile}>{x.arquivo.split("/").pop()}</div>
+            </div>
+            <a href={x.arquivo} download style={s.downloadBtn}>
+              {x.arquivo.toLowerCase().endsWith(".pdf") ? "Baixar PDF ↓" : "Baixar ↓"}
+            </a>
+          </div>
+        ))}
+
         {resource.secoes.map((sec, i) => <SecaoView key={i} secao={sec} />)}
 
         <div style={s.footer}>
