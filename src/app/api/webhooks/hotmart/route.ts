@@ -48,7 +48,7 @@ const PRODUTOS: Record<string, string> = {
     "8551535": "Oferta extra — 100 plugins do Hermes (R$27)",
     "8551609": "Oferta extra — 50 casos de uso do Hermes (R$37)",
     "8551624": "Oferta extra — Segundo cérebro com o Hermes (R$47)",
-    "8552026": "De Um Agente a Um Squad (R$497)",
+    "8552026": "De Um Agente a Um Squad (R$697)",
 };
 
 // Quem compra o ingresso recebe as boas-vindas por WhatsApp (3 passos do Tabari).
