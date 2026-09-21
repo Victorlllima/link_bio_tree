@@ -45,6 +45,9 @@ async function salvar(d: Record<string, string>, ciclo: string) {
                     ja_tentou: d.ja_tentou || null,
                     onde_travou: d.onde_travou || null,
                     conta_ia: d.conta_ia || null,
+                    profissao: d.profissao || null,
+                    gasto_mes: d.gasto_mes || null,
+                    tempo_perdido: d.tempo_perdido || null,
                     o_que_quer: d.o_que_quer || null,
                     maior_duvida: d.maior_duvida || null,
                 }),
@@ -81,6 +84,23 @@ const ONDE_TRAVOU: Record<string, string> = {
     nao_travei: "Ainda não travou",
 };
 
+const GASTO: Record<string, string> = {
+    nada: "nada ainda",
+    ate_120: "até R$120",
+    "120_400": "R$120 a R$400",
+    "400_1000": "R$400 a R$1.000",
+    mais_1000: "mais de R$1.000",
+    token_sem_saber: "paga por token e não sabe quanto dá",
+};
+
+const TEMPO: Record<string, string> = {
+    ate_1h: "até 1h",
+    "1_3h": "1h a 3h",
+    "3_8h": "3h a 8h",
+    mais_8h: "mais de 8h",
+    nao_medi: "nunca mediu",
+};
+
 const CONTA_IA: Record<string, string> = {
     claude: "Assina Claude",
     chatgpt: "Assina ChatGPT",
@@ -114,7 +134,9 @@ export async function POST(req: NextRequest) {
             `💻 *Sistema:* ${SISTEMA[d.sistema] || d.sistema || "—"}`,
             `🔧 *Já tentou:* ${JA_TENTOU[d.ja_tentou] || d.ja_tentou || "—"}`,
             `🧱 *Onde travou:* ${ONDE_TRAVOU[d.onde_travou] || d.onde_travou || "—"}`,
-            `🔑 *Conta de IA:* ${CONTA_IA[d.conta_ia] || d.conta_ia || "—"}`,
+            d.profissao ? `🧑‍💻 *O que faz:* ${d.profissao}` : "",
+            `💸 *Gasta por mês com IA:* ${GASTO[d.gasto_mes] || d.gasto_mes || "—"}`,
+            `⏳ *Perde por semana:* ${TEMPO[d.tempo_perdido] || d.tempo_perdido || "—"}`,
             "",
             d.o_que_quer ? `🎯 *O que quer que ele faça:*\n${d.o_que_quer}` : "",
             d.maior_duvida ? `😰 *Maior dúvida/medo:*\n${d.maior_duvida}` : "",

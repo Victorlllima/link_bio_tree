@@ -4,7 +4,11 @@
 -- Preenchida por quem JÁ comprou o ingresso, antes do evento começar.
 -- Função: onboarding + contexto pro Red adaptar os exemplos das aulas.
 -- NÃO confundir com a ficha de INTERESSE, que abre na Aula 4 e qualifica MQL
--- pro backend (De Um Agente a Um Squad R$397) — essa ainda não existe.
+-- pro backend (De Um Agente a Um Squad R$697), que ainda não existe.
+--
+-- 21/09/2026: colunas profissao, gasto_mes e tempo_perdido criadas direto no
+-- banco (alter table add column if not exists), porque o ciclo 1 já estava
+-- rodando. Motivo: as perguntas antigas mapeavam a máquina e não a pessoa.
 --
 -- O `ciclo` vem de ciclo_atual.data_inicio, não é constante no código: a
 -- Hermes Week é LPSG semanal e a mesma URL serve todos os ciclos.
@@ -23,7 +27,10 @@ create table if not exists hermes_week_matriculas (
   onde_travou text,
   conta_ia text,
   o_que_quer text,
-  maior_duvida text,
+  maior_duvida text,        -- saiu do formulário em 21/09 (vai pra ficha de INTERESSE)
+  profissao text,           -- 21/09: o que a pessoa faz
+  gasto_mes text,           -- 21/09: quanto gasta por mês com IA hoje
+  tempo_perdido text,       -- 21/09: horas por semana na tarefa que quer automatizar
   criado_em timestamptz not null default now(),
   constraint hermes_week_matriculas_ciclo_email unique (ciclo, email)
 );
