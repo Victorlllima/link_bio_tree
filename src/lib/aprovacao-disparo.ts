@@ -1,15 +1,21 @@
 /**
- * Aprovação de disparo em grupo por LINK ASSINADO (Red, 09/08/2026).
+ * Confirmação de disparo em grupo por LINK ASSINADO.
  *
- * O Red aprova cada disparo tocando um link que chega no Telegram. O link
- * carrega o id do disparo + um token HMAC(id, APROVACAO_SECRET). Sem o segredo
- * ninguém forja um link — então a aprovação não pode ser disparada por acidente
- * nem por terceiros. Não guarda segredo por linha no banco: o token é derivado.
+ * ⚠️ INVERSÃO DA TRAVA (Red, 22/09/2026). Antes: nada saía sem clique.
+ * Resultado: o ciclo de agosto inteiro expirou sem um único envio, porque
+ * ninguém clicou. Agora o padrão é SAIR. O Red recebe o aviso 30 min antes e
+ * só precisa tocar se quiser SEGURAR. Silêncio = aprovado.
+ *
+ * O link carrega o id do disparo + um token HMAC(id, APROVACAO_SECRET). Sem o
+ * segredo ninguém forja um link — então um veto não pode ser disparado por
+ * acidente nem por terceiros. Não guarda segredo por linha no banco: o token é
+ * derivado.
  *
  * Fluxo:
- *   cron detecta hora do disparo → linkAprovacao(id) → manda no Telegram
- *   Red toca o link → /api/aprovar-disparo valida o token → marca aprovado=true
- *   próximo tick do cron vê aprovado=true → troca nome + posta no grupo
+ *   cron detecta 30 min pra hora → linkVeto(id) → manda no Telegram
+ *   Red NÃO toca em nada → na hora, o cron posta
+ *   Red toca o link → /api/vetar-disparo valida o token → status='vetado'
+ *   → o cron pula, e nada sai. O Red então manda o texto novo pro Alfred.
  */
 
 import { createHmac, timingSafeEqual } from "crypto";
@@ -34,7 +40,16 @@ export function tokenValido(id: number, token: string): boolean {
     return a.length === b.length && timingSafeEqual(a, b);
 }
 
-/** URL absoluta de aprovação, para o botão do Telegram. */
+/** URL absoluta de VETO, para o botão do Telegram. */
+export function linkVeto(id: number, origin: string): string {
+    return `${origin}/api/vetar-disparo?id=${id}&t=${tokenDisparo(id)}`;
+}
+
+/**
+ * URL de aprovação explícita. Mantida para o caso de o Red querer ANTECIPAR um
+ * disparo que ele mesmo vetou, ou liberar algo preso. Não é mais o caminho
+ * normal — o caminho normal é o silêncio.
+ */
 export function linkAprovacao(id: number, origin: string): string {
     return `${origin}/api/aprovar-disparo?id=${id}&t=${tokenDisparo(id)}`;
 }

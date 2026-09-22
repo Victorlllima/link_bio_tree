@@ -1,31 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { enviarTextoGrupo, trocarNomeGrupo } from "@/lib/evolution-grupo";
 import { enviarMensagem } from "@/lib/whatsapp";
-import { linkAprovacao } from "@/lib/aprovacao-disparo";
+import { linkVeto } from "@/lib/aprovacao-disparo";
 
 /**
- * Disparos em GRUPO do carrinho — agendados, COM APROVAÇÃO por link (Red 09/08).
+ * Disparos em GRUPO — agendados, com VETO por link (Red 22/09/2026).
+ *
+ * ⚠️ TRAVA INVERTIDA EM 22/09/2026. Antes: nada saía sem aprovado=true.
+ * Resultado: os 17 disparos do ciclo de agosto expiraram sem um único envio.
+ * Agora o padrão é SAIR. O Red recebe o aviso 30 min antes e só toca se quiser
+ * SEGURAR. Silêncio = aprovado.
  *
  * Espelha o auto-chain de wpp-fila (Vercel Hobby: cron 1x/dia + função ~60s).
  * O cron diário só REARMA a cadeia; uma vez rodando, a rota se re-chama a cada
  * ~3 min e cobre o dia todo, sem depender de cron sub-diário.
  *
  * Por tick, para cada disparo pendente:
- *   - faltam ≤30 min e ainda não pedi aprovação → manda o LINK no Telegram.
- *   - chegou a hora E aprovado=true              → troca nome + posta no grupo.
- *   - chegou a hora e NÃO aprovado               → NÃO envia; alerta que passou.
+ *   - faltam ≤30 min e ainda não avisei    → manda o aviso + botão SEGURAR.
+ *   - chegou a hora e status != 'vetado'   → troca nome + posta no grupo.
+ *   - status = 'vetado'                    → nunca entra na fila. Nada sai.
  *
- * ⚠️ NADA sai sem aprovado=true. É a trava absoluta.
- * Autenticação: Bearer <CRON_SECRET>.
+ * O veto é a única coisa que impede um envio. Autenticação: Bearer <CRON_SECRET>.
  */
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 const SUPABASE_URL = "https://supabase.redpro.com.br";
 const CRON_SECRET = process.env.CRON_SECRET;
-const ANTECEDENCIA_MS = 30 * 60_000; // pede aprovação 30 min antes
+const ANTECEDENCIA_MS = 30 * 60_000; // avisa 30 min antes
 const RECHAMADA_MS = 3 * 60_000;     // re-tick a cada 3 min
-const TOLERANCIA_ATRASO_MS = 15 * 60_000; // depois disso, marca 'expirado'
+const TOLERANCIA_ATRASO_MS = 15 * 60_000; // depois disso, atrasou demais: não posta
 
 function sbHeaders() {
     const key = process.env.SUPABASE_SERVICE_KEY!;
@@ -171,34 +175,39 @@ async function tick(req: NextRequest): Promise<NextResponse> {
 
         // ── Chegou a hora ────────────────────────────────────────────────
         if (faltam <= 0) {
-            if (d.aprovado) {
+            // ⚠️ INVERSÃO: não pergunta mais se foi aprovado. Só o veto segura,
+            // e disparo vetado nem chega aqui (pendentes() filtra o status).
+            if (-faltam <= TOLERANCIA_ATRASO_MS) {
                 await executar(d, req);
                 houveAcao = true;
-            } else if (-faltam > TOLERANCIA_ATRASO_MS) {
-                // Passou muito e não foi aprovado → expira e avisa.
-                await patch(d.id, { status: "expirado" });
+            } else {
+                // Atrasou mais que a tolerância — provavelmente a cadeia caiu.
+                // Não posta fora de hora: mensagem de "1h antes" chegando 40 min
+                // depois da aula faz mais estrago que silêncio.
+                await patch(d.id, { status: "atrasado" });
                 await telegram(
-                    `⏱️ *Disparo ${d.ordem} do carrinho EXPIROU sem aprovação.*\n\n` +
-                    `A hora (${new Date(quando).toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" })}) passou e você não liberou.\n` +
-                    `_Não postei nada. Se ainda quiser, posta manualmente._`,
+                    `⏱️ *Disparo ${d.ordem} ATRASOU e não foi postado.*\n\n` +
+                    `Hora marcada: ${new Date(quando).toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" })}. ` +
+                    `Passou de ${TOLERANCIA_ATRASO_MS / 60_000} min, então segurei.\n` +
+                    `_Se ainda fizer sentido, posta manualmente._`,
                 );
                 houveAcao = true;
             }
-            // dentro da tolerância e não aprovado: aguarda (você ainda pode liberar)
             continue;
         }
 
-        // ── Faltam ≤30 min e ainda não pedi aprovação → pede agora ────────
+        // ── Faltam ≤30 min e ainda não avisei → avisa agora ───────────────
         if (faltam <= ANTECEDENCIA_MS && !d.aprov_pedido_em) {
             const horaBRT = new Date(quando).toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" });
             const preview = (d.texto || "(só troca o nome do grupo)").slice(0, 500);
             const rotulo = d.tipo_grupo === "carrinho" ? "🛒 CARRINHO" : "📚 GRUPO SEMANA";
             await telegram(
-                `${rotulo} — *disparo ${d.ordem}* (${horaBRT})\n\n` +
+                `${rotulo} — *disparo ${d.ordem}* sai às *${horaBRT}*\n\n` +
                 `*Nome do grupo vira:* ${d.novo_nome || "(mantém)"}\n` +
                 `─────────\n${preview}\n─────────\n\n` +
-                `Toca pra *liberar*. Sem clique, não posto.`,
-                [{ text: `✅ Aprovar disparo ${d.ordem} (${horaBRT})`, url: linkAprovacao(d.id, origin) }],
+                `*Não precisa responder.* Em 30 min isso sai.\n` +
+                `Toca só se quiser segurar ou mudar alguma coisa.`,
+                [{ text: `✋ Segurar disparo ${d.ordem}`, url: linkVeto(d.id, origin) }],
             );
             await patch(d.id, { aprov_pedido_em: "now()" });
             houveAcao = true;
