@@ -296,6 +296,38 @@ export const RESOURCES: Resource[] = [
     ],
   },
   {
+    slug: "filtro-de-realidade",
+    titulo: "Filtro de Realidade",
+    categoria: "Guias",
+    novo: true,
+    resumo: "O bloco que trava seu Hermes de inventar resposta com a mesma cara de quem sabe.",
+    intro:
+      "O modelo tende a concordar com o que você diz e, de vez em quando, inventa com convicção total. " +
+      "O Filtro de Realidade é um bloco de instrução que faz o agente rotular o que não pode verificar, " +
+      "em vez de chutar bonito.",
+    arquivo: "/redreply/pdfs/filtro-de-realidade.pdf",
+    secoes: [
+      {
+        titulo: "O que muda",
+        texto:
+          "Antes: pergunta técnica, resposta segura, número certo, tom de quem sabe. Depois: se não " +
+          "tem certeza, o agente para e diz 'não consigo verificar isso' em vez de te dar uma resposta pronta.",
+      },
+      {
+        titulo: "Por que funciona",
+        texto:
+          "O problema não é o modelo errar. É ele errar com a mesma confiança de quando acerta. O bloco " +
+          "obriga a rotular inferência, especulação e o que não foi verificado, item por item.",
+      },
+      {
+        titulo: "Onde colar",
+        texto:
+          "SOUL.md do Hermes, não a memória. É comportamento (quem o agente é), não fato (o que ele sabe) " +
+          "— por isso precisa valer pra toda sessão, sempre, sem o agente decidir se lembra ou não.",
+      },
+    ],
+  },
+  {
     slug: "mcp-vs-a2a",
     titulo: "MCP vs A2A",
     categoria: "Guias",
