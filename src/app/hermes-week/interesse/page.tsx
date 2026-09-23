@@ -54,21 +54,49 @@ export default function HermesWeekInteressePage() {
       <div style={S.wrap}>
         {done ? (
           <div style={S.doneBox}>
+            <img src="/logo-academy.png" alt="RedPro AI Academy" style={S.logoDone} />
             <div style={S.check}>✓</div>
-            <h1 style={S.h1}>Recebi sua ficha.</h1>
+            <h1 style={S.h1}>Recebi.</h1>
             <p style={S.lead}>
-              Segunda, 28/09 às <strong style={{ color: "#F97316" }}>6h50</strong>, você recebe o link 10 minutos antes de todo mundo,
-              com uma coisa que só existe para quem preencheu. Fica de olho no grupo.
+              Dois lembretes e acabou.
+            </p>
+            <p style={S.lead}>
+              <strong style={{ color: "#fff" }}>Domingo, 20h</strong>, a aula final. É onde eu mostro o que
+              existe depois de um agente só, e onde eu conto o que vai junto para quem preencheu esta ficha.
+            </p>
+            <p style={S.lead}>
+              <strong style={{ color: "#fff" }}>Segunda, 6h50</strong>, o link chega no seu WhatsApp,
+              dez minutos antes de ir para o grupo. É o mesmo número que te mandou as mensagens da semana.
             </p>
           </div>
         ) : (
           <>
-            <div style={S.kicker}>Ficha de interesse · Hermes Week</div>
-            <h1 style={S.h1}>Você quer o <span style={{ color: "#F97316" }}>próximo passo</span>?</h1>
+            <img src="/logo-academy.png" alt="RedPro AI Academy" style={S.logo} />
+            <div style={S.kicker}>Hermes Week</div>
+            <h1 style={S.h1}>Você quer <span style={{ color: "#F97316" }}>continuar</span> depois de sexta?</h1>
             <p style={S.lead}>
-              Domingo, 20h, eu mostro o que existe depois de um agente só. Preencher esta ficha te dá a
-              <strong style={{ color: "#fff" }}> janela das 6h50</strong> na segunda e uma coisa que só vai para quem preencheu. Leva 2 minutos.
+              Domingo, às 20h, eu mostro o que eu faço quando um agente só não dá mais conta. Na segunda de
+              manhã abre a inscrição para quem quiser seguir comigo depois da semana.
             </p>
+            <p style={S.lead}>
+              Esta ficha serve para eu montar a aula de domingo sabendo quem está do outro lado. Leva dois
+              minutos e não te compromete com nada.
+            </p>
+
+            <div style={S.box}>
+              <div style={S.boxTitle}>O que preencher te dá</div>
+              <p style={S.boxItem}>
+                <strong style={{ color: "#fff" }}>1. O link chega às 6h50, no seu WhatsApp.</strong> Dez
+                minutos antes de ir para o grupo. Eu vou ser honesto sobre o tamanho disso: não tem vaga
+                limitada e o preço é o mesmo o dia inteiro. Os dez minutos servem para você ler a página com
+                calma e decidir antes de o seu dia começar, sem caçar mensagem em grupo às sete da manhã.
+              </p>
+              <p style={S.boxItem}>
+                <strong style={{ color: "#fff" }}>2. Um material pronto que só vai para quem preencheu.</strong>{" "}
+                Não é PDF nem planilha. É uma coisa que você importa e usa no primeiro dia. Eu mostro o que é
+                no domingo, às 20h, na aula.
+              </p>
+            </div>
 
             <form onSubmit={submit} style={S.form}>
               <Field label="Seu nome">
@@ -125,7 +153,7 @@ export default function HermesWeekInteressePage() {
               </Field>
 
               <button type="submit" disabled={!valido || sending} style={{ ...S.btn, opacity: valido && !sending ? 1 : 0.5, cursor: valido && !sending ? "pointer" : "not-allowed" }}>
-                {sending ? "Enviando…" : "Garantir minha janela das 6h50"}
+                {sending ? "Enviando…" : "Enviar minha ficha"}
               </button>
             </form>
           </>
@@ -156,6 +184,11 @@ const S: Record<string, React.CSSProperties> = {
   select: { background: "#141414", border: "1px solid #1F1F1F", borderRadius: 10, padding: "13px 15px", color: "#F5F5F5", fontSize: 15, fontFamily: "inherit", outline: "none", appearance: "none" },
   textarea: { background: "#141414", border: "1px solid #1F1F1F", borderRadius: 10, padding: "13px 15px", color: "#F5F5F5", fontSize: 15, fontFamily: "inherit", outline: "none", resize: "vertical" },
   btn: { background: "#F97316", color: "#080808", fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 17, padding: "17px", borderRadius: 10, border: "none", marginTop: 8 },
-  doneBox: { textAlign: "center", paddingTop: 60 },
+  logo: { height: 92, display: "block", margin: "0 auto 22px" },
+  logoDone: { height: 64, display: "block", margin: "0 auto 20px" },
+  box: { background: "#101010", border: "1px solid #1F1F1F", borderRadius: 12, padding: "20px 20px 6px", marginBottom: 34 },
+  boxTitle: { fontSize: 12, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "#F97316", marginBottom: 14 },
+  boxItem: { color: "#B8B8B8", fontSize: 14.5, lineHeight: 1.6, marginBottom: 16 },
+  doneBox: { textAlign: "center", paddingTop: 40 },
   check: { width: 72, height: 72, margin: "0 auto 24px", borderRadius: "50%", background: "rgba(74,222,128,.12)", border: "2px solid #4ADE80", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, color: "#4ADE80" },
 };
