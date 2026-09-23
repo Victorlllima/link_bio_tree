@@ -74,7 +74,7 @@ export default function HermesWeekInteressePage() {
           <>
             <img src="/logo-academy.png" alt="RedPro AI Academy" style={S.logo} />
             <div style={S.kicker}>Hermes Week</div>
-            <h1 style={S.h1}>Você quer continuar aprendendo sobre <span style={{ color: "#F97316" }}>agentes</span>?</h1>
+            <h1 style={S.h1}>Um agente você já tem.<br />Quer aprender a ter um <span style={{ color: "#F97316" }}>time</span>?</h1>
             <p style={S.lead}>
               Domingo, às 20h, eu mostro o que eu faço quando um agente só não dá mais conta. Na segunda de
               manhã abre a inscrição para quem quiser seguir comigo depois da semana.
