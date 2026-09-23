@@ -62,7 +62,8 @@ export default function HermesWeekInteressePage() {
             </p>
             <p style={S.lead}>
               <strong style={{ color: "#fff" }}>Domingo, 20h</strong>, a aula final. É onde eu mostro o que
-              existe depois de um agente só, e onde eu conto o que vai junto para quem preencheu esta ficha.
+              existe depois de um agente só, e onde eu entrego os dois materiais que são seus por ter
+              preenchido isto aqui.
             </p>
             <p style={S.lead}>
               <strong style={{ color: "#fff" }}>Segunda, 6h50</strong>, o link chega no seu WhatsApp,
@@ -73,28 +74,32 @@ export default function HermesWeekInteressePage() {
           <>
             <img src="/logo-academy.png" alt="RedPro AI Academy" style={S.logo} />
             <div style={S.kicker}>Hermes Week</div>
-            <h1 style={S.h1}>Você quer <span style={{ color: "#F97316" }}>continuar</span> depois de sexta?</h1>
+            <h1 style={S.h1}>Você quer continuar aprendendo sobre <span style={{ color: "#F97316" }}>agentes</span>?</h1>
             <p style={S.lead}>
               Domingo, às 20h, eu mostro o que eu faço quando um agente só não dá mais conta. Na segunda de
               manhã abre a inscrição para quem quiser seguir comigo depois da semana.
             </p>
             <p style={S.lead}>
               Esta ficha serve para eu montar a aula de domingo sabendo quem está do outro lado. Leva dois
-              minutos e não te compromete com nada.
+              minutos.
             </p>
 
             <div style={S.box}>
-              <div style={S.boxTitle}>O que preencher te dá</div>
+              <div style={S.boxTitle}>Quem preenche leva dois materiais</div>
               <p style={S.boxItem}>
-                <strong style={{ color: "#fff" }}>1. O link chega às 6h50, no seu WhatsApp.</strong> Dez
-                minutos antes de ir para o grupo. Eu vou ser honesto sobre o tamanho disso: não tem vaga
-                limitada e o preço é o mesmo o dia inteiro. Os dez minutos servem para você ler a página com
-                calma e decidir antes de o seu dia começar, sem caçar mensagem em grupo às sete da manhã.
+                Os dois são prontos para usar, nenhum dos dois é PDF ou planilha, e eu mostro o que cada um
+                faz no domingo, às 20h, na aula final.
               </p>
               <p style={S.boxItem}>
-                <strong style={{ color: "#fff" }}>2. Um material pronto que só vai para quem preencheu.</strong>{" "}
-                Não é PDF nem planilha. É uma coisa que você importa e usa no primeiro dia. Eu mostro o que é
-                no domingo, às 20h, na aula.
+                <strong style={{ color: "#fff" }}>E eles são seus por ter preenchido.</strong> Não dependem de
+                você comprar nada depois. Se você preencher hoje e no domingo decidir que já está bom do
+                jeito que está, os dois continuam seus do mesmo jeito.
+              </p>
+              <p style={S.boxItem}>
+                Quem preenche também recebe o link da inscrição às <strong style={{ color: "#fff" }}>6h50</strong> da
+                segunda, dez minutos antes de ir para o grupo. Sendo honesto sobre o tamanho disso: não tem
+                vaga limitada e o preço é o mesmo o dia inteiro. Os dez minutos servem para você ler com calma
+                antes de o seu dia começar.
               </p>
             </div>
 
@@ -184,8 +189,8 @@ const S: Record<string, React.CSSProperties> = {
   select: { background: "#141414", border: "1px solid #1F1F1F", borderRadius: 10, padding: "13px 15px", color: "#F5F5F5", fontSize: 15, fontFamily: "inherit", outline: "none", appearance: "none" },
   textarea: { background: "#141414", border: "1px solid #1F1F1F", borderRadius: 10, padding: "13px 15px", color: "#F5F5F5", fontSize: 15, fontFamily: "inherit", outline: "none", resize: "vertical" },
   btn: { background: "#F97316", color: "#080808", fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 17, padding: "17px", borderRadius: 10, border: "none", marginTop: 8 },
-  logo: { height: 92, display: "block", margin: "0 auto 22px" },
-  logoDone: { height: 64, display: "block", margin: "0 auto 20px" },
+  logo: { height: 168, display: "block", margin: "0 auto 18px" },
+  logoDone: { height: 120, display: "block", margin: "0 auto 18px" },
   box: { background: "#101010", border: "1px solid #1F1F1F", borderRadius: 12, padding: "20px 20px 6px", marginBottom: 34 },
   boxTitle: { fontSize: 12, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "#F97316", marginBottom: 14 },
   boxItem: { color: "#B8B8B8", fontSize: 14.5, lineHeight: 1.6, marginBottom: 16 },
