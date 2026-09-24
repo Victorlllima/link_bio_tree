@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { TrilhaModulos } from "./TrilhaModulos";
+import { CardDaLive } from "./CardDaLive";
 
 export const metadata: Metadata = {
     title: "De Um Agente a Um Squad · RedPro AI Academy",
@@ -32,9 +33,6 @@ export default function SquadPage() {
                         alt="RedPro AI Academy"
                         className="mx-auto mb-7 h-28 w-auto sm:h-36"
                     />
-                    <p className="squad-mono mb-5 text-[11px] uppercase tracking-[0.3em] text-[#D6A85A]">
-                        Turma 1 · começa em 29 de setembro
-                    </p>
                     <h1 className="mx-auto max-w-3xl text-5xl leading-[1.02] tracking-tight sm:text-7xl">
                         De um agente
                         <br />
@@ -53,12 +51,12 @@ export default function SquadPage() {
                             v: "Sete semanas, sete entregas. Você constrói uma coisa por vez, em vez de receber um catálogo e nunca abrir.",
                         },
                         {
-                            k: "Uma live por semana",
-                            v: "Encontro ao vivo com quem está construindo junto. Você leva o que travou e a gente resolve na hora.",
+                            k: "Módulo é roteiro fechado",
+                            v: "Cada aula foi escrita, testada e gravada numa ordem que funciona. É o caminho, sem desvio e sem improviso.",
                         },
                         {
-                            k: "A turma inteira junta",
-                            v: "Todo mundo na mesma semana, no mesmo módulo, com o mesmo problema. É por isso que funciona.",
+                            k: "Live é o que mudou essa semana",
+                            v: "O Hermes muda toda semana. A live existe para o que é novo demais para estar em qualquer aula gravada.",
                         },
                     ].map((c) => (
                         <div
@@ -84,16 +82,8 @@ export default function SquadPage() {
                     <TrilhaModulos />
                 </section>
 
-                <section className="mx-auto mt-20 max-w-2xl rounded-2xl border border-white/[0.07] bg-white/[0.02] p-8 text-center sm:mt-24">
-                    <p className="squad-mono text-[11px] uppercase tracking-[0.26em] text-[#D6A85A]/70">
-                        A live da semana
-                    </p>
-                    <p className="mx-auto mt-4 max-w-lg text-[17px] leading-relaxed text-white/70">
-                        Toda semana a gente se encontra. Você chega com o que travou no módulo daquela
-                        semana, mostra a tela, e sai com aquilo resolvido. Quem não puder ir, assiste
-                        depois e manda a dúvida antes.
-                    </p>
-                    {/* TODO-RED: dia e horário da live, e se fica gravada para quem faltar. */}
+                <section className="mt-6">
+                    <CardDaLive />
                 </section>
 
                 <footer className="mt-20 text-center text-[13px] text-white/30">
