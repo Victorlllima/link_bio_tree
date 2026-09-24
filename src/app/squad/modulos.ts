@@ -69,16 +69,16 @@ export const MODULOS: Modulo[] = [
     },
     {
         n: 4,
-        titulo: "Operação de frota",
+        titulo: "Operação do squad",
         subtitulo: "Multi-gateway e observabilidade",
         resumo:
             "A partir do terceiro agente o problema deixa de ser capacidade e passa a ser operação: saber onde cada um roda, atualizar todos e diagnosticar o que caiu.",
         duracao: "39 min",
         aulas: [
-            "Frota: o que muda a partir do terceiro agente",
+            "O squad: o que muda a partir do terceiro agente",
             "Seletor de gateway e contexto de execução",
             "Edição remota de configuração",
-            "Atualização coordenada da frota",
+            "Atualização coordenada do squad",
             "Credenciais por agente: escopo e rotação",
             "Diagnóstico: log, health check e fila de tarefas",
             "Rotina de verificação diária",
