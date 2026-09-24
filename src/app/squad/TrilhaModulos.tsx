@@ -6,92 +6,107 @@ import { BeamCard } from "@/components/ui/beam-card";
 import { MODULOS } from "./modulos";
 
 /**
- * A trilha dos sete módulos. Cada card é uma semana: clica, abre, mostra as aulas.
- * Vertical de propósito — a leitura é de cima para baixo, como uma jornada,
- * e não uma grade de produtos.
+ * Os sete módulos lado a lado, todos do mesmo tamanho (Red, 24/09/2026).
+ * Nada abre sozinho: o painel de aulas só aparece depois do clique, e ocupa a largura
+ * inteira abaixo da fileira, para o conteúdo respirar sem quebrar o alinhamento dos cards.
  */
 export function TrilhaModulos() {
-    const [aberto, setAberto] = useState<number | null>(1);
+    const [aberto, setAberto] = useState<number | null>(null);
+    const modulo = MODULOS.find((m) => m.n === aberto) ?? null;
 
     return (
-        <ol className="mx-auto flex w-full max-w-3xl flex-col gap-5">
-            {MODULOS.map((m) => {
-                const ativo = aberto === m.n;
-                return (
-                    <li key={m.n}>
-                        <BeamCard ativo={ativo} variant={ativo ? "colorful" : "ocean"}>
-                            <button
-                                type="button"
-                                onClick={() => setAberto(ativo ? null : m.n)}
-                                aria-expanded={ativo}
-                                className="flex w-full items-start gap-5 p-6 text-left sm:p-7"
+        <div>
+            <ol className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+                {MODULOS.map((m) => {
+                    const ativo = aberto === m.n;
+                    return (
+                        <li key={m.n} className="h-full">
+                            <BeamCard
+                                ativo={ativo}
+                                variant={ativo ? "colorful" : "ocean"}
+                                className="h-full"
                             >
-                                <span className="shrink-0 select-none">
-                                    <span className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] font-mono text-lg font-bold text-white/90">
-                                        {m.n}
+                                <button
+                                    type="button"
+                                    onClick={() => setAberto(ativo ? null : m.n)}
+                                    aria-expanded={ativo}
+                                    className="flex h-full min-h-[210px] w-full flex-col items-start p-4 text-left"
+                                >
+                                    <span className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-orange-400">
+                                        Módulo {m.n}
                                     </span>
-                                    <span className="mt-2 block text-center font-mono text-[10px] uppercase tracking-[0.18em] text-white/35">
-                                        sem {m.n}
-                                    </span>
-                                </span>
 
-                                <span className="min-w-0 flex-1">
-                                    <span className="mb-2 block font-mono text-[11px] uppercase tracking-[0.16em] text-orange-400/90">
-                                        {m.teto}
-                                    </span>
-                                    <span className="block text-xl font-semibold leading-tight tracking-tight text-white sm:text-2xl">
+                                    <span className="mb-2 block text-[15px] font-semibold leading-snug tracking-tight text-white">
                                         {m.titulo}
                                     </span>
-                                    <span className="mt-2 block text-[15px] leading-relaxed text-white/55">
-                                        {m.resumo}
-                                    </span>
-                                    <span className="mt-3 flex items-center gap-3 font-mono text-[11px] text-white/35">
-                                        <span>{m.aulas.length} aulas</span>
-                                        <span aria-hidden>·</span>
-                                        <span>{m.duracao}</span>
-                                    </span>
-                                </span>
 
-                                <span
-                                    aria-hidden
-                                    className="mt-1 shrink-0 text-white/30 transition-transform duration-300"
-                                    style={{ transform: ativo ? "rotate(45deg)" : "none" }}
-                                >
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                        <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                    </svg>
-                                </span>
-                            </button>
+                                    <span className="block text-[12.5px] leading-snug text-white/45">
+                                        {m.subtitulo}
+                                    </span>
 
-                            <AnimatePresence initial={false}>
-                                {ativo && (
-                                    <motion.div
-                                        initial={{ height: 0, opacity: 0 }}
-                                        animate={{ height: "auto", opacity: 1 }}
-                                        exit={{ height: 0, opacity: 0 }}
-                                        transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-                                        className="overflow-hidden"
+                                    <span className="mt-auto flex w-full items-center justify-between pt-4 font-mono text-[10px] text-white/30">
+                                        <span>{m.aulas.length} aulas · {m.duracao}</span>
+                                        <span
+                                            aria-hidden
+                                            className="transition-transform duration-300"
+                                            style={{ transform: ativo ? "rotate(45deg)" : "none" }}
+                                        >
+                                            <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                                                <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                                            </svg>
+                                        </span>
+                                    </span>
+                                </button>
+                            </BeamCard>
+                        </li>
+                    );
+                })}
+            </ol>
+
+            <AnimatePresence initial={false} mode="wait">
+                {modulo && (
+                    <motion.div
+                        key={modulo.n}
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+                        className="overflow-hidden"
+                    >
+                        <div className="mt-3 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-8">
+                            <div className="mb-6 flex flex-wrap items-baseline gap-x-4 gap-y-2 border-b border-white/[0.07] pb-5">
+                                <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-orange-400">
+                                    Módulo {modulo.n} · semana {modulo.n}
+                                </span>
+                                <h3 className="text-2xl font-semibold tracking-tight text-white">
+                                    {modulo.titulo}
+                                </h3>
+                                <span className="font-mono text-[11px] text-white/35">
+                                    {modulo.aulas.length} aulas · {modulo.duracao}
+                                </span>
+                            </div>
+
+                            <p className="mb-7 max-w-3xl text-[15px] leading-relaxed text-white/60">
+                                {modulo.resumo}
+                            </p>
+
+                            <ul className="grid gap-x-10 gap-y-0 sm:grid-cols-2">
+                                {modulo.aulas.map((a, i) => (
+                                    <li
+                                        key={a}
+                                        className="flex items-center gap-4 border-b border-white/[0.05] py-3 last:border-0 sm:last:border-b"
                                     >
-                                        <ul className="border-t border-white/[0.07] px-6 pb-7 pt-5 sm:px-7">
-                                            {m.aulas.map((a, i) => (
-                                                <li
-                                                    key={a}
-                                                    className="flex items-center gap-4 border-b border-white/[0.04] py-3 last:border-0"
-                                                >
-                                                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/10 font-mono text-[11px] text-white/40">
-                                                        {m.n}.{i + 1}
-                                                    </span>
-                                                    <span className="text-[15px] text-white/75">{a}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </BeamCard>
-                    </li>
-                );
-            })}
-        </ol>
+                                        <span className="w-9 shrink-0 font-mono text-[11px] text-white/30">
+                                            {modulo.n}.{i + 1}
+                                        </span>
+                                        <span className="text-[14.5px] leading-snug text-white/75">{a}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
     );
 }

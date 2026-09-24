@@ -25,7 +25,7 @@ export default function SquadPage() {
                 <div className="absolute bottom-[-12rem] right-[-8rem] h-[30rem] w-[30rem] rounded-full bg-indigo-500/[0.07] blur-[130px]" />
             </div>
 
-            <div className="relative z-10 mx-auto max-w-5xl px-5 pb-28 pt-16 sm:pt-24">
+            <div className="relative z-10 mx-auto max-w-6xl px-5 pb-28 pt-16 sm:pt-24">
                 <header className="mb-16 text-center sm:mb-20">
                     <img
                         src="/logo-academy.png"
@@ -74,10 +74,10 @@ export default function SquadPage() {
                 <section>
                     <div className="mb-8 text-center">
                         <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                            A trilha das sete semanas
+                            Sete módulos, um por semana
                         </h2>
                         <p className="mt-3 text-[15px] text-white/45">
-                            Cada semana responde um teto que você já encostou. Clica para ver as aulas.
+                            Clique em um módulo para ver as aulas.
                         </p>
                     </div>
 
