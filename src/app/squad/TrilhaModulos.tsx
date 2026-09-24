@@ -30,8 +30,24 @@ export function TrilhaModulos() {
                                     type="button"
                                     onClick={() => setAberto(ativo ? null : m.n)}
                                     aria-expanded={ativo}
-                                    className="flex h-full min-h-[210px] w-full flex-col items-start p-4 text-left"
+                                    className="group/card relative flex h-full w-full flex-col items-start overflow-hidden rounded-2xl text-left"
                                 >
+                                    {/* a arte do módulo, a mesma das capas da área de membros */}
+                                    <span
+                                        aria-hidden
+                                        className="block h-[132px] w-full bg-cover bg-center transition-transform duration-700 group-hover/card:scale-[1.06]"
+                                        style={{ backgroundImage: `url(/squad/modulo-${m.n}.jpg)` }}
+                                    />
+                                    <span
+                                        aria-hidden
+                                        className="pointer-events-none absolute inset-x-0 top-0 h-[150px]"
+                                        style={{
+                                            background:
+                                                "linear-gradient(to bottom, rgba(11,11,12,0) 30%, rgba(11,11,12,.75) 72%, #0B0B0C 100%)",
+                                        }}
+                                    />
+
+                                    <span className="flex w-full flex-1 flex-col items-start p-4">
                                     <span className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-orange-400">
                                         Módulo {m.n}
                                     </span>
@@ -55,6 +71,7 @@ export function TrilhaModulos() {
                                                 <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                                             </svg>
                                         </span>
+                                    </span>
                                     </span>
                                 </button>
                             </BeamCard>
