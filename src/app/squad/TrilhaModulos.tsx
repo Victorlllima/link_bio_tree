@@ -125,29 +125,32 @@ export function TrilhaModulos() {
                                     "radial-gradient(ellipse 80% 140% at 8% 0%, rgba(214,168,90,.07), transparent 60%), #0B0B0C",
                             }}
                         >
-                            <div className="mb-7 flex flex-wrap items-end gap-x-5 gap-y-2 border-b border-[#D6A85A]/12 pb-6">
-                                <span className="squad-mono text-[10px] uppercase tracking-[0.3em] text-[#D6A85A]">
+                            <div className="mb-7 border-b border-[#D6A85A]/12 pb-6 text-center">
+                                <span className="squad-mono block text-[10px] uppercase tracking-[0.3em] text-[#D6A85A]">
                                     Módulo {modulo.n} · semana {modulo.n}
                                 </span>
-                                <h3 className="squad-serif text-[34px] italic leading-none text-[#F3D698]">
+                                <h3 className="squad-serif mt-3 text-[34px] italic leading-none text-[#F3D698]">
                                     {modulo.titulo}
                                 </h3>
-                                <span className="squad-mono ml-auto text-[10px] tracking-wider text-white/30">
+                                <span className="squad-mono mt-3 block text-[10px] tracking-wider text-white/30">
                                     {modulo.aulas.length} aulas · {modulo.duracao}
                                 </span>
                             </div>
 
-                            <p className="mb-8 max-w-3xl text-[15.5px] leading-relaxed text-white/55">
+                            <p className="mx-auto mb-9 max-w-2xl text-center text-[15.5px] leading-relaxed text-white/55">
                                 {modulo.resumo}
                             </p>
 
-                            <ul className="grid gap-x-12 sm:grid-cols-2">
+                            {/* uma coluna só, centralizada no card (Red, 24/09).
+                                Os números ficam numa coluna fixa: centralizar cada linha
+                                inteira fazia a numeração ziguezaguear. */}
+                            <ul className="mx-auto w-full max-w-lg">
                                 {modulo.aulas.map((a, i) => (
                                     <li
                                         key={a}
-                                        className="flex items-baseline gap-4 border-b border-white/[0.05] py-3.5 last:border-0 sm:last:border-b"
+                                        className="flex items-baseline gap-5 border-b border-white/[0.05] py-3.5 last:border-0"
                                     >
-                                        <span className="squad-mono w-9 shrink-0 text-[10.5px] text-[#D6A85A]/55">
+                                        <span className="squad-mono w-8 shrink-0 text-right text-[10.5px] text-[#D6A85A]/55">
                                             {modulo.n}.{i + 1}
                                         </span>
                                         <span className="text-[14.5px] leading-snug text-white/75">{a}</span>
