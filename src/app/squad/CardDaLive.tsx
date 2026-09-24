@@ -7,30 +7,31 @@ import { BeamCard } from "@/components/ui/beam-card";
  * roteiro fechado, gravado e testado; a live é o que é novo demais para caber em
  * qualquer aula gravada.
  *
- * Os exemplos abaixo são reais e datados, tirados das notas de versão do
- * NousResearch/hermes-agent lidas em 24/09/2026. Trocar quando envelhecerem: a graça
- * do bloco é ele ser deste mês, não de sempre.
+ * 🔴 SEM DATA NOS EXEMPLOS (Red, 24/09/2026). A live é semanal e recorrente: data no
+ * exemplo envelhece a página toda semana e deixa o argumento velho justamente onde ele
+ * deveria estar mais novo. O que fica é o TIPO de coisa que entra na live.
+ *
+ * Fontes dos exemplos, lidas em 24/09/2026: o post do @tonbistudio sobre o Modo Simples
+ * do Desktop e o anúncio da Nous no mesmo dia, mais as notas de versão do
+ * NousResearch/hermes-agent (v0.21.4 e v0.21.5). Trocar o conteúdo a cada ciclo, sem
+ * nunca colocar data de volta.
  */
 const NOVIDADES = [
     {
-        data: "24 set",
+        t: "O Desktop ganhou um Modo Simples",
+        d: "Uma tela limpa, só a conversa e a lista de sessões, sem os instrumentos de desenvolvedor. Você volta para o Avançado quando quiser e o seu espaço de trabalho reaparece exatamente como você deixou.",
+    },
+    {
         t: "A aba de MCP virou Connectors",
-        d: "Plugin instalado agora oferece ligar os servidores dele na hora, e as ferramentas entram em todo chat que já estava aberto.",
+        d: "Plugin recém-instalado oferece ligar os servidores dele na hora, e as ferramentas dele entram nos chats que já estavam abertos, sem reiniciar nada.",
     },
     {
-        data: "24 set",
-        t: "Modo Simples e Avançado no Desktop",
-        d: "A mesma instalação passa a ter duas caras. Muda o que aparece na tela de quem está começando.",
+        t: "Uma onda de SDK de plugin no Desktop",
+        d: "Rascunho no campo de escrever, fatias próprias na lista de sessões, preferência de navegação e uma ponte de eventos para o backend do plugin.",
     },
     {
-        data: "24 set",
-        t: "Onda de SDK de plugin do Desktop",
-        d: "Rascunho no composer, fatias na lista de sessões, preferência de navegação e uma ponte de eventos para o backend do plugin.",
-    },
-    {
-        data: "21 set",
-        t: "O Desktop para de subir um segundo motor",
-        d: "Ele passa a se conectar no que já está rodando na máquina. Quem tinha dois processos brigando pelo mesmo banco sentiu.",
+        t: "Skill fixada em toda sessão nova",
+        d: "Dá para pendurar uma skill no prompt de toda conversa que nascer, em vez de lembrar de chamar ela na mão.",
     },
 ];
 
@@ -59,17 +60,18 @@ export function CardDaLive() {
 
                 <div>
                     <p className="squad-mono mb-5 text-[10px] uppercase tracking-[0.24em] text-white/30">
-                        Só nos últimos dias, por exemplo
+                        O tipo de coisa que entra na live
                     </p>
                     <ul className="space-y-0">
                         {NOVIDADES.map((n) => (
                             <li
                                 key={n.t}
-                                className="flex gap-5 border-b border-white/[0.06] py-4 last:border-0"
+                                className="flex gap-4 border-b border-white/[0.06] py-4 last:border-0"
                             >
-                                <span className="squad-mono w-12 shrink-0 pt-[3px] text-[10px] tracking-wider text-[#D6A85A]/55">
-                                    {n.data}
-                                </span>
+                                <span
+                                    aria-hidden
+                                    className="mt-[9px] h-[5px] w-[5px] shrink-0 rounded-full bg-[#D6A85A]/70"
+                                />
                                 <span>
                                     <span className="block text-[15px] font-medium leading-snug text-white/85">
                                         {n.t}
@@ -82,7 +84,7 @@ export function CardDaLive() {
                         ))}
                     </ul>
                     <p className="squad-mono mt-5 text-[10.5px] leading-relaxed text-white/25">
-                        Quatro coisas em quatro dias. Nenhuma delas cabe numa aula gravada no mês passado.
+                        Nada disso cabe numa aula gravada. Por isso a live existe.
                     </p>
                 </div>
             </div>
