@@ -6,9 +6,16 @@ import { BeamCard } from "@/components/ui/beam-card";
 import { MODULOS } from "./modulos";
 
 /**
- * Os sete módulos lado a lado, todos do mesmo tamanho (Red, 24/09/2026).
- * Nada abre sozinho: o painel de aulas só aparece depois do clique, e ocupa a largura
- * inteira abaixo da fileira, para o conteúdo respirar sem quebrar o alinhamento dos cards.
+ * Os sete módulos lado a lado, no formato de pôster da área de membros.
+ *
+ * Revisão de 24/09 (Red: "ficaram horríveis, nada premium"). O que mudou e por quê:
+ *  - a arte deixou de ser uma tarja de 132px e passou a ocupar a proporção 4:5,
+ *    que é o que faz o card ler como capa e não como banner;
+ *  - as bordas coloridas saíram: azul e ciano sobre arte dourada derrubavam a página;
+ *  - o número do módulo virou elemento gráfico grande sobre a arte, em vez de legenda;
+ *  - o nome vai em serifa itálica, a mesma das capas, criando hierarquia de verdade
+ *    contra o subtítulo em mono minúsculo;
+ *  - fio dourado na borda de baixo, que é a assinatura visual da referência.
  */
 export function TrilhaModulos() {
     const [aberto, setAberto] = useState<number | null>(null);
@@ -16,63 +23,84 @@ export function TrilhaModulos() {
 
     return (
         <div>
-            <ol className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+            <ol className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
                 {MODULOS.map((m) => {
                     const ativo = aberto === m.n;
                     return (
                         <li key={m.n} className="h-full">
-                            <BeamCard
-                                ativo={ativo}
-                                variant={ativo ? "colorful" : "ocean"}
-                                className="h-full"
-                            >
+                            <BeamCard ativo={ativo} variant={ativo ? "brasa" : "ouro"} className="h-full">
                                 <button
                                     type="button"
                                     onClick={() => setAberto(ativo ? null : m.n)}
                                     aria-expanded={ativo}
-                                    className="group/card relative flex h-full w-full flex-col items-start overflow-hidden rounded-2xl text-left"
+                                    aria-label={`Módulo ${m.n}: ${m.titulo}`}
+                                    className="group/card relative flex h-full w-full flex-col overflow-hidden rounded-2xl text-left"
                                 >
-                                    {/* a arte do módulo, a mesma das capas da área de membros */}
-                                    <span
-                                        aria-hidden
-                                        className="block h-[132px] w-full bg-cover bg-center transition-transform duration-700 group-hover/card:scale-[1.06]"
-                                        style={{ backgroundImage: `url(/squad/modulo-${m.n}.jpg)` }}
-                                    />
-                                    <span
-                                        aria-hidden
-                                        className="pointer-events-none absolute inset-x-0 top-0 h-[150px]"
-                                        style={{
-                                            background:
-                                                "linear-gradient(to bottom, rgba(11,11,12,0) 30%, rgba(11,11,12,.75) 72%, #0B0B0C 100%)",
-                                        }}
-                                    />
-
-                                    <span className="flex w-full flex-1 flex-col items-start p-4">
-                                    <span className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-orange-400">
-                                        Módulo {m.n}
-                                    </span>
-
-                                    <span className="mb-2 block text-[15px] font-semibold leading-snug tracking-tight text-white">
-                                        {m.titulo}
-                                    </span>
-
-                                    <span className="block text-[12.5px] leading-snug text-white/45">
-                                        {m.subtitulo}
-                                    </span>
-
-                                    <span className="mt-auto flex w-full items-center justify-between pt-4 font-mono text-[10px] text-white/30">
-                                        <span>{m.aulas.length} aulas · {m.duracao}</span>
+                                    {/* arte em proporção de pôster */}
+                                    <span className="relative block aspect-[4/5] w-full overflow-hidden">
                                         <span
                                             aria-hidden
-                                            className="transition-transform duration-300"
-                                            style={{ transform: ativo ? "rotate(45deg)" : "none" }}
+                                            className="absolute inset-0 bg-cover bg-center transition-transform duration-[900ms] ease-out group-hover/card:scale-[1.07]"
+                                            style={{ backgroundImage: `url(/squad/modulo-${m.n}.jpg)` }}
+                                        />
+                                        <span
+                                            aria-hidden
+                                            className="absolute inset-0"
+                                            style={{
+                                                background:
+                                                    "linear-gradient(to bottom, rgba(8,8,10,.15) 0%, rgba(8,8,10,.05) 38%, rgba(8,8,10,.82) 78%, #08080A 100%)",
+                                            }}
+                                        />
+                                        {/* o número como elemento gráfico, não como legenda */}
+                                        <span
+                                            aria-hidden
+                                            className="squad-serif absolute left-3 top-1 select-none text-[62px] leading-none"
+                                            style={{
+                                                WebkitTextStroke: "1px rgba(214,168,90,.55)",
+                                                color: "transparent",
+                                            }}
                                         >
-                                            <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
-                                                <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                                            </svg>
+                                            {m.n}
                                         </span>
                                     </span>
+
+                                    <span className="flex flex-1 flex-col px-4 pb-4 pt-1">
+                                        <span className="squad-mono mb-2 text-[9.5px] uppercase tracking-[0.26em] text-[#D6A85A]">
+                                            Módulo {m.n}
+                                        </span>
+
+                                        <span className="squad-serif block text-[22px] italic leading-[1.12] text-[#F3D698]">
+                                            {m.titulo}
+                                        </span>
+
+                                        <span className="mt-2 block text-[12.5px] leading-snug text-white/40">
+                                            {m.subtitulo}
+                                        </span>
+
+                                        <span className="squad-mono mt-auto flex w-full items-center justify-between whitespace-nowrap pt-5 text-[9.5px] tracking-wider text-white/25">
+                                            <span>{m.aulas.length} aulas</span>
+                                            <span
+                                                aria-hidden
+                                                className="text-[#D6A85A]/70 transition-all duration-300 group-hover/card:text-[#F3D698]"
+                                                style={{ transform: ativo ? "rotate(45deg)" : "none" }}
+                                            >
+                                                <svg width="12" height="12" viewBox="0 0 20 20" fill="none">
+                                                    <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                                </svg>
+                                            </span>
+                                        </span>
                                     </span>
+
+                                    {/* fio dourado na borda de baixo — a assinatura da referência */}
+                                    <span
+                                        aria-hidden
+                                        className="absolute inset-x-0 bottom-0 h-[3px] transition-opacity duration-500"
+                                        style={{
+                                            opacity: ativo ? 1 : 0.55,
+                                            background:
+                                                "linear-gradient(to right, transparent, #B8863C 18%, #F3D698 50%, #B8863C 82%, transparent)",
+                                        }}
+                                    />
                                 </button>
                             </BeamCard>
                         </li>
@@ -90,30 +118,36 @@ export function TrilhaModulos() {
                         transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
                         className="overflow-hidden"
                     >
-                        <div className="mt-3 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-8">
-                            <div className="mb-6 flex flex-wrap items-baseline gap-x-4 gap-y-2 border-b border-white/[0.07] pb-5">
-                                <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-orange-400">
+                        <div
+                            className="mt-4 rounded-2xl border border-[#D6A85A]/15 p-7 sm:p-9"
+                            style={{
+                                background:
+                                    "radial-gradient(ellipse 80% 140% at 8% 0%, rgba(214,168,90,.07), transparent 60%), #0B0B0C",
+                            }}
+                        >
+                            <div className="mb-7 flex flex-wrap items-end gap-x-5 gap-y-2 border-b border-[#D6A85A]/12 pb-6">
+                                <span className="squad-mono text-[10px] uppercase tracking-[0.3em] text-[#D6A85A]">
                                     Módulo {modulo.n} · semana {modulo.n}
                                 </span>
-                                <h3 className="text-2xl font-semibold tracking-tight text-white">
+                                <h3 className="squad-serif text-[34px] italic leading-none text-[#F3D698]">
                                     {modulo.titulo}
                                 </h3>
-                                <span className="font-mono text-[11px] text-white/35">
+                                <span className="squad-mono ml-auto text-[10px] tracking-wider text-white/30">
                                     {modulo.aulas.length} aulas · {modulo.duracao}
                                 </span>
                             </div>
 
-                            <p className="mb-7 max-w-3xl text-[15px] leading-relaxed text-white/60">
+                            <p className="mb-8 max-w-3xl text-[15.5px] leading-relaxed text-white/55">
                                 {modulo.resumo}
                             </p>
 
-                            <ul className="grid gap-x-10 gap-y-0 sm:grid-cols-2">
+                            <ul className="grid gap-x-12 sm:grid-cols-2">
                                 {modulo.aulas.map((a, i) => (
                                     <li
                                         key={a}
-                                        className="flex items-center gap-4 border-b border-white/[0.05] py-3 last:border-0 sm:last:border-b"
+                                        className="flex items-baseline gap-4 border-b border-white/[0.05] py-3.5 last:border-0 sm:last:border-b"
                                     >
-                                        <span className="w-9 shrink-0 font-mono text-[11px] text-white/30">
+                                        <span className="squad-mono w-9 shrink-0 text-[10.5px] text-[#D6A85A]/55">
                                             {modulo.n}.{i + 1}
                                         </span>
                                         <span className="text-[14.5px] leading-snug text-white/75">{a}</span>

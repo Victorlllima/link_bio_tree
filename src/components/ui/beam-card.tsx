@@ -17,20 +17,20 @@ import { cn } from "@/lib/utils";
  * continua funcionando: a interface é a mesma (children + className + variant).
  */
 
-type Variant = "colorful" | "ocean" | "sunset" | "mono";
+type Variant = "ouro" | "brasa" | "mono";
 
+// 🔴 24/09: as paletas coloridas saíram. Sobre a arte dourada dos módulos, azul e
+// ciano brigavam com o ouro e derrubavam a página inteira. Ouro e âmbar, só.
 const PALETAS: Record<Variant, [string, string, string, string]> = {
-    // laranja da marca na frente, para o card ler como RedPro
-    colorful: ["#F97316", "#6366F1", "#22D3EE", "#F43F5E"],
-    ocean: ["#6366F1", "#38BDF8", "#818CF8", "#22D3EE"],
-    sunset: ["#F97316", "#FBBF24", "#F43F5E", "#FB7185"],
+    ouro: ["#D6A85A", "#F3D698", "#B8863C", "#EFC97A"],
+    brasa: ["#F97316", "#D6A85A", "#B8863C", "#FBBF24"],
     mono: ["#A3A3A3", "#737373", "#D4D4D4", "#525252"],
 };
 
 export function BeamCard({
     children,
     className,
-    variant = "colorful",
+    variant = "ouro",
     ativo = false,
     duracao = 14,
 }: {
@@ -66,7 +66,7 @@ export function BeamCard({
           -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           -webkit-mask-composite: xor; mask-composite: exclude;
           animation: girar-${id} ${duracao}s linear infinite;
-          opacity: .55; transition: opacity .5s ease; pointer-events: none; z-index: 1;
+          opacity: .3; transition: opacity .5s ease; pointer-events: none; z-index: 1;
         }
         [data-beam="${id}"]:hover::before, [data-beam="${id}"][data-ativo]::before { opacity: 1; }
         [data-beam="${id}"][data-ativo]::before { animation-duration: ${Math.max(6, duracao / 2)}s; }
@@ -78,10 +78,10 @@ export function BeamCard({
             radial-gradient(ellipse 40px 120px at 100% 34%, ${c3}, transparent 70%),
             radial-gradient(ellipse 180px 50px at 64% 100%, ${c4}, transparent 70%),
             radial-gradient(ellipse 36px 110px at 0% 68%, ${c2}, transparent 70%);
-          opacity: .16; filter: blur(14px) saturate(1.3); transition: opacity .6s ease;
+          opacity: .1; filter: blur(16px) saturate(1.25); transition: opacity .6s ease;
         }
-        [data-beam="${id}"]:hover::after { opacity: .3; }
-        [data-beam="${id}"][data-ativo]::after { opacity: .42; }
+        [data-beam="${id}"]:hover::after { opacity: .26; }
+        [data-beam="${id}"][data-ativo]::after { opacity: .4; }
         @media (prefers-reduced-motion: reduce) {
           [data-beam="${id}"]::before { animation-duration: ${duracao * 3}s; }
         }

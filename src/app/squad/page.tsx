@@ -19,7 +19,7 @@ export const metadata: Metadata = {
  */
 export default function SquadPage() {
     return (
-        <main className="min-h-screen bg-[#08080A] text-white antialiased">
+        <main className="squad-root min-h-screen bg-[#08080A] text-white antialiased">
             <div className="pointer-events-none fixed inset-0 z-0">
                 <div className="absolute left-1/2 top-[-18rem] h-[36rem] w-[52rem] -translate-x-1/2 rounded-full bg-orange-500/[0.07] blur-[140px]" />
                 <div className="absolute bottom-[-12rem] right-[-8rem] h-[30rem] w-[30rem] rounded-full bg-indigo-500/[0.07] blur-[130px]" />
@@ -32,13 +32,13 @@ export default function SquadPage() {
                         alt="RedPro AI Academy"
                         className="mx-auto mb-7 h-28 w-auto sm:h-36"
                     />
-                    <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.28em] text-orange-400">
+                    <p className="squad-mono mb-5 text-[11px] uppercase tracking-[0.3em] text-[#D6A85A]">
                         Turma 1 · começa em 29 de setembro
                     </p>
-                    <h1 className="mx-auto max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
+                    <h1 className="mx-auto max-w-3xl text-5xl leading-[1.02] tracking-tight sm:text-7xl">
                         De um agente
                         <br />
-                        a um <span className="text-orange-500">squad</span>
+                        a um <span className="squad-serif italic text-[#F3D698]">squad</span>
                     </h1>
                     <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-white/55">
                         Sete semanas montando o seu time de agentes. Um módulo novo por semana, uma
@@ -73,7 +73,7 @@ export default function SquadPage() {
 
                 <section>
                     <div className="mb-8 text-center">
-                        <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                        <h2 className="squad-serif text-3xl italic tracking-tight text-[#F3D698] sm:text-4xl">
                             Sete módulos, um por semana
                         </h2>
                         <p className="mt-3 text-[15px] text-white/45">
@@ -85,7 +85,7 @@ export default function SquadPage() {
                 </section>
 
                 <section className="mx-auto mt-20 max-w-2xl rounded-2xl border border-white/[0.07] bg-white/[0.02] p-8 text-center sm:mt-24">
-                    <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-white/35">
+                    <p className="squad-mono text-[11px] uppercase tracking-[0.26em] text-[#D6A85A]/70">
                         A live da semana
                     </p>
                     <p className="mx-auto mt-4 max-w-lg text-[17px] leading-relaxed text-white/70">
