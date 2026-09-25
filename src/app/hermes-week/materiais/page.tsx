@@ -161,13 +161,13 @@ const html = `
     <div class="item">
       <div class="tit"><span class="num">2</span> O squad pronto para importar</div>
       <p>
-        Cinco agentes montados: um <strong>coordenador</strong>, que recebe a demanda e distribui
-        sem nunca executar, um <strong>pesquisador</strong>, um <strong>redator</strong>, um
-        <strong>revisor</strong> e um <strong>operador</strong>.
+Um <strong>orquestrador</strong>, que recebe a demanda e distribui sem nunca executar, e três
+        trabalhadores: um <strong>pesquisador</strong>, um <strong>redator</strong> e um
+        <strong>revisor</strong>.
       </p>
       <p>
         Cada um vem com a função escrita, a descrição que aparece na tela e o modelo certo
-        apontado. <strong>O operador já vem com o modelo mais barato</strong>, porque é ele que
+        apontado. <strong>O pesquisador já vem com o modelo mais barato</strong>, porque é ele que
         mais roda, e é onde a conta cresce sem você perceber.
       </p>
       <p>
@@ -175,7 +175,7 @@ const html = `
         sozinho, o pedido que configura o quadro de tarefas, e os três erros que costumam
         aparecer na primeira vez.
       </p>
-      <div class="meta">ZIP · 5 perfis + guia de instalação</div>
+      <div class="meta">ZIP · 4 perfis + guia de instalação</div>
       <a class="btn" href="${ZIP}" download>Baixar o squad</a>
     </div>
 
