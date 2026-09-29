@@ -27,8 +27,8 @@ export async function lerCicloAtual(opts?: { revalidar?: number }): Promise<Cicl
        (dado fresco, é ele que manda a data no e-mail); a LP passa segundos e
        volta a ser pré-renderizada, que é o que o tráfego pago exige. */
     const fallback: CicloAtual = {
-        dataInicio: "2026-09-21",
-        linkGrupo: "https://chat.whatsapp.com/F3fKDtOH98MBbgkSroDt2G",
+        dataInicio: "2026-10-12",
+        linkGrupo: "https://chat.whatsapp.com/LrrqSg4aiBB6w9SMNXtazV",
     };
     try {
         const res = await fetch(

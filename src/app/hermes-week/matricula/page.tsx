@@ -33,7 +33,7 @@ import { useEffect, useState } from "react";
  * ==========================================================================*/
 
 // ⚠️ SEMANAL: trocar o link do grupo a cada ciclo (mesmo link da página de obrigado).
-const GRUPO_URL = "https://chat.whatsapp.com/F3fKDtOH98MBbgkSroDt2G";
+const GRUPO_URL = "https://chat.whatsapp.com/LrrqSg4aiBB6w9SMNXtazV";
 
 type Form = {
   nome: string; email: string; ddi: string; whatsapp: string;
