@@ -152,7 +152,35 @@ export default function MetricasPainel() {
     }
   }
 
-  const hoje = snaps[0]; // ordenado dia.desc
+  // Pode haver mais de uma campanha ativa no mesmo dia (descoberta automática) —
+  // soma tudo do dia mais recente num único snapshot agregado antes de exibir.
+  const hoje = useMemo(() => {
+    if (!snaps.length) return undefined;
+    const diaMaisRecente = snaps[0].dia;
+    const doDia = snaps.filter((s) => s.dia === diaMaisRecente);
+    if (doDia.length === 1) return doDia[0];
+    const soma = doDia.reduce(
+      (acc, s) => ({
+        ...acc,
+        gasto: acc.gasto + Number(s.gasto),
+        impressoes: acc.impressoes + s.impressoes,
+        alcance: acc.alcance + s.alcance,
+        cliques: acc.cliques + s.cliques,
+        link_clicks: acc.link_clicks + s.link_clicks,
+        page_views: acc.page_views + s.page_views,
+        view_content: acc.view_content + s.view_content,
+        initiate_checkout: acc.initiate_checkout + s.initiate_checkout,
+        purchases: acc.purchases + s.purchases,
+        receita: acc.receita + Number(s.receita),
+      }),
+      { ...doDia[0], gasto: 0, impressoes: 0, alcance: 0, cliques: 0, link_clicks: 0, page_views: 0, view_content: 0, initiate_checkout: 0, purchases: 0, receita: 0 }
+    );
+    soma.ctr = soma.impressoes > 0 ? (soma.link_clicks / soma.impressoes) * 100 : 0;
+    soma.cpc = soma.link_clicks > 0 ? soma.gasto / soma.link_clicks : 0;
+    soma.cpm = soma.impressoes > 0 ? (soma.gasto / soma.impressoes) * 1000 : 0;
+    soma.frequencia = doDia.reduce((s, x) => s + x.frequencia, 0) / doDia.length;
+    return soma;
+  }, [snaps]);
   const derivadas = useMemo(() => (hoje ? derivar(hoje) : null), [hoje]);
 
   // estado consolidado pro motor de próximas ações

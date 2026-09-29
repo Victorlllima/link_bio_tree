@@ -23,6 +23,7 @@ interface Criativo {
   ctr: number;
   cpc: number;
   status: string;
+  thumb_url?: string | null;
   classificacao: Classificacao;
 }
 
@@ -187,8 +188,16 @@ export default function CriativosPainel() {
               return (
                 <>
                   <tr key={c.ad_id}>
-                    <td style={{ ...st.td, minWidth: 200, fontWeight: 600, color: "#f5f5f5" }}>
-                      {nomeAmigavel(c.nome)}
+                    <td style={{ ...st.td, minWidth: 220, fontWeight: 600, color: "#f5f5f5" }}>
+                      <div style={st.crtCell}>
+                        {c.thumb_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={c.thumb_url} alt={nomeAmigavel(c.nome)} style={st.crtThumb} loading="lazy" referrerPolicy="no-referrer" />
+                        ) : (
+                          <div style={{ ...st.crtThumb, ...st.crtThumbVazio }}>🖼️</div>
+                        )}
+                        <span>{nomeAmigavel(c.nome)}</span>
+                      </div>
                     </td>
                     <td style={{ ...st.td, fontWeight: 800, color: cor.texto }}>
                       {c.gasto > 0 ? fmtValor(Number(c.roas), "x") : "—"}
@@ -266,6 +275,10 @@ const st: Record<string, React.CSSProperties> = {
 
   veredicto: { fontSize: 11, fontWeight: 800, padding: "2px 8px", borderRadius: 20, border: "1px solid", display: "inline-block" },
   btnExpandir: { background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "5px 10px", fontSize: 11.5, color: "#a3a3a3", cursor: "pointer", fontFamily: "'DM Sans', system-ui" },
+
+  crtCell: { display: "flex", alignItems: "center", gap: 10 },
+  crtThumb: { width: 40, height: 40, borderRadius: 8, objectFit: "cover", flexShrink: 0, background: "#0f0f0f" },
+  crtThumbVazio: { display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, border: "1px solid rgba(255,255,255,0.08)" },
 
   tempGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10, paddingTop: 6 },
   tempCard: { background: "#161616", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 12px" },

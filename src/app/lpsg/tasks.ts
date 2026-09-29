@@ -261,40 +261,43 @@ export interface Fase {
   cor: string;
 }
 
+// Datas relativas ao D0 do ciclo vigente — ver .claude/CICLO-ATUAL.md no repo Starlight.
+// Cada ciclo do LPSG roda de segunda a segunda; não hardcodar ano/mês aqui de novo
+// (foi o que deixou este bloco inteiro descrevendo o produto e as datas erradas por 2 meses).
 export const FASES_TABARI: Fase[] = [
   {
     num: "1",
-    titulo: "Captação (Curso de Entrada)",
-    data: "Agora → contínuo",
-    descricao: "Curso de R$17 com tráfego pago traz leads a custo quase zero. Na Aula 12, o aluno entra direto no grupo de WhatsApp de aquecimento — gratuito, sem comprar nada ainda.",
+    titulo: "Captação (tráfego + orgânico)",
+    data: "Contínuo",
+    descricao: "Tráfego pago + YouTube/Instagram/Threads levam pro grupo de WhatsApp. Sem compra ainda — é aquecimento.",
     cor: "#f97316",
   },
   {
     num: "2",
-    titulo: "Aquecimento no Grupo de WhatsApp",
-    data: "13 → 26/jul",
-    descricao: "É dentro do grupo — não numa página — que a oferta do ingresso R$44 é revelada e vendida, com ancoragem e escassez real (padrão Turbo Express). Conteúdo orgânico + e-mails reforçam por fora. Meta: 30% de presença na 1ª aula do evento.",
+    titulo: "Antecipação + Lives de captação",
+    data: "D-1 (vídeo) · D-11/D-4 (lives quinta 15h)",
+    descricao: "A oferta da Hermes Week R$62 é revelada dentro do grupo — ancoragem e escassez real, reforçadas por vídeo de antecipação e lives semanais.",
     cor: "#fb923c",
   },
   {
     num: "3",
-    titulo: "Evento 5+1 (Aulas 1-5)",
-    data: "27 → 31/jul · 7h",
-    descricao: "5 dias entregando valor real: a pessoa constrói um CRM funcional. Marcos de vitória na quarta e na sexta.",
+    titulo: "Hermes Week (Aulas 1-5)",
+    data: "D0 → D+4 · 20h",
+    descricao: "5 aulas entregando valor real: o aluno sai com um agente Hermes funcionando. Marco 1 na aula 3, marco 2 na aula 5.",
     cor: "#f59e0b",
   },
   {
     num: "4",
-    titulo: "Pitch de Domingo (Aula 6)",
-    data: "2/ago · 20h",
-    descricao: "A oferta da Formação S.H.A.R.K. R$998. Ancoragem, bônus escalonados, escassez real.",
+    titulo: "Apresentação de domingo",
+    data: "D+6 · 20h",
+    descricao: "A oferta de De Um Agente a Um Squad R$697. Ancoragem, garantia de 7 dias, sem bônus.",
     cor: "#ef4444",
   },
   {
     num: "5",
     titulo: "Abertura do Carrinho",
-    data: "3/ago · 6h50",
-    descricao: "Carrinho abre com janela curta. Prova social intercalada + recuperação de abandono até fechar.",
+    data: "D+7 · 6h50 → 21h",
+    descricao: "Carrinho abre com janela de um dia. Prova social intercalada + recuperação de abandono até fechar — no mesmo dia já começa a Aula 1 do próximo ciclo.",
     cor: "#dc2626",
   },
 ];

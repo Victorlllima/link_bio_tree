@@ -10,6 +10,7 @@ import {
   type TutorialPasso,
   type DriveTipo,
 } from "./tasks";
+import ComparativoPainel from "./ComparativoPainel";
 import MetricasPainel from "./MetricasPainel";
 import CriativosPainel from "./CriativosPainel";
 import LeadsPainel from "./LeadsPainel";
@@ -19,7 +20,7 @@ import MensageriaPainel from "./MensageriaPainel";
 type EstadoItem = { task_id: string; responsavel: Responsavel; done: boolean };
 type EstadoMap = Record<string, { responsavel: Responsavel; done: boolean }>;
 
-type Nivel = "operacional" | "drive" | "metricas" | "criativos" | "leads" | "garantia" | "mensageria";
+type Nivel = "comparativo" | "operacional" | "drive" | "metricas" | "criativos" | "leads" | "garantia" | "mensageria";
 
 const DRIVE_ICON: Record<DriveTipo, string> = {
   doc: "📄", pdf: "📕", html: "🌐", img: "🖼️", planilha: "📊", video: "🎬", pasta: "📁", link: "🔗",
@@ -33,7 +34,7 @@ export default function LpsgPainel() {
   const [senha, setSenha] = useState("");
   const [erroSenha, setErroSenha] = useState(false);
   const [estado, setEstado] = useState<EstadoMap>({});
-  const [nivel, setNivel] = useState<Nivel>("operacional");
+  const [nivel, setNivel] = useState<Nivel>("comparativo");
   const [pessoa, setPessoa] = useState<Pessoa>("todos");
   const [carregando, setCarregando] = useState(true);
   const [tutorial, setTutorial] = useState<TutorialPasso | null>(null);
@@ -146,8 +147,8 @@ export default function LpsgPainel() {
       <div style={s.wrap}>
         <header style={s.header}>
           <div>
-            <h1 style={s.h1}>Lançamento LPSG · 1º Ciclo</h1>
-            <p style={s.subtitle}>&ldquo;Como Construir um CRM Customizado em 5 Dias&rdquo; · evento 27/jul-3/ago · aulas 7h</p>
+            <h1 style={s.h1}>Hermes Week · Painel de Lançamento</h1>
+            <p style={s.subtitle}>Método Tabari (LPSG) · acompanhamento semana a semana</p>
           </div>
           <div style={s.progressBadge}>
             <span style={s.progressNum}>{progresso.feitas}/{progresso.total}</span>
@@ -174,12 +175,13 @@ export default function LpsgPainel() {
         {/* ---------- ABAS DE NÍVEL (topo) ---------- */}
         <nav style={s.abas}>
           {([
-            ["operacional", "✅ Checklist Operacional"],
-            ["metricas", "📊 Métricas de Tráfego"],
+            ["comparativo", "📈 Visão Geral"],
+            ["metricas", "📊 Detalhe diário"],
             ["criativos", "🎨 Criativos por Público"],
             ["leads", "🎓 Leads & Fichas"],
             ["garantia", "🛡️ Garantia 90 dias"],
             ["mensageria", "💬 Mensageria"],
+            ["operacional", "✅ Checklist Operacional"],
             ["drive", "📁 Drive de Conteúdo"],
           ] as [Nivel, string][]).map(([n, label]) => (
             <button key={n} onClick={() => setNivel(n)} style={{ ...s.aba, ...(nivel === n ? s.abaAtiva : {}) }}>
@@ -188,7 +190,10 @@ export default function LpsgPainel() {
           ))}
         </nav>
 
-        {/* ---------- MÉTRICAS DE TRÁFEGO ---------- */}
+        {/* ---------- VISÃO GERAL (comparativo semanal + próximas ações) ---------- */}
+        {nivel === "comparativo" && <ComparativoPainel />}
+
+        {/* ---------- MÉTRICAS DE TRÁFEGO (detalhe do dia) ---------- */}
         {nivel === "metricas" && <MetricasPainel />}
 
         {/* ---------- CRIATIVOS POR TEMPERATURA DE PÚBLICO ---------- */}
