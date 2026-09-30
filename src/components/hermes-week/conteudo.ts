@@ -1800,7 +1800,7 @@ const G: Variante = {
   },
 };
 
-export type VarianteTextualId = Exclude<VarianteId, "F">;
+export type VarianteTextualId = Exclude<VarianteId, "F" | "H">;
 
 export const VARIANTES: Record<VarianteTextualId, Variante> = { A, B, C, D, E, G };
 

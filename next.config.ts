@@ -29,8 +29,10 @@ const nextConfig: NextConfig = {
    *  TEMPORÁRIO de propósito (307, não 308): variação de teste vira e mexe
    *  muda de papel, e 308 fica cacheado no navegador de quem já clicou.
    *
-   *  ⚠️ A RAIZ E A /f NÃO ENTRAM. Elas servem a LP cinemática, que recebe o
-   *  orgânico e o link da bio. A instrução do Red foi sobre os anúncios.
+   *  ⚠️ A RAIZ E A /f NÃO ENTRAM. A raiz recebe o orgânico e o link da bio;
+   *  desde 30/09/2026 ela serve a variação H (landing 3D, app/hermes-week/
+   *  route.ts) e a LP cinemática (F) segue em /f. A instrução do Red foi
+   *  sobre os anúncios.
    * ======================================================================== */
   async redirects() {
     return ["a", "b", "c", "d", "e"].map((v) => ({
