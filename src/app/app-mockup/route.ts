@@ -234,6 +234,19 @@ const HTML = `<!DOCTYPE html>
   .pill.gray { background: #2a2a2a; color: var(--text-dim); }
   .pill.blue { background: #1a2a3a; color: #6ab4ff; }
 
+  @media (max-width: 480px) {
+    body { padding: 0; display: block; }
+    .meta { display: none; }
+    .phone {
+      width: 100%;
+      height: 100dvh;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+    }
+    .statusbar { display: none; }
+  }
+
   .notif { padding: 14px 20px; border-bottom: 1px solid #1a1a1a; display: flex; gap: 12px; }
   .notif .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); margin-top: 5px; flex-shrink: 0; }
   .notif.read .dot { background: transparent; }
@@ -411,16 +424,16 @@ const HTML = `<!DOCTYPE html>
     </div>
 
     <div class="section" style="padding-bottom:0;"><h2>Skills</h2></div>
-    <div class="item"><div class="ico">⬇</div><div class="info"><div class="t">Auditoria de Segurança</div><div class="s">Skill pra instalar no seu Claude Code</div></div><span class="pill blue">skill</span></div>
-    <div class="item"><div class="ico">⬇</div><div class="info"><div class="t">Raio-X de Custo</div><div class="s">Skill pra instalar no seu Claude Code</div></div><span class="pill blue">skill</span></div>
-    <div class="item"><div class="ico">⬇</div><div class="info"><div class="t">Teste de Carga</div><div class="s">Skill pra instalar no seu Claude Code</div></div><span class="pill blue">skill</span></div>
-    <div class="item"><div class="ico">⬇</div><div class="info"><div class="t">Mapa do Sistema</div><div class="s">Skill pra instalar no seu Claude Code</div></div><span class="pill blue">skill</span></div>
-    <div class="item"><div class="ico">⬇</div><div class="info"><div class="t">Checklist de Deploy</div><div class="s">Skill pra instalar no seu Claude Code</div></div><span class="pill blue">skill</span></div>
-    <div class="item"><div class="ico">⬇</div><div class="info"><div class="t">Auditoria de Reversibilidade</div><div class="s">Skill pra instalar no seu Claude Code</div></div><span class="pill blue">skill</span></div>
+    <div class="item"><div class="ico">⬇</div><div class="info"><div class="t">Auditoria de Segurança</div><div class="s">Varre o projeto atrás do que mais expõe sistema em produção — RLS, chave exposta, rota sem autenticação</div></div><span class="pill blue">skill</span></div>
+    <div class="item"><div class="ico">⬇</div><div class="info"><div class="t">Raio-X de Custo</div><div class="s">Calcula quanto custa de verdade manter seu sistema de IA rodando — e onde o dinheiro vaza</div></div><span class="pill blue">skill</span></div>
+    <div class="item"><div class="ico">⬇</div><div class="info"><div class="t">Teste de Carga</div><div class="s">Descobre o que quebra no seu sistema quando o uso dobrar</div></div><span class="pill blue">skill</span></div>
+    <div class="item"><div class="ico">⬇</div><div class="info"><div class="t">Mapa do Sistema</div><div class="s">Lê o projeto inteiro e explica o que cada parte faz, em português</div></div><span class="pill blue">skill</span></div>
+    <div class="item"><div class="ico">⬇</div><div class="info"><div class="t">Checklist de Deploy</div><div class="s">Verificação final antes de entregar pro cliente: erro tratado, log, backup, rollback</div></div><span class="pill blue">skill</span></div>
+    <div class="item"><div class="ico">⬇</div><div class="info"><div class="t">Auditoria de Reversibilidade</div><div class="s">Mapeia o que seus agentes fazem sozinhos sem ninguém conferir</div></div><span class="pill blue">skill</span></div>
 
     <div class="section" style="padding-bottom:0; padding-top:10px;"><h2>Guias</h2></div>
-    <div class="item"><div class="ico">📄</div><div class="info"><div class="t">Caveman Mode</div><div class="s">Guia em PDF</div></div><span class="pill gray">guia</span></div>
-    <div class="item"><div class="ico">📄</div><div class="info"><div class="t">Migrar do ChatGPT pro Claude</div><div class="s">Guia em PDF</div></div><span class="pill gray">guia</span></div>
+    <div class="item"><div class="ico">📄</div><div class="info"><div class="t">Caveman Mode</div><div class="s">Modo de escrita que corta a enrolação do prompt — direto ao ponto</div></div><span class="pill gray">guia</span></div>
+    <div class="item"><div class="ico">📄</div><div class="info"><div class="t">Migrar do ChatGPT pro Claude</div><div class="s">O que muda de verdade na migração, sem recomeçar do zero</div></div><span class="pill gray">guia</span></div>
   </div>
 
   <div class="screen" id="screen-loja">
