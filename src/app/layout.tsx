@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     description: "Delegar o código é a parte fácil. Difícil é saber conferir depois. Skills, guias e sistemas para quem constrói com IA.",
   },
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦈</text></svg>",
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌀</text></svg>",
   },
 };
 

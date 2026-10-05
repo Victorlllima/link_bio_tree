@@ -58,7 +58,7 @@ const HEAD_META = `<title>${esc(TITULO)}</title>
 <meta name="twitter:description" content="${esc(DESCRICAO)}">
 <meta name="twitter:image" content="https://redpro.com.br/hermes-week/h/og.jpg">
 <meta name="theme-color" content="#0A0A0A">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦈</text></svg>">`;
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌀</text></svg>">`;
 
 const PIXEL_BASE = `<script>
 !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
