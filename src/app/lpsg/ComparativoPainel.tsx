@@ -180,6 +180,17 @@ export default function ComparativoPainel() {
     return gerarAcoes(estado);
   }, [snaps, criativos]);
 
+  // Hook declarado antes dos retornos antecipados: com ele depois, a tela
+  // quebrava (React #310) assim que os snapshots carregavam.
+  const temGapDeDados = useMemo(() => {
+    const dias = [...new Set(snaps.map((s) => s.dia))].sort();
+    for (let i = 1; i < dias.length; i++) {
+      const diff = (new Date(dias[i]).getTime() - new Date(dias[i - 1]).getTime()) / 86400000;
+      if (diff > 10) return true;
+    }
+    return false;
+  }, [snaps]);
+
   if (carregando) return <div style={st.vazio}>Carregando comparativo…</div>;
 
   if (!semanas.length) {
@@ -196,15 +207,6 @@ export default function ComparativoPainel() {
   }
 
   const semanaMaisRecente = semanas[0];
-  const temGapDeDados = useMemo(() => {
-    const dias = [...new Set(snaps.map((s) => s.dia))].sort();
-    for (let i = 1; i < dias.length; i++) {
-      const diff = (new Date(dias[i]).getTime() - new Date(dias[i - 1]).getTime()) / 86400000;
-      if (diff > 10) return true;
-    }
-    return false;
-  }, [snaps]);
-
   return (
     <div>
       {acoes.length > 0 && (
