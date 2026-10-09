@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { lerCicloAtual } from "@/lib/ciclo-atual";
 
 export const dynamic = "force-dynamic";
 
@@ -60,8 +61,15 @@ function qualificar(d: Record<string, string>): { tag: "HOT" | "WARM" | "COLD"; 
 }
 
 const SUPABASE_URL = "https://supabase.redpro.com.br";
-// Ciclo = a segunda que abre a inscrição. Trocar a cada ciclo novo.
-const CICLO = "2026-09-28";
+// Ciclo = a segunda do carrinho (D0 + 7). Vem de `ciclo_atual`, que o Alfred
+// vira toda sexta. Antes era fixo em "2026-09-28" e a turma 2 gravava por cima
+// da turma 1 (o upsert é por ciclo + e-mail).
+async function cicloDaFicha(): Promise<string> {
+    const { dataInicio } = await lerCicloAtual();
+    const d = new Date(`${dataInicio}T12:00:00-03:00`);
+    d.setUTCDate(d.getUTCDate() + 7);
+    return d.toISOString().slice(0, 10);
+}
 
 async function salvar(d: Record<string, string>, tag: string, score: number) {
     const key = process.env.SUPABASE_SERVICE_KEY;
@@ -78,7 +86,7 @@ async function salvar(d: Record<string, string>, tag: string, score: number) {
                     Prefer: "resolution=merge-duplicates,return=minimal",
                 },
                 body: JSON.stringify({
-                    ciclo: CICLO,
+                    ciclo: await cicloDaFicha(),
                     nome: d.nome,
                     email: (d.email || "").toLowerCase().trim(),
                     whatsapp: d.whatsapp,
