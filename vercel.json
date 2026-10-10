@@ -86,6 +86,14 @@
     {
       "path": "/api/cron/disparos-grupo",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/dashboard-youtube",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/dashboard-youtube",
+      "schedule": "0 13 * * *"
     }
   ]
 }
