@@ -24,6 +24,14 @@ const SB = "https://supabase.redpro.com.br/rest/v1";
 const GRAPH = "https://graph.facebook.com/v21.0";
 const AD_ACCOUNT = "961901509283620";
 const FILTRO_CAMPANHA = "HWK"; // toda campanha da Hermes Week começa com HWK_
+// Boost feito direto do app do Instagram ("Promover"): a Meta nomeia a campanha sozinha a
+// partir do texto do post, nunca com o prefixo HWK_. É a distribuição orgânica turbinada que o
+// método Tabari prevê (25% do budget diário) — decisão do Red (10/10/2026): conta como gasto
+// da Hermes Week, não fica separado em "outras campanhas".
+const PREFIXOS_BOOST_IG = ["Post do Instagram", "Publicação do Instagram", "Reel do Instagram"];
+function ehCampanhaHermesWeek(nome: string): boolean {
+  return nome.includes(FILTRO_CAMPANHA) || PREFIXOS_BOOST_IG.some((p) => nome.startsWith(p));
+}
 const PRIMEIRO_D0 = "2026-09-21";
 
 function sbH() {
@@ -186,13 +194,30 @@ async function meta(path: string) {
 
 async function lerMeta(since: string, until: string, comAnuncios: boolean) {
   const tr = encodeURIComponent(JSON.stringify({ since, until }));
-  const filt = encodeURIComponent(JSON.stringify([{ field: "campaign.name", operator: "CONTAIN", value: FILTRO_CAMPANHA }]));
   const base = `act_${AD_ACCOUNT}/insights?time_range=${tr}`;
   const fBase = "spend,impressions,inline_link_clicks,actions,action_values";
+
+  // Fase 1: lista TODA campanha com gasto na janela (sem filtro), pra decidir — pelo nome —
+  // quais contam como Hermes Week. Campanha de boost do Instagram não tem prefixo HWK_, então
+  // o filtro do Meta não dá conta sozinho; a decisão é feita aqui, em código.
+  const campsBrutos = (await meta(`${base}&level=campaign&fields=campaign_id,campaign_name,spend&limit=200`)) as {
+    data?: { campaign_id?: string; campaign_name?: string; spend?: string }[];
+  };
+  const todasCamps = campsBrutos.data || [];
+  const idsHermesWeek = todasCamps
+    .filter((c) => ehCampanhaHermesWeek(String(c.campaign_name || "")))
+    .map((c) => c.campaign_id)
+    .filter((id): id is string => !!id);
+
+  // Sem nenhuma campanha reconhecida na janela: filtra por um id inexistente pra devolver zerado
+  // em vez de cair sem filtro nenhum (que somaria a conta inteira, de qualquer campanha antiga).
+  const filtroIds = idsHermesWeek.length ? idsHermesWeek : ["0"];
+  const filt = encodeURIComponent(JSON.stringify([{ field: "campaign.id", operator: "IN", value: filtroIds }]));
+
   const reqs: Promise<Record<string, unknown>>[] = [
     meta(`${base}&level=account&filtering=${filt}&fields=${fBase},reach,frequency,cpm,ctr,clicks`),
     meta(`${base}&level=account&filtering=${filt}&time_increment=1&fields=${fBase}&limit=100`),
-    meta(`${base}&level=campaign&fields=campaign_name,spend&limit=100`),
+    Promise.resolve(campsBrutos as Record<string, unknown>),
   ];
   if (comAnuncios) {
     reqs.push(
@@ -435,7 +460,7 @@ export async function montar(pedido: string, opts: { leve?: boolean; cal?: Ciclo
   });
   const diasComGasto = serie.filter((s) => s.gasto > 0).length;
   const outrasCampanhas = ((m?.camps?.data || []) as Record<string, unknown>[])
-    .filter((c) => !String(c.campaign_name || "").includes(FILTRO_CAMPANHA) && Number(c.spend) > 0)
+    .filter((c) => !ehCampanhaHermesWeek(String(c.campaign_name || "")) && Number(c.spend) > 0)
     .map((c) => ({ nome: String(c.campaign_name), gasto: Number(c.spend) }));
   const verbaDistrib = manual.verba_distribuicao ?? 0;
 
