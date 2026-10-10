@@ -25,6 +25,19 @@ function authed(req: Request): boolean {
   return (req.headers.get("cookie") || "").includes(`lpsg_auth=${LPSG_PASSWORD}`);
 }
 
+export async function GET(req: Request) {
+  if (!authed(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const ciclo = new URL(req.url).searchParams.get("ciclo") || "";
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(ciclo)) return NextResponse.json({ error: "ciclo inválido" }, { status: 400 });
+  const k = process.env.SUPABASE_SERVICE_KEY!;
+  const res = await fetch(`${SB}/hw_dash_manual?ciclo=eq.${ciclo}&select=chave,valor`, { headers: { apikey: k, Authorization: `Bearer ${k}` }, cache: "no-store" });
+  if (!res.ok) return NextResponse.json({ error: await res.text() }, { status: 500 });
+  const rows = (await res.json()) as { chave: string; valor: number | null }[];
+  const valores: Record<string, number> = {};
+  for (const x of rows) if (x.valor !== null) valores[x.chave] = Number(x.valor);
+  return NextResponse.json({ valores });
+}
+
 export async function POST(req: Request) {
   if (!authed(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const k = process.env.SUPABASE_SERVICE_KEY!;

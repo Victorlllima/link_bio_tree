@@ -5,7 +5,7 @@
 //   Meta Marketing API (ao vivo, cache de 90s) → tráfego, criativos
 //   Supabase hotmart_compras (webhook)         → ingressos, bumps, Formação,
 //                                                abandono, reembolso, origem
-//   Supabase hermes_week_matriculas / crm_week_status → fichas
+//   Supabase hermes_week_matriculas / crm_week_status (ciclo = D0 + 7) → fichas
 //   Supabase grupos_ciclo + disparos_grupo + Evolution → grupo e mensageria
 //   Supabase hw_dash_manual                     → o que não tem API (presença
 //                                                ao vivo, únicos, verba de
@@ -25,7 +25,6 @@ const GRAPH = "https://graph.facebook.com/v21.0";
 const AD_ACCOUNT = "961901509283620";
 const FILTRO_CAMPANHA = "HWK"; // toda campanha da Hermes Week começa com HWK_
 const PRIMEIRO_D0 = "2026-09-21";
-const INICIO_VENDAS = "2026-09-01T00:00:00-03:00";
 
 function sbH() {
   const k = process.env.SUPABASE_SERVICE_KEY!;
@@ -80,22 +79,64 @@ const act = (a: MetaAction[] | undefined, ...tipos: string[]) => {
 // ============================================================
 // CICLOS
 // ============================================================
-export async function listarCiclos(): Promise<{ atual: string; ciclos: string[] }> {
-  const [ca, mats, man] = await Promise.all([
-    sb<{ data_inicio: string }[]>("ciclo_atual?select=data_inicio&limit=1").catch(() => []),
-    sb<{ ciclo: string }[]>("hermes_week_matriculas?select=ciclo").catch(() => []),
-    sb<{ ciclo: string }[]>("hw_dash_manual?select=ciclo").catch(() => []),
-  ]);
-  const atual = ca[0]?.data_inicio || PRIMEIRO_D0;
-  const set = new Set<string>([PRIMEIRO_D0, atual]);
-  for (const r of [...mats, ...man]) if (r.ciclo && r.ciclo >= PRIMEIRO_D0) set.add(r.ciclo.slice(0, 10));
-  // só segundas-feiras são D0 válidos
-  const ciclos = [...set].filter((d) => new Date(`${d}T12:00:00-03:00`).getUTCDay() === 1).sort();
-  return { atual, ciclos };
+export type CicloCal = {
+  d0: string; // segunda-feira da Aula 1
+  indice: number; // posição entre as turmas reais (as semanas puladas não contam)
+  nome: string;
+  captIni: Date; // 00h00 do primeiro dia de captação
+  captFim: Date; // 23h59 da segunda da Aula 1 (a segunda ainda é captação)
+  aulaIni: Date; // segunda 20h
+  carrinhoFim: Date; // segunda seguinte 21h
+};
+
+// Semanas puladas até 09/10/2026, usadas se a tabela de exceções não responder.
+const PULADAS_PADRAO = ["2026-09-28", "2026-10-05"];
+
+/**
+ * Calendário das turmas, gerado a cada segunda-feira (D0 = Aula 1) a partir de 21/09.
+ *  - A captação dura até 7 dias e termina às 23h59 da segunda da Aula 1.
+ *  - Ela nunca invade a segunda da turma anterior: começa na terça seguinte a ela.
+ *    Por isso a turma 2 (05/10) tem 8 dias e a turma 3 (13/10) tem 7.
+ *  - Semana pulada ou captação fora do padrão vêm de hw_ciclos_excecoes.
+ *  - Só aparecem turmas cuja captação já começou.
+ */
+export async function calendario(): Promise<CicloCal[]> {
+  const exc = await sb<{ d0: string; pular: boolean; capt_ini: string | null }[]>("hw_ciclos_excecoes?select=d0,pular,capt_ini").catch(() => null);
+  const puladas = new Set((exc ?? PULADAS_PADRAO.map((d0) => ({ d0, pular: true, capt_ini: null }))).filter((e) => e.pular).map((e) => e.d0));
+  const inicios = new Map((exc ?? []).filter((e) => e.capt_ini).map((e) => [e.d0, e.capt_ini as string]));
+  const agora = Date.now();
+  const lista: CicloCal[] = [];
+  let anterior: string | null = null;
+  for (let d0 = PRIMEIRO_D0; d0 <= brDia(new Date(agora + 30 * 86400e3)); d0 = dia(d0, 7)) {
+    if (puladas.has(d0)) continue;
+    const padrao = dia(d0, -7);
+    const iniStr = inicios.get(d0) ?? (anterior && dia(anterior, 1) > padrao ? dia(anterior, 1) : padrao);
+    const captIni = em(iniStr, "00:00");
+    if (captIni.getTime() > agora) break;
+    const indice = lista.length + 1;
+    lista.push({
+      d0,
+      indice,
+      nome: `Turma ${indice} · ${dm(d0)}`,
+      captIni,
+      captFim: new Date(em(dia(d0, 1), "00:00").getTime() - 1),
+      aulaIni: em(d0, "20:00"),
+      carrinhoFim: em(dia(d0, 7), "21:00"),
+    });
+    anterior = d0;
+  }
+  return lista;
 }
 
-function nomeCiclo(d0: string, i: number) {
-  return `Turma ${i + 1} · ${dm(d0)}`;
+/** Quais turmas estão vivas agora: em captação, em aula ou carrinho, ou as duas ao mesmo tempo. */
+export async function listarCiclos(): Promise<{ cal: CicloCal[]; atual: string; captacao: string | null; aula: string | null }> {
+  const cal = await calendario();
+  const t = Date.now();
+  const ultima = <T,>(xs: T[]) => (xs.length ? xs[xs.length - 1] : null);
+  const cap = ultima(cal.filter((c) => t >= c.captIni.getTime() && t <= c.captFim.getTime()));
+  const aula = ultima(cal.filter((c) => t >= c.aulaIni.getTime() && t < c.carrinhoFim.getTime()));
+  const atual = (cap ?? aula ?? ultima(cal))?.d0 ?? PRIMEIRO_D0;
+  return { cal, atual, captacao: cap?.d0 ?? null, aula: aula?.d0 ?? null };
 }
 
 function faseDo(d0: string, agora: Date): { fase: Fase; proximo: { rotulo: string; quando: string } | null } {
@@ -159,7 +200,7 @@ async function lerMeta(since: string, until: string, comAnuncios: boolean) {
         `${base}&level=ad&filtering=${filt}&fields=ad_id,ad_name,spend,impressions,inline_link_clicks,ctr,actions,video_p75_watched_actions&limit=300`,
       ),
       meta(
-        `act_${AD_ACCOUNT}/ads?filtering=${filt}&fields=id,name,effective_status,created_time,creative%7Bthumbnail_url.thumbnail_width(400).thumbnail_height(400),image_url%7D&limit=300`,
+        `act_${AD_ACCOUNT}/ads?filtering=${filt}&fields=id,name,effective_status,created_time,creative.thumbnail_width(600).thumbnail_height(600)%7Bthumbnail_url,image_url%7D&limit=300`,
       ),
     );
   }
@@ -170,24 +211,22 @@ async function lerMeta(since: string, until: string, comAnuncios: boolean) {
 // ============================================================
 // MONTAGEM
 // ============================================================
-export async function montar(d0: string, opts: { leve?: boolean } = {}): Promise<Dados> {
+export async function montar(pedido: string, opts: { leve?: boolean; cal?: CicloCal[] } = {}): Promise<Dados> {
   const agora = new Date();
-  const { atual, ciclos } = await listarCiclos();
-  if (!ciclos.includes(d0)) {
-    ciclos.push(d0);
-    ciclos.sort();
-  }
-  const idx = ciclos.indexOf(d0);
-  const prev = idx > 0 ? ciclos[idx - 1] : null;
+  const cal = opts.cal ?? (await calendario());
+  const ciclo = cal.find((c) => c.d0 === pedido) ?? cal[cal.length - 1];
+  if (!ciclo) throw new Error("nenhuma turma com captação iniciada");
+  const d0 = ciclo.d0;
+  const idx = ciclo.indice - 1;
 
-  const captIni = prev ? em(prev, "20:00") : new Date(INICIO_VENDAS);
-  const captFim = em(d0, "20:00");
+  const captIni = ciclo.captIni;
+  const captFim = ciclo.captFim;
   const carrinhoAbre = em(dia(d0, 7), "06:50");
   const carrinhoFecha = em(dia(d0, 7), "21:00");
+  // o carrinho só fica aberto na segunda: as vendas da Formação vão da apresentação até o fim dessa segunda
   const backendIni = em(dia(d0, 6), "20:00");
-  const backendFim = em(dia(d0, 14), "00:00");
+  const backendFim = em(dia(d0, 8), "00:00");
   const { fase, proximo } = faseDo(d0, agora);
-  void atual;
 
   // ---------- leituras do banco em paralelo ----------
   const prodIds: string[] = [PRODUTOS.ingresso, ...PRODUTOS.bumps.map((b) => b.id)];
@@ -201,6 +240,9 @@ export async function montar(d0: string, opts: { leve?: boolean } = {}): Promise
     : process.env.HW_PRODUTO_FORMACAO || null;
   if (produtoBackend) prodIds.push(produtoBackend);
 
+  // O histórico inteiro é carregado de propósito: a Hotmart manda PURCHASE_COMPLETE 7 dias depois
+  // da aprovação (fim da garantia). Sem a aprovação original na lista, a compra antiga pareceria
+  // uma venda nova e entraria na turma errada.
   const desde = new Date(captIni.getTime() - 86400e3).toISOString();
   const selCompra =
     "transacao,evento,produto_id,email,valor,criado_em,origem:payload->data->purchase->origin,comissoes:payload->data->commissions,pagamento:payload->data->purchase->payment->>type,email_membro:payload->data->user->>email";
@@ -208,12 +250,12 @@ export async function montar(d0: string, opts: { leve?: boolean } = {}): Promise
 
   const [compras, mats, interesse, grupos, disparos] = await Promise.all([
     sb<Compra[]>(
-      `hotmart_compras?select=${selCompra}&produto_id=in.(${prodIds.join(",")})&criado_em=gte.${encodeURIComponent(desde)}&order=criado_em.asc&limit=10000`,
+      `hotmart_compras?select=${selCompra}&produto_id=in.(${prodIds.join(",")})&order=criado_em.asc&limit=10000`,
     ).catch((e) => {
       fontes.hotmart = { ok: false, erro: String(e.message || e) };
       return [] as Compra[];
     }),
-    sb<{ email: string }[]>(`hermes_week_matriculas?ciclo=eq.${d0}&select=email`).catch(() => []),
+    sb<{ email: string }[]>(`hermes_week_matriculas?select=email&criado_em=gte.${encodeURIComponent(desde)}`).catch(() => []),
     sb<{ email: string; tag: string; criado_em: string }[]>(
       `crm_week_status?select=email,tag,criado_em&criado_em=gte.${encodeURIComponent(em(dia(d0, 3), "00:00").toISOString())}&criado_em=lt.${encodeURIComponent(em(dia(d0, 7), "21:00").toISOString())}`,
     ).catch(() => []),
@@ -563,9 +605,13 @@ export async function montar(d0: string, opts: { leve?: boolean } = {}): Promise
   // ============================================================
   // FICHAS
   // ============================================================
-  const matEmails = new Set(mats.map((x) => (x.email || "").toLowerCase()));
+  // a ficha é da turma de quem comprou o ingresso nela; o campo `ciclo` da tabela depende de quando o Alfred vira a data
+  const matEmails = new Set(mats.map((x) => (x.email || "").toLowerCase()).filter((e) => emailsIngresso.has(e)));
   const intEmails = new Map<string, string>();
-  for (const r of interesse) intEmails.set((r.email || "").toLowerCase(), (r.tag || "").toUpperCase());
+  for (const r of interesse) {
+    const e = (r.email || "").toLowerCase();
+    if (emailsIngresso.has(e)) intEmails.set(e, (r.tag || "").toUpperCase());
+  }
   const tags = [...intEmails.values()];
   const presA4 = manual.presenca_a4 ?? null;
   const fichas: Dados["fichas"] = {
@@ -697,17 +743,19 @@ export async function montar(d0: string, opts: { leve?: boolean } = {}): Promise
     geradoEm: agora.toISOString(),
     ciclo: {
       d0,
-      nome: nomeCiclo(d0, idx),
-      indice: idx + 1,
+      nome: ciclo.nome,
+      indice: ciclo.indice,
       captIni: captIni.toISOString(),
       captFim: captFim.toISOString(),
       pitch: em(dia(d0, 6), "20:00").toISOString(),
+      emCaptacao: agora >= captIni && agora <= captFim,
+      emAula: agora >= ciclo.aulaIni && agora < ciclo.carrinhoFim,
       carrinhoAbre: carrinhoAbre.toISOString(),
       carrinhoFecha: carrinhoFecha.toISOString(),
       fase,
       proximo,
     },
-    ciclos: ciclos.map((c, i) => ({ d0: c, nome: nomeCiclo(c, i) })),
+    ciclos: cal.map((c) => ({ d0: c.d0, nome: c.nome, indice: c.indice })),
     fontes,
     manual,
     trafego,
@@ -797,16 +845,16 @@ function ler(d: Dados): Leitura[] {
     const obs = `Só o que o anúncio trouxe (${t.vendasPagas} ingressos + bumps deles). Com a bio junto: ${(v.roas ?? 0).toFixed(2).replace(".", ",")}.`;
     const c = avaliar(REGUAS.roas_captacao, r);
     if (c === "vermelho") L.push({ nivel: "ruim", area: "Tráfego", titulo: `ROAS do anúncio em ${rs}`, texto: `Abaixo de 1: o ingresso não está pagando o tráfego. ${obs}`, acao: "Nunca escale prejuízo. Olhe primeiro o criativo, depois a página." });
-    else if (c === "amarelo") L.push({ nivel: "atencao", area: "Tráfego", titulo: `ROAS do anúncio em ${rs}, abaixo do piso de 1,25`, texto: `O piso do Tabari cobre imposto e taxa a partir de 1,25. ${obs}`, acao: "Uma otimização por semana: comece pelo criativo." });
+    else if (c === "amarelo") L.push({ nivel: "atencao", area: "Tráfego", titulo: `ROAS do anúncio em ${rs}, abaixo do piso de 1,25`, texto: `O piso do método cobre imposto e taxa a partir de 1,25. ${obs}`, acao: "Uma otimização por semana: comece pelo criativo." });
     else if (r >= 1.8) L.push({ nivel: "bom", area: "Tráfego", titulo: `ROAS do anúncio em ${rs}: hora de escalar`, texto: `Acima de 1,8 o método manda duplicar a campanha. ${obs}`, acao: "Duplique e escale na cópia. Não mexa no original." });
     else L.push({ nivel: "bom", area: "Tráfego", titulo: `ROAS do anúncio em ${rs}`, texto: `Acima do piso de 1,25. ${obs}` });
   }
-  if (t.verbaDia !== null && t.verbaDia < 100) L.push({ nivel: "atencao", area: "Tráfego", titulo: `Verba média de ${brl(t.verbaDia)}/dia`, texto: "O mínimo do Tabari é R$100/dia por campanha.", acao: "Abaixo disso a Meta não acha comprador de ingresso." });
+  if (t.verbaDia !== null && t.verbaDia < 100) L.push({ nivel: "atencao", area: "Tráfego", titulo: `Verba média de ${brl(t.verbaDia)}/dia`, texto: "O mínimo do método é R$100/dia por campanha.", acao: "Abaixo disso a Meta não acha comprador de ingresso." });
   if (t.connect !== null && t.cliquesLink > 100 && t.connect < 70) L.push({ nivel: "ruim", area: "Página", titulo: `Connect rate de ${p(t.connect)}`, texto: "De quem clica, menos de 70% vê a página. O problema não é o criativo.", acao: "Verifique velocidade e o redirecionamento da página." });
-  if (t.convPagina !== null && t.lpv >= 300 && t.convPagina < 3) L.push({ nivel: "ruim", area: "Página", titulo: `Página convertendo ${p(t.convPagina)}`, texto: `Meta 5%. ${t.lpv} visitas pagas ${t.lpv < 5000 ? "(ainda abaixo das 5.000 que o Tabari pede pra julgar)" : ""}.`, acao: "Teste 2 páginas novas por semana." });
-  if (t.frequencia !== null && t.frequencia < 3 && t.gasto > 200) L.push({ nivel: "info", area: "Tráfego", titulo: `Frequência ${t.frequencia.toFixed(1).replace(".", ",")}`, texto: "O Tabari busca acima de 5: são ~11 contatos antes de comprar.", acao: "Normal no começo. Se a escala travar, é a distribuição de conteúdo que sobe a frequência." });
-  if (t.distribuicaoPct === null && t.gasto > 0) L.push({ nivel: "atencao", area: "Tráfego", titulo: "Verba de distribuição não lançada", texto: "O Tabari põe 10-25% da verba em distribuir conteúdo. Desligar derrubou 30% da escala e 2 pontos de conversão.", acao: "Lance o gasto do impulsionamento em Lançar números." });
-  else if (t.distribuicaoPct !== null && (t.distribuicaoPct < 10 || t.distribuicaoPct > 25)) L.push({ nivel: "atencao", area: "Tráfego", titulo: `Distribuição em ${p(t.distribuicaoPct)} da verba`, texto: "A faixa do Tabari é 10% a 25%.", acao: "Ajuste 5 pontos por semana até achar o equilíbrio." });
+  if (t.convPagina !== null && t.lpv >= 300 && t.convPagina < 3) L.push({ nivel: "ruim", area: "Página", titulo: `Página convertendo ${p(t.convPagina)}`, texto: `Meta 5%. ${t.lpv} visitas pagas ${t.lpv < 5000 ? "(ainda abaixo das 5.000 que o método pede pra julgar)" : ""}.`, acao: "Teste 2 páginas novas por semana." });
+  if (t.frequencia !== null && t.frequencia < 3 && t.gasto > 200) L.push({ nivel: "info", area: "Tráfego", titulo: `Frequência ${t.frequencia.toFixed(1).replace(".", ",")}`, texto: "O método busca acima de 5: são ~11 contatos antes de comprar.", acao: "Normal no começo. Se a escala travar, é a distribuição de conteúdo que sobe a frequência." });
+  if (t.distribuicaoPct === null && t.gasto > 0) L.push({ nivel: "atencao", area: "Tráfego", titulo: "Verba de distribuição não lançada", texto: "O método põe 10-25% da verba em distribuir conteúdo. Desligar derrubou 30% da escala e 2 pontos de conversão.", acao: "Lance o gasto do impulsionamento em Lançar números." });
+  else if (t.distribuicaoPct !== null && (t.distribuicaoPct < 10 || t.distribuicaoPct > 25)) L.push({ nivel: "atencao", area: "Tráfego", titulo: `Distribuição em ${p(t.distribuicaoPct)} da verba`, texto: "A faixa do método é 10% a 25%.", acao: "Ajuste 5 pontos por semana até achar o equilíbrio." });
 
   // criativos
   const dinheiroParado = d.criativos.filter((c) => c.impressoes >= IMPRESSOES_MIN_JULGAR && c.vendas === 0 && c.status === "ACTIVE");
@@ -815,11 +863,11 @@ function ler(d: Dados): Leitura[] {
   if (dinheiroParado.length && total > 0) L.push({ nivel: gastoParado / total > 0.4 ? "ruim" : "atencao", area: "Criativos", titulo: `${dinheiroParado.length} anúncios ativos sem venda`, texto: `Queimaram ${brl(gastoParado)} (${p((gastoParado / total) * 100)} da verba) já com volume pra julgar.`, acao: "Quem tá ruim sai. Puxe a verba pros campeões e faça variações de gancho deles." });
   const campeoes = d.criativos.filter((c) => c.veredito.rotulo === "Campeão" || c.veredito.rotulo === "Vendendo");
   if (campeoes.length) L.push({ nivel: "bom", area: "Criativos", titulo: `${campeoes.length} criativo${campeoes.length > 1 ? "s" : ""} vendendo`, texto: campeoes.slice(0, 3).map((c) => `${c.nome} (${c.vendas})`).join(" · "), acao: "1-2 campeões trazem 80% do resultado. Grave 5-10 hooks novos sobre eles." });
-  if (d.batelada.ativos > 0 && d.batelada.ativos < 15) L.push({ nivel: "atencao", area: "Criativos", titulo: `${d.batelada.ativos} criativos ativos`, texto: `A batelada do Tabari é 15 (5 estáticos, 5 vídeos, 5 carrosséis). Hoje: ${d.batelada.estatico} est · ${d.batelada.video} vid · ${d.batelada.carrossel} car.` });
-  if (d.batelada.novos7d < 5 && f === "captacao") L.push({ nivel: "atencao", area: "Criativos", titulo: `${d.batelada.novos7d} criativos novos em 7 dias`, texto: "O Tabari sobe 5 a 10 hooks novos por semana sobre os corpos validados." });
+  if (d.batelada.ativos > 0 && d.batelada.ativos < 15) L.push({ nivel: "atencao", area: "Criativos", titulo: `${d.batelada.ativos} criativos ativos`, texto: `A batelada do método é 15 (5 estáticos, 5 vídeos, 5 carrosséis). Hoje: ${d.batelada.estatico} est · ${d.batelada.video} vid · ${d.batelada.carrossel} car.` });
+  if (d.batelada.novos7d < 5 && f === "captacao") L.push({ nivel: "atencao", area: "Criativos", titulo: `${d.batelada.novos7d} criativos novos em 7 dias`, texto: "O método sobe 5 a 10 hooks novos por semana sobre os corpos validados." });
 
   // bumps
-  for (const b of v.bumps) if (v.ingressos >= 20 && b.take !== null && b.take < 30) L.push({ nivel: "atencao", area: "Vendas", titulo: `Bump "${b.nome}" com ${p(b.take)} de take`, texto: "Abaixo de 30% depois de 20 vendas (régua do squad)." });
+  for (const b of v.bumps) if (v.ingressos >= 20 && b.take !== null && b.take < 30) L.push({ nivel: "atencao", area: "Vendas", titulo: `Bump "${b.nome}" com ${p(b.take)} de take`, texto: "Abaixo de 30% depois de 20 vendas (referência complementar)." });
   if (v.pendentes > 0) L.push({ nivel: "info", area: "Vendas", titulo: `${v.pendentes} Pix/boleto gerado e não pago`, texto: "Pix não dispara bump nem upsell sozinho.", acao: "Recupere pelo WhatsApp em 15-40 min." });
 
   // grupo e fichas
@@ -835,7 +883,7 @@ function ler(d: Dados): Leitura[] {
   const a1 = d.aulas[0];
   if (a1.presencaPct !== null) {
     const c = avaliar(REGUAS.presenca_a1, a1.presencaPct);
-    L.push({ nivel: c === "verde" ? "bom" : c === "amarelo" ? "info" : "ruim", area: "Aulas", titulo: `Aula 1 com ${p(a1.presencaPct)} ao vivo`, texto: "O mínimo é 30% dos compradores (à noite o Tabari mede ~50%)." });
+    L.push({ nivel: c === "verde" ? "bom" : c === "amarelo" ? "info" : "ruim", area: "Aulas", titulo: `Aula 1 com ${p(a1.presencaPct)} ao vivo`, texto: "O mínimo é 30% dos compradores (à noite o método mede ~50%)." });
   } else if (["aulas", "sabado", "pitch", "carrinho", "pos"].includes(f)) {
     L.push({ nivel: "atencao", area: "Aulas", titulo: "Presença da Aula 1 não lançada", texto: "Sem esse número não dá pra ler a curva da semana.", acao: "Lance o pico ao vivo do YouTube em Lançar números." });
   }
@@ -849,10 +897,10 @@ function ler(d: Dados): Leitura[] {
     const cv = d.backend.conv;
     L.push(
       cv < 5
-        ? { nivel: "ruim", area: "Formação", titulo: `Conversão de ${p(cv)}`, texto: "Abaixo de 5% o Tabari manda jogar o evento fora.", acao: "Regrave as aulas (comece pela 4 e pela apresentação)." }
+        ? { nivel: "ruim", area: "Formação", titulo: `Conversão de ${p(cv)}`, texto: "Abaixo de 5% o método manda jogar o evento fora.", acao: "Regrave as aulas (comece pela 4 e pela apresentação)." }
         : cv < 7
           ? { nivel: "atencao", area: "Formação", titulo: `Conversão de ${p(cv)}`, texto: "Entre 5% e 7%: ainda não valida a gravação." }
-          : { nivel: "bom", area: "Formação", titulo: `Conversão de ${p(cv)}`, texto: cv >= 10 ? "Acima de 10%: o alvo do Tabari." : "Acima do piso de 7%: gravação validada." },
+          : { nivel: "bom", area: "Formação", titulo: `Conversão de ${p(cv)}`, texto: cv >= 10 ? "Acima de 10%: o alvo do método." : "Acima do piso de 7%: gravação validada." },
     );
   } else if (f === "carrinho" || f === "pos") {
     L.push({ nivel: "atencao", area: "Formação", titulo: "Vendas da Formação sem fonte", texto: "O produto ainda não está ligado ao painel.", acao: "Informe o ID do produto na Hotmart (ou as vendas) em Lançar números." });
@@ -869,7 +917,7 @@ function ler(d: Dados): Leitura[] {
   return L.sort((a, b) => ordem[a.nivel] - ordem[b.nivel]);
 }
 
-// Score de saúde (fórmula do squad: 100 − 15 por vermelho − 5 por amarelo, por área)
+// Score de saúde (fórmula complementar: 100 − 15 por vermelho − 5 por amarelo, por área)
 function saude(d: Dados): Dados["saude"] {
   const areas: Record<string, Cor[]> = {
     Tráfego: [
@@ -901,7 +949,7 @@ function saude(d: Dados): Dados["saude"] {
   return { total, areas: lista };
 }
 
-// Resumo de um ciclo para a aba Comparativo (planilha de semanas do Tabari)
+// Resumo de um ciclo para a aba Comparativo (planilha de semanas do método)
 export function resumir(d: Dados): Resumo {
   return {
     d0: d.ciclo.d0,

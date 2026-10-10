@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Info, AlertTriangle, CheckCircle2, XCircle, Lightbulb } from "lucide-react";
 import { REGUAS, avaliar, type Cor, type Regua } from "./metas";
 import type { Leitura } from "./tipos";
 
@@ -30,103 +29,102 @@ function fmtLimite(r: Regua, v: number) {
 export function metaTexto(r: Regua) {
   const p: string[] = [];
   if (r.maiorMelhor) {
-    if (r.min !== undefined) p.push(`mín ${fmtLimite(r, r.min)}`);
-    if (r.ideal !== undefined) p.push(`meta ${fmtLimite(r, r.ideal)}`);
+    if (r.min !== undefined) p.push(`mínimo ${fmtLimite(r, r.min)}`);
+    if (r.ideal !== undefined && r.ideal !== r.min) p.push(`meta ${fmtLimite(r, r.ideal)}`);
   } else {
-    if (r.ideal !== undefined) p.push(`ideal ≤ ${fmtLimite(r, r.ideal)}`);
+    if (r.ideal !== undefined) p.push(`ideal até ${fmtLimite(r, r.ideal)}`);
     if (r.max !== undefined) p.push(`teto ${fmtLimite(r, r.max)}`);
   }
   return p.join(" · ");
 }
 
-const ORIGEM = { tabari: "Tabari", squad: "Squad Turbo", red: "Decisão do Red" };
+const ORIGEM = { metodo: "Do método", squad: "Referência complementar", red: "Decisão do Red" };
 
-// ---------- ponto de semáforo ----------
 export function Ponto({ cor }: { cor: Cor }) {
-  return <span className={`pontinho ${cor}`} />;
+  return <i className={`dot ${cor}`} aria-hidden />;
 }
 
-// ---------- KPI ----------
+export function ReguaDica({ r }: { r: Regua }) {
+  return (
+    <div className="dica">
+      <b>{metaTexto(r) || "Sem número em nenhuma fonte"}</b> · {r.texto}
+      <span className="fonte">
+        {ORIGEM[r.origem]} · {r.fonte}
+      </span>
+    </div>
+  );
+}
+
+// ---------- indicador ----------
 export function Kpi({
-  icone,
-  tom = "menta",
   rotulo,
   valor,
   sub,
   regua,
   valorNum,
   spark,
+  semCard,
 }: {
-  icone: ReactNode;
-  tom?: "menta" | "azul" | "ambar" | "verm" | "roxo";
   rotulo: string;
   valor: string;
   sub?: ReactNode;
   regua?: string;
   valorNum?: number | null;
   spark?: number[];
+  semCard?: boolean;
 }) {
   const r = regua ? REGUAS[regua] : undefined;
   const cor = r ? avaliar(r, valorNum) : "neutro";
   const [aberto, setAberto] = useState(false);
-  return (
-    <div className="card kpi">
-      <div className={`kpi-ico bg-${tom}`}>{icone}</div>
-      {spark && spark.length > 1 ? <Spark valores={spark} tom={tom} /> : r ? <span className="ponto"><Ponto cor={cor} /></span> : null}
-      <div className="kpi-rot">
-        {rotulo}
-        {r && (
-          <button className="info-btn" onClick={() => setAberto(!aberto)} aria-label="Ver a régua">
-            <Info size={13} />
-          </button>
-        )}
+  const corpo = (
+    <div className="stat">
+      <div className="topo">
+        <span className="rot">
+          {rotulo}
+          {r && (
+            <button className="info-b" onClick={() => setAberto(!aberto)} aria-label={`Ver a régua de ${rotulo}`}>
+              i
+            </button>
+          )}
+        </span>
+        {r && <Ponto cor={cor} />}
       </div>
-      <div className={`kpi-val num ${r ? `cor-${cor}` : ""}`}>{valor}</div>
-      <div className="kpi-sub">
+      <div className={`v num ${r && cor !== "verde" ? `c-${cor}` : ""}`}>{valor}</div>
+      <div className="s">
         {sub}
-        {r && !aberto && <div>{metaTexto(r)}</div>}
+        {r && !aberto && <div className="meta-linha">{metaTexto(r)}</div>}
       </div>
+      {spark && spark.length > 1 && <Spark valores={spark} />}
       {r && aberto && <ReguaDica r={r} />}
     </div>
   );
+  return semCard ? corpo : <div className="card">{corpo}</div>;
 }
 
-export function ReguaDica({ r }: { r: Regua }) {
-  return (
-    <div className="dica">
-      <b>{metaTexto(r)}</b> · {r.texto}
-      <div style={{ marginTop: 4, color: "var(--grayLight)" }}>
-        {ORIGEM[r.origem]} · {r.fonte}
-      </div>
-    </div>
-  );
-}
-
-// ---------- linha de régua (meta vs realizado) ----------
+// ---------- régua (meta x realizado) ----------
 export function LinhaRegua({ chave, valor, sub, nome }: { chave: string; valor: number | null | undefined; sub?: ReactNode; nome?: string }) {
   const r = REGUAS[chave];
   const cor = avaliar(r, valor);
   const [aberto, setAberto] = useState(false);
-  // escala do trilho: até 1,5x a meta (ou o teto, quando menor é melhor)
   const alvo = r.maiorMelhor ? (r.ideal ?? r.min ?? 1) : (r.max ?? r.ideal ?? 1);
   const escala = alvo * 1.5;
-  const w = valor === null || valor === undefined ? 0 : Math.min(100, (valor / escala) * 100);
-  const corBarra = cor === "verde" ? "var(--menta)" : cor === "amarelo" ? "var(--ambar)" : cor === "vermelho" ? "var(--verm)" : "var(--grayLight)";
+  const w = valor === null || valor === undefined ? 0 : Math.max(0, Math.min(100, (valor / escala) * 100));
+  const corBarra = cor === "verde" ? "var(--ok)" : cor === "amarelo" ? "var(--warn)" : cor === "vermelho" ? "var(--bad)" : "var(--ivory3)";
   return (
-    <div className="regua-linha">
+    <div className="regua">
       <div className="regua-top">
         <div className="regua-nome">
           <Ponto cor={cor} />
           {nome || r.nome}
-          <button className="info-btn" onClick={() => setAberto(!aberto)} aria-label="Ver a régua">
-            <Info size={13} />
+          <button className="info-b" onClick={() => setAberto(!aberto)} aria-label={`Ver a régua de ${nome || r.nome}`}>
+            i
           </button>
         </div>
-        <div className={`regua-val num cor-${cor}`}>{fmtRegua(r, valor)}</div>
+        <div className={`regua-val num ${cor === "verde" ? "" : `c-${cor}`}`}>{fmtRegua(r, valor)}</div>
       </div>
       <div className="trilho">
         <i style={{ width: `${w}%`, background: corBarra }} />
-        <span className="marca-meta" style={{ left: `${(alvo / escala) * 100}%` }} />
+        <b style={{ left: `${(alvo / escala) * 100}%` }} />
       </div>
       <div className="regua-pe">
         <span>{sub}</span>
@@ -153,56 +151,47 @@ export function Bloco({ titulo, sub, acao, children, className = "" }: { titulo:
   );
 }
 
-// ---------- alerta ----------
-const NIVEL = {
-  ruim: { rot: "Problema", cls: "verm", ico: XCircle },
-  atencao: { rot: "Atenção", cls: "ambar", ico: AlertTriangle },
-  bom: { rot: "Bom", cls: "menta", ico: CheckCircle2 },
-  info: { rot: "Leitura", cls: "azul", ico: Lightbulb },
-};
+// ---------- leitura ----------
+const NIVEL = { ruim: "Problema", atencao: "Atenção", bom: "Em ordem", info: "Observação" };
 export function Alerta({ a }: { a: Leitura }) {
-  const n = NIVEL[a.nivel];
-  const Ico = n.ico;
   return (
-    <div className="alerta">
-      <div className={`ico bg-${n.cls}`}>
-        <Ico size={17} />
+    <div className={`leit ${a.nivel}`}>
+      <div className="tipo">
+        {NIVEL[a.nivel]} · {a.area}
       </div>
-      <div>
-        <div className={`tipo t-${n.cls}`}>
-          {n.rot} · {a.area}
-        </div>
-        <h4>{a.titulo}</h4>
-        <p>{a.texto}</p>
-        {a.acao && <div className="acao">→ {a.acao}</div>}
-      </div>
+      <h4>{a.titulo}</h4>
+      <p>{a.texto}</p>
+      {a.acao && <div className="acao">{a.acao}</div>}
     </div>
   );
 }
 
-// ---------- funil ----------
+// ---------- funil (livro-razão) ----------
 export function Funil({ etapas }: { etapas: { nome: string; valor: number | null; sub?: string; regua?: string; taxa?: number | null }[] }) {
   const max = Math.max(1, ...etapas.map((e) => e.valor || 0));
+  // escala logarítmica: com impressões na casa dos milhares e vendas na casa das dezenas,
+  // a escala linear apagaria todas as etapas depois da primeira
+  const larg = (v: number) => (v > 0 ? Math.max(2, (Math.log10(v + 1) / Math.log10(max + 1)) * 100) : 0);
   return (
-    <div className="funil">
+    <div>
       {etapas.map((e, i) => (
         <div key={e.nome}>
-          {i > 0 && (
-            <div className="passagem">
-              ↓ {e.taxa !== undefined && e.taxa !== null ? fP(e.taxa) : "—"} passam
+          {i > 0 && e.taxa !== undefined && (
+            <div className="razao-passa">
+              {e.taxa === null ? "sem taxa" : `${fP(e.taxa)} seguem`}
               {e.regua && <Ponto cor={avaliar(REGUAS[e.regua], e.taxa)} />}
-              {e.regua && <span style={{ color: "var(--grayLight)" }}>({metaTexto(REGUAS[e.regua])})</span>}
+              {e.regua && <span>{metaTexto(REGUAS[e.regua])}</span>}
             </div>
           )}
-          <div className="etapaF">
-            <i style={{ width: `${Math.max(2, ((e.valor || 0) / max) * 100)}%` }} />
-            <div>
+          <div className="razao-linha">
+            <div className="razao-nome">
               <b>{e.nome}</b>
               {e.sub && <small>{e.sub}</small>}
             </div>
-            <div className="dir">
-              <b className="num">{e.valor === null ? "—" : fN(e.valor)}</b>
+            <div className="razao-barra">
+              <i style={{ width: `${larg(e.valor || 0)}%` }} />
             </div>
+            <div className="razao-val num">{e.valor === null ? "—" : fN(e.valor)}</div>
           </div>
         </div>
       ))}
@@ -210,84 +199,73 @@ export function Funil({ etapas }: { etapas: { nome: string; valor: number | null
   );
 }
 
-// ---------- gráficos SVG ----------
-const COR_TOM: Record<string, string> = { menta: "#2EE6A6", azul: "#4A9BFF", ambar: "#F5A623", verm: "#FF5F52", roxo: "#A78BFA" };
+// ---------- gráficos ----------
+const CHAMP = "#cdb68a";
+const CHAMP_C = "#e4cd97";
 
-export function Spark({ valores, tom = "menta" }: { valores: number[]; tom?: string }) {
-  const w = 112,
-    h = 42;
+export function Spark({ valores }: { valores: number[] }) {
+  const w = 96,
+    h = 34;
   const max = Math.max(...valores, 1);
   const pts = valores.map((v, i) => `${(i / (valores.length - 1)) * w},${h - (v / max) * (h - 4) - 2}`);
-  const c = COR_TOM[tom] || COR_TOM.menta;
-  const id = `sp${tom}${valores.length}`;
   return (
-    <svg className="spark" width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
-      <defs>
-        <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor={c} stopOpacity="0.28" />
-          <stop offset="1" stopColor={c} stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <polygon points={`0,${h} ${pts.join(" ")} ${w},${h}`} fill={`url(#${id})`} />
-      <polyline points={pts.join(" ")} fill="none" stroke={c} strokeWidth="1.6" />
+    <svg className="spark" width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden>
+      <polyline points={pts.join(" ")} fill="none" stroke={CHAMP} strokeWidth="1" opacity="0.85" />
     </svg>
   );
 }
 
 export function Area({
   pontos,
-  tom = "menta",
   fmt = (n: number) => fN(n),
   barras,
 }: {
   pontos: { x: string; y: number }[];
-  tom?: string;
   fmt?: (n: number) => string;
   barras?: { x: string; y: number }[];
 }) {
   const [sel, setSel] = useState<number | null>(null);
   if (!pontos.length) return <div className="vazio">Sem dados no período.</div>;
-  const W = 720,
-    H = 220,
-    pl = 52,
-    pb = 24,
-    pt = 10;
-  const max = Math.max(...pontos.map((p) => p.y), ...(barras || []).map((b) => b.y), 1) * 1.1;
-  const maxB = barras ? Math.max(...barras.map((b) => b.y), 1) * 1.15 : 1;
+  const W = 760,
+    H = 240,
+    pl = 54,
+    pb = 26,
+    pt = 12;
+  const max = Math.max(...pontos.map((p) => p.y), 1) * 1.12;
+  const maxB = barras ? Math.max(...barras.map((b) => b.y), 1) * 1.2 : 1;
   const n = pontos.length;
-  const X = (i: number) => pl + (n === 1 ? (W - pl) / 2 : (i / (n - 1)) * (W - pl - 6));
+  const X = (i: number) => pl + (n === 1 ? (W - pl) / 2 : (i / (n - 1)) * (W - pl - 8));
   const Y = (v: number) => pt + (H - pt - pb) * (1 - v / max);
   const YB = (v: number) => pt + (H - pt - pb) * (1 - v / maxB);
-  const c = COR_TOM[tom] || COR_TOM.menta;
   const linha = pontos.map((p, i) => `${X(i)},${Y(p.y)}`).join(" ");
-  const id = `ar${tom}`;
-  const passo = Math.max(1, Math.ceil(n / 8));
+  const passo = Math.max(1, Math.ceil(n / 9));
+  const tx = sel !== null ? Math.min(X(sel) + 12, W - 160) : 0;
   return (
     <svg className="graf" viewBox={`0 0 ${W} ${H}`} onMouseLeave={() => setSel(null)}>
       <defs>
-        <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor={c} stopOpacity="0.3" />
-          <stop offset="1" stopColor={c} stopOpacity="0" />
+        <linearGradient id="hwArea" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor={CHAMP} stopOpacity="0.22" />
+          <stop offset="1" stopColor={CHAMP} stopOpacity="0" />
         </linearGradient>
       </defs>
       {[0, 0.5, 1].map((f) => (
         <g key={f}>
-          <line x1={pl} x2={W} y1={Y(max * f)} y2={Y(max * f)} stroke="rgba(255,255,255,.06)" />
-          <text x={pl - 8} y={Y(max * f) + 3} textAnchor="end">
+          <line x1={pl} x2={W} y1={Y(max * f)} y2={Y(max * f)} stroke="rgba(236,230,216,.07)" />
+          <text x={pl - 10} y={Y(max * f) + 3} textAnchor="end">
             {fmt(max * f)}
           </text>
         </g>
       ))}
       {barras?.map((b, i) => {
-        const bw = Math.max(4, ((W - pl) / n) * 0.45);
-        return <rect key={i} x={X(i) - bw / 2} y={YB(b.y)} width={bw} height={H - pb - YB(b.y)} rx="3" fill="#4A9BFF" opacity="0.55" />;
+        const bw = Math.max(3, ((W - pl) / n) * 0.34);
+        return <rect key={i} x={X(i) - bw / 2} y={YB(b.y)} width={bw} height={Math.max(0, H - pb - YB(b.y))} fill="#ece6d8" opacity="0.5" />;
       })}
-      <polygon points={`${X(0)},${H - pb} ${linha} ${X(n - 1)},${H - pb}`} fill={`url(#${id})`} />
-      <polyline points={linha} fill="none" stroke={c} strokeWidth="2" />
+      <polygon points={`${X(0)},${H - pb} ${linha} ${X(n - 1)},${H - pb}`} fill="url(#hwArea)" />
+      <polyline points={linha} fill="none" stroke={CHAMP} strokeWidth="1.5" />
       {pontos.map((p, i) => (
         <g key={i}>
           {i % passo === 0 && (
-            <text x={X(i)} y={H - 6} textAnchor="middle">
+            <text x={X(i)} y={H - 7} textAnchor="middle">
               {p.x}
             </text>
           )}
@@ -296,17 +274,17 @@ export function Area({
       ))}
       {sel !== null && (
         <g>
-          <line x1={X(sel)} x2={X(sel)} y1={pt} y2={H - pb} stroke={c} strokeDasharray="3 3" opacity="0.6" />
-          <circle cx={X(sel)} cy={Y(pontos[sel].y)} r="4" fill={c} />
-          <rect x={Math.min(X(sel) + 8, W - 150)} y={pt} width="142" height={barras ? 46 : 32} rx="8" fill="#161D1A" stroke="rgba(255,255,255,.12)" />
-          <text x={Math.min(X(sel) + 18, W - 140)} y={pt + 14} style={{ fill: "#8B968F" }}>
+          <line x1={X(sel)} x2={X(sel)} y1={pt} y2={H - pb} stroke={CHAMP_C} strokeDasharray="2 4" opacity="0.6" />
+          <circle cx={X(sel)} cy={Y(pontos[sel].y)} r="3.5" fill={CHAMP_C} />
+          <rect x={tx} y={pt} width="148" height={barras ? 54 : 40} fill="#101012" stroke="rgba(236,230,216,.18)" />
+          <text x={tx + 12} y={pt + 16} style={{ fill: "#6d685d", fontSize: 9, letterSpacing: "0.12em" }}>
             {pontos[sel].x}
           </text>
-          <text x={Math.min(X(sel) + 18, W - 140)} y={pt + 27} style={{ fill: "#E9EFEC", fontWeight: 700, fontSize: 11 }}>
+          <text x={tx + 12} y={pt + 32} style={{ fill: "#ece6d8", fontSize: 14, fontFamily: "Bodoni Moda, serif" }}>
             {fmt(pontos[sel].y)}
           </text>
           {barras && (
-            <text x={Math.min(X(sel) + 18, W - 140)} y={pt + 40} style={{ fill: "#4A9BFF", fontSize: 11 }}>
+            <text x={tx + 12} y={pt + 47} style={{ fill: "#a6a092", fontSize: 10 }}>
               {fN(barras[sel]?.y)} ingressos
             </text>
           )}
@@ -316,28 +294,40 @@ export function Area({
   );
 }
 
-export function Barras({ itens, tom = "menta", fmt = (n: number) => fN(n), destaque }: { itens: { x: string; y: number; meta?: number | null }[]; tom?: string; fmt?: (n: number) => string; destaque?: (i: number) => boolean }) {
+export function Barras({ itens, fmt = (n: number) => fN(n), destaque }: { itens: { x: string; y: number; meta?: number | null }[]; fmt?: (n: number) => string; destaque?: (i: number) => boolean }) {
   if (!itens.length) return <div className="vazio">Sem dados.</div>;
-  const W = 720,
-    H = 200,
-    pb = 24,
-    pt = 16;
+  const W = 760,
+    H = 210,
+    pb = 26,
+    pt = 22;
   const max = Math.max(...itens.map((i) => Math.max(i.y, i.meta || 0)), 1) * 1.15;
-  const bw = ((W - 10) / itens.length) * 0.6;
+  const bw = Math.min(44, ((W - 10) / itens.length) * 0.5);
   const X = (i: number) => 5 + ((W - 10) / itens.length) * (i + 0.5);
   const Y = (v: number) => pt + (H - pt - pb) * (1 - v / max);
-  const c = COR_TOM[tom] || COR_TOM.menta;
   return (
     <svg className="graf" viewBox={`0 0 ${W} ${H}`}>
+      <defs>
+        <linearGradient id="hwBar" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="#ece6d8" stopOpacity="0.92" />
+          <stop offset="1" stopColor="#ece6d8" stopOpacity="0.28" />
+        </linearGradient>
+        <linearGradient id="hwBarB" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="#e4cd97" />
+          <stop offset="1" stopColor="#a98e57" stopOpacity="0.5" />
+        </linearGradient>
+      </defs>
+      <line x1="0" x2={W} y1={H - pb} y2={H - pb} stroke="rgba(236,230,216,.12)" />
       {itens.map((it, i) => (
         <g key={i}>
-          <rect x={X(i) - bw / 2} y={Y(it.y)} width={bw} height={Math.max(0, H - pb - Y(it.y))} rx="4" fill={c} opacity={destaque && !destaque(i) ? 0.35 : 0.85} />
-          {it.meta !== undefined && it.meta !== null && <line x1={X(i) - bw / 2 - 4} x2={X(i) + bw / 2 + 4} y1={Y(it.meta)} y2={Y(it.meta)} stroke="#E9EFEC" strokeWidth="2" strokeDasharray="4 3" opacity="0.7" />}
-          <text x={X(i)} y={Y(it.y) - 5} textAnchor="middle" style={{ fill: "#E9EFEC", fontSize: 11 }}>
+          <rect x={X(i) - bw / 2} y={Y(it.y)} width={bw} height={Math.max(0, H - pb - Y(it.y))} fill={destaque && destaque(i) ? "url(#hwBarB)" : "url(#hwBar)"} opacity={destaque && !destaque(i) ? 0.55 : 1} />
+          {it.meta !== undefined && it.meta !== null && (
+            <line x1={X(i) - bw / 2 - 6} x2={X(i) + bw / 2 + 6} y1={Y(it.meta)} y2={Y(it.meta)} stroke="#e4cd97" strokeWidth="1.2" strokeDasharray="3 3" />
+          )}
+          <text x={X(i)} y={Y(it.y) - 7} textAnchor="middle" style={{ fill: "#ece6d8", fontSize: 12, fontFamily: "Bodoni Moda, serif" }}>
             {it.y ? fmt(it.y) : ""}
           </text>
           {(itens.length <= 14 || i % 2 === 0) && (
-            <text x={X(i)} y={H - 6} textAnchor="middle">
+            <text x={X(i)} y={H - 8} textAnchor="middle">
               {it.x}
             </text>
           )}
@@ -350,11 +340,7 @@ export function Barras({ itens, tom = "menta", fmt = (n: number) => fN(n), desta
 export function Calor({ matriz }: { matriz: number[][] }) {
   const dias = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
   const max = Math.max(1, ...matriz.flat());
-  const cor = (v: number) => {
-    if (!v) return "var(--elevado)";
-    const t = v / max;
-    return `rgba(46,230,166,${0.18 + t * 0.82})`;
-  };
+  const cor = (v: number) => (v ? `rgba(228,205,151,${0.2 + (v / max) * 0.8})` : "rgba(236,230,216,.04)");
   return (
     <div>
       <div className="calor">
@@ -365,18 +351,19 @@ export function Calor({ matriz }: { matriz: number[][] }) {
           </span>
         ))}
         {matriz.map((linha, d) => (
-          <FragmentoLinha key={d} rot={dias[d]} linha={linha} cor={cor} />
+          <Linha key={d} rot={dias[d]} linha={linha} cor={cor} />
         ))}
       </div>
       <div className="legenda">
         <span>
-          menos <i style={{ background: "linear-gradient(90deg,#161D1A,#1b7a5c,#2EE6A6)", width: 80 }} /> mais vendas
+          <i style={{ background: "linear-gradient(90deg, rgba(228,205,151,.2), #e4cd97)", width: 70 }} />
+          menos vendas, mais vendas
         </span>
       </div>
     </div>
   );
 }
-function FragmentoLinha({ rot, linha, cor }: { rot: string; linha: number[]; cor: (v: number) => string }) {
+function Linha({ rot, linha, cor }: { rot: string; linha: number[]; cor: (v: number) => string }) {
   return (
     <>
       <span style={{ alignSelf: "center" }}>{rot}</span>

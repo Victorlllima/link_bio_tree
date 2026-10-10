@@ -25,6 +25,8 @@ export interface CicloInfo {
   pitch: string;
   carrinhoAbre: string;
   carrinhoFecha: string;
+  emCaptacao: boolean; // hoje está entre o início e o fim (23h59 da segunda) da captação
+  emAula: boolean; // hoje está entre a Aula 1 e o fechamento do carrinho
   fase: Fase;
   proximo: { rotulo: string; quando: string } | null;
 }
@@ -115,7 +117,7 @@ export interface Resumo {
 export interface Dados {
   geradoEm: string;
   ciclo: CicloInfo;
-  ciclos: { d0: string; nome: string }[];
+  ciclos: { d0: string; nome: string; indice: number }[];
   fontes: { meta: Fonte; hotmart: Fonte; evolution: Fonte };
   manual: Record<string, number>;
   trafego: {
