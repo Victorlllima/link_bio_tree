@@ -6,6 +6,7 @@ import { confirmarEmail, emailBoasVindas } from "@/lib/mensagens-crmweek";
 import { emailConfirmacao as emailConfirmacaoHermesWeek, emailBoasVindas as emailBoasVindasHermesWeek, emailRecuperacao as emailRecuperacaoHermesWeek } from "@/lib/mensagens-hermesweek";
 import { lerCicloAtual } from "@/lib/ciclo-atual";
 import { enfileirar } from "@/lib/wpp-fila";
+import { BUMPS_HERMES_WEEK, eventoCapi, type EventoCapi } from "@/lib/capi-eventos";
 
 /**
  * Webhook da Hotmart — hub de pós-compra.
@@ -86,7 +87,16 @@ async function gravar(row: Record<string, unknown>) {
 }
 
 // event_id = transação da Hotmart → a Meta deduplica contra o Purchase do pixel no browser.
-async function metaCapi(email: string, nome: string, fone: string, valor: number, moeda: string, eventId: string) {
+async function metaCapi(
+    email: string,
+    nome: string,
+    fone: string,
+    valor: number,
+    moeda: string,
+    eventId: string,
+    evento: EventoCapi = "Purchase",
+    produto?: { id: string; nome: string },
+) {
     // Nome da var alinhado com /api/meta-capi, que já roda em produção.
     const token = process.env.META_CAPI_ACCESS_TOKEN || process.env.META_CAPI_TOKEN;
     const pixel = PIXEL_ID;
@@ -104,12 +114,17 @@ async function metaCapi(email: string, nome: string, fone: string, valor: number
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 data: [{
-                    event_name: "Purchase",
+                    event_name: evento,
                     event_time: Math.floor(Date.now() / 1000),
                     action_source: "website",
                     event_id: eventId,
                     user_data,
-                    custom_data: { value: valor, currency: moeda },
+                    // Purchase mantém exatamente o custom_data de sempre. O bump (OrderBump) leva
+                    // também o produto, para dar para separar no Events Manager.
+                    custom_data:
+                        evento === "OrderBump" && produto
+                            ? { value: valor, currency: moeda, content_name: produto.nome, content_ids: [produto.id], content_type: "product" }
+                            : { value: valor, currency: moeda },
                 }],
             }),
         });
@@ -389,12 +404,16 @@ export async function POST(req: NextRequest) {
         // evento de compra falso envenena justamente o sinal que a campanha usa
         // pra otimizar. O CAPI agora só dispara pra produto que existe no mapa.
         const produtoConhecido = Boolean(PRODUTOS[produtoId]);
+        // Order bump (oferta adicional): o comprador já entrou na audiência pelo ingresso e já
+        // recebeu os e-mails. Aqui não há nada para inscrever nem para mandar.
+        const ehAdicional = BUMPS_HERMES_WEEK.has(produtoId);
+        const nomeEventoCapi = eventoCapi(produtoId);
 
         const [capi, lista, wpp, mail] = await Promise.all([
             produtoConhecido
-                ? metaCapi(email, nome, fone, valor, moeda, transacao)
+                ? metaCapi(email, nome, fone, valor, moeda, transacao, nomeEventoCapi, { id: produtoId, nome: produtoNome })
                 : Promise.resolve({ ok: true as const }),
-            resend(email, nome, produtoId),
+            ehAdicional ? Promise.resolve({ ok: true as const }) : resend(email, nome, produtoId),
             enviarWpp
                 ? enviarMensagem(fone, confirmarEmail(nome, email, fone))
                 : Promise.resolve(null),
@@ -462,32 +481,30 @@ export async function POST(req: NextRequest) {
             ].filter(Boolean).join("\n"));
         }
 
-        // Sem telefone no ingresso o comprador fica órfão da mensageria — precisa
-        // aparecer no alerta, senão passa despercebido até o dia da aula.
-        const statusWpp = !ehIngresso
-            ? ""
-            : !fone
-                ? " · 🔴 WhatsApp: comprador SEM telefone"
-                : wpp?.ok
-                    ? " · ✅ WhatsApp"
-                    : " · ⚠️ WhatsApp falhou";
-
-        // O e-mail 2 é AGENDADO pra D+1 09h BRT, não enviado agora — o texto precisa
-        // dizer isso, senão o Red procura na caixa de entrada uma coisa que só sai amanhã.
-        const statusEmailHW = !ehHermesWeek
-            ? ""
-            : ` · ${mailHW1?.ok ? "✅" : "⚠️"} e-mail 1 · ${mailHW2?.ok ? `🗓️ e-mail 2 agendado ${(mailHW2 as { agendado_para?: string }).agendado_para ?? "D+1"}` : "⚠️ e-mail 2 não agendou"}`;
-
-        await telegram([
-            `💰 *VENDA — ${produtoNome}*`,
-            "",
-            `👤 ${nome}`,
-            `📧 ${email}`,
-            fone ? `📱 ${fone}` : "",
-            `💵 ${moeda} ${valor.toFixed(2)}`,
-            "",
-            `${gravou.ok ? "✅" : "⚠️"} banco · ${capi.ok ? "✅" : "⚠️"} Meta CAPI · ${lista.ok ? "✅" : "⚠️"} Resend${statusWpp}${ehIngresso ? ` · ${mail?.ok ? "✅" : "⚠️"} e-mail` : ""}${statusEmailHW}`,
-        ].filter(Boolean).join("\n"));
+        /* O aviso de cada venda no Telegram saiu em 09/10/2026 (Red): a Hotmart já avisa, e o
+         * aviso repetido chegava 4 vezes por pedido com bump. Só sobra o alerta de falha:
+         * se o banco, o CAPI, o Resend ou um e-mail do pós-compra falhar, ninguém fica no escuro. */
+        const audienciaMapeada = Boolean(AUDIENCIA_POR_PRODUTO[produtoId]);
+        const falhas: string[] = [];
+        if (!gravou.ok) falhas.push("não gravou no banco");
+        if (!capi.ok) falhas.push(`Meta CAPI: ${"erro" in capi ? capi.erro : "falhou"}`);
+        if (!lista.ok && audienciaMapeada) falhas.push(`Resend (audiência): ${"erro" in lista ? lista.erro : "falhou"}`);
+        if (ehIngresso && mail && !mail.ok) falhas.push("e-mail de boas-vindas");
+        if (ehHermesWeek && !mailHW1?.ok) falhas.push("e-mail 1 da Hermes Week (confirmação)");
+        if (ehHermesWeek && !mailHW2?.ok) falhas.push("e-mail 2 da Hermes Week (não agendou)");
+        if (falhas.length) {
+            await telegram(
+                [
+                    `⚠️ *Pós-compra com falha* — ${produtoNome}`,
+                    "",
+                    `👤 ${nome || "—"}`,
+                    `📧 ${email || "—"}`,
+                    `💵 ${moeda} ${valor.toFixed(2)}`,
+                    "",
+                    ...falhas.map((f) => `• ${f}`),
+                ].join("\n"),
+            );
+        }
 
         return NextResponse.json({
             ok: true, evento, gravou: gravou.ok, capi: capi.ok, resend: lista.ok,
