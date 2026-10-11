@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshCw, Eye, EyeOff } from "lucide-react";
 import "./painel.css";
-import type { Dados, Resumo } from "./tipos";
-import { REGUAS, REGRAS_OURO, avaliar } from "./metas";
+import type { Dados, Resumo, RespInvestidor, LinhaInvestidor, BaseSimulador } from "./tipos";
+import { REGUAS, REGRAS_OURO, avaliar, PRECO_INGRESSO, PRODUTOS, ROAS_ESCALA, PASSO_MAX_VERBA } from "./metas";
 import { Kpi, LinhaRegua, Bloco, Alerta, Funil, Area, Barras, Calor, Ponto, ReguaDica, fN, fR, fP, fX, metaTexto } from "./ui";
 
-type Aba = "geral" | "trafego" | "criativos" | "vendas" | "grupo" | "aulas" | "formacao" | "financeiro" | "comparativo" | "lancar" | "reguas";
+type Aba = "geral" | "trafego" | "criativos" | "vendas" | "grupo" | "aulas" | "formacao" | "financeiro" | "investidor" | "comparativo" | "lancar" | "reguas";
 
 const NAV: { id: Aba; rot: string; sepDepois?: boolean }[] = [
   { id: "geral", rot: "Visão geral", sepDepois: true },
@@ -18,6 +18,7 @@ const NAV: { id: Aba; rot: string; sepDepois?: boolean }[] = [
   { id: "aulas", rot: "Aulas" },
   { id: "formacao", rot: "Carrinho", sepDepois: true },
   { id: "financeiro", rot: "Financeiro" },
+  { id: "investidor", rot: "Investidor" },
   { id: "comparativo", rot: "Comparativo", sepDepois: true },
   { id: "lancar", rot: "Lançar números" },
   { id: "reguas", rot: "Réguas" },
@@ -237,6 +238,7 @@ export default function Painel() {
             {aba === "aulas" && <Aulas d={dados} ir={irPara} />}
             {aba === "formacao" && <Formacao d={dados} ir={irPara} />}
             {aba === "financeiro" && <Financeiro d={dados} />}
+            {aba === "investidor" && <Investidor atual={dados.ciclo.d0} />}
             {aba === "comparativo" && <Comparativo atual={dados.ciclo.d0} />}
             {aba === "lancar" && <Lancar lista={lista} padrao={padraoLancar || dados.ciclo.d0} salvo={() => carregar(sel)} />}
             {aba === "reguas" && <Reguas />}
@@ -925,6 +927,237 @@ function Financeiro({ d }: { d: Dados }) {
           <div className="dica">O método aceita ROAS de captação perto de 1 porque quem paga o lançamento é a Formação. Mas a meta do aluno é <b>pelo menos R$20 mil líquidos por lançamento</b>, e o ROAS do lançamento inteiro não pode ficar negativo.</div>
         </Bloco>
       </div>
+    </>
+  );
+}
+
+// ============================================================
+// INVESTIDOR
+// ============================================================
+function corGasto(real: number, ate: number) {
+  if (ate <= 0) return "";
+  const r = real / ate;
+  return r > 1.05 ? "c-vermelho" : r < 0.8 ? "c-amarelo" : "";
+}
+
+// ---------- simulador de escala ----------
+type Premissas = { cpa: number; ticketBruto: number; ticketLiq: number; conv: number; formLiq: number };
+
+function projetar(verbaDia: number, p: Premissas, parteInv: number) {
+  const gasto = verbaDia * 7;
+  const ingressos = p.cpa > 0 ? gasto / p.cpa : 0;
+  const receita = ingressos * (p.ticketLiq + (p.conv / 100) * p.formLiq);
+  const lucro = receita - gasto;
+  const exc = Math.max(0, lucro);
+  return { gasto, ingressos, receita, lucro, inv: exc * parteInv, red: exc * (1 - parteInv), roas: gasto > 0 ? (ingressos * p.ticketBruto) / gasto : null };
+}
+
+const chipEstilo = (on: boolean): React.CSSProperties => ({
+  border: `1px solid ${on ? "var(--brass2)" : "var(--line2)"}`,
+  background: on ? "var(--brass-tint)" : "transparent",
+  color: on ? "var(--ivory)" : "var(--ivory2)",
+  padding: "6px 12px",
+  fontSize: 12,
+  borderRadius: 2,
+  cursor: "pointer",
+});
+
+function SimuladorEscala({ base, acordo }: { base: BaseSimulador; acordo: RespInvestidor["acordo"] }) {
+  const B0 = acordo.captacaoDia + acordo.distribuicaoDia;
+  const MAX = 1000;
+  const [verba, setVerba] = useState(B0);
+  const [piora, setPiora] = useState(0);
+
+  const taxa = base.taxa;
+  const mediaBump = PRODUTOS.bumps.reduce((s, b) => s + b.preco, 0) / PRODUTOS.bumps.length;
+  const ticketMin = PRECO_INGRESSO + ((REGUAS.take_bump.min ?? 30) / 100) * mediaBump;
+  const convMin = REGUAS.conv_backend.min ?? 7;
+  const roasPiso = REGUAS.roas_captacao.ideal ?? 1.25;
+  const minimos: Premissas = {
+    cpa: PRECO_INGRESSO / roasPiso,
+    ticketBruto: ticketMin,
+    ticketLiq: ticketMin * (1 - taxa),
+    conv: convMin,
+    formLiq: base.formacaoPreco * (1 - taxa),
+  };
+  const temAtual = base.cpa !== null && base.ticketBruto !== null && base.ticketLiquido !== null;
+  const convAtual = base.convFormacao ?? convMin;
+  const dobras = Math.max(0, Math.log2(verba / B0));
+  const atuais: Premissas | null = temAtual
+    ? { cpa: (base.cpa as number) * Math.pow(1 + piora / 100, dobras), ticketBruto: base.ticketBruto as number, ticketLiq: base.ticketLiquido as number, conv: convAtual, formLiq: base.formacaoLiquida }
+    : null;
+
+  const parte = acordo.parteInvestidor;
+  const escada = atuais ? Math.round((0.4 * projetar(B0, { ...atuais, cpa: base.cpa as number }, parte).receita) / 7 / 10) * 10 : null;
+  const marcas: { rot: string; v: number }[] = [
+    { rot: "Acordo", v: B0 },
+    { rot: "+20%", v: Math.round(B0 * (1 + PASSO_MAX_VERBA)) },
+    { rot: "2x", v: B0 * 2 },
+    ...(escada !== null && escada > B0 && escada <= MAX ? [{ rot: "Escada do método (40% da receita)", v: escada }] : []),
+  ];
+  const aumento = verba / B0 - 1;
+
+  const cenario = (titulo: string, sub: string, p: Premissas | null, comparar: Premissas | null) => {
+    if (!p) return <Bloco titulo={titulo} sub={sub}><div className="vazio">Ainda não há ingresso vendido para medir os KPIs atuais.</div></Bloco>;
+    const s1 = projetar(verba, p, parte);
+    const base1 = comparar ? projetar(B0, comparar, parte) : null;
+    const linha = (rot: string, v1: number, casas = 0, money = true, extra?: React.ReactNode) => (
+      <tr><td>{rot}</td><td className="dir num">{money ? fR(v1, casas) : fN(v1, 1)}{extra}</td><td className="dir num">{money ? fR(v1 * 4, casas) : fN(v1 * 4, 1)}</td></tr>
+    );
+    return (
+      <Bloco titulo={titulo} sub={sub}>
+        <div className="tab-wrap">
+          <table className="tab">
+            <thead><tr><th>Resultado</th><th className="dir">1 semana</th><th className="dir">4 semanas</th></tr></thead>
+            <tbody>
+              {linha("Ingressos", s1.ingressos, 0, false)}
+              {linha("Receita líquida", s1.receita)}
+              {linha("Gasto do investidor", s1.gasto)}
+              {linha("Lucro depois de devolver o gasto", s1.lucro, 0, true, base1 && Math.abs(verba - B0) > 0.5 ? <div className="dim3" style={{ fontSize: 10.5 }}>{s1.lucro - base1.lucro >= 0 ? "+" : "−"}{fR(Math.abs(s1.lucro - base1.lucro), 0)} sobre R$ {fN(B0)}/dia</div> : null)}
+              {linha(`Investidor ${fN(parte * 100, 0)}%`, s1.inv)}
+              {linha(`RedPro ${fN((1 - parte) * 100, 0)}%`, s1.red)}
+            </tbody>
+          </table>
+        </div>
+        <LinhaRegua chave="roas_captacao" valor={s1.roas} nome="ROAS da captação" />
+      </Bloco>
+    );
+  };
+
+  const sAtual = atuais ? projetar(verba, atuais, parte) : null;
+  const veredito = sAtual?.roas == null ? null : sAtual.roas >= ROAS_ESCALA ? { cor: "info", t: `O método libera escalar com ROAS acima de ${fN(ROAS_ESCALA, 1)}: duplique a campanha e escale na cópia, sem mexer na original.` }
+    : sAtual.roas >= roasPiso ? { cor: "", t: `ROAS entre ${fN(roasPiso, 2)} e ${fN(ROAS_ESCALA, 1)}: a captação se paga, mas o método ainda não manda escalar.` }
+    : { cor: "ruim", t: `ROAS abaixo do piso de ${fN(roasPiso, 2)} com esta verba e este CPA: o método manda não escalar.` };
+
+  return (
+    <Bloco titulo="Simulador de escala" sub="Quanto a semana rende se a verba por dia mudar. Verba dividida 75% captação e 25% distribuição, como no acordo.">
+      <div style={{ display: "grid", gap: 18, marginBottom: 20 }}>
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8, flexWrap: "wrap", gap: 8 }}>
+            <span className="dim">Verba por dia</span>
+            <span className="serif num brass" style={{ fontSize: 30 }}>{fR(verba, 0)} <span className="dim3" style={{ fontSize: 13 }}>{fN(verba / B0, 1)}x o acordo · {fR(verba * 7, 0)} por semana</span></span>
+          </div>
+          <input type="range" min={B0} max={MAX} step={10} value={verba} onChange={(e) => setVerba(Number(e.target.value))} style={{ width: "100%", accentColor: "var(--brass2)" }} aria-label="Verba por dia" />
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
+            {marcas.map((m) => <button key={m.rot} type="button" style={chipEstilo(verba === m.v)} onClick={() => setVerba(Math.min(MAX, Math.max(B0, m.v)))}>{m.rot} · {fR(m.v, 0)}</button>)}
+          </div>
+        </div>
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8, flexWrap: "wrap", gap: 8 }}>
+            <span className="dim">Quanto o CPA piora cada vez que a verba dobra</span>
+            <span className="num brass">{fN(piora, 0)}%</span>
+          </div>
+          <input type="range" min={0} max={30} step={1} value={piora} onChange={(e) => setPiora(Number(e.target.value))} style={{ width: "100%", accentColor: "var(--brass2)" }} aria-label="Piora do CPA ao dobrar a verba" />
+          <div className="dim3" style={{ fontSize: 12, marginTop: 6 }}>O método não dá esse número. Em 0% o simulador é otimista. Vale só para os KPIs de hoje: nos mínimos, o CPA fica no piso por definição.</div>
+        </div>
+      </div>
+
+      {aumento > PASSO_MAX_VERBA + 0.001 && <div className="aviso">Esta verba é {fN(aumento * 100, 0)}% acima do acordo. Subir mais de {fN(PASSO_MAX_VERBA * 100, 0)}% de uma vez reinicia o aprendizado da Meta (regra da nossa skill de tráfego, não do método). Suba em degraus ou duplique a campanha.</div>}
+      {veredito && <div className={`aviso ${veredito.cor}`}>{veredito.t}</div>}
+
+      <div className="g2">
+        {cenario("Se os KPIs mínimos do método se mantiverem", `CPA R$ ${fN(minimos.cpa, 2)} (ROAS ${fN(roasPiso, 2)}) · Formação ${fN(convMin, 0)}% · take de bump ${fN(REGUAS.take_bump.min ?? 30, 0)}%`, minimos, minimos)}
+        {cenario("Se os KPIs de hoje se mantiverem", atuais ? `CPA R$ ${fN(atuais.cpa, 2)} · Formação ${fN(atuais.conv, 1)}%${base.convFormacao === null ? " (ainda sem medida, usei o piso)" : ""} · ticket líquido R$ ${fN(atuais.ticketLiq, 2)}` : "média acumulada de todas as turmas", atuais, atuais ? { ...atuais, cpa: base.cpa as number } : null)}
+      </div>
+      <div className="dica">
+        Média acumulada de todas as turmas: {fN(base.ingressos)} ingressos, CPA de {fR(base.cpa)}. Formação medida sobre {fN(base.convBase.ingressos)} ingressos de turmas com carrinho encerrado: {fN(base.convBase.vendas)} venda(s), {base.convFormacao === null ? "sem base ainda" : fP(base.convFormacao)}.
+        A semana projetada repete a mesma verba, e a receita da Formação é contada na semana da captação, embora o dinheiro caia depois (carrinho na segunda, liberação em até 30 dias). Quatro semanas é a semana multiplicada por quatro.
+      </div>
+    </Bloco>
+  );
+}
+
+function Investidor({ atual }: { atual: string }) {
+  const [r, setR] = useState<RespInvestidor | null>(null);
+  const [erro, setErro] = useState<string | null>(null);
+  useEffect(() => {
+    const carregar = () =>
+      fetch("/api/dashboard?investidor=1", { cache: "no-store" })
+        .then((x) => x.json())
+        .then((j) => (j.error ? setErro(j.error) : (setErro(null), setR(j))))
+        .catch((e) => setErro(String(e)));
+    carregar();
+    const t = setInterval(() => !document.hidden && carregar(), 120000);
+    return () => clearInterval(t);
+  }, []);
+
+  const foco: LinhaInvestidor | undefined = r ? [...r.linhas].reverse().find((l) => l.emCaptacao) ?? r.linhas.find((l) => l.d0 === atual) ?? r.linhas[r.linhas.length - 1] : undefined;
+  const t = r?.total;
+  const a = r?.acordo;
+  const manuais = r?.linhas.filter((l) => l.distribuicaoManual > 0) ?? [];
+  return (
+    <>
+      <Cab rot="Investidor" titulo="O investidor já foi pago?" sub="A receita líquida cobre o gasto primeiro, turma após turma. O que sobra é lucro: 30% do investidor, 70% da RedPro AI Academy." />
+      {erro && <div className="aviso ruim">{erro}</div>}
+      {!r || !t || !a ? <div className="vazio">Somando gasto e receita de cada turma.</div> : (
+        <>
+          <div className="g4">
+            <Kpi rotulo="Investido" valor={fR(t.gasto)} sub="tudo que a Meta cobrou, pago pelo investidor" />
+            <Kpi rotulo="Falta devolver" valor={fR(t.saldoDevedor)} sub={`já voltou ${fR(t.devolvido)}`} />
+            <Kpi rotulo="Lucro a dividir" valor={fR(t.excedente)} sub={`investidor ${fR(t.parteInvestidor)} · RedPro ${fR(t.parteRedpro)}`} />
+            <Kpi rotulo="Retorno do investidor" valor={fR(t.retornoInvestidor)} sub={`capital devolvido + ${fN(a.parteInvestidor * 100, 0)}% do lucro`} />
+          </div>
+
+          {foco && (
+            <Bloco titulo={`${foco.nome}: acordo contra gasto real`} sub={`${fN(foco.diasDecorridos, 1)} de ${foco.dias} dias de captação · ${foco.fase}`}>
+              <div className="tab-wrap">
+                <table className="tab">
+                  <thead><tr><th>Verba</th><th className="dir">Acordo por dia</th><th className="dir">Acordo na captação</th><th className="dir">Acordo até agora</th><th className="dir">Gasto real</th></tr></thead>
+                  <tbody>
+                    <tr><td>Captação</td><td className="dir num">{fR(a.captacaoDia, 0)}</td><td className="dir num">{fR(foco.acordoCaptacao, 0)}</td><td className="dir num">{fR(a.captacaoDia * foco.diasDecorridos)}</td><td className={`dir num ${corGasto(foco.gastoCaptacao, a.captacaoDia * foco.diasDecorridos)}`}>{fR(foco.gastoCaptacao)}</td></tr>
+                    <tr><td>Distribuição</td><td className="dir num">{fR(a.distribuicaoDia, 0)}</td><td className="dir num">{fR(foco.acordoDistribuicao, 0)}</td><td className="dir num">{fR(a.distribuicaoDia * foco.diasDecorridos)}</td><td className={`dir num ${corGasto(foco.gastoDistribuicao, a.distribuicaoDia * foco.diasDecorridos)}`}>{fR(foco.gastoDistribuicao)}</td></tr>
+                    {foco.gastoOutros > 0 && <tr><td>Custos extras</td><td className="dir num">—</td><td className="dir num">—</td><td className="dir num">—</td><td className="dir num">{fR(foco.gastoOutros)}</td></tr>}
+                    <tr><td><b>Total</b></td><td className="dir num"><b>{fR(a.captacaoDia + a.distribuicaoDia, 0)}</b></td><td className="dir num"><b>{fR(foco.acordo, 0)}</b></td><td className="dir num"><b>{fR(foco.acordoAteHoje)}</b></td><td className={`dir num ${corGasto(foco.gasto, foco.acordoAteHoje)}`}><b>{fR(foco.gasto)}</b></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className="dica">Vermelho: gastando mais de 5% acima do acordo até agora. Amarelo: mais de 20% abaixo, a verba não está saindo.</div>
+            </Bloco>
+          )}
+
+          <Bloco titulo="Por turma" sub="O saldo passa de uma turma para a seguinte. Só depois de zerá-lo existe lucro.">
+            <div className="tab-wrap">
+              <table className="tab">
+                <thead>
+                  <tr>
+                    <th>Turma</th><th className="dir">Acordo</th><th className="dir">Gasto real</th><th className="dir">Receita líquida</th>
+                    <th className="dir">Devolvido</th><th className="dir">Saldo a devolver</th><th className="dir">Lucro</th>
+                    <th className="dir">Investidor {fN(a.parteInvestidor * 100, 0)}%</th><th className="dir">RedPro {fN((1 - a.parteInvestidor) * 100, 0)}%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {r.linhas.map((l) => (
+                    <tr key={l.d0} className={l.d0 === foco?.d0 ? "atual" : ""}>
+                      <td><b>{l.nome}</b><div className="dim3" style={{ fontSize: 10.5 }}>{l.fase}</div></td>
+                      <td className="dir num">{fR(l.acordo, 0)}<div className="dim3" style={{ fontSize: 10.5 }}>{l.dias} dias</div></td>
+                      <td className={`dir num ${l.emCaptacao ? corGasto(l.gasto, l.acordoAteHoje) : ""}`}>{fR(l.gasto)}</td>
+                      <td className="dir num">{fR(l.receitaLiquida)}</td>
+                      <td className="dir num">{fR(l.devolvido)}</td>
+                      <td className={`dir num ${l.saldoDepois > 0 ? "c-amarelo" : ""}`}>{fR(l.saldoDepois)}</td>
+                      <td className="dir num">{fR(l.excedente)}</td>
+                      <td className="dir num">{fR(l.parteInvestidor)}</td>
+                      <td className="dir num">{fR(l.parteRedpro)}</td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <td><b>Total</b></td><td className="dir num">{fR(r.linhas.reduce((s, l) => s + l.acordo, 0), 0)}</td>
+                    <td className="dir num"><b className="brass">{fR(t.gasto)}</b></td><td className="dir num"><b className="brass">{fR(t.receitaLiquida)}</b></td>
+                    <td className="dir num"><b className="brass">{fR(t.devolvido)}</b></td><td className="dir num"><b className="brass">{fR(t.saldoDevedor)}</b></td>
+                    <td className="dir num"><b className="brass">{fR(t.excedente)}</b></td><td className="dir num"><b className="brass">{fR(t.parteInvestidor)}</b></td><td className="dir num"><b className="brass">{fR(t.parteRedpro)}</b></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="dica">Receita líquida é a comissão do produtor que a Hotmart informa, na data da venda aprovada, com ingresso, bumps e Formação. Gasto real é o que a Meta cobrou nas campanhas HWK e no boost do Instagram, mais os custos extras lançados em Lançar números.</div>
+          </Bloco>
+
+          <SimuladorEscala base={r.base} acordo={r.acordo} />
+
+          {manuais.map((l) => (
+            <div key={l.d0} className="aviso">{l.nome} tem {fR(l.distribuicaoManual)} lançados à mão como distribuição. Não entram aqui, porque o boost do Instagram já vem da Meta e somar de novo contaria duas vezes. Se esse valor foi pago fora da Meta, lance em Custos extras.</div>
+          ))}
+        </>
+      )}
     </>
   );
 }

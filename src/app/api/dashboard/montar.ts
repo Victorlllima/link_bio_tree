@@ -29,6 +29,9 @@ const FILTRO_CAMPANHA = "HWK"; // toda campanha da Hermes Week começa com HWK_
 // método Tabari prevê (25% do budget diário) — decisão do Red (10/10/2026): conta como gasto
 // da Hermes Week, não fica separado em "outras campanhas".
 const PREFIXOS_BOOST_IG = ["Post do Instagram", "Publicação do Instagram", "Reel do Instagram"];
+function ehDistribuicao(nome: string): boolean {
+  return nome.includes("_DIS_") || PREFIXOS_BOOST_IG.some((p) => nome.startsWith(p));
+}
 function ehCampanhaHermesWeek(nome: string): boolean {
   return nome.includes(FILTRO_CAMPANHA) || PREFIXOS_BOOST_IG.some((p) => nome.startsWith(p));
 }
@@ -462,6 +465,12 @@ export async function montar(pedido: string, opts: { leve?: boolean; cal?: Ciclo
   const outrasCampanhas = ((m?.camps?.data || []) as Record<string, unknown>[])
     .filter((c) => !ehCampanhaHermesWeek(String(c.campaign_name || "")) && Number(c.spend) > 0)
     .map((c) => ({ nome: String(c.campaign_name), gasto: Number(c.spend) }));
+  const campanhas = ((m?.camps?.data || []) as Record<string, unknown>[])
+    .filter((c) => ehCampanhaHermesWeek(String(c.campaign_name || "")) && Number(c.spend) > 0)
+    .map((c) => {
+      const nome = String(c.campaign_name);
+      return { nome, gasto: Number(c.spend), tipo: ehDistribuicao(nome) ? ("distribuicao" as const) : ("captacao" as const) };
+    });
   const verbaDistrib = manual.verba_distribuicao ?? 0;
 
   const vendasPagas = origem.anuncio;
@@ -487,6 +496,7 @@ export async function montar(pedido: string, opts: { leve?: boolean; cal?: Ciclo
     vendasPagas,
     cpaPago: div(gasto, vendasPagas),
     outrasCampanhas,
+    campanhas,
     distribuicaoPct: verbaDistrib > 0 ? pct(verbaDistrib, gasto + verbaDistrib) : null,
     serie,
   };

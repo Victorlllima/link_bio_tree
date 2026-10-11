@@ -142,6 +142,7 @@ export interface Dados {
     vendasPagas: number;
     cpaPago: number | null;
     outrasCampanhas: { nome: string; gasto: number }[];
+    campanhas: { nome: string; gasto: number; tipo: "captacao" | "distribuicao" }[];
     distribuicaoPct: number | null;
     serie: DiaTrafego[];
   };
@@ -224,4 +225,68 @@ export interface Dados {
   };
   leitura: Leitura[];
   saude: { total: number; areas: { area: string; nota: number; vermelhos: number; amarelos: number }[] };
+}
+
+// ---------- aba Investidor ----------
+export interface LinhaInvestidor {
+  d0: string;
+  nome: string;
+  fase: string;
+  emCaptacao: boolean;
+  dias: number; // dias de captação da turma (7 ou 8)
+  diasDecorridos: number; // fração já passada da captação
+  acordo: number; // verba combinada para a captação inteira
+  acordoCaptacao: number;
+  acordoDistribuicao: number;
+  acordoAteHoje: number;
+  gasto: number; // o que a Meta cobrou (campanhas HWK + boost do Instagram) mais custos extras lançados
+  gastoCaptacao: number;
+  gastoDistribuicao: number;
+  gastoOutros: number;
+  distribuicaoManual: number; // lançado à mão como distribuição, não somado
+  receitaLiquida: number;
+  ingressos: number;
+  receitaFront: number; // ingresso + bumps, bruto
+  liquidoFront: number;
+  vendasFormacao: number;
+  receitaFormacao: number;
+  liquidoFormacao: number;
+  carrinhoFechado: boolean; // só as turmas com carrinho encerrado entram na conversão da Formação
+  saldoAnterior: number; // o que o investidor ainda tinha a receber antes desta turma
+  devolvido: number; // parte da receita desta turma que abateu o saldo
+  saldoDepois: number;
+  excedente: number; // lucro: o que sobrou depois de zerar o saldo
+  parteInvestidor: number;
+  parteRedpro: number;
+}
+
+// Base do simulador de escala: os KPIs acumulados de todas as turmas.
+export interface BaseSimulador {
+  ingressos: number;
+  gasto: number; // mídia total (captação + distribuição + extras)
+  cpa: number | null; // gasto total ÷ ingressos
+  ticketBruto: number | null; // ingresso + bumps por ingresso vendido
+  ticketLiquido: number | null;
+  taxa: number; // fatia que a plataforma retém
+  convFormacao: number | null; // % sobre os ingressos das turmas com carrinho encerrado
+  convBase: { vendas: number; ingressos: number };
+  formacaoPreco: number;
+  formacaoLiquida: number; // por venda
+}
+
+export interface RespInvestidor {
+  geradoEm: string;
+  base: BaseSimulador;
+  acordo: { captacaoDia: number; distribuicaoDia: number; parteInvestidor: number };
+  linhas: LinhaInvestidor[];
+  total: {
+    gasto: number;
+    receitaLiquida: number;
+    devolvido: number;
+    saldoDevedor: number;
+    excedente: number;
+    parteInvestidor: number;
+    parteRedpro: number;
+    retornoInvestidor: number; // devolvido + parte do lucro
+  };
 }

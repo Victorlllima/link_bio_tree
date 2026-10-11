@@ -233,6 +233,15 @@ export const QUEDA_AULA = [null, 0.7, 0.85, 0.85, 0.85, 1.3] as const;
 
 export const IMPRESSOES_MIN_JULGAR = 5000; // aula 4
 export const PRECO_INGRESSO = 62;
+
+// ACORDO COM O INVESTIDOR (Red, 11/10/2026). Todo o gasto de mídia é pago por ele. A receita
+// líquida cobre primeiro o investimento acumulado; o que sobra divide 30% investidor, 70% RedPro.
+// Escala (régua do método): com ROAS ≥1,8 duplica a campanha e escala na cópia. O passo máximo
+// de 20% por vez vem da nossa skill da Meta (evita reiniciar o aprendizado), não do método.
+export const ROAS_ESCALA = 1.8;
+export const PASSO_MAX_VERBA = 0.2;
+
+export const ACORDO = { captacaoDia: 150, distribuicaoDia: 50, parteInvestidor: 0.3 } as const;
 export const PRECO_FORMACAO_PADRAO = 997; // Red, 04/10/2026
 
 export const PRODUTOS = {

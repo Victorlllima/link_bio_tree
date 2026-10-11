@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { montar, listarCiclos, resumir } from "./montar";
+import { montarInvestidor } from "./investidor";
 
 // GET /api/dashboard?vivos=1            → as turmas ao vivo agora (captação e/ou aula) + lista de turmas
 // GET /api/dashboard?ciclo=YYYY-MM-DD   → todos os números de uma turma (D0 = segunda da Aula 1)
 // GET /api/dashboard?comparativo=1      → resumo de todas as turmas
+// GET /api/dashboard?investidor=1       → gasto, devolução e divisão 30/70 por turma
 // Mesmo login do /lpsg (cookie lpsg_auth).
 
 export const dynamic = "force-dynamic";
@@ -22,6 +24,10 @@ export async function GET(req: Request) {
   try {
     const { cal, atual, captacao, aula } = await listarCiclos();
     const lista = cal.map((c) => ({ d0: c.d0, nome: c.nome, indice: c.indice }));
+
+    if (url.searchParams.get("investidor")) {
+      return NextResponse.json(await montarInvestidor(cal));
+    }
 
     if (url.searchParams.get("comparativo")) {
       const resumos = await Promise.all(cal.map((c) => montar(c.d0, { leve: true, cal }).then(resumir)));
