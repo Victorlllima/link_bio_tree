@@ -1087,7 +1087,7 @@ function Investidor({ atual }: { atual: string }) {
   const manuais = r?.linhas.filter((l) => l.distribuicaoManual > 0) ?? [];
   return (
     <>
-      <Cab rot="Investidor" titulo="O investidor já foi pago?" sub="A receita líquida cobre o gasto primeiro, turma após turma. O que sobra é lucro: 30% do investidor, 70% da RedPro AI Academy." />
+      <Cab rot="Investidor" titulo="Gasto, devolução e lucro" sub="A receita líquida cobre o gasto primeiro, turma após turma. O que sobra é lucro: 30% do investidor, 70% da RedPro AI Academy." />
       {erro && <div className="aviso ruim">{erro}</div>}
       {!r || !t || !a ? <div className="vazio">Somando gasto e receita de cada turma.</div> : (
         <>
