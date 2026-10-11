@@ -233,6 +233,7 @@ export interface LinhaInvestidor {
   nome: string;
   fase: string;
   emCaptacao: boolean;
+  foraDoAcordo: boolean; // turma anterior à entrada do investidor: gasto e lucro são da RedPro
   dias: number; // dias de captação da turma (7 ou 8)
   diasDecorridos: number; // fração já passada da captação
   acordo: number; // verba combinada para a captação inteira
@@ -277,7 +278,7 @@ export interface BaseSimulador {
 export interface RespInvestidor {
   geradoEm: string;
   base: BaseSimulador;
-  acordo: { captacaoDia: number; distribuicaoDia: number; parteInvestidor: number };
+  acordo: { captacaoDia: number; distribuicaoDia: number; parteInvestidor: number; primeiraTurma: string };
   linhas: LinhaInvestidor[];
   total: {
     gasto: number;

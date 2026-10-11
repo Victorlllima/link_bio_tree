@@ -31,24 +31,27 @@ export async function montarInvestidor(cal: CicloCal[]): Promise<RespInvestidor>
     const gastoCaptacao = d.trafego.gasto - gastoDistribuicao;
 
     const receita = d.financeiro.receitaLiquida;
-    const saldoAnterior = saldo;
+    // Turma anterior à entrada do investidor: a RedPro bancou e fica com tudo, nada entra na conta dele.
+    const fora = c.d0 < ACORDO.primeiraTurma;
+    const saldoAnterior = fora ? 0 : saldo;
     const devido = saldoAnterior + gasto;
-    const devolvido = Math.min(receita, devido);
-    const saldoDepois = devido - devolvido;
-    const excedente = Math.max(0, receita - devido);
-    saldo = saldoDepois;
+    const devolvido = fora ? 0 : Math.min(receita, devido);
+    const saldoDepois = fora ? 0 : devido - devolvido;
+    const excedente = fora ? 0 : Math.max(0, receita - devido);
+    if (!fora) saldo = saldoDepois;
 
-    const acordoDia = ACORDO.captacaoDia + ACORDO.distribuicaoDia;
+    const acordoDia = fora ? 0 : ACORDO.captacaoDia + ACORDO.distribuicaoDia;
     return {
       d0: d.ciclo.d0,
       nome: d.ciclo.nome,
       fase: d.ciclo.fase.rotulo,
       emCaptacao: d.ciclo.emCaptacao,
+      foraDoAcordo: fora,
       dias,
       diasDecorridos: r2(diasDecorridos),
       acordo: acordoDia * dias,
-      acordoCaptacao: ACORDO.captacaoDia * dias,
-      acordoDistribuicao: ACORDO.distribuicaoDia * dias,
+      acordoCaptacao: fora ? 0 : ACORDO.captacaoDia * dias,
+      acordoDistribuicao: fora ? 0 : ACORDO.distribuicaoDia * dias,
       acordoAteHoje: r2(acordoDia * diasDecorridos),
       gasto: r2(gasto),
       gastoCaptacao: r2(gastoCaptacao),
@@ -72,14 +75,17 @@ export async function montarInvestidor(cal: CicloCal[]): Promise<RespInvestidor>
     };
   });
 
-  const soma = (f: (l: LinhaInvestidor) => number) => r2(linhas.reduce((s, l) => s + f(l), 0));
+  const noAcordo = linhas.filter((l) => !l.foraDoAcordo);
+  const soma = (f: (l: LinhaInvestidor) => number) => r2(noAcordo.reduce((s, l) => s + f(l), 0));
+  const somaTodas = (f: (l: LinhaInvestidor) => number) => r2(linhas.reduce((s, l) => s + f(l), 0));
   const devolvido = soma((l) => l.devolvido);
   const parteInvestidor = soma((l) => l.parteInvestidor);
 
-  const ingressos = soma((l) => l.ingressos);
-  const bruto = soma((l) => l.receitaFront);
-  const liquido = soma((l) => l.liquidoFront);
-  const gastoTotal = soma((l) => l.gasto);
+  // KPIs de desempenho valem para todas as turmas, inclusive a Turma 1; só o dinheiro do investidor exclui.
+  const ingressos = somaTodas((l) => l.ingressos);
+  const bruto = somaTodas((l) => l.receitaFront);
+  const liquido = somaTodas((l) => l.liquidoFront);
+  const gastoTotal = somaTodas((l) => l.gasto);
   const fechadas = linhas.filter((l) => l.carrinhoFechado);
   const convIng = fechadas.reduce((s, l) => s + l.ingressos, 0);
   const convVendas = fechadas.reduce((s, l) => s + l.vendasFormacao, 0);

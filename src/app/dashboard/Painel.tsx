@@ -1081,7 +1081,7 @@ function Investidor({ atual }: { atual: string }) {
     return () => clearInterval(t);
   }, []);
 
-  const foco: LinhaInvestidor | undefined = r ? [...r.linhas].reverse().find((l) => l.emCaptacao) ?? r.linhas.find((l) => l.d0 === atual) ?? r.linhas[r.linhas.length - 1] : undefined;
+  const foco: LinhaInvestidor | undefined = r ? [...r.linhas].reverse().find((l) => l.emCaptacao && !l.foraDoAcordo) ?? r.linhas.find((l) => l.d0 === atual && !l.foraDoAcordo) ?? [...r.linhas].reverse().find((l) => !l.foraDoAcordo) : undefined;
   const t = r?.total;
   const a = r?.acordo;
   const manuais = r?.linhas.filter((l) => l.distribuicaoManual > 0) ?? [];
@@ -1126,7 +1126,15 @@ function Investidor({ atual }: { atual: string }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {r.linhas.map((l) => (
+                  {r.linhas.map((l) => l.foraDoAcordo ? (
+                    <tr key={l.d0}>
+                      <td><b>{l.nome}</b><div className="dim3" style={{ fontSize: 10.5 }}>{l.fase} · fora do acordo, é da RedPro</div></td>
+                      <td className="dir num dim3">—</td>
+                      <td className="dir num dim">{fR(l.gasto)}</td>
+                      <td className="dir num dim">{fR(l.receitaLiquida)}</td>
+                      <td className="dir num dim3">—</td><td className="dir num dim3">—</td><td className="dir num dim3">—</td><td className="dir num dim3">—</td><td className="dir num dim3">—</td>
+                    </tr>
+                  ) : (
                     <tr key={l.d0} className={l.d0 === foco?.d0 ? "atual" : ""}>
                       <td><b>{l.nome}</b><div className="dim3" style={{ fontSize: 10.5 }}>{l.fase}</div></td>
                       <td className="dir num">{fR(l.acordo, 0)}<div className="dim3" style={{ fontSize: 10.5 }}>{l.dias} dias</div></td>
@@ -1148,7 +1156,7 @@ function Investidor({ atual }: { atual: string }) {
                 </tbody>
               </table>
             </div>
-            <div className="dica">Receita líquida é a comissão do produtor que a Hotmart informa, na data da venda aprovada, com ingresso, bumps e Formação. Gasto real é o que a Meta cobrou nas campanhas HWK e no boost do Instagram, mais os custos extras lançados em Lançar números.</div>
+            <div className="dica">O investidor entrou na captação da Turma 2 (05/10). A Turma 1 foi bancada pela RedPro e fica fora do total e da divisão. Receita líquida é a comissão do produtor que a Hotmart informa, na data da venda aprovada, com ingresso, bumps e Formação. Gasto real é o que a Meta cobrou nas campanhas HWK e no boost do Instagram, mais os custos extras lançados em Lançar números.</div>
           </Bloco>
 
           <SimuladorEscala base={r.base} acordo={r.acordo} />

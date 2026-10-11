@@ -241,7 +241,9 @@ export const PRECO_INGRESSO = 62;
 export const ROAS_ESCALA = 1.8;
 export const PASSO_MAX_VERBA = 0.2;
 
-export const ACORDO = { captacaoDia: 150, distribuicaoDia: 50, parteInvestidor: 0.3 } as const;
+// primeiraTurma: D0 da primeira turma com o investidor (entrou em 05/10, captação da Turma 2).
+// As turmas anteriores (Turma 1) são investimento e lucro da RedPro, fora desta conta.
+export const ACORDO = { captacaoDia: 150, distribuicaoDia: 50, parteInvestidor: 0.3, primeiraTurma: "2026-10-12" } as const;
 export const PRECO_FORMACAO_PADRAO = 997; // Red, 04/10/2026
 
 export const PRODUTOS = {
