@@ -21,7 +21,10 @@ import type { Metadata } from "next";
  *
  *  ⚠️ O SERVIDOR PRONTO NÃO ESTÁ AQUI. Ele é da janela da primeira hora de
  *  compra (6h50 às 8h de segunda) e é entregue junto do acesso ao curso. Ele é
- *  o gatilho do módulo 1 do DUAAUS: publicar aqui derrubaria a oferta.
+ *  o gatilho do módulo 1 da Formação: publicar aqui derrubaria a oferta.
+ *
+ *  ⚠️ NADA QUE SEJA ORDER BUMP ENTRA AQUI (Red, 12/10/2026): os PDFs dos bumps (100 plugins,
+ *  50 casos de uso, segundo cérebro) são vendidos na Hotmart e não podem ser entregues de graça.
  *
  *  ⚠️ SEM DATA NA PÁGINA. A Hermes Week roda toda semana. Data cravada
  *  envelheceria em sete dias (foi o bug de 27/07).
@@ -30,10 +33,6 @@ import type { Metadata } from "next";
 const SUPORTE = "suporte@redpro.com.br";
 const PDF = "/hermes-week/materiais/hermes-week-o-curso-inteiro.pdf";
 const ZIP = "/hermes-week/materiais/squad-pronto-para-importar.zip";
-// O PDF dos 100 plugins era o bump de R$27. Saiu da lista de bumps em 25/09/2026, porque o
-// Red prometeu o link dele de graça na câmera, na Aula 4. Entregar menos do que foi falado
-// custaria mais do que o produto valia.
-const PLUGINS = "/hermes-week/materiais/100-plugins-do-hermes.pdf";
 
 export const metadata: Metadata = {
   title: "Os seus materiais — Hermes Week",
@@ -133,8 +132,8 @@ const html = `
       <img src="/logo-academy.png" alt="RedPro AI Academy" class="marca">
       <h1>Os seus <em>materiais</em></h1>
       <p class="lead">
-        O que eu prometi para quem preencheu a ficha, mais a análise dos plugins que eu falei
-        na quinta. São seus, comprando ou não comprando nada depois.
+        O que eu prometi para quem preencheu a ficha. São seus, comprando ou não comprando
+        nada depois.
       </p>
     </div>
 
@@ -177,25 +176,6 @@ Um <strong>orquestrador</strong>, que recebe a demanda e distribui sem nunca exe
       </p>
       <div class="meta">ZIP · 4 perfis + guia de instalação</div>
       <a class="btn" href="${ZIP}" download>Baixar o squad</a>
-    </div>
-
-    <div class="item">
-      <div class="tit"><span class="num">3</span> Os 100 melhores plugins, analisados</div>
-      <p>
-        Eu falei disso na quinta e prometi o link. Está aqui.
-      </p>
-      <p>
-        Os 100 plugins do catálogo oficial, um por um: <strong>o que cada um faz</strong>, para
-        quem vale a pena, e o que ele exige para funcionar. A maioria com a imagem da tela.
-      </p>
-      <p>
-        Serve para você não ter que abrir o catálogo e testar no escuro. Você procura o que
-        precisa, lê a análise, e instala sabendo o que está instalando. Lembrando do que eu falei
-        na aula: estar no catálogo não quer dizer que o código foi auditado, então manda o
-        repositório para o seu agente olhar antes.
-      </p>
-      <div class="meta">PDF · 60 páginas · 100 plugins</div>
-      <a class="btn" href="${PLUGINS}" download>Baixar a análise</a>
     </div>
 
     <div class="nota">

@@ -66,8 +66,8 @@ export default function HermesWeekInteressePage() {
               preenchido isto aqui.
             </p>
             <p style={S.lead}>
-              <strong style={{ color: "#fff" }}>Segunda, 6h50</strong>, o link chega no seu WhatsApp,
-              dez minutos antes de ir para o grupo. É o mesmo número que te mandou as mensagens da semana.
+              <strong style={{ color: "#fff" }}>Segunda, 7h</strong>, o link dos materiais chega no seu
+              e-mail. Fica de olho na caixa de entrada e no spam.
             </p>
           </div>
         ) : (
