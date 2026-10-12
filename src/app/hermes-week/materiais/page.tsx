@@ -33,6 +33,7 @@ import type { Metadata } from "next";
 const SUPORTE = "suporte@redpro.com.br";
 const PDF = "/hermes-week/materiais/hermes-week-o-curso-inteiro.pdf";
 const ZIP = "/hermes-week/materiais/squad-pronto-para-importar.zip";
+const CHECKLIST = "/hermes-week/materiais/checklist-da-instalacao-do-hermes.pdf";
 
 export const metadata: Metadata = {
   title: "Os seus materiais — Hermes Week",
@@ -132,8 +133,8 @@ const html = `
       <img src="/logo-academy.png" alt="RedPro AI Academy" class="marca">
       <h1>Os seus <em>materiais</em></h1>
       <p class="lead">
-        O que eu prometi para quem preencheu a ficha. São seus, comprando ou não comprando
-        nada depois.
+        O que eu prometi para quem preencheu a ficha, mais o checklist da instalação. São seus,
+        comprando ou não comprando nada depois.
       </p>
     </div>
 
@@ -176,6 +177,22 @@ Um <strong>orquestrador</strong>, que recebe a demanda e distribui sem nunca exe
       </p>
       <div class="meta">ZIP · 4 perfis + guia de instalação</div>
       <a class="btn" href="${ZIP}" download>Baixar o squad</a>
+    </div>
+
+    <div class="item">
+      <div class="tit"><span class="num">3</span> O checklist da instalação do Hermes</div>
+      <p>
+        A lista de verificação da sua instalação, de ponta a ponta, que eu prometi na primeira aula.
+        São <strong>dezesseis itens</strong>, em três listas: o que conferir <strong>antes</strong> de
+        instalar, <strong>durante</strong> e <strong>depois</strong>, cada um com o sintoma de quando
+        você pula.
+      </p>
+      <p>
+        No fim tem uma quarta lista, <strong>só para quem instala numa VPS</strong>: o que conferir antes de
+        deixar o agente rodando fora do seu computador.
+      </p>
+      <div class="meta">PDF · 10 páginas</div>
+      <a class="btn" href="${CHECKLIST}" download>Baixar o checklist</a>
     </div>
 
     <div class="nota">
