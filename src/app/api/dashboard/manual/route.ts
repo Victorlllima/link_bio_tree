@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { lpsgAutorizado } from "@/lib/lpsg-auth";
 
 // POST /api/dashboard/manual  { ciclo: "YYYY-MM-DD", valores: { chave: número | null } }
 // Grava os números que não têm API (presença ao vivo, únicos, verba de
@@ -7,7 +8,6 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 const SB = "https://supabase.redpro.com.br/rest/v1";
-const LPSG_PASSWORD = process.env.LPSG_PASSWORD || "lpsg2026";
 
 const CHAVES_MANUAIS = new Set([
   ...[1, 2, 3, 4, 5, 6].flatMap((n) => [`presenca_a${n}`, `unicos_a${n}`, `duracao_a${n}`]),
@@ -22,7 +22,7 @@ const CHAVES_MANUAIS = new Set([
 ]);
 
 function authed(req: Request): boolean {
-  return (req.headers.get("cookie") || "").includes(`lpsg_auth=${LPSG_PASSWORD}`);
+  return lpsgAutorizado(req);
 }
 
 export async function GET(req: Request) {

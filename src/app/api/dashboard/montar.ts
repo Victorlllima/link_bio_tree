@@ -94,8 +94,10 @@ export type CicloCal = {
   d0: string; // segunda-feira da Aula 1
   indice: number; // posição entre as turmas reais (as semanas puladas não contam)
   nome: string;
-  captIni: Date; // 00h00 do primeiro dia de captação
-  captFim: Date; // 23h59 da segunda da Aula 1 (a segunda ainda é captação)
+  captIni: Date; // início da captação: segunda 20h da turma anterior (virada), ou 00h00 se a anterior foi pulada
+  captFim: Date; // 19h59 da segunda da Aula 1 (Red, 13/10/2026: a captação passa ao grupo novo às 20h)
+  gastoIni: string; // 1º dia (BR) de gasto de mídia da turma: a Meta só entrega por dia, então a segunda da virada fica com a turma que acaba
+  gastoFim: string; // último dia (BR) de gasto da turma = a segunda da Aula 1
   aulaIni: Date; // segunda 20h
   carrinhoFim: Date; // segunda seguinte 21h
 };
@@ -121,16 +123,25 @@ export async function calendario(): Promise<CicloCal[]> {
   for (let d0 = PRIMEIRO_D0; d0 <= brDia(new Date(agora + 30 * 86400e3)); d0 = dia(d0, 7)) {
     if (puladas.has(d0)) continue;
     const padrao = dia(d0, -7);
-    const iniStr = inicios.get(d0) ?? (anterior && dia(anterior, 1) > padrao ? dia(anterior, 1) : padrao);
-    const captIni = em(iniStr, "00:00");
+    const excIni = inicios.get(d0);
+    // Corte às 20h de segunda (Red, 13/10/2026): a captação da turma seguinte começa na virada, quando a
+    // anterior é a semana imediatamente anterior. Se a anterior foi pulada, começa à 00h do dia padrão.
+    const consecutiva = !excIni && anterior !== null && anterior >= padrao;
+    const captIni = consecutiva ? em(anterior as string, "20:00") : em(excIni ?? padrao, "00:00");
+    const gastoIni = consecutiva ? dia(anterior as string, 1) : (excIni ?? padrao);
     if (captIni.getTime() > agora) break;
     const indice = lista.length + 1;
+    // A turma só termina às 20h se a próxima semana existe (não foi pulada); senão mantém o fim do dia.
+    const proximaPulada = puladas.has(dia(d0, 7));
+    const captFim = proximaPulada ? new Date(em(dia(d0, 1), "00:00").getTime() - 1) : new Date(em(d0, "20:00").getTime() - 1);
     lista.push({
       d0,
       indice,
       nome: `Turma ${indice} · ${dm(d0)}`,
       captIni,
-      captFim: new Date(em(dia(d0, 1), "00:00").getTime() - 1),
+      captFim,
+      gastoIni,
+      gastoFim: d0,
       aulaIni: em(d0, "20:00"),
       carrinhoFim: em(dia(d0, 7), "21:00"),
     });
@@ -294,9 +305,9 @@ export async function montar(pedido: string, opts: { leve?: boolean; cal?: Ciclo
   ]);
 
   // ---------- Meta ----------
-  const since = brDia(captIni);
+  const since = ciclo.gastoIni;
   const hoje = brDia(agora);
-  const fimCapt = brDia(captFim);
+  const fimCapt = ciclo.gastoFim;
   const until = fimCapt < hoje ? fimCapt : hoje;
   let m: Awaited<ReturnType<typeof lerMeta>> | null = null;
   if (since <= until) {

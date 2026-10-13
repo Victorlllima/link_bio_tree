@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
+import { lpsgAutorizado } from "@/lib/lpsg-auth";
 
 const SUPABASE_URL = "https://supabase.redpro.com.br";
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY!;
-const LPSG_PASSWORD = process.env.LPSG_PASSWORD || "lpsg2026";
 
 const headers = {
   "Content-Type": "application/json",
@@ -12,7 +12,7 @@ const headers = {
 
 function authed(req: Request): boolean {
   const cookie = req.headers.get("cookie") || "";
-  return cookie.includes(`lpsg_auth=${LPSG_PASSWORD}`);
+  return lpsgAutorizado(req);
 }
 
 // GET → estado atual de todas as tarefas (responsavel + done por task_id)

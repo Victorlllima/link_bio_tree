@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { lpsgAutorizado } from "@/lib/lpsg-auth";
 
 /**
  * Registro dos 6 marcos da Garantia "Primeiro cliente em 90 dias" — por aluno.
@@ -22,7 +23,8 @@ function headers() {
     return { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" };
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!lpsgAutorizado(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     const key = process.env.SUPABASE_SERVICE_KEY;
     if (!key) return NextResponse.json({ ok: false, erro: "sem service key" }, { status: 500 });
 
@@ -44,6 +46,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  if (!lpsgAutorizado(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     const key = process.env.SUPABASE_SERVICE_KEY;
     if (!key) return NextResponse.json({ ok: false, erro: "sem service key" }, { status: 500 });
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { montar, listarCiclos, resumir } from "./montar";
 import { montarInvestidor } from "./investidor";
+import { lpsgAutorizado } from "@/lib/lpsg-auth";
 
 // GET /api/dashboard?vivos=1            → as turmas ao vivo agora (captação e/ou aula) + lista de turmas
 // GET /api/dashboard?ciclo=YYYY-MM-DD   → todos os números de uma turma (D0 = segunda da Aula 1)
@@ -11,11 +12,10 @@ import { montarInvestidor } from "./investidor";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-const LPSG_PASSWORD = process.env.LPSG_PASSWORD || "lpsg2026";
 
 function authed(req: Request): boolean {
   const cookie = req.headers.get("cookie") || "";
-  return cookie.includes(`lpsg_auth=${LPSG_PASSWORD}`);
+  return lpsgAutorizado(req);
 }
 
 export async function GET(req: Request) {

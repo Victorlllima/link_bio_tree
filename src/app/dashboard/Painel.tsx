@@ -1081,7 +1081,8 @@ function Investidor({ atual }: { atual: string }) {
     return () => clearInterval(t);
   }, []);
 
-  const foco: LinhaInvestidor | undefined = r ? [...r.linhas].reverse().find((l) => l.emCaptacao && !l.foraDoAcordo) ?? r.linhas.find((l) => l.d0 === atual && !l.foraDoAcordo) ?? [...r.linhas].reverse().find((l) => !l.foraDoAcordo) : undefined;
+  // A aba segue o ciclo escolhido no seletor (Red, 13/10/2026). Se a turma escolhida não existir na lista, cai na que está em captação.
+  const foco: LinhaInvestidor | undefined = r ? r.linhas.find((l) => l.d0 === atual) ?? [...r.linhas].reverse().find((l) => l.emCaptacao) ?? r.linhas[r.linhas.length - 1] : undefined;
   const t = r?.total;
   const a = r?.acordo;
   const manuais = r?.linhas.filter((l) => l.distribuicaoManual > 0) ?? [];
@@ -1091,14 +1092,27 @@ function Investidor({ atual }: { atual: string }) {
       {erro && <div className="aviso ruim">{erro}</div>}
       {!r || !t || !a ? <div className="vazio">Somando gasto e receita de cada turma.</div> : (
         <>
-          <div className="g4">
-            <Kpi rotulo="Investido" valor={fR(t.gasto)} sub="tudo que a Meta cobrou, pago pelo investidor" />
-            <Kpi rotulo="Falta devolver" valor={fR(t.saldoDevedor)} sub={`já voltou ${fR(t.devolvido)}`} />
-            <Kpi rotulo="Lucro a dividir" valor={fR(t.excedente)} sub={`investidor ${fR(t.parteInvestidor)} · RedPro ${fR(t.parteRedpro)}`} />
-            <Kpi rotulo="Retorno do investidor" valor={fR(t.retornoInvestidor)} sub={`capital devolvido + ${fN(a.parteInvestidor * 100, 0)}% do lucro`} />
-          </div>
-
           {foco && (
+            <Bloco titulo={foco.nome} sub={`${foco.fase} · captação de ${foco.dias} dias`}>
+              <div className="g4">
+                <Kpi rotulo="Gasto da turma" valor={fR(foco.gasto)} sub={foco.foraDoAcordo ? "fora do acordo, é da RedPro" : `acordo: ${fR(foco.acordo, 0)}`} />
+                <Kpi rotulo="Receita líquida da turma" valor={fR(foco.receitaLiquida)} sub={`${foco.ingressos} ingressos · ${foco.vendasFormacao} Formação`} />
+                <Kpi rotulo="Devolvido nesta turma" valor={foco.foraDoAcordo ? "—" : fR(foco.devolvido)} sub={foco.foraDoAcordo ? "fora da conta do investidor" : `saldo depois da turma: ${fR(foco.saldoDepois)}`} />
+                <Kpi rotulo="Lucro da turma" valor={foco.foraDoAcordo ? "—" : fR(foco.excedente)} sub={foco.foraDoAcordo ? "100% RedPro" : `investidor ${fR(foco.parteInvestidor)} · RedPro ${fR(foco.parteRedpro)}`} />
+              </div>
+            </Bloco>
+          )}
+
+          <Bloco titulo="Acumulado do acordo" sub="Todas as turmas com o investidor somadas. O saldo passa de uma turma para a seguinte.">
+            <div className="g4">
+              <Kpi rotulo="Investido" valor={fR(t.gasto)} sub="tudo que a Meta cobrou, pago pelo investidor" />
+              <Kpi rotulo="Falta devolver" valor={fR(t.saldoDevedor)} sub={`já voltou ${fR(t.devolvido)}`} />
+              <Kpi rotulo="Lucro a dividir" valor={fR(t.excedente)} sub={`investidor ${fR(t.parteInvestidor)} · RedPro ${fR(t.parteRedpro)}`} />
+              <Kpi rotulo="Retorno do investidor" valor={fR(t.retornoInvestidor)} sub={`capital devolvido + ${fN(a.parteInvestidor * 100, 0)}% do lucro`} />
+            </div>
+          </Bloco>
+
+          {foco && !foco.foraDoAcordo && (
             <Bloco titulo={`${foco.nome}: acordo contra gasto real`} sub={`${fN(foco.diasDecorridos, 1)} de ${foco.dias} dias de captação · ${foco.fase}`}>
               <div className="tab-wrap">
                 <table className="tab">

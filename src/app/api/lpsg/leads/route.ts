@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { lpsgAutorizado } from "@/lib/lpsg-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +27,8 @@ async function buscar(tabela: string, ordem: string) {
     }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+    if (!lpsgAutorizado(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     // Os mais quentes primeiro na ficha de interesse; os mais recentes primeiro na matrícula.
     const [matriculas, status] = await Promise.all([
         buscar("crm_week_matriculas", "criado_em.desc"),

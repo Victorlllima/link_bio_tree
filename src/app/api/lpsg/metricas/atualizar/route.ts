@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { lpsgAutorizado } from "@/lib/lpsg-auth";
 
 // ============================================================
 // Botão "Atualizar agora" do dashboard de tráfego.
@@ -16,7 +17,6 @@ export const dynamic = "force-dynamic";
 
 const SUPABASE_URL = "https://supabase.redpro.com.br";
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY!;
-const LPSG_PASSWORD = process.env.LPSG_PASSWORD || "lpsg2026";
 const META_TOKEN = process.env.META_ADS_TOKEN;
 const AD_ACCOUNT = "961901509283620";
 const GRAPH = "https://graph.facebook.com/v21.0";
@@ -29,7 +29,7 @@ const sbHeaders = {
 
 function authed(req: Request): boolean {
   const cookie = req.headers.get("cookie") || "";
-  return cookie.includes(`lpsg_auth=${LPSG_PASSWORD}`);
+  return lpsgAutorizado(req);
 }
 
 function hojeBR(): string {
