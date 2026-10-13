@@ -265,10 +265,10 @@ export async function POST(req: NextRequest) {
     if (!texto) return NextResponse.json({ ok: true, ignorado: "sem texto" });
 
     const comprador = await buscarComprador(fone);
-    // Não é comprador do ingresso → só avisa o Red, não automatiza nada.
+    // Não é comprador do ingresso → não automatiza nada e não avisa o Red (Red, 12/10/2026:
+    // esse aviso é desnecessário — gerava uma notificação por mensagem de quem nunca comprou).
     if (!comprador) {
-        await telegram(`💬 *WhatsApp* (não é comprador do ingresso)\n\n📱 ${fone}\n\n"${texto.slice(0, 300)}"`);
-        return NextResponse.json({ ok: true, tratado: "encaminhado" });
+        return NextResponse.json({ ok: true, ignorado: "não é comprador" });
     }
 
     const nome = String(comprador.nome ?? "");
