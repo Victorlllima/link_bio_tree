@@ -296,12 +296,10 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ ok: true, tratado: "email_novo", enviou: r.ok });
     }
 
-    // Qualquer outra coisa (dúvida, áudio, "não") → humano decide.
-    await telegram(
-        `💬 *Resposta de comprador — Desafio CRM*\n\n👤 ${nome}\n📱 ${fone}\n📧 ${comprador.email}\n\n` +
-        `"${texto.slice(0, 400)}"\n\n_Responder manualmente._`,
-    );
-    return NextResponse.json({ ok: true, tratado: "encaminhado" });
+    // Qualquer outra coisa (dúvida, áudio, "não") → não notifica mais (Red, 12/10/2026:
+    // "não quero mais receber esse tipo de notificação". O Desafio CRM está em standby;
+    // fica só o registro, sem tocar o Telegram).
+    return NextResponse.json({ ok: true, ignorado: `resposta não classificada de ${nome || fone}` });
 }
 
 export async function GET() {
