@@ -669,6 +669,43 @@ export const RESOURCES: Resource[] = [
     ],
   },
   {
+    slug: "10-skills-hermes",
+    titulo: "10 skills do GitHub para o seu Hermes",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "Dez skills e ferramentas abertas do GitHub para pesquisa, escrita, leitura da web, PDF, código, segurança, memória e design, com o comando para ligar cada uma e o pedido pronto para colar no seu agente.",
+    intro:
+      "Cada skill desta página resolve um gargalo diferente do Hermes: ler X, YouTube e Reddit, escrever sem cara de IA, limpar páginas da web, responder curto, gerar PDF, dividir projeto entre agentes, revisar código, seguir playbooks de segurança, mapear um código grande e caprichar no design. O PDF mostra o que cada uma faz, para quem vale, como ligar no Hermes e o que pedir depois de ligada.",
+    arquivo: "/redreply/pdfs/10-skills-hermes.pdf",
+    secoes: [
+      {
+        titulo: "As dez do guia",
+        texto:
+          "• Agent Reach: o seu agente lê e pesquisa em X, YouTube, Reddit, GitHub e na web\n" +
+          "• Humanizer: tira o jeitão de IA do texto sem mudar o que ele diz\n" +
+          "• Defuddle: entrega só o conteúdo da página, sem menu, anúncio e rodapé\n" +
+          "• Caveman: respostas curtas e diretas, com menos tokens\n" +
+          "• PDF Creator: Markdown vira PDF diagramado, com checagem visual\n" +
+          "• Oh My Hermes: um agente planeja, outro critica e outro executa\n" +
+          "• Agent Skills: spec, teste e revisão antes de o agente chamar de pronto\n" +
+          "• Cybersecurity Skills: 818 playbooks de segurança, um por vez\n" +
+          "• Codebase Memory MCP: um mapa permanente do seu código\n" +
+          "• Make Interfaces Feel Better: os detalhes que fazem uma tela parecer bem-feita",
+      },
+      {
+        titulo: "Formas de ligar no Hermes",
+        texto:
+          "Skill, quando o repositório ensina o agente a fazer algo. MCP, quando ele é um serviço que o agente consulta. E pedido ao agente, quando o projeto tem um guia de instalação escrito para o próprio agente seguir. O guia diz qual forma cada uma usa.",
+      },
+      {
+        titulo: "Por onde começar",
+        texto:
+          "Você não precisa ligar as dez. Escolha a que corta o seu maior atrito de hoje e deixe o resto para depois: um agente com ferramentas demais escolhe pior. Antes de instalar qualquer skill de terceiro, rode o hermes skills inspect com o mesmo endereço e leia o que ela diz.",
+      },
+    ],
+  },
+  {
     slug: "8-repos-hermes",
     titulo: "8 repositórios para o seu Hermes",
     categoria: "Guias",
