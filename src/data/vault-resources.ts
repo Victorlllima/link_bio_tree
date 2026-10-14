@@ -669,6 +669,41 @@ export const RESOURCES: Resource[] = [
     ],
   },
   {
+    slug: "8-repos-hermes",
+    titulo: "8 repositórios para o seu Hermes",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "Oito repositórios abertos do GitHub que ampliam o que o Hermes faz, com o comando para ligar cada um e o pedido pronto para colar no seu agente.",
+    intro:
+      "Cada repositório desta página acrescenta algo que o Hermes não traz de fábrica: escrever sem cara de IA, converter um livro em consulta, revisar a segurança do seu app, procurar vaga, pesquisar em cima das suas fontes, rotear modelos e gerar mídia. O PDF mostra o que cada um faz, para quem vale, como ligar no Hermes e o que pedir depois de ligado.",
+    arquivo: "/redreply/pdfs/8-repos-hermes.pdf",
+    secoes: [
+      {
+        titulo: "Os oito do guia",
+        texto:
+          "• No AI Slop: tira os padrões de escrita de IA do seu texto sem apagar a sua voz\n" +
+          "• I Have ADHD: respostas que abrem com a próxima ação, em passos numerados\n" +
+          "• Book to Skill: transforma um livro ou uma pasta de documentos em uma skill de consulta\n" +
+          "• Strix: pentest com agentes de IA no seu próprio app\n" +
+          "• AI Job Search: avalia a vaga, adapta o currículo e prepara a entrevista\n" +
+          "• Open Notebook: alternativa aberta ao NotebookLM, na sua máquina\n" +
+          "• OmniRoute: um endereço só para vários modelos, com rota reserva\n" +
+          "• Open Generative AI: estúdio de imagem e vídeo que o seu agente pode operar",
+      },
+      {
+        titulo: "Três formas de ligar no Hermes",
+        texto:
+          "Skill, quando o repositório ensina o agente a fazer algo. MCP, quando ele é um serviço que o agente precisa operar. Provider, quando ele entrega modelos. O guia diz qual das três cada repositório usa.",
+      },
+      {
+        titulo: "Por onde começar",
+        texto:
+          "Você não precisa ligar os oito. Escolha o que corta o seu maior atrito de hoje e deixe o resto para depois: um agente com ferramentas demais escolhe pior. Antes de instalar qualquer skill de terceiro, rode o hermes skills inspect com o mesmo endereço e leia o que ela diz.",
+      },
+    ],
+  },
+  {
     slug: "hermes-para-estudos",
     titulo: "Hermes para estudos",
     categoria: "Guias",
