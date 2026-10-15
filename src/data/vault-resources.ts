@@ -669,6 +669,45 @@ export const RESOURCES: Resource[] = [
     ],
   },
   {
+    slug: "12-projetos-hermes",
+    titulo: "12 projetos para construir num fim de semana com o Hermes",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "Doze projetos para fazer com o Hermes, cada um com o que ele faz, o que você precisa ter à mão e o pedido pronto para colar no seu agente.",
+    intro:
+      "Recepcionista de IA, painel do dinheiro, assistente de WhatsApp, caçador de ideias por áudio, braço direito, raspador de comentários, cupido de collabs, link na bio, diário de entregas, planejador de viagem, auditor de assinaturas e checador de segurança. O PDF mostra o que cada projeto faz, para quem vale, o que você precisa ter à mão e o pedido pronto para colar no Hermes.",
+    arquivo: "/redreply/pdfs/12-projetos-hermes.pdf",
+    secoes: [
+      {
+        titulo: "Os doze do guia",
+        texto:
+          "• Recepcionista de IA: responde as mensagens do seu negócio e avisa o que é urgente\n" +
+          "• Painel do dinheiro: reúne as suas fontes de renda numa tela só\n" +
+          "• Assistente de WhatsApp: responde dúvidas e anota pedidos de agendamento\n" +
+          "• Caçador de ideias por áudio: transforma um áudio no Telegram numa lista organizada\n" +
+          "• Braço direito de IA: resumo da agenda e dos e-mails toda manhã\n" +
+          "• Raspador de comentários: transforma perguntas da audiência em ideias de conteúdo\n" +
+          "• Cupido de collabs: junta criadores por nicho, audiência e estilo\n" +
+          "• Link na bio: a sua própria página, com botões e cliques\n" +
+          "• Diário público de entregas: registra o que você fez no projeto, todo dia\n" +
+          "• Planejador de viagem: transforma prints e fotos num roteiro dia a dia\n" +
+          "• Auditor de assinaturas: acha as cobranças recorrentes que você esqueceu\n" +
+          "• Checador de segurança: procura chaves e segredos expostos antes de publicar",
+      },
+      {
+        titulo: "As três peças dos pedidos",
+        texto:
+          "Telegram ou WhatsApp, para o Hermes conversar com você. Rotina diária, para ele trabalhar sozinho no horário. E um app que ele constrói na sua máquina. O guia diz o que cada projeto usa.",
+      },
+      {
+        titulo: "Por onde começar",
+        texto:
+          "Você não precisa fazer os doze. Escolha o que resolve uma dor sua hoje e comece com dados de exemplo. Revise o que o Hermes montou antes de ligar contas reais e nunca envie senha de banco no chat.",
+      },
+    ],
+  },
+  {
     slug: "10-skills-hermes",
     titulo: "10 skills do GitHub para o seu Hermes",
     categoria: "Guias",
