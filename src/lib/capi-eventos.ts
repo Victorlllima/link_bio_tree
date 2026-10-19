@@ -18,10 +18,16 @@
 // Ofertas adicionais (order bumps) da Hermes Week na Hotmart.
 export const BUMPS_HERMES_WEEK: ReadonlySet<string> = new Set(["8551535", "8551609", "8551624"]);
 
+// Formação Arquiteto de Agentes (R$1.497, fundador R$697). Decisão do Red (19/10/2026): vai à Meta
+// como evento personalizado, nunca como `Purchase`, para o valor alto não entrar no sinal que
+// otimiza a captação da Hermes Week (R$62).
+export const PRODUTO_FORMACAO = "8660306";
+
 export const VIRADA_CAPI_BUMP = Date.parse("2026-10-13T00:00:00-03:00");
 
-export type EventoCapi = "Purchase" | "OrderBump";
+export type EventoCapi = "Purchase" | "OrderBump" | "FormacaoPurchase";
 
 export function eventoCapi(produtoId: string, agora: number = Date.now()): EventoCapi {
+  if (produtoId === PRODUTO_FORMACAO) return "FormacaoPurchase";
   return BUMPS_HERMES_WEEK.has(produtoId) && agora >= VIRADA_CAPI_BUMP ? "OrderBump" : "Purchase";
 }

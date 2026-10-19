@@ -50,6 +50,7 @@ const PRODUTOS: Record<string, string> = {
     "8551609": "Oferta extra — 50 casos de uso do Hermes (R$37)",
     "8551624": "Oferta extra — Segundo cérebro com o Hermes (R$47)",
     "8552026": "De Um Agente a Um Squad (R$697)",
+    "8660306": "Formação Arquiteto de Agentes (R$1.497)",
 };
 
 // Quem compra o ingresso recebe as boas-vindas por WhatsApp (3 passos do Tabari).
@@ -119,10 +120,11 @@ async function metaCapi(
                     action_source: "website",
                     event_id: eventId,
                     user_data,
-                    // Purchase mantém exatamente o custom_data de sempre. O bump (OrderBump) leva
-                    // também o produto, para dar para separar no Events Manager.
+                    // Purchase mantém exatamente o custom_data de sempre. O bump (OrderBump) e a
+                    // Formação (FormacaoPurchase) levam também o produto, para dar para separar
+                    // no Events Manager.
                     custom_data:
-                        evento === "OrderBump" && produto
+                        evento !== "Purchase" && produto
                             ? { value: valor, currency: moeda, content_name: produto.nome, content_ids: [produto.id], content_type: "product" }
                             : { value: valor, currency: moeda },
                 }],
