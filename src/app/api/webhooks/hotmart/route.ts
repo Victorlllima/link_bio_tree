@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { enviarMensagem } from "@/lib/whatsapp";
-import { estadoInstancia } from "@/lib/evolution";
-import { confirmarEmail, emailBoasVindas } from "@/lib/mensagens-crmweek";
 import { emailConfirmacao as emailConfirmacaoHermesWeek, emailBoasVindas as emailBoasVindasHermesWeek, emailRecuperacao as emailRecuperacaoHermesWeek } from "@/lib/mensagens-hermesweek";
 import { lerCicloAtual } from "@/lib/ciclo-atual";
-import { enfileirar } from "@/lib/wpp-fila";
 import { BUMPS_HERMES_WEEK, eventoCapi, type EventoCapi } from "@/lib/capi-eventos";
 
 /**
@@ -28,7 +24,7 @@ import { BUMPS_HERMES_WEEK, eventoCapi, type EventoCapi } from "@/lib/capi-event
  *   META_CAPI_ACCESS_TOKEN ✅ (pixel é hardcoded, igual /api/meta-capi)
  *   RESEND_API_KEY ✅ (conferido na API da Vercel em 06/09/2026 — o aviso antigo de que
  *     não estava lá era falso e induzia erro em quem lia)
- *   RESEND_CRMWEEK_AUDIENCE_ID ✅ · RESEND_IAA_AUDIENCE_ID ✅ · RESEND_HERMESWEEK_AUDIENCE_ID ✅
+ *   RESEND_IAA_AUDIENCE_ID ✅ · RESEND_HERMESWEEK_AUDIENCE_ID ✅
  *
  * Nada disso derruba o webhook: cada serviço falha isolado, loga, e o Telegram avisa com ⚠️.
  */
@@ -43,7 +39,6 @@ const PIXEL_ID = "1543917230170877";
 // Produtos (ver .claude/workspace/hotmart_doc.md)
 const PRODUTOS: Record<string, string> = {
     "8039631": "IAA — Introdução à Automação (R$17)",
-    "8124888": "Ingresso — Desafio CRM em 5 Dias (R$44)",
     "7646318": "Claude for Business",
     "8443182": "Ingresso — Hermes Week (R$62)",
     "8551535": "Oferta extra — 100 plugins do Hermes (R$27)",
@@ -53,8 +48,6 @@ const PRODUTOS: Record<string, string> = {
     "8660306": "Formação Arquiteto de Agentes (R$1.497)",
 };
 
-// Quem compra o ingresso recebe as boas-vindas por WhatsApp (3 passos do Tabari).
-const PRODUTO_INGRESSO = "8124888";
 const PRODUTO_HERMES_WEEK = "8443182";
 
 const sha256 = (v: string) => crypto.createHash("sha256").update(v.trim().toLowerCase()).digest("hex");
@@ -192,11 +185,8 @@ async function enviarEmailRecuperacao(email: string, nome: string, motivo: "expi
     }
 }
 
-// Cada produto tem sua audiência no Resend — segmentação por produto, igual ao
-// WhatsApp. Antes TODO comprador caía na lista do CRM Week (bug): quem comprava
-// só o IAA recebia o e-mail de aluno do evento. IDs verificados na API 23/07.
+// Cada produto tem sua audiência no Resend (segmentação por produto). IDs verificados na API 23/07.
 const AUDIENCIA_POR_PRODUTO: Record<string, string | undefined> = {
-    "8124888": process.env.RESEND_CRMWEEK_AUDIENCE_ID,   // Ingresso → crm-week-ingresso
     "8039631": process.env.RESEND_IAA_AUDIENCE_ID,       // IAA → compradores-r17
     "8443182": process.env.RESEND_HERMESWEEK_AUDIENCE_ID, // Ingresso → Hermes Week (criar audiência nova no Resend, ver HERMES/CHECKLIST-VIRADA-CICLO.md)
 };
@@ -234,25 +224,6 @@ async function resend(email: string, nome: string, produtoId: string) {
  * Enquanto o remetente era `red@`, toda resposta de comprador voltava com
  * erro e ninguém ficava sabendo. */
 const REMETENTE = "RedPro AI Academy <suporte@redpro.com.br>";
-
-// ENVIA o e-mail de boas-vindas (rede de segurança: grupo + ficha). Diferente de resend(),
-// que só inscreve na audiência sem disparar nada.
-async function enviarEmailBoasVindas(email: string, nome: string) {
-    const key = process.env.RESEND_API_KEY;
-    if (!key || !email) return { ok: false, erro: "sem RESEND_API_KEY ou email" };
-    const { subject, html } = emailBoasVindas(nome);
-    try {
-        const res = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ from: REMETENTE, to: [email], subject, html }),
-        });
-        if (!res.ok) return { ok: false, erro: `${res.status} ${await res.text()}` };
-        return { ok: true };
-    } catch (e) {
-        return { ok: false, erro: String(e) };
-    }
-}
 
 /**
  * Data/hora do e-mail D+1: 09h BRT do dia seguinte à compra.
@@ -391,13 +362,7 @@ export async function POST(req: NextRequest) {
     if (!gravou.ok) console.error("[hotmart] falha ao gravar:", gravou.erro);
 
     if (evento === "PURCHASE_APPROVED") {
-        // WhatsApp só pro ingresso do Desafio, e só se a Hotmart mandou telefone.
-        // Aqui vai a MENSAGEM 1: uma pergunta de um toque (confirma o e-mail).
-        // Os passos 2 e 3 saem em /api/webhooks/evolution, quando a pessoa responde —
-        // resposta primeiro abre a janela de 24h e protege o número do banimento.
-        const ehIngresso = produtoId === PRODUTO_INGRESSO;
         const ehHermesWeek = produtoId === PRODUTO_HERMES_WEEK;
-        const enviarWpp = ehIngresso && Boolean(fone);
 
         // 🔴 GATE DE PRODUTO NO CAPI (08/09/2026). O botão "testar" do painel da
         // Hotmart manda um PURCHASE_APPROVED completo, com produto id "0", e-mail
@@ -411,16 +376,11 @@ export async function POST(req: NextRequest) {
         const ehAdicional = BUMPS_HERMES_WEEK.has(produtoId);
         const nomeEventoCapi = eventoCapi(produtoId);
 
-        const [capi, lista, wpp, mail] = await Promise.all([
+        const [capi, lista] = await Promise.all([
             produtoConhecido
                 ? metaCapi(email, nome, fone, valor, moeda, transacao, nomeEventoCapi, { id: produtoId, nome: produtoNome })
                 : Promise.resolve({ ok: true as const }),
             ehAdicional ? Promise.resolve({ ok: true as const }) : resend(email, nome, produtoId),
-            enviarWpp
-                ? enviarMensagem(fone, confirmarEmail(nome, email, fone))
-                : Promise.resolve(null),
-            // E-mail de boas-vindas (rede de segurança grupo+ficha) só pro ingresso.
-            ehIngresso ? enviarEmailBoasVindas(email, nome) : Promise.resolve(null),
         ]);
 
         /* ------------------------------------------------------------------
@@ -445,43 +405,8 @@ export async function POST(req: NextRequest) {
         }
         if (!capi.ok) console.error("[hotmart] CAPI:", "erro" in capi ? capi.erro : "");
         if (!lista.ok) console.error("[hotmart] Resend audiência:", lista.erro);
-        if (wpp && !wpp.ok) console.error("[hotmart] WhatsApp:", wpp.erro);
-        if (mail && !mail.ok) console.error("[hotmart] e-mail boas-vindas:", mail.erro);
         if (mailHW1 && !mailHW1.ok) console.error("[hotmart] e-mail 1 Hermes Week:", mailHW1.erro);
         if (mailHW2 && !mailHW2.ok) console.error("[hotmart] e-mail 2 Hermes Week:", mailHW2.erro);
-
-        // 🔴 ALERTA ANTI-SILÊNCIO — dispara ANTES do resumo de venda e SEPARADO dele.
-        // Contexto (25/07/2026, ION): a 1ª venda real do CRM Week saiu, mas o WhatsApp
-        // de boas-vindas NÃO foi entregue — a instância Evolution estava `close` e a
-        // falha só virava um "⚠️ WhatsApp falhou" perdido no rodapé da msg de sucesso.
-        // Ninguém percebeu. Agora, se o WhatsApp do ingresso falhar (ou o comprador vier
-        // sem telefone), o Red recebe um alerta próprio, chamativo, com o estado real da
-        // instância — pra saber na hora se precisa reconectar (ler o QR no celular).
-        if (ehIngresso && (!fone || (wpp && !wpp.ok))) {
-            // Consulta o estado real da instância na fonte — não adianta chutar.
-            const estado = fone ? await estadoInstancia() : null;
-            const diagInstancia = estado
-                ? estado.ok
-                    ? estado.estado === "open"
-                        ? "🟢 instância `open` (conectada) — a falha NÃO é de conexão, investigar o número/mensagem"
-                        : `🔴 instância *${estado.estado ?? "?"}* — WhatsApp DESCONECTADO, precisa reconectar (ler o QR no celular)`
-                    : `⚠️ não consegui checar o estado da instância: ${estado.erro}`
-                : "";
-
-            await telegram([
-                "🔴🔴 *WHATSAPP DE BOAS-VINDAS NÃO SAIU* 🔴🔴",
-                "",
-                `Comprou o *ingresso* mas NÃO recebeu a mensagem 1:`,
-                `👤 ${nome || "—"}`,
-                fone ? `📱 ${fone}` : "📱 🔴 comprador SEM telefone no cadastro",
-                `📧 ${email || "—"}`,
-                "",
-                fone ? `Erro do envio: \`${wpp?.erro ?? "—"}\`` : "",
-                diagInstancia,
-                "",
-                "➡️ *Ação:* reconecta a `academy-suporte` (QR no WhatsApp) e, se quiser, reenvia a msg 1 manualmente.",
-            ].filter(Boolean).join("\n"));
-        }
 
         /* O aviso de cada venda no Telegram saiu em 09/10/2026 (Red): a Hotmart já avisa, e o
          * aviso repetido chegava 4 vezes por pedido com bump. Só sobra o alerta de falha:
@@ -491,7 +416,6 @@ export async function POST(req: NextRequest) {
         if (!gravou.ok) falhas.push("não gravou no banco");
         if (!capi.ok) falhas.push(`Meta CAPI: ${"erro" in capi ? capi.erro : "falhou"}`);
         if (!lista.ok && audienciaMapeada) falhas.push(`Resend (audiência): ${"erro" in lista ? lista.erro : "falhou"}`);
-        if (ehIngresso && mail && !mail.ok) falhas.push("e-mail de boas-vindas");
         if (ehHermesWeek && !mailHW1?.ok) falhas.push("e-mail 1 da Hermes Week (confirmação)");
         if (ehHermesWeek && !mailHW2?.ok) falhas.push("e-mail 2 da Hermes Week (não agendou)");
         if (falhas.length) {
@@ -510,47 +434,13 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({
             ok: true, evento, gravou: gravou.ok, capi: capi.ok, resend: lista.ok,
-            email_boas_vindas: ehIngresso ? (mail?.ok ?? false) : null,
             email_hermes_week: ehHermesWeek ? { e1: mailHW1?.ok ?? false, e2: mailHW2?.ok ?? false } : null,
-            whatsapp: wpp ? wpp.ok : null,
         });
     }
 
-    if (evento === "PURCHASE_OUT_OF_SHOPPING_CART") {
-        // Abandono de checkout. Payload diferente do de compra: sem
-        // purchase/price (ninguém pagou ainda) — `fone` já cobre buyer.phone
-        // como fallback (linha acima). Ver developers.hotmart.com/.../cart-abandonment-webhook.
-        const ehIngressoAbandono = produtoId === PRODUTO_INGRESSO;
-
-        if (ehIngressoAbandono && fone) {
-            // Approval gate: só enfileira. O envio de verdade depende de
-            // "crmweek-c1-abandono" estar em WPP_CAMPANHAS_ATIVAS (Vercel) — a
-            // mesma trava que protege as outras campanhas de disparo em massa.
-            const r = await enfileirar("crmweek-c1-abandono", [
-                { telefone: fone.replace(/\D/g, ""), nome },
-            ]);
-            if (!r.ok) console.error("[hotmart] enfileirar abandono:", r.erro);
-            await telegram(
-                `🟡 *Abandono de checkout* — ${produtoNome}\n\n` +
-                `👤 ${nome || "—"}\n📱 ${fone || "—"}\n📧 ${email || "—"}\n\n` +
-                `${r.ok ? "✅ enfileirado pra recuperação (crmweek-c1-abandono)" : `⚠️ falha ao enfileirar: ${r.erro}`}`,
-            );
-        } else if (ehIngressoAbandono) {
-            // Abandonou mas a Hotmart não mandou telefone — não dá pra recuperar por WhatsApp.
-            await telegram(`🟡 *Abandono de checkout* — ${produtoNome}\n\n👤 ${nome || "—"}\n📧 ${email || "—"}\n\n📱 sem telefone — recuperação por WhatsApp não é possível.`);
-        }
-
-        /* 🔴 CORRIGIDO 14/09/2026 (ZENITH): este return era incondicional e matava a
-         * recuperação da Hermes Week. O bloco abaixo trata
-         * `PURCHASE_OUT_OF_SHOPPING_CART && PRODUTO_HERMES_WEEK`, mas nunca era
-         * alcançado — o abandono da Week caía aqui, não batia em nenhum `if`
-         * (a condição compara com PRODUTO_INGRESSO, que é a CRM Week) e retornava
-         * em silêncio. Custou pelo menos uma recuperação: Gustavo Monteiro
-         * abandonou em 12/09 14:07 e não recebeu e-mail nenhum.
-         * A Week agora NÃO retorna aqui — cai no bloco de recuperação por e-mail. */
-        if (produtoId !== PRODUTO_HERMES_WEEK) {
-            return NextResponse.json({ ok: true, evento, gravou: gravou.ok, enfileirado: ehIngressoAbandono && Boolean(fone) });
-        }
+    // Abandono de checkout de outro produto: só registra (a recuperação por e-mail é só da Hermes Week, abaixo).
+    if (evento === "PURCHASE_OUT_OF_SHOPPING_CART" && produtoId !== PRODUTO_HERMES_WEEK) {
+        return NextResponse.json({ ok: true, evento, gravou: gravou.ok });
     }
 
     /* ------------------------------------------------------------------
@@ -560,9 +450,7 @@ export async function POST(req: NextRequest) {
      *   PURCHASE_EXPIRED            → gerou Pix/boleto e o código venceu
      *   PURCHASE_OUT_OF_SHOPPING_CART → abandonou o checkout (Hermes Week)
      *
-     * O abandono do ingresso da CRM Week continua no bloco abaixo, por
-     * WhatsApp. Aqui é e-mail, porque a instância da Evolution está
-     * desconectada e e-mail é o único canal da Hermes Week que está provado.
+     * Recuperação por e-mail, o canal provado da Hermes Week.
      * ---------------------------------------------------------------- */
     const recuperavel =
         evento === "PURCHASE_EXPIRED" ||

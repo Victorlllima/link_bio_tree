@@ -3,7 +3,7 @@ import { lpsgAutorizado } from "@/lib/lpsg-auth";
 
 export const dynamic = "force-dynamic";
 
-// Lê as duas fichas do CRM Week para o painel /lpsg (aba "Leads").
+// Lê as duas fichas da Hermes Week para o painel /lpsg (aba "Leads").
 // Protegido pelo mesmo gate de senha do painel (LPSG_PASSWORD via cookie) — ver /api/lpsg/auth.
 
 const SUPABASE_URL = "https://supabase.redpro.com.br";
@@ -31,8 +31,8 @@ export async function GET(req: Request) {
     if (!lpsgAutorizado(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     // Os mais quentes primeiro na ficha de interesse; os mais recentes primeiro na matrícula.
     const [matriculas, status] = await Promise.all([
-        buscar("crm_week_matriculas", "criado_em.desc"),
-        buscar("crm_week_status", "score.desc,criado_em.desc"),
+        buscar("hermes_week_matriculas", "criado_em.desc"),
+        buscar("hermes_week_interesse", "score.desc,criado_em.desc"),
     ]);
 
     return NextResponse.json({ ok: true, matriculas, status });

@@ -11,7 +11,7 @@ import { linkVeto } from "@/lib/aprovacao-disparo";
  * Agora o padrão é SAIR. O Red recebe o aviso 30 min antes e só toca se quiser
  * SEGURAR. Silêncio = aprovado.
  *
- * Espelha o auto-chain de wpp-fila (Vercel Hobby: cron 1x/dia + função ~60s).
+ * Auto-encadeado (Vercel Hobby: cron 1x/dia + função ~60s).
  * O cron diário só REARMA a cadeia; uma vez rodando, a rota se re-chama a cada
  * ~3 min e cobre o dia todo, sem depender de cron sub-diário.
  *
