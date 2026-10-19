@@ -4,7 +4,7 @@ import { lerCicloAtual } from "@/lib/ciclo-atual";
 export const dynamic = "force-dynamic";
 
 // FICHA DE INTERESSE — HERMES WEEK (abre na aula 4, quinta 20h).
-// Mesmo motor de /api/crm-week-status: mesma tabela `crm_week_status`, mesmo painel /lpsg.
+// Grava na tabela `hermes_week_interesse` (lida pelo painel /lpsg, pelo dashboard e pela Amanda na VPS).
 // O que muda: as opções são do Hermético, e existe uma 5ª resposta — a pergunta de valor
 // ancorado (R$1.397, dobro do preço real de R$697), que é o termômetro do Tabari.
 
@@ -76,7 +76,7 @@ async function salvar(d: Record<string, string>, tag: string, score: number) {
     if (!key) return { ok: false, erro: "SUPABASE_SERVICE_KEY ausente" };
     try {
         const res = await fetch(
-            `${SUPABASE_URL}/rest/v1/crm_week_status?on_conflict=ciclo,email`,
+            `${SUPABASE_URL}/rest/v1/hermes_week_interesse?on_conflict=ciclo,email`,
             {
                 method: "POST",
                 headers: {

@@ -4,11 +4,10 @@ import { lerCicloAtual, formatarCiclo, type CicloFormatado } from "@/lib/ciclo-a
 /* ============================================================================
  *  /hermes-week/obrigado  ·  página pós-compra da Hermes Week
  * ----------------------------------------------------------------------------
- *  Adaptada da /lpsg-obrigado (CRM Week, ago/2026). O que mudou e por quê:
+ *  Decisões e por quê:
  *
- *  1. O grupo aqui é ENTRADA, não confirmação. Na CRM Week o comprador já
- *     estava no grupo desde o IAA, então a página só lembrava. Na Hermes Week
- *     ele compra direto pelo tráfego e nunca esteve em grupo nenhum — se ele
+ *  1. O grupo aqui é ENTRADA, não confirmação. O comprador da Hermes Week
+ *     compra direto pelo tráfego e nunca esteve em grupo nenhum — se ele
  *     não clicar aqui, não entra, e o grupo é a entrega principal. Por isso o
  *     bloco 1 é o único com botão e vem antes de qualquer outra coisa.
  *

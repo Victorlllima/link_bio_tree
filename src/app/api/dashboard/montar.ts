@@ -5,7 +5,7 @@
 //   Meta Marketing API (ao vivo, cache de 90s) → tráfego, criativos
 //   Supabase hotmart_compras (webhook)         → ingressos, bumps, Formação,
 //                                                abandono, reembolso, origem
-//   Supabase hermes_week_matriculas / crm_week_status (ciclo = D0 + 7) → fichas
+//   Supabase hermes_week_matriculas / hermes_week_interesse (ciclo = D0 + 7) → fichas
 //   Supabase grupos_ciclo + disparos_grupo + Evolution → grupo e mensageria
 //   Supabase hw_dash_manual                     → o que não tem API (presença
 //                                                ao vivo, únicos, verba de
@@ -285,7 +285,7 @@ export async function montar(pedido: string, opts: { leve?: boolean; cal?: Ciclo
     }),
     sb<{ email: string }[]>(`hermes_week_matriculas?select=email&criado_em=gte.${encodeURIComponent(desde)}`).catch(() => []),
     sb<{ email: string; tag: string; criado_em: string }[]>(
-      `crm_week_status?select=email,tag,criado_em&criado_em=gte.${encodeURIComponent(em(dia(d0, 3), "00:00").toISOString())}&criado_em=lt.${encodeURIComponent(em(dia(d0, 7), "21:00").toISOString())}`,
+      `hermes_week_interesse?select=email,tag,criado_em&criado_em=gte.${encodeURIComponent(em(dia(d0, 3), "00:00").toISOString())}&criado_em=lt.${encodeURIComponent(em(dia(d0, 7), "21:00").toISOString())}`,
     ).catch(() => []),
     sb<{ ciclo: string; tipo_grupo: string; jid: string; nome_grupo: string }[]>(
       `grupos_ciclo?ciclo=eq.hermes-week-${idx + 1}&tipo_grupo=eq.semana&select=ciclo,tipo_grupo,jid,nome_grupo`,

@@ -10,7 +10,7 @@ import { lerCicloAtual } from "@/lib/ciclo-atual";
  * qualificação MQL acontece na ficha de INTERESSE, que abre na Aula 4 e
  * ainda não existe.
  *
- * Diferença pro /api/crm-week-matricula (funil antigo, em standby): o ciclo
+ * O ciclo
  * NÃO é constante no código. A Hermes Week roda toda semana com a mesma URL,
  * então o ciclo vem de `ciclo_atual.data_inicio`, escrito pelo Alfred toda
  * sexta. Sem isso a ficha do ciclo 2 sobrescreveria a do ciclo 1.

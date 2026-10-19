@@ -8,7 +8,7 @@ create table if not exists public.garantia_marcos (
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now(),
 
-  -- chave do aluno (casa com academy_matriculas.email / crm_week_matriculas)
+  -- chave do aluno (casa com academy_matriculas.email / hermes_week_matriculas)
   email        text not null,
   nome         text,
 

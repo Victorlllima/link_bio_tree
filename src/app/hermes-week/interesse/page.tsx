@@ -6,7 +6,7 @@ import { useState } from "react";
 // "pré-pitch sem preço + ficha de interesse". Quem preenche entra na inscrição às 6h50
 // (10 min antes) e leva o squad pronto para importar (bônus travado com o Red em 23/09).
 //
-// Adaptada de /crm-week-status (mesmo motor: mesma API, mesma tabela, mesmo painel /lpsg).
+// Grava em hermes_week_interesse pela /api/hermes-week-interesse (lida pelo painel /lpsg).
 // A 4ª pergunta é nova e é a do Tabari: disposição a pagar no VALOR ANCORADO (R$1.397),
 // que é o dobro do preço real de R$697. Ele mede a divisão ideal 20% sim / 20% não /
 // 60% preciso de mais informação, e calibra o pitch de domingo com isso.

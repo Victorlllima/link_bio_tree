@@ -2,14 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-// Aba "Leads" do painel /lpsg — mostra as duas fichas do CRM Week.
-// Matrículas: quem comprou o ingresso e preencheu o onboarding.
+// Aba "Leads" do painel /lpsg: as duas fichas da Hermes Week.
+// Matrículas: quem comprou o ingresso e preencheu a ficha de matrícula.
 // Interesse (MQL): quem preencheu na aula 4 — ordenado do mais quente pro mais frio.
 
 type Matricula = {
   id: number; ciclo: string; nome: string; email: string; whatsapp: string;
-  ocupacao: string | null; nivel_ia: string | null; ja_construiu: string | null;
-  nicho: string | null; objetivo: string | null; maior_duvida: string | null;
+  profissao: string | null; sistema: string | null; ja_tentou: string | null;
+  onde_travou: string | null; o_que_quer: string | null; maior_duvida: string | null;
   criado_em: string;
 };
 
@@ -113,8 +113,8 @@ export default function LeadsPainel() {
         <button
           style={s.btnCSV}
           onClick={() => vista === "status"
-            ? baixarCSV(`crm-week-interesse-${new Date().toISOString().slice(0, 10)}`, statusFiltrado as unknown as Record<string, unknown>[])
-            : baixarCSV(`crm-week-matriculas-${new Date().toISOString().slice(0, 10)}`, matriculas as unknown as Record<string, unknown>[])}
+            ? baixarCSV(`hermes-week-interesse-${new Date().toISOString().slice(0, 10)}`, statusFiltrado as unknown as Record<string, unknown>[])
+            : baixarCSV(`hermes-week-matriculas-${new Date().toISOString().slice(0, 10)}`, matriculas as unknown as Record<string, unknown>[])}
         >
           ⬇ Exportar CSV
         </button>
@@ -179,7 +179,7 @@ export default function LeadsPainel() {
             <table style={s.tabela}>
               <thead>
                 <tr>
-                  {["Nome", "Contato", "Faz hoje", "Nível IA", "Já construiu", "Objetivo", "Nicho", "Maior dúvida", "Quando"].map((h) => (
+                  {["Nome", "Contato", "Profissão", "Sistema", "Já tentou", "O que quer", "Onde travou", "Maior dúvida", "Quando"].map((h) => (
                     <th key={h} style={s.th}>{h}</th>
                   ))}
                 </tr>
@@ -192,11 +192,11 @@ export default function LeadsPainel() {
                       <div style={s.contato}>{m.whatsapp}</div>
                       <div style={s.contatoDim}>{m.email}</div>
                     </td>
-                    <td style={s.td}>{lbl(m.ocupacao)}</td>
-                    <td style={s.td}>{lbl(m.nivel_ia)}</td>
-                    <td style={s.td}>{lbl(m.ja_construiu)}</td>
-                    <td style={s.td}>{lbl(m.objetivo)}</td>
-                    <td style={s.td}>{m.nicho || "—"}</td>
+                    <td style={s.td}>{lbl(m.profissao)}</td>
+                    <td style={s.td}>{lbl(m.sistema)}</td>
+                    <td style={s.td}>{lbl(m.ja_tentou)}</td>
+                    <td style={s.td}>{lbl(m.o_que_quer)}</td>
+                    <td style={s.td}>{m.onde_travou || "—"}</td>
                     <td style={{ ...s.td, maxWidth: 240, color: "#B8B8B8" }}>{m.maior_duvida || "—"}</td>
                     <td style={{ ...s.td, whiteSpace: "nowrap", color: "#8A8A8A" }}>{dataBR(m.criado_em)}</td>
                   </tr>

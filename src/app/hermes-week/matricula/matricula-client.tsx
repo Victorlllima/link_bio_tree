@@ -250,7 +250,6 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 // Paleta âmbar da Hermes Week (#E8A33D), a mesma de /hermes-week/obrigado.
-// Não usa o laranja #F97316 do CRM Week de propósito: são funis diferentes.
 const S: Record<string, React.CSSProperties> = {
   root: { minHeight: "100vh", background: "#0A0A0C", color: "#F5F5F5", fontFamily: "'JetBrains Mono', ui-monospace, monospace", padding: "48px 20px", display: "flex", justifyContent: "center" },
   wrap: { maxWidth: 560, width: "100%" },

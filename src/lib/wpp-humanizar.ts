@@ -7,7 +7,6 @@
  * de ban mais comuns são denúncia do destinatário e MENSAGEM IDÊNTICA em massa.
  *
  * Este módulo ataca a segunda: nenhuma variável fixa, nenhum texto repetido.
- * O delay aleatório e a fila de disparo vivem em `wpp-fila.ts`.
  */
 
 /**

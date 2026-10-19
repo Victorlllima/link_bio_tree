@@ -1,7 +1,7 @@
 /**
  * Mensagens da Hermes Week.
  *
- * Diferente do mensagens-crmweek.ts (funil antigo, em standby), os dois
+ * Os dois
  * valores que mudam a cada ciclo semanal — data de início e link do grupo —
  * NÃO são constantes fixas aqui. Eles vêm da tabela `ciclo_atual` no
  * Supabase, escrita pelo Alfred toda sexta-feira (ver
@@ -132,7 +132,7 @@ export function emailBoasVindas(nome: string, ciclo: CicloAtual): { subject: str
  *  (`PURCHASE_BILLET_PRINTED`, 12h03) e o `PURCHASE_EXPIRED` entrou às 01h32 do
  *  dia seguinte. O webhook registrou os dois eventos e **nada disparou**.
  *
- *  Por que e-mail e não WhatsApp: a recuperação do ciclo anterior (CRM Week) usa
+ *  Por que e-mail e não WhatsApp: a recuperação antiga usava
  *  fila da Evolution, e a instância `academy-suporte` está desconectada desde
  *  04/09. E-mail é o único canal da Hermes Week que está provado funcionando.
  *
