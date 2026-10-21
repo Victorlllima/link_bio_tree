@@ -32,9 +32,9 @@ import { useEffect, useState } from "react";
  *  INTERESSE, que abre na Aula 4 e qualifica de verdade.
  * ==========================================================================*/
 
-// O link do grupo NÃO mora mais aqui (12/10/2026): chega por prop, lido de `ciclo_atual` (Supabase) pelo
-// page.tsx. Antes era uma constante cravada que a virada de segunda precisava editar e publicar à mão;
-// com a virada rodando na VPS, isso deixava o comprador novo caindo no grupo da turma em aula.
+// O link do grupo NÃO aparece mais nesta ficha (21/10/2026, Red). O link só vai por e-mail: a ficha lê `ciclo_atual`,
+// que depois da virada de segunda aponta para a captação do ciclo seguinte, e mandava para o grupo errado quem já
+// estava na turma em aula e preenchia a ficha depois da virada (4 casos entre 19 e 21/10).
 
 type Form = {
   nome: string; email: string; ddi: string; whatsapp: string;
@@ -63,7 +63,7 @@ const INITIAL: Form = {
   gasto_mes: "", tempo_perdido: "", o_que_quer: "",
 };
 
-export default function HermesWeekMatriculaPage({ grupoUrl }: { grupoUrl: string }) {
+export default function HermesWeekMatriculaPage() {
   const [form, setForm] = useState<Form>(INITIAL);
 
   /* Nome e e-mail chegam prontos pela URL (?nome=&email=), montada pelo webhook
@@ -121,15 +121,9 @@ export default function HermesWeekMatriculaPage({ grupoUrl }: { grupoUrl: string
               Anotado. Vou usar suas respostas pra ajustar os exemplos das aulas, principalmente
               a parte da instalação, que muda de acordo com o sistema.
               <br /><br />
-              Agora falta <strong style={{ color: "#E8A33D" }}>uma coisa só</strong>: entrar no grupo.
-              É por lá que chegam os links de cada aula. Quem não entra no grupo não recebe os links.
+              Falta só entrar no grupo do WhatsApp, é por lá que chegam os links de cada aula. O link está no
+              e-mail de confirmação da sua compra. Se não encontrar, olha a caixa de spam ou escreve pra suporte@redpro.com.br.
             </p>
-            <a href={grupoUrl} style={S.btnWpp} target="_blank" rel="noopener noreferrer">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-              </svg>
-              Entrar no grupo do WhatsApp
-            </a>
           </div>
         ) : (
           <>
