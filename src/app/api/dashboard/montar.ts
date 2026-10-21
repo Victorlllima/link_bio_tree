@@ -36,6 +36,7 @@ function ehCampanhaHermesWeek(nome: string): boolean {
   return nome.includes(FILTRO_CAMPANHA) || PREFIXOS_BOOST_IG.some((p) => nome.startsWith(p));
 }
 const PRIMEIRO_D0 = "2026-09-21";
+export const PRODUTO_FORMACAO = "8660306";
 
 function sbH() {
   const k = process.env.SUPABASE_SERVICE_KEY!;
@@ -264,7 +265,8 @@ export async function montar(pedido: string, opts: { leve?: boolean; cal?: Ciclo
   const carrinhoFecha = em(dia(d0, 7), "21:00");
   // o carrinho só fica aberto na segunda: as vendas da Formação vão da apresentação até o fim dessa segunda
   const backendIni = em(dia(d0, 6), "20:00");
-  const backendFim = em(dia(d0, 8), "00:00");
+  // boleto emitido com o carrinho aberto compensa até ~3 dias depois: a venda continua da turma (Red, 21/10/2026)
+  const backendFim = em(dia(d0, 10), "00:00");
   const { fase, proximo } = faseDo(d0, agora);
 
   // ---------- leituras do banco em paralelo ----------
@@ -274,9 +276,10 @@ export async function montar(pedido: string, opts: { leve?: boolean; cal?: Ciclo
   );
   const manual: Record<string, number> = {};
   for (const r of manualRows) if (r.valor !== null) manual[r.chave] = Number(r.valor);
+  // Formação Arquiteto de Agentes (Hotmart 8660306). Sem isto o painel não lia nenhuma venda dela.
   const produtoBackend = manual.produto_formacao_id
     ? String(manual.produto_formacao_id)
-    : process.env.HW_PRODUTO_FORMACAO || null;
+    : process.env.HW_PRODUTO_FORMACAO || PRODUTO_FORMACAO;
   if (produtoBackend) prodIds.push(produtoBackend);
 
   // O histórico inteiro é carregado de propósito: a Hotmart manda PURCHASE_COMPLETE 7 dias depois
@@ -1016,4 +1019,24 @@ export function resumir(d: Dados): Resumo {
     convBackend: d.backend.conv,
     lucro: d.financeiro.investimento > 0 ? d.financeiro.lucro : null,
   };
+}
+
+
+// ============================================================
+// Usados pelo recorte por período e pelo corte exato das 20h
+// ============================================================
+export { sb, meta, lerMeta, ehDistribuicao, ehCampanhaHermesWeek, dia, em, brDia, brHora, r2 };
+export type { Compra };
+
+/** Gasto da Hermes Week (campanhas HWK_ e boost do Instagram) depois das 20h de um dia (Brasília). */
+export async function gastoDepoisDas20(diaBr: string): Promise<number> {
+  if (diaBr > brDia(new Date())) return 0;
+  const tr = encodeURIComponent(JSON.stringify({ since: diaBr, until: diaBr }));
+  const j = (await meta(
+    `act_${AD_ACCOUNT}/insights?time_range=${tr}&level=campaign&fields=campaign_name,spend&breakdowns=hourly_stats_aggregated_by_advertiser_time_zone&limit=500`,
+  )) as { data?: Record<string, string>[] };
+  return (j.data || [])
+    .filter((r) => ehCampanhaHermesWeek(String(r.campaign_name || "")))
+    .filter((r) => parseInt(String(r.hourly_stats_aggregated_by_advertiser_time_zone), 10) >= 20)
+    .reduce((s, r) => s + Number(r.spend || 0), 0);
 }

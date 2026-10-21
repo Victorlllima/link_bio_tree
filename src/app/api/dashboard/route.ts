@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { montar, listarCiclos, resumir } from "./montar";
 import { montarInvestidor } from "./investidor";
+import { montarRecorte } from "./recorte";
 import { lpsgAutorizado } from "@/lib/lpsg-auth";
 
 // GET /api/dashboard?vivos=1            → as turmas ao vivo agora (captação e/ou aula) + lista de turmas
 // GET /api/dashboard?ciclo=YYYY-MM-DD   → todos os números de uma turma (D0 = segunda da Aula 1)
 // GET /api/dashboard?comparativo=1      → resumo de todas as turmas
 // GET /api/dashboard?investidor=1       → gasto, devolução e divisão 30/70 por turma
+// GET /api/dashboard?recorte=total_baby|total_geral|periodo[&de=YYYY-MM-DD&ate=YYYY-MM-DD] → mesmos números de qualquer janela de datas
 // Mesmo login do /lpsg (cookie lpsg_auth).
 
 export const dynamic = "force-dynamic";
@@ -24,6 +26,12 @@ export async function GET(req: Request) {
   try {
     const { cal, atual, captacao, aula } = await listarCiclos();
     const lista = cal.map((c) => ({ d0: c.d0, nome: c.nome, indice: c.indice }));
+
+    const modoRecorte = url.searchParams.get("recorte");
+    if (modoRecorte === "periodo" || modoRecorte === "total_baby" || modoRecorte === "total_geral") {
+      const r = await montarRecorte(modoRecorte, url.searchParams.get("de"), url.searchParams.get("ate"));
+      return NextResponse.json({ ...r, ciclos: lista });
+    }
 
     if (url.searchParams.get("investidor")) {
       return NextResponse.json(await montarInvestidor(cal));

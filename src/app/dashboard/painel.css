@@ -401,3 +401,12 @@
   .hw .g4 { grid-template-columns: 1fr; }
   .hw .ciclo label { display: none; }
 }
+
+/* ---------- filtro por período (Red, 21/10/2026) ---------- */
+.hw .ciclo .datas { display: inline-flex; align-items: center; gap: 8px; margin-left: 6px; color: var(--ivory3); font-size: 12px; }
+.hw .ciclo input[type="date"] {
+  background: transparent; border: 1px solid var(--line2); border-radius: 2px; color: var(--ivory);
+  font: inherit; font-size: 13px; padding: 4px 8px; color-scheme: dark;
+}
+.hw .ciclo optgroup { background: #101012; color: var(--ivory3); font-style: normal; }
+@media (max-width: 720px) { .hw .ciclo { flex-wrap: wrap; } .hw .ciclo .datas { margin-left: 0; } }

@@ -10,7 +10,7 @@
 // ============================================================
 import { ACORDO } from "@/app/dashboard/metas";
 import type { BaseSimulador, LinhaInvestidor, RespInvestidor } from "@/app/dashboard/tipos";
-import { montar, type CicloCal } from "./montar";
+import { montar, gastoDepoisDas20, em, type CicloCal } from "./montar";
 
 const DIA = 86400e3;
 const r2 = (n: number) => Math.round(n * 100) / 100;
@@ -18,6 +18,22 @@ const r2 = (n: number) => Math.round(n * 100) / 100;
 export async function montarInvestidor(cal: CicloCal[]): Promise<RespInvestidor> {
   const agora = Date.now();
   const dados = await Promise.all(cal.map((c) => montar(c.d0, { leve: true, cal })));
+
+  // Corte exato às 20h de segunda (Red, 17/10/2026). A Meta só entrega gasto por dia, então o painel
+  // deixa a segunda inteira com a turma que acaba. Aqui o gasto depois das 20h dessa segunda passa
+  // para a turma seguinte, pelo breakdown por hora da Meta.
+  const pos20 = new Map<string, Promise<number>>();
+  const depois20 = (d: string) => (pos20.has(d) ? pos20.get(d)! : (pos20.set(d, gastoDepoisDas20(d).catch(() => 0)), pos20.get(d)!));
+  const ajustes = await Promise.all(
+    cal.map(async (c, i) => {
+      let aj = 0;
+      const terminaAs20 = c.captFim.getTime() === em(c.d0, "20:00").getTime() - 1;
+      if (terminaAs20) aj -= await depois20(c.d0);
+      const ant = cal[i - 1];
+      if (ant && c.captIni.getTime() === em(ant.d0, "20:00").getTime()) aj += await depois20(ant.d0);
+      return aj;
+    }),
+  );
 
   let saldo = 0;
   const linhas: LinhaInvestidor[] = dados.map((d, i) => {
@@ -27,8 +43,8 @@ export async function montarInvestidor(cal: CicloCal[]): Promise<RespInvestidor>
 
     const gastoDistribuicao = d.trafego.campanhas.filter((x) => x.tipo === "distribuicao").reduce((s, x) => s + x.gasto, 0);
     const gastoOutros = d.financeiro.outros;
-    const gasto = d.trafego.gasto + gastoOutros;
-    const gastoCaptacao = d.trafego.gasto - gastoDistribuicao;
+    const gasto = d.trafego.gasto + ajustes[i] + gastoOutros;
+    const gastoCaptacao = d.trafego.gasto + ajustes[i] - gastoDistribuicao;
 
     const receita = d.financeiro.receitaLiquida;
     // Turma anterior à entrada do investidor: a RedPro bancou e fica com tudo, nada entra na conta dele.

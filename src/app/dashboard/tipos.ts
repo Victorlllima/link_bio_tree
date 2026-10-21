@@ -291,3 +291,78 @@ export interface RespInvestidor {
     retornoInvestidor: number; // devolvido + parte do lucro
   };
 }
+
+// ============================================================
+// RECORTE: números de qualquer janela de datas ou do total (sem depender do calendário das turmas)
+// ============================================================
+export type ModoRecorte = "periodo" | "total_baby" | "total_geral";
+
+export type RecorteDia = {
+  dia: string;
+  gasto: number;
+  gastoVenda: number;
+  gastoDistribuicao: number;
+  ingressos: number;
+  receita: number;
+  liquido: number;
+};
+
+export type RecorteBloco = { nome: string; vendas: number; receita: number; liquido: number };
+
+export type Recorte = {
+  geradoEm: string;
+  modo: ModoRecorte;
+  de: string;
+  ate: string;
+  rotulo: string;
+  gasto: { total: number; venda: number; distribuicao: number; dias: number; porDia: number | null };
+  trafego: {
+    impressoes: number;
+    alcance: number;
+    cliquesLink: number;
+    cpm: number | null;
+    cpcLink: number | null;
+    ctr: number | null;
+  };
+  vendas: {
+    ingressos: number;
+    receitaIngresso: number;
+    liquidoIngresso: number;
+    extras: RecorteBloco[];
+    extrasVendas: number;
+    receitaExtras: number;
+    liquidoExtras: number;
+    extrasPorIngresso: number | null;
+    formacao: RecorteBloco;
+    convFormacao: number | null;
+  };
+  origem: { anuncio: number; bio: number; boost: number; outro: number; semOrigem: number };
+  totais: {
+    receitaBruta: number;
+    receitaLiquida: number;
+    roasIngresso: number | null;
+    roasComExtras: number | null;
+    roasFunil: number | null;
+    cpa: number | null;
+    receitaPorIngresso: number | null;
+    lucro: number;
+  };
+  serie: RecorteDia[];
+  outrasCampanhas: { nome: string; gasto: number }[];
+  // regra do acordo aplicada à janela, a partir da entrada do investidor (05/10)
+  investidor: {
+    desde: string | null;
+    antes: { gasto: number; receitaLiquida: number } | null;
+    gasto: number;
+    receitaLiquida: number;
+    devolvido: number;
+    saldoDevedor: number;
+    excedente: number;
+    parteInvestidor: number;
+    parteRedpro: number;
+    totalInvestidor: number;
+    multiplo: number | null;
+  };
+  avisos: string[];
+  ciclos: { d0: string; nome: string; indice: number }[];
+};

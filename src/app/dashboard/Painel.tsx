@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshCw, Eye, EyeOff } from "lucide-react";
 import "./painel.css";
-import type { Dados, Resumo, RespInvestidor, LinhaInvestidor, BaseSimulador } from "./tipos";
+import type { Dados, Resumo, RespInvestidor, LinhaInvestidor, BaseSimulador, Recorte } from "./tipos";
 import { REGUAS, REGRAS_OURO, avaliar, PRECO_INGRESSO, PRODUTOS, ROAS_ESCALA, PASSO_MAX_VERBA } from "./metas";
 import { Kpi, LinhaRegua, Bloco, Alerta, Funil, Area, Barras, Calor, Ponto, ReguaDica, fN, fR, fP, fX, metaTexto } from "./ui";
 
@@ -56,9 +56,11 @@ function falta(iso: string, agora: string) {
 }
 
 // ============================================================
-// Quais dados cada aba usa quando está em "Ao vivo": as de dinheiro e captação usam a turma
-// em captação; as de evento (aulas, grupo, carrinho) usam a turma em aula.
-const ABAS_CAPTACAO = new Set<Aba>(["trafego", "criativos", "vendas"]);
+// Filtro do painel (Red, 21/10/2026): uma turma, o total do investidor (desde 05/10), o total geral
+// ou um período escolhido por data. Não existe mais "Ao vivo": abre na turma em captação.
+const MODOS_RECORTE = ["total_baby", "total_geral", "periodo"] as const;
+type ModoRec = (typeof MODOS_RECORTE)[number];
+const ehModoRecorte = (v: string): v is ModoRec => (MODOS_RECORTE as readonly string[]).includes(v);
 const tag = (d: Dados) => `${d.ciclo.nome} · ${d.ciclo.fase.rotulo}`;
 type Turma = { d0: string; nome: string; indice: number };
 
@@ -66,9 +68,11 @@ export default function Painel() {
   const [auth, setAuth] = useState<boolean | null>(null);
   const [senha, setSenha] = useState("");
   const [erroSenha, setErroSenha] = useState(false);
-  const [sel, setSel] = useState<string>(""); // "" = ao vivo
-  const [vivos, setVivos] = useState<Dados[]>([]);
+  const [sel, setSel] = useState<string>(""); // "" = ainda não escolhido (abre na turma em captação)
   const [fixo, setFixo] = useState<Dados | null>(null);
+  const [rec, setRec] = useState<Recorte | null>(null);
+  const [de, setDe] = useState<string>("");
+  const [ate, setAte] = useState<string>("");
   const [lista, setLista] = useState<Turma[]>([]);
   const [geradoEm, setGeradoEm] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
@@ -76,25 +80,27 @@ export default function Painel() {
   const [aba, setAba] = useState<Aba>("geral");
   const [privado, setPrivado] = useState(false);
 
-  const carregar = useCallback(async (escolha: string) => {
+  const carregar = useCallback(async (escolha: string, deP = "", ateP = "") => {
     setCarregando(true);
     setErro(null);
     try {
-      const r = await fetch(escolha ? `/api/dashboard?ciclo=${escolha}` : "/api/dashboard?vivos=1", { cache: "no-store" });
+      let url = "/api/dashboard";
+      if (ehModoRecorte(escolha)) url = `/api/dashboard?recorte=${escolha}${escolha === "periodo" ? `&de=${deP}&ate=${ateP}` : ""}`;
+      else if (escolha) url = `/api/dashboard?ciclo=${escolha}`;
+      const r = await fetch(url, { cache: "no-store" });
       if (r.status === 401) {
         setAuth(false);
         return;
       }
       const j = await r.json();
       if (j.error) throw new Error(j.error);
-      if (escolha) {
-        setFixo(j);
-        setLista(j.ciclos);
-        setGeradoEm(j.geradoEm);
+      setLista(j.ciclos);
+      setGeradoEm(j.geradoEm);
+      if (ehModoRecorte(escolha)) {
+        setRec(j);
       } else {
-        setVivos(j.vivos);
-        setLista(j.ciclos);
-        setGeradoEm(j.vivos[0]?.geradoEm ?? new Date().toISOString());
+        setFixo(j);
+        if (!escolha) setSel(j.ciclo.d0); // primeira abertura: fica na turma em captação
       }
       setAuth(true);
     } catch (e) {
@@ -114,20 +120,20 @@ export default function Painel() {
   }, [carregar]);
 
   // atualiza sozinho a cada 2 min (30 s com o carrinho aberto) e pausa com a aba escondida
-  const carrinhoAberto = (sel ? [fixo] : vivos).some((d) => d?.ciclo.fase.id === "carrinho");
+  const carrinhoAberto = !ehModoRecorte(sel) && fixo?.ciclo.fase.id === "carrinho";
   useEffect(() => {
     if (!geradoEm) return;
     const ms = carrinhoAberto ? 30e3 : 120e3;
     const t = setInterval(() => {
-      if (document.visibilityState === "visible") carregar(sel);
+      if (document.visibilityState === "visible") carregar(sel, de, ate);
     }, ms);
-    const vis = () => document.visibilityState === "visible" && Date.now() - new Date(geradoEm).getTime() > ms && carregar(sel);
+    const vis = () => document.visibilityState === "visible" && Date.now() - new Date(geradoEm).getTime() > ms && carregar(sel, de, ate);
     document.addEventListener("visibilitychange", vis);
     return () => {
       clearInterval(t);
       document.removeEventListener("visibilitychange", vis);
     };
-  }, [geradoEm, sel, carrinhoAberto, carregar]);
+  }, [geradoEm, sel, de, ate, carrinhoAberto, carregar]);
 
   function irPara(a: Aba) {
     setAba(a);
@@ -138,14 +144,29 @@ export default function Painel() {
   }
   function escolher(v: string) {
     setSel(v);
+    if (v === "periodo") {
+      // período novo: últimos 7 dias, ajustável nas datas ao lado
+      const hoje = brDiaDe(Date.now());
+      const d1 = de || somaDia(hoje, -6);
+      const d2 = ate || hoje;
+      setDe(d1);
+      setAte(d2);
+      carregar(v, d1, d2);
+      return;
+    }
     carregar(v);
+  }
+  function mudarData(novoDe: string, novoAte: string) {
+    setDe(novoDe);
+    setAte(novoAte);
+    if (novoDe && novoAte && novoDe <= novoAte) carregar("periodo", novoDe, novoAte);
   }
 
   async function entrar(e: React.FormEvent) {
     e.preventDefault();
     setErroSenha(false);
     const r = await fetch("/api/lpsg/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: senha }) });
-    if (r.ok) carregar(sel);
+    if (r.ok) carregar(sel, de, ate);
     else setErroSenha(true);
   }
 
@@ -163,14 +184,11 @@ export default function Painel() {
     );
   }
 
-  // turma em captação e turma em aula ou carrinho (podem ser a mesma, ou haver só uma)
-  const cap = vivos.find((v) => v.ciclo.emCaptacao) ?? null;
-  const aula = [...vivos].reverse().find((v) => v.ciclo.emAula) ?? null;
-  const dupla = !sel && vivos.length === 2 && cap && aula && cap.ciclo.d0 !== aula.ciclo.d0 ? { cap, aula } : null;
-  const dados: Dados | null = sel ? fixo : (ABAS_CAPTACAO.has(aba) ? (cap ?? aula) : (aula ?? cap)) ?? vivos[0] ?? null;
-  const alertasRuins = (dupla ? [dupla.cap, dupla.aula] : dados ? [dados] : []).reduce((n, d) => n + d.leitura.filter((l) => l.nivel === "ruim").length, 0);
-  const faseTexto = dupla && aba === "geral" ? "Duas turmas ao vivo" : dados?.ciclo.fase.rotulo;
-  const padraoLancar = (aula ?? cap)?.ciclo.d0 ?? lista[lista.length - 1]?.d0 ?? "";
+  const modoRec = ehModoRecorte(sel);
+  const dados: Dados | null = modoRec ? null : fixo;
+  const alertasRuins = dados ? dados.leitura.filter((l) => l.nivel === "ruim").length : 0;
+  const faseTexto = modoRec ? undefined : dados?.ciclo.fase.rotulo;
+  const padraoLancar = fixo?.ciclo.d0 ?? lista[lista.length - 1]?.d0 ?? "";
 
   return (
     <div className={`hw ${privado ? "privado" : ""}`}>
@@ -182,13 +200,26 @@ export default function Painel() {
           </div>
           <div className="esp" />
           <div className="ciclo">
-            <label htmlFor="hw-ciclo">Turma</label>
+            <label htmlFor="hw-ciclo">Filtro</label>
             <select id="hw-ciclo" value={sel} onChange={(e) => escolher(e.target.value)}>
-              <option value="">Ao vivo</option>
-              {[...lista].reverse().map((c) => (
-                <option key={c.d0} value={c.d0}>{c.nome}</option>
-              ))}
+              <optgroup label="Turma">
+                {[...lista].reverse().map((c) => (
+                  <option key={c.d0} value={c.d0}>{c.nome}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Somas">
+                <option value="total_baby">Total do investidor (desde 05/10)</option>
+                <option value="total_geral">Total geral (desde 08/09)</option>
+                <option value="periodo">Período por data</option>
+              </optgroup>
             </select>
+            {sel === "periodo" && (
+              <span className="datas">
+                <input type="date" value={de} max={ate || undefined} onChange={(e) => mudarData(e.target.value, ate)} aria-label="Data inicial" />
+                <span>a</span>
+                <input type="date" value={ate} min={de || undefined} max={brDiaDe(Date.now())} onChange={(e) => mudarData(de, e.target.value)} aria-label="Data final" />
+              </span>
+            )}
           </div>
           {faseTexto && (
             <div className="fase">
@@ -202,14 +233,14 @@ export default function Painel() {
               <span>{carregando ? "Atualizando" : `Atualizado às ${dmh(geradoEm).split(" ")[1]}`}</span>
             </div>
           )}
-          <button className="iconb" onClick={() => carregar(sel)} aria-label="Atualizar os números" disabled={carregando}>
+          <button className="iconb" onClick={() => carregar(sel, de, ate)} aria-label="Atualizar os números" disabled={carregando}>
             <RefreshCw size={16} className={carregando ? "girando" : ""} />
           </button>
           <button className="iconb" onClick={() => setPrivado(!privado)} aria-label={privado ? "Mostrar valores" : "Ocultar valores"}>
             {privado ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         </div>
-        <div className="nav-faixa">
+        {!modoRec && <div className="nav-faixa">
           <nav className="nav" aria-label="Seções do painel">
             {NAV.map((n) => (
               <span key={n.id} style={{ display: "contents" }}>
@@ -221,16 +252,18 @@ export default function Painel() {
               </span>
             ))}
           </nav>
-        </div>
+        </div>}
       </header>
 
       <main className="wrap">
         {erro && <div className="aviso ruim">Não consegui montar o painel: {erro}</div>}
-        {!dados ? (
+        {modoRec ? (
+          rec && rec.modo === sel ? <RecorteView r={rec} /> : <div className="vazio">Somando gasto e receita do período.</div>
+        ) : !dados ? (
           <div className="vazio">Montando os números do ciclo.</div>
         ) : (
           <>
-            {aba === "geral" && (dupla ? <GeralDupla cap={dupla.cap} aula={dupla.aula} /> : <Geral d={dados} />)}
+            {aba === "geral" && <Geral d={dados} />}
             {aba === "trafego" && <Trafego d={dados} />}
             {aba === "criativos" && <Criativos d={dados} />}
             {aba === "vendas" && <Vendas d={dados} />}
@@ -432,115 +465,6 @@ function Geral({ d }: { d: Dados }) {
         <Area pontos={t.serie.map((s) => ({ x: ddmm(s.dia), y: s.gasto }))} barras={t.serie.map((s) => ({ x: s.dia, y: s.ingressos }))} fmt={(n) => `R$${fN(n)}`} />
         <div className="legenda"><span><i style={{ background: "#cdb68a" }} />gasto por dia</span><span><i style={{ background: "#ece6d8", opacity: 0.5, height: 8 }} />ingressos</span></div>
       </Bloco>
-    </>
-  );
-}
-
-// ============================================================
-// VISÃO GERAL COM DUAS TURMAS AO VIVO
-// De terça a segunda uma turma está em aula e a seguinte em captação, ao mesmo tempo.
-// ============================================================
-function GeralDupla({ cap, aula }: { cap: Dados; aula: Dados }) {
-  const rg = REGUAS.ingressos;
-  const vc = cap.vendas;
-  const tc = cap.trafego;
-  const pctMeta = Math.min(100, vc.meta ? (vc.ingressos / vc.meta) * 100 : 0);
-  const ultimaAula = [...aula.aulas].reverse().find((a) => a.presenca !== null) ?? null;
-  const presMin = REGUAS.presenca_a1.min ?? 30;
-  const projecao = cap.leitura.find((l) => l.titulo.startsWith("Projeção"));
-  const AREAS_CAP = ["Tráfego", "Página", "Criativos", "Vendas", "Fontes"];
-  const AREAS_AULA = ["Aulas", "Fichas", "Grupo", "Formação", "Financeiro"];
-  const leit = (d: Dados, areas: string[]) => d.leitura.filter((l) => areas.includes(l.area));
-  const notaCor = (n: number) => (n >= 80 ? "verde" : n >= 60 ? "amarelo" : "vermelho");
-  const lc = leit(cap, AREAS_CAP);
-  const la = leit(aula, AREAS_AULA);
-  return (
-    <>
-      <Cab
-        rot="Duas turmas ao vivo"
-        titulo={<>{saudacao()}, <em>Red.</em></>}
-        sub={`A ${aula.ciclo.nome} está em ${aula.ciclo.fase.rotulo.toLowerCase()}. A ${cap.ciclo.nome} está em captação até ${dm(cap.ciclo.captFim)}, às 23h59.`}
-      />
-
-      <div className="par heroes">
-        <section className="laca hero-mini" aria-label={`Captação da ${cap.ciclo.nome}`}>
-          <div className="hm-cab">
-            <span className="rot"><Ponto cor={avaliar(rg, vc.ingressos)} />{cap.ciclo.nome} · em captação</span>
-            <span className="rot">Saúde <b className={`c-${notaCor(cap.saude.total)}`} style={{ fontWeight: 600 }}>{cap.saude.total}</b></span>
-          </div>
-          <div className="gigante med num">{fN(vc.ingressos)}<small>de {fN(vc.meta)}</small></div>
-          <div className="meter">
-            <i style={{ width: `${pctMeta}%` }} />
-            {rg.min !== undefined && <b style={{ left: `${(rg.min / vc.meta) * 100}%` }} />}
-          </div>
-          <div className="meter-pe">
-            <span>{fN(tc.vendasPagas)} pelo anúncio e {fN(vc.origem.bio)} pela bio</span>
-            <span>mínimo {fN(rg.min)} · meta {fN(vc.meta)}</span>
-          </div>
-          {projecao && <p className="hero-sub">{projecao.titulo}. {projecao.texto}</p>}
-          <div className="mini3">
-            <RStat rot="Investido" chave="verba_dia" num={tc.verbaDia} valor={fR(tc.gasto, 0)} sub={`${fR(tc.verbaDia, 0)} por dia`} />
-            <RStat rot="ROAS do anúncio" chave="roas_captacao" num={vc.roasPago} valor={fX(vc.roasPago)} sub={`com a bio ${fX(vc.roas)}`} />
-            <RStat rot="Custo por ingresso" chave="cpa_ingresso" num={vc.cpa} valor={fR(vc.cpa)} sub={`só anúncio ${fR(tc.cpaPago)}`} />
-          </div>
-        </section>
-
-        <section className="laca hero-mini" aria-label={`Evento da ${aula.ciclo.nome}`}>
-          <div className="hm-cab">
-            <span className="rot"><Ponto cor={ultimaAula ? avaliar(REGUAS.presenca_a1, ultimaAula.presencaPct) : "neutro"} />{aula.ciclo.nome} · {aula.ciclo.fase.rotulo.toLowerCase()}</span>
-            <span className="rot">Saúde <b className={`c-${notaCor(aula.saude.total)}`} style={{ fontWeight: 600 }}>{aula.saude.total}</b></span>
-          </div>
-          <div className="gigante med num">{ultimaAula ? fN(ultimaAula.presenca) : "—"}<small>{ultimaAula ? `ao vivo na ${ultimaAula.rotulo}` : "presença não lançada"}</small></div>
-          <div className="meter">
-            <i style={{ width: `${Math.min(100, ultimaAula?.presencaPct ?? 0)}%` }} />
-            <b style={{ left: `${presMin}%` }} />
-          </div>
-          <div className="meter-pe">
-            <span>{ultimaAula ? `${fP(ultimaAula.presencaPct)} dos ${fN(aula.vendas.ingressos)} compradores` : `${fN(aula.vendas.ingressos)} compradores na turma`}</span>
-            <span>mínimo {fN(presMin)}% ao vivo</span>
-          </div>
-          <Teclado d={aula} />
-          <div className="mini3">
-            <RStat rot="Matrícula" chave="matricula" num={aula.fichas.matriculaPct} valor={fP(aula.fichas.matriculaPct, 0)} sub={`${aula.fichas.matriculas} de ${aula.vendas.ingressos}`} />
-            <RStat rot="Ficha de interesse" chave="ficha_interesse" num={aula.fichas.interesse.total ? aula.fichas.interessePct : null} valor={fP(aula.fichas.interessePct, 0)} sub={`HOT ${aula.fichas.interesse.hot} · WARM ${aula.fichas.interesse.warm} · COLD ${aula.fichas.interesse.cold}`} />
-            <RStat rot="Formação" chave="conv_backend" num={aula.backend.conv} valor={fN(aula.backend.vendas)} sub={aula.backend.conv === null ? "sem vendas lançadas" : `${fP(aula.backend.conv)} dos ingressos`} />
-          </div>
-        </section>
-      </div>
-
-      <div className="par">
-        <Bloco titulo={`Captação da ${cap.ciclo.nome}`} sub="Do anúncio ao ingresso, com a régua do método em cada passagem.">
-          <Funil etapas={etapasFunil(cap).slice(0, 6)} />
-        </Bloco>
-        <Bloco titulo={`Evento da ${aula.ciclo.nome}`} sub="Do ingresso à Formação.">
-          <Funil etapas={etapasFunil(aula).slice(5)} />
-        </Bloco>
-      </div>
-
-      <div className="par">
-        <Bloco titulo="Leitura da captação" sub="O que está pegando e o que fazer agora.">
-          {lc.length === 0 ? <div className="vazio">Nada fora da régua.</div> : lc.map((a, i) => <Alerta key={i} a={a} />)}
-        </Bloco>
-        <Bloco titulo="Leitura do evento" sub="Aulas, fichas, grupo e carrinho.">
-          {la.length === 0 ? <div className="vazio">Nada fora da régua.</div> : la.map((a, i) => <Alerta key={i} a={a} />)}
-        </Bloco>
-      </div>
-
-      <div className="par">
-        <Bloco titulo="Verba e vendas da captação" sub="A linha é o gasto por dia. As barras são os ingressos vendidos no dia.">
-          <Area pontos={tc.serie.map((s) => ({ x: ddmm(s.dia), y: s.gasto }))} barras={tc.serie.map((s) => ({ x: s.dia, y: s.ingressos }))} fmt={(n) => `R$${fN(n)}`} />
-        </Bloco>
-        <Bloco titulo="Presença nas aulas" sub="Barra: ao vivo. Tracejado: esperado pela régua.">
-          <Barras itens={aula.aulas.map((a) => ({ x: a.rotulo.replace("Apresentação (dom)", "Domingo"), y: a.presenca || 0, meta: a.esperado }))} />
-        </Bloco>
-      </div>
-
-      <div className="dica">
-        <b>Regras que impedem besteira</b>
-        <ul style={{ margin: "8px 0 0", paddingLeft: 16 }}>
-          {REGRAS_OURO.map((r) => <li key={r} style={{ marginBottom: 4 }}>{r}</li>)}
-        </ul>
-      </div>
     </>
   );
 }
@@ -1368,6 +1292,117 @@ function Reguas() {
         ))}
       </div>
       <div className="dica"><b>Sem número em nenhuma fonte</b>, então o painel mostra o dado sem semáforo: CPC, take rate de cada bump pelo método, entrada no grupo, preenchimento da ficha de matrícula, vendas por hora, chargeback e LTV.</div>
+    </>
+  );
+}
+
+// ============================================================
+// RECORTE: total do investidor, total geral ou período por data
+// ============================================================
+function RecorteView({ r }: { r: Recorte }) {
+  const v = r.vendas;
+  const t = r.totais;
+  const iv = r.investidor;
+  const liquidoSobreGasto = r.gasto.total > 0 ? t.receitaLiquida / r.gasto.total : null;
+  const origemItens = [
+    { x: "Anúncio de venda", y: r.origem.anuncio },
+    { x: "Link da bio", y: r.origem.bio },
+    { x: "Boost do app", y: r.origem.boost },
+    { x: "Outra", y: r.origem.outro },
+    { x: "Sem origem", y: r.origem.semOrigem },
+  ];
+  const janela = r.de === r.ate ? porExtenso(r.de) : `${porExtenso(r.de)} a ${porExtenso(r.ate)}`;
+  return (
+    <>
+      <Cab rot="Recorte" titulo={r.rotulo} sub={`${janela}. Gasto da Meta (venda mais distribuição) contra o que entrou na Hotmart, dia inteiro, horário de Brasília.`} />
+
+      <div className="g4">
+        <Kpi rotulo="Gasto total" valor={fR(r.gasto.total)} sub={`venda ${fR(r.gasto.venda, 0)} · distribuição ${fR(r.gasto.distribuicao, 0)}`} />
+        <Kpi rotulo="Ingressos" valor={fN(v.ingressos)} sub={`CPA ${fR(t.cpa)} · ${fN(v.extrasPorIngresso, 2)} extras por ingresso`} />
+        <Kpi rotulo="ROAS do ingresso" valor={fX(t.roasIngresso)} sub={`com extras ${fX(t.roasComExtras)}`} regua="roas_captacao" valorNum={t.roasIngresso} />
+        <Kpi rotulo="ROAS do funil completo" valor={fX(t.roasFunil)} sub={`bruto · líquido sobre gasto ${fX(liquidoSobreGasto)}`} />
+      </div>
+      <div className="g4">
+        <Kpi rotulo="Receita bruta" valor={fR(t.receitaBruta)} sub={`${fR(t.receitaPorIngresso)} por ingresso`} />
+        <Kpi rotulo="Receita líquida" valor={fR(t.receitaLiquida)} sub="comissão do produtor, depois da taxa da Hotmart" />
+        <Kpi rotulo="Lucro" valor={fR(t.lucro)} sub="líquido menos gasto de mídia" />
+        <Kpi rotulo="Formação" valor={fN(v.formacao.vendas)} sub={`${fR(v.formacao.receita)} bruto · ${fP(v.convFormacao)} dos ingressos`} />
+      </div>
+
+      <Bloco titulo="Investidor: a conta do acordo neste recorte" sub={iv.desde ? `Vale de ${ddmm(iv.desde)} em diante, a partir da entrada do investidor. O gasto é coberto primeiro, o resto divide em 30% investidor e 70% RedPro.` : "Esta janela é anterior à entrada do investidor: o tráfego foi pago pela RedPro."}>
+        {iv.desde ? (
+          <>
+            <div className="g4">
+              <Kpi rotulo="Investido" valor={fR(iv.gasto)} sub="tudo que a Meta cobrou, pago pelo investidor" />
+              <Kpi rotulo="Devolvido do gasto" valor={fR(iv.devolvido)} sub={iv.saldoDevedor > 0 ? `ainda falta devolver ${fR(iv.saldoDevedor)}` : "gasto totalmente coberto"} />
+              <Kpi rotulo="Lucro a dividir" valor={fR(iv.excedente)} sub={`receita líquida ${fR(iv.receitaLiquida)} menos gasto`} />
+              <Kpi rotulo="Total para o investidor" valor={fR(iv.totalInvestidor)} sub={`${fX(iv.multiplo)} do que investiu · devolução + 30% do lucro`} />
+            </div>
+            <div className="g2" style={{ marginTop: 14 }}>
+              <Kpi rotulo="30% do investidor" valor={fR(iv.parteInvestidor)} sub="parte do lucro" />
+              <Kpi rotulo="70% RedPro" valor={fR(iv.parteRedpro)} sub="o que sobra para a RedPro AI Academy" />
+            </div>
+            {iv.antes && <div className="dica">Antes da entrada do investidor, nesta janela: gasto {fR(iv.antes.gasto)} pago pela RedPro e receita líquida {fR(iv.antes.receitaLiquida)}. Fica fora da conta dele.</div>}
+          </>
+        ) : null}
+      </Bloco>
+
+      <div className="g2">
+        <Bloco titulo="De onde vem o dinheiro">
+          <div className="tab-wrap">
+            <table className="tab">
+              <thead><tr><th>Linha</th><th className="dir">Vendas</th><th className="dir">Bruto</th><th className="dir">Líquido</th></tr></thead>
+              <tbody>
+                <tr><td>Ingresso R${fN(PRECO_INGRESSO)}</td><td className="dir num">{v.ingressos}</td><td className="dir num">{fR(v.receitaIngresso)}</td><td className="dir num">{fR(v.liquidoIngresso)}</td></tr>
+                {v.extras.map((b) => <tr key={b.nome}><td>{b.nome}</td><td className="dir num">{b.vendas}</td><td className="dir num">{fR(b.receita)}</td><td className="dir num">{fR(b.liquido)}</td></tr>)}
+                <tr><td>{v.formacao.nome}</td><td className="dir num">{v.formacao.vendas}</td><td className="dir num">{fR(v.formacao.receita)}</td><td className="dir num">{fR(v.formacao.liquido)}</td></tr>
+                <tr><td><b>Total</b></td><td /><td className="dir num"><b className="brass">{fR(t.receitaBruta)}</b></td><td className="dir num"><b className="brass">{fR(t.receitaLiquida)}</b></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="dica">Venda contada na data da aprovação do pagamento. Boleto e Pix entram quando compensam.</div>
+        </Bloco>
+        <Bloco titulo="De onde vêm os ingressos" sub="Pelo código de origem gravado na Hotmart.">
+          <Barras itens={origemItens} />
+          <div className="dica">"Boost do app" é o código que o Instagram gera no reel turbinado. "Link da bio" mistura reel, orgânico e qualquer post.</div>
+        </Bloco>
+      </div>
+
+      <Bloco titulo="Dia a dia" sub="Linha: gasto do dia. Barras: ingressos.">
+        <Area pontos={r.serie.map((d) => ({ x: ddmm(d.dia), y: d.gasto }))} barras={r.serie.map((d) => ({ x: ddmm(d.dia), y: d.ingressos }))} fmt={(n) => fR(n, 0)} />
+        <div className="tab-wrap" style={{ marginTop: 14 }}>
+          <table className="tab">
+            <thead><tr><th>Dia</th><th className="dir">Venda</th><th className="dir">Distribuição</th><th className="dir">Gasto</th><th className="dir">Ingressos</th><th className="dir">Receita</th><th className="dir">Líquido</th></tr></thead>
+            <tbody>
+              {[...r.serie].reverse().map((d) => (
+                <tr key={d.dia}>
+                  <td>{DOW3[dowDe(d.dia)]} {ddmm(d.dia)}</td>
+                  <td className="dir num">{fR(d.gastoVenda)}</td>
+                  <td className="dir num">{fR(d.gastoDistribuicao)}</td>
+                  <td className="dir num">{fR(d.gasto)}</td>
+                  <td className="dir num">{d.ingressos}</td>
+                  <td className="dir num">{fR(d.receita)}</td>
+                  <td className="dir num">{fR(d.liquido)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Bloco>
+
+      <Bloco titulo="Tráfego do recorte" sub="Só as campanhas da Hermes Week (venda e distribuição).">
+        <div className="g4">
+          <Kpi rotulo="Impressões" valor={fN(r.trafego.impressoes)} sub={`alcance ${fN(r.trafego.alcance)}`} />
+          <Kpi rotulo="Cliques no link" valor={fN(r.trafego.cliquesLink)} sub={`CTR ${fP(r.trafego.ctr, 2)}`} />
+          <Kpi rotulo="CPM" valor={fR(r.trafego.cpm)} sub="custo por mil impressões" />
+          <Kpi rotulo="Custo por clique no link" valor={fR(r.trafego.cpcLink)} sub={`gasto médio ${fR(r.gasto.porDia, 0)} por dia (${r.gasto.dias} dias)`} />
+        </div>
+        {r.outrasCampanhas.length > 0 && (
+          <div className="dica">Fora da conta: {r.outrasCampanhas.map((c) => `${c.nome} ${fR(c.gasto)}`).join(" · ")}.</div>
+        )}
+      </Bloco>
+
+      {r.avisos.map((a) => <div key={a} className="aviso">{a}</div>)}
     </>
   );
 }
