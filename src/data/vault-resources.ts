@@ -37,6 +37,47 @@ const COMO_INSTALAR: Secao = {
 
 export const RESOURCES: Resource[] = [
   {
+    slug: "100-dicas-hermes",
+    titulo: "100 dicas do Hermes",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "As 100 dicas da Nous Research para usar o Hermes, em português, nas 9 categorias originais, com o número de cada dica.",
+    intro:
+      "A Nous Research, que desenvolve o Hermes, publicou 100 dicas de uso. Eu traduzi todas para o português e organizei num PDF, nas mesmas 9 categorias, cada dica com o número original. É para consultar: ache a categoria do seu problema e vá direto nela.",
+    arquivo: "/redreply/pdfs/100-dicas-hermes.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF de 13 páginas, com capa, índice e as 100 dicas, uma por uma, com a numeração original da Nous Research. As dicas são curtas e vão direto ao que fazer.",
+      },
+      {
+        titulo: "As 9 categorias",
+        texto:
+          "• Mensagens e controles do dia a dia (10)\n" +
+          "• Memória e contexto da conversa (11)\n" +
+          "• Skills e instruções do agente (11)\n" +
+          "• Projetos e organização do agente (8)\n" +
+          "• Ferramentas e acesso ao computador (9)\n" +
+          "• Automação e trabalho em segundo plano (15)\n" +
+          "• Modelos e controle de custo (17)\n" +
+          "• Segurança e permissões (7)\n" +
+          "• Manutenção e recuperação (12)",
+      },
+      {
+        titulo: "Como usar",
+        texto:
+          "Não precisa ler tudo de uma vez. Abra o índice, escolha a categoria do que está te incomodando (agente gastando demais, memória confusa, tarefa agendada que falha) e leia só aquelas dicas. Várias pedem um ajuste de configuração, então vale testar com calma.",
+      },
+      {
+        titulo: "De onde vêm",
+        texto:
+          "As dicas vêm das Hermes Wingtips, publicadas por @witcheer, da Nous Research. Tradução e organização: @redpro.ia. Pedido aberto não é roadmap: cada dica descreve o que o Hermes faz hoje, e o produto muda rápido.",
+      },
+    ],
+  },
+  {
     slug: "agentic-pilot-redpro",
     titulo: "Agentic Pilot RedPro",
     categoria: "Skills",
