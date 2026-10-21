@@ -8,7 +8,7 @@
 //   - zerado o saldo, o excedente é lucro: 30% investidor, 70% RedPro AI Academy.
 // Gasto, receita e janela de cada turma vêm do mesmo `montar` do resto do painel.
 // ============================================================
-import { ACORDO } from "@/app/dashboard/metas";
+import { ACORDO, TAXAS } from "@/app/dashboard/metas";
 import type { BaseSimulador, LinhaInvestidor, RespInvestidor } from "@/app/dashboard/tipos";
 import { montar, gastoDepoisDas20, em, type CicloCal } from "./montar";
 
@@ -43,10 +43,18 @@ export async function montarInvestidor(cal: CicloCal[]): Promise<RespInvestidor>
 
     const gastoDistribuicao = d.trafego.campanhas.filter((x) => x.tipo === "distribuicao").reduce((s, x) => s + x.gasto, 0);
     const gastoOutros = d.financeiro.outros;
-    const gasto = d.trafego.gasto + ajustes[i] + gastoOutros;
-    const gastoCaptacao = d.trafego.gasto + ajustes[i] - gastoDistribuicao;
+    // o investidor paga o gasto da Meta mais o imposto que a Meta soma na fatura
+    const gastoMeta = d.trafego.gasto + ajustes[i] + gastoOutros;
+    const fatorMeta = 1 + TAXAS.metaSobreGastoPct / 100;
+    const taxaMeta = gastoMeta * (fatorMeta - 1);
+    const gasto = gastoMeta * fatorMeta;
+    const gastoCaptacao = (d.trafego.gasto + ajustes[i] - gastoDistribuicao) * fatorMeta;
 
-    const receita = d.financeiro.receitaLiquida;
+    // receita do acordo: comissão da Hotmart (já sem a taxa dela), menos reembolsos, menos imposto sobre a receita
+    const reembolsos = d.financeiro.reembolsado;
+    const baseReceita = d.financeiro.receitaLiquida - reembolsos;
+    const impostoReceita = Math.max(0, baseReceita) * (TAXAS.impostoSobreReceitaPct / 100);
+    const receita = baseReceita - impostoReceita;
     // Turma anterior à entrada do investidor: a RedPro bancou e fica com tudo, nada entra na conta dele.
     const fora = c.d0 < ACORDO.primeiraTurma;
     const saldoAnterior = fora ? 0 : saldo;
@@ -70,11 +78,17 @@ export async function montarInvestidor(cal: CicloCal[]): Promise<RespInvestidor>
       acordoDistribuicao: fora ? 0 : ACORDO.distribuicaoDia * dias,
       acordoAteHoje: r2(acordoDia * diasDecorridos),
       gasto: r2(gasto),
+      gastoMeta: r2(gastoMeta),
+      taxaMeta: r2(taxaMeta),
       gastoCaptacao: r2(gastoCaptacao),
-      gastoDistribuicao: r2(gastoDistribuicao),
+      gastoDistribuicao: r2(gastoDistribuicao * fatorMeta),
       gastoOutros: r2(gastoOutros),
       distribuicaoManual: d.financeiro.distribuicao,
       receitaLiquida: r2(receita),
+      receitaBruta: r2(d.financeiro.receitaBruta),
+      taxaHotmart: r2(d.financeiro.taxaHotmart),
+      reembolsos: r2(reembolsos),
+      impostoReceita: r2(impostoReceita),
       ingressos: d.vendas.ingressos,
       receitaFront: r2(d.vendas.receitaFront),
       liquidoFront: r2(d.vendas.liquidoFront),
@@ -126,9 +140,16 @@ export async function montarInvestidor(cal: CicloCal[]): Promise<RespInvestidor>
     geradoEm: new Date().toISOString(),
     base,
     acordo: { ...ACORDO },
+    taxas: { ...TAXAS },
     linhas,
     total: {
       gasto: soma((l) => l.gasto),
+      gastoMeta: soma((l) => l.gastoMeta),
+      taxaMeta: soma((l) => l.taxaMeta),
+      receitaBruta: soma((l) => l.receitaBruta),
+      taxaHotmart: soma((l) => l.taxaHotmart),
+      reembolsos: soma((l) => l.reembolsos),
+      impostoReceita: soma((l) => l.impostoReceita),
       receitaLiquida: soma((l) => l.receitaLiquida),
       devolvido,
       saldoDevedor: r2(saldo),

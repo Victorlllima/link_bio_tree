@@ -244,6 +244,16 @@ export const PASSO_MAX_VERBA = 0.2;
 // primeiraTurma: D0 da primeira turma com o investidor (entrou em 05/10, captação da Turma 2).
 // As turmas anteriores (Turma 1) são investimento e lucro da RedPro, fora desta conta.
 export const ACORDO = { captacaoDia: 150, distribuicaoDia: 50, parteInvestidor: 0.3, primeiraTurma: "2026-10-12" } as const;
+// TAXAS DA CONTA DO INVESTIDOR (Red, 21/10/2026): o painel é a base das transferências e devoluções ao
+// investidor, então tudo que tira dinheiro do caminho entra na conta.
+//   - Hotmart: automática, venda a venda (comissão do produtor que o webhook informa = valor depois da taxa
+//     de 9,9% + R$2,49). Reembolso e chargeback saem do líquido, também automático.
+//   - metaSobreGastoPct: imposto/IOF que a Meta soma ao gasto na fatura do cartão. O que o investidor paga de
+//     verdade é o gasto + isso, e é isso que volta para ele. Preencher com o % da fatura da Meta.
+//   - impostoSobreReceitaPct: imposto da RedPro sobre a receita líquida, descontado ANTES de dividir o lucro.
+//     Deixar 0 se o imposto não deve sair antes da divisão dos 30/70.
+// Enquanto estiver em 0, o painel mostra "a definir" ao lado da taxa.
+export const TAXAS = { metaSobreGastoPct: 0, impostoSobreReceitaPct: 0 };
 export const PRECO_FORMACAO_PADRAO = 997; // Red, 04/10/2026
 
 export const PRODUTOS = {

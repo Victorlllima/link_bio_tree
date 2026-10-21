@@ -1036,6 +1036,34 @@ function Investidor({ atual }: { atual: string }) {
             </div>
           </Bloco>
 
+          <Bloco titulo="Taxas na conta" sub="Tudo que tira dinheiro do caminho entra aqui antes da divisão. É por este bloco que se confere a transferência ao investidor.">
+            <div className="g2">
+              <div className="tab-wrap">
+                <table className="tab">
+                  <thead><tr><th>Receita</th><th className="dir">Valor</th></tr></thead>
+                  <tbody>
+                    <tr><td>Receita bruta (ingressos, extras e Formação)</td><td className="dir num">{fR(t.receitaBruta)}</td></tr>
+                    <tr><td>Taxa da Hotmart <span className="dim3">(real, venda a venda)</span></td><td className="dir num c-amarelo">− {fR(t.taxaHotmart)}</td></tr>
+                    <tr><td>Reembolsos e chargebacks <span className="dim3">(automático)</span></td><td className="dir num c-amarelo">− {fR(t.reembolsos)}</td></tr>
+                    <tr><td>Imposto sobre a receita <span className="dim3">({r.taxas.impostoSobreReceitaPct > 0 ? `${fN(r.taxas.impostoSobreReceitaPct, 2)}%` : "a definir"})</span></td><td className="dir num c-amarelo">− {fR(t.impostoReceita)}</td></tr>
+                    <tr><td><b>Receita que cobre o investimento</b></td><td className="dir num"><b className="brass">{fR(t.receitaLiquida)}</b></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className="tab-wrap">
+                <table className="tab">
+                  <thead><tr><th>Investimento</th><th className="dir">Valor</th></tr></thead>
+                  <tbody>
+                    <tr><td>Gasto de mídia mostrado pela Meta</td><td className="dir num">{fR(t.gastoMeta)}</td></tr>
+                    <tr><td>Imposto da Meta na fatura <span className="dim3">({r.taxas.metaSobreGastoPct > 0 ? `${fN(r.taxas.metaSobreGastoPct, 2)}%` : "a definir"})</span></td><td className="dir num c-amarelo">+ {fR(t.taxaMeta)}</td></tr>
+                    <tr><td><b>Pago pelo investidor</b></td><td className="dir num"><b className="brass">{fR(t.gasto)}</b></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {(r.taxas.metaSobreGastoPct === 0 || r.taxas.impostoSobreReceitaPct === 0) && <div className="aviso">Há taxa em 0% marcada como "a definir": informe o percentual do imposto que a Meta soma à fatura e o do imposto sobre a receita para a conta refletir o que sai de verdade. A taxa da Hotmart e os reembolsos já entram sozinhos.</div>}
+          </Bloco>
+
           {foco && !foco.foraDoAcordo && (
             <Bloco titulo={`${foco.nome}: acordo contra gasto real`} sub={`${fN(foco.diasDecorridos, 1)} de ${foco.dias} dias de captação · ${foco.fase}`}>
               <div className="tab-wrap">
@@ -1324,7 +1352,7 @@ function RecorteView({ r }: { r: Recorte }) {
       </div>
       <div className="g4">
         <Kpi rotulo="Receita bruta" valor={fR(t.receitaBruta)} sub={`${fR(t.receitaPorIngresso)} por ingresso`} />
-        <Kpi rotulo="Receita líquida" valor={fR(t.receitaLiquida)} sub="comissão do produtor, depois da taxa da Hotmart" />
+        <Kpi rotulo="Líquido da Hotmart" valor={fR(t.receitaLiquida)} sub={`depois da taxa da Hotmart (${fR(r.taxas.hotmart)}) · reembolsos ${fR(r.taxas.reembolsos)}`} />
         <Kpi rotulo="Lucro" valor={fR(t.lucro)} sub="líquido menos gasto de mídia" />
         <Kpi rotulo="Formação" valor={fN(v.formacao.vendas)} sub={`${fR(v.formacao.receita)} bruto · ${fP(v.convFormacao)} dos ingressos`} />
       </div>
@@ -1345,6 +1373,34 @@ function RecorteView({ r }: { r: Recorte }) {
             {iv.antes && <div className="dica">Antes da entrada do investidor, nesta janela: gasto {fR(iv.antes.gasto)} pago pela RedPro e receita líquida {fR(iv.antes.receitaLiquida)}. Fica fora da conta dele.</div>}
           </>
         ) : null}
+      </Bloco>
+
+      <Bloco titulo="Taxas na conta" sub="Da receita bruta até o que cobre o investimento, e do gasto da Meta até o que o investidor pagou.">
+        <div className="g2">
+          <div className="tab-wrap">
+            <table className="tab">
+              <thead><tr><th>Receita</th><th className="dir">Valor</th></tr></thead>
+              <tbody>
+                <tr><td>Receita bruta</td><td className="dir num">{fR(t.receitaBruta)}</td></tr>
+                <tr><td>Taxa da Hotmart <span className="dim3">(real, venda a venda)</span></td><td className="dir num c-amarelo">− {fR(r.taxas.hotmart)}</td></tr>
+                <tr><td>Reembolsos e chargebacks</td><td className="dir num c-amarelo">− {fR(r.taxas.reembolsos)}</td></tr>
+                <tr><td>Imposto sobre a receita <span className="dim3">({r.taxas.receitaPct > 0 ? `${fN(r.taxas.receitaPct, 2)}%` : "a definir"})</span></td><td className="dir num c-amarelo">− {fR(r.taxas.receitaValor)}</td></tr>
+                <tr><td><b>Receita que cobre o investimento</b></td><td className="dir num"><b className="brass">{fR(iv.receitaLiquida)}</b></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="tab-wrap">
+            <table className="tab">
+              <thead><tr><th>Investimento</th><th className="dir">Valor</th></tr></thead>
+              <tbody>
+                <tr><td>Gasto de mídia mostrado pela Meta</td><td className="dir num">{fR(iv.gastoMeta)}</td></tr>
+                <tr><td>Imposto da Meta na fatura <span className="dim3">({r.taxas.metaPct > 0 ? `${fN(r.taxas.metaPct, 2)}%` : "a definir"})</span></td><td className="dir num c-amarelo">+ {fR(r.taxas.metaValor)}</td></tr>
+                <tr><td><b>Pago pelo investidor</b></td><td className="dir num"><b className="brass">{fR(iv.gasto)}</b></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {iv.antes && <div className="dica">A tabela de receita cobre a janela inteira; a conta do investidor só conta de 05/10 em diante.</div>}
       </Bloco>
 
       <div className="g2">

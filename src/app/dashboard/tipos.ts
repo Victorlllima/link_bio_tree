@@ -216,6 +216,8 @@ export interface Dados {
     outros: number;
     receitaBruta: number;
     receitaLiquida: number;
+    taxaHotmart: number; // bruto menos a comissão do produtor
+    reembolsado: number; // líquido das vendas da turma que viraram reembolso ou chargeback
     lucro: number;
     roasTotal: number | null;
     margem: number | null;
@@ -245,7 +247,13 @@ export interface LinhaInvestidor {
   gastoDistribuicao: number;
   gastoOutros: number;
   distribuicaoManual: number; // lançado à mão como distribuição, não somado
-  receitaLiquida: number;
+  receitaLiquida: number; // base do acordo: comissão da Hotmart, menos reembolsos, menos imposto sobre a receita
+  receitaBruta: number;
+  taxaHotmart: number;
+  reembolsos: number;
+  impostoReceita: number;
+  gastoMeta: number; // o que a Meta mostra
+  taxaMeta: number; // imposto sobre o gasto na fatura (parâmetro)
   ingressos: number;
   receitaFront: number; // ingresso + bumps, bruto
   liquidoFront: number;
@@ -279,10 +287,17 @@ export interface RespInvestidor {
   geradoEm: string;
   base: BaseSimulador;
   acordo: { captacaoDia: number; distribuicaoDia: number; parteInvestidor: number; primeiraTurma: string };
+  taxas: { metaSobreGastoPct: number; impostoSobreReceitaPct: number };
   linhas: LinhaInvestidor[];
   total: {
     gasto: number;
     receitaLiquida: number;
+    receitaBruta: number;
+    taxaHotmart: number;
+    reembolsos: number;
+    impostoReceita: number;
+    gastoMeta: number;
+    taxaMeta: number;
     devolvido: number;
     saldoDevedor: number;
     excedente: number;
@@ -337,6 +352,7 @@ export type Recorte = {
     convFormacao: number | null;
   };
   origem: { anuncio: number; bio: number; boost: number; outro: number; semOrigem: number };
+  taxas: { metaPct: number; receitaPct: number; metaValor: number; receitaValor: number; hotmart: number; reembolsos: number };
   totais: {
     receitaBruta: number;
     receitaLiquida: number;
@@ -352,6 +368,7 @@ export type Recorte = {
   // regra do acordo aplicada à janela, a partir da entrada do investidor (05/10)
   investidor: {
     desde: string | null;
+    gastoMeta: number;
     antes: { gasto: number; receitaLiquida: number } | null;
     gasto: number;
     receitaLiquida: number;

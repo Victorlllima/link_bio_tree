@@ -12,7 +12,7 @@
 // comissão do produtor. A Meta só entrega gasto por dia: o recorte é por dia inteiro.
 // ============================================================
 import { PRODUTOS, PRECO_INGRESSO, PRECO_FORMACAO_PADRAO } from "@/app/dashboard/metas";
-import { ACORDO } from "@/app/dashboard/metas";
+import { ACORDO, TAXAS } from "@/app/dashboard/metas";
 import type { Recorte, RecorteDia, RecorteBloco, ModoRecorte } from "@/app/dashboard/tipos";
 import { sb, meta, ehCampanhaHermesWeek, ehDistribuicao, dia, em, brDia, r2, PRODUTO_FORMACAO, type Compra } from "./montar";
 
@@ -98,6 +98,10 @@ export async function montarRecorte(modo: ModoRecorte, deIn?: string | null, ate
   } catch (e) {
     avisos.push(`Hotmart indisponível: ${String((e as Error).message || e)}. As vendas aparecem zeradas.`);
   }
+  // reembolso e chargeback: a venda aprovada sai do líquido
+  const reembTx = new Set(
+    compras.filter((c) => c.evento === "PURCHASE_REFUNDED" || c.evento === "PURCHASE_CHARGEBACK").map((c) => c.transacao || "").filter(Boolean),
+  );
   const aprovadas = (prod: string) => {
     const mapa = new Map<string, Compra>();
     for (const c of compras) {
@@ -153,7 +157,7 @@ export async function montarRecorte(modo: ModoRecorte, deIn?: string | null, ate
     const d = brDia(c.criado_em);
     const prod = c.produto_id;
     const preco = prod === PRODUTOS.ingresso ? PRECO_INGRESSO : prod === PRODUTO_FORMACAO ? PRECO_FORMACAO_PADRAO : PRODUTOS.bumps.find((b) => b.id === prod)?.preco || 0;
-    liqDia.set(d, (liqDia.get(d) || 0) + liquidoDe(c, preco));
+    if (!(c.transacao && reembTx.has(c.transacao))) liqDia.set(d, (liqDia.get(d) || 0) + liquidoDe(c, preco));
     recDia.set(d, (recDia.get(d) || 0) + (Number(c.valor) || preco));
   }
   const ingDia = new Map<string, number>();
@@ -179,20 +183,30 @@ export async function montarRecorte(modo: ModoRecorte, deIn?: string | null, ate
   const receitaExtras = extras.reduce((s, x) => s + x.receita, 0);
   const liquidoExtras = extras.reduce((s, x) => s + x.liquido, 0);
   const receitaBruta = bIng.receita + receitaExtras + bFor.receita;
-  const receitaLiquida = bIng.liquido + liquidoExtras + bFor.liquido;
+  const receitaLiquida = bIng.liquido + liquidoExtras + bFor.liquido; // comissão da Hotmart (já sem a taxa dela)
+  const taxaHotmart = Math.max(0, receitaBruta - receitaLiquida);
+  const reembolsos = todas.filter((c) => c.transacao && reembTx.has(c.transacao)).reduce((s, c) => {
+    const preco = c.produto_id === PRODUTOS.ingresso ? PRECO_INGRESSO : c.produto_id === PRODUTO_FORMACAO ? PRECO_FORMACAO_PADRAO : PRODUTOS.bumps.find((b) => b.id === c.produto_id)?.preco || 0;
+    return s + liquidoDe(c, preco);
+  }, 0);
   const cliquesLink = Number(tot.inline_link_clicks || 0);
 
   // ---------- regra do acordo (30% do lucro) a partir da entrada do investidor ----------
   const desdeInv = ate < INICIO_BABY ? null : de > INICIO_BABY ? de : INICIO_BABY;
   const dentro = serie.filter((x) => desdeInv !== null && x.dia >= desdeInv);
   const antesLst = serie.filter((x) => desdeInv === null || x.dia < desdeInv);
-  const gInv = dentro.reduce((s, x) => s + x.gasto, 0);
-  const rInv = dentro.reduce((s, x) => s + x.liquido, 0);
+  const gMetaInv = dentro.reduce((s, x) => s + x.gasto, 0);
+  const fatorMeta = 1 + TAXAS.metaSobreGastoPct / 100;
+  const gInv = gMetaInv * fatorMeta; // o que o investidor paga de verdade: gasto + imposto da Meta na fatura
+  const rLiqInv = dentro.reduce((s, x) => s + x.liquido, 0); // já sem reembolsos
+  const impostoRec = Math.max(0, rLiqInv) * (TAXAS.impostoSobreReceitaPct / 100);
+  const rInv = rLiqInv - impostoRec;
   const devolvido = Math.min(rInv, gInv);
   const excedente = Math.max(0, rInv - gInv);
   const parteInv = excedente * ACORDO.parteInvestidor;
   const antes = antesLst.length && de < INICIO_BABY ? { gasto: r2(antesLst.reduce((s, x) => s + x.gasto, 0)), receitaLiquida: r2(antesLst.reduce((s, x) => s + x.liquido, 0)) } : null;
 
+  if (TAXAS.metaSobreGastoPct === 0 || TAXAS.impostoSobreReceitaPct === 0) avisos.push("Taxas a definir: imposto da Meta sobre o gasto e imposto sobre a receita estão em 0%. A taxa da Hotmart e os reembolsos já entram sozinhos.");
   if (modo === "periodo") avisos.push("Período sem saldo anterior: o gasto é coberto primeiro e o resto divide 30/70 dentro da janela. O acumulado do acordo, turma a turma, está na aba Investidor.");
   if (de < INICIO_BABY) avisos.push(`Antes de ${INICIO_BABY.slice(8, 10)}/${INICIO_BABY.slice(5, 7)} o tráfego foi pago pela RedPro. A conta do investidor só conta daí em diante.`);
   avisos.push("A Meta entrega gasto por dia: o recorte vai de 00h a 23h59. A divisão por turma (corte às 20h de segunda) está na aba Investidor.");
@@ -226,6 +240,14 @@ export async function montarRecorte(modo: ModoRecorte, deIn?: string | null, ate
       convFormacao: bIng.vendas ? (bFor.vendas / bIng.vendas) * 100 : null,
     },
     origem,
+    taxas: {
+      metaPct: TAXAS.metaSobreGastoPct,
+      receitaPct: TAXAS.impostoSobreReceitaPct,
+      metaValor: r2(gInv - gMetaInv),
+      receitaValor: r2(impostoRec),
+      hotmart: r2(taxaHotmart),
+      reembolsos: r2(reembolsos),
+    },
     totais: {
       receitaBruta: r2(receitaBruta),
       receitaLiquida: r2(receitaLiquida),
@@ -234,12 +256,13 @@ export async function montarRecorte(modo: ModoRecorte, deIn?: string | null, ate
       roasFunil: div(receitaBruta, gTotal),
       cpa: div(gTotal, bIng.vendas),
       receitaPorIngresso: div(receitaBruta, bIng.vendas),
-      lucro: r2(receitaLiquida - gTotal),
+      lucro: r2(receitaLiquida - reembolsos - gTotal),
     },
     serie,
     outrasCampanhas: [...outras.entries()].map(([nome, gasto]) => ({ nome, gasto: r2(gasto) })).filter((x) => x.gasto > 0),
     investidor: {
       desde: desdeInv,
+      gastoMeta: r2(gMetaInv),
       antes,
       gasto: r2(gInv),
       receitaLiquida: r2(rInv),

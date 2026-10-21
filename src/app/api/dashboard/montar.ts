@@ -787,6 +787,12 @@ export async function montar(pedido: string, opts: { leve?: boolean; cal?: Ciclo
   const roasAlvo = manual.roas_alvo ?? 3;
   const ticketMedioLiquido = div(liquidoFront, ingressos);
   const convBase = backend.conv !== null ? backend.conv / 100 : 0.07;
+  // reembolso e chargeback: a venda aprovada sai do líquido (o dinheiro volta ao comprador)
+  const reembTx = new Set(
+    compras.filter((c) => c.evento === "PURCHASE_REFUNDED" || c.evento === "PURCHASE_CHARGEBACK").map((c) => c.transacao || "").filter(Boolean),
+  );
+  const aprovadasDaTurma = [...ingressosTx, ...PRODUTOS.bumps.flatMap((b) => aprovadas(b.id, captIni, captFim)), ...backendTx];
+  const reembolsado = aprovadasDaTurma.filter((c) => c.transacao && reembTx.has(c.transacao)).reduce((s, c) => s + (liquidoDe(c) ?? 0), 0);
   const financeiro: Dados["financeiro"] = {
     investimento,
     trafego: gasto,
@@ -794,6 +800,8 @@ export async function montar(pedido: string, opts: { leve?: boolean; cal?: Ciclo
     outros,
     receitaBruta,
     receitaLiquida,
+    taxaHotmart: r2(Math.max(0, receitaBruta - receitaLiquida)),
+    reembolsado: r2(reembolsado),
     lucro: receitaLiquida - investimento,
     roasTotal: div(receitaBruta, investimento),
     margem: pct(receitaLiquida - investimento, receitaBruta),
