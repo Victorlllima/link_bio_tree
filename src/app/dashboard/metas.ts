@@ -257,9 +257,9 @@ export const ACORDO = { captacaoDia: 150, distribuicaoDia: 50, parteInvestidor: 
 export const TAXAS = { metaSobreGastoPct: 0, impostoSobreReceitaPct: 0 };
 
 // LIBERAÇÃO DO DINHEIRO NA HOTMART (para saber o que já pode ser transferido ao investidor).
-// Cartão: D+30, medido no extrato em 20/09/2026. Pix, boleto e PayPal: a API da Hotmart não informa a data de
-// liberação; o painel usa o fim da garantia (7 dias) como estimativa. NÃO medido: conferir no extrato da Hotmart.
-export const LIBERACAO_DIAS = { cartao: 30, outros: 7 };
+// Medido no extrato da Hotmart em 21/10/2026 (188 lançamentos desde 05/10): cartão cai em D+29/30 e Pix/boleto em D+1/2.
+// Fonte exata: api-statement.hotmart.com (campo effectivenessDate), lida pelo cron caixa-diario da VPS.
+export const LIBERACAO_DIAS = { cartao: 30, outros: 2 };
 export const PRECO_FORMACAO_PADRAO = 997; // Red, 04/10/2026
 
 export const PRODUTOS = {
