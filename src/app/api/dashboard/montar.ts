@@ -227,13 +227,24 @@ async function lerMeta(since: string, until: string, comAnuncios: boolean) {
   // Sem nenhuma campanha reconhecida na janela: filtra por um id inexistente pra devolver zerado
   // em vez de cair sem filtro nenhum (que somaria a conta inteira, de qualquer campanha antiga).
   const filtroIds = idsHermesWeek.length ? idsHermesWeek : ["0"];
+  // Só captação: o boost do Instagram otimiza visita ao perfil, então seus cliques não vão para a página
+  // e sujariam connect rate, conversão da página, CPM e CTR da campanha de venda.
+  const idsCaptacao = todasCamps
+    .filter((c) => ehCampanhaHermesWeek(String(c.campaign_name || "")) && !ehDistribuicao(String(c.campaign_name || "")))
+    .map((c) => c.campaign_id)
+    .filter((id): id is string => !!id);
+  const filtCapt = encodeURIComponent(JSON.stringify([{ field: "campaign.id", operator: "IN", value: idsCaptacao.length ? idsCaptacao : ["0"] }]));
   const filt = encodeURIComponent(JSON.stringify([{ field: "campaign.id", operator: "IN", value: filtroIds }]));
 
   const reqs: Promise<Record<string, unknown>>[] = [
     meta(`${base}&level=account&filtering=${filt}&fields=${fBase},reach,frequency,cpm,ctr,clicks`),
-    meta(`${base}&level=account&filtering=${filt}&time_increment=1&fields=${fBase}&limit=100`),
+    // A Meta devolve spend e impressões zerados quando se filtra por campaign.id junto com time_increment.
+    // Por isso a série diária vem por campanha, sem filtro, e é somada aqui só nas campanhas da Hermes Week.
+    meta(`${base}&level=campaign&time_increment=1&fields=campaign_name,spend,impressions&limit=1000`),
     Promise.resolve(campsBrutos as Record<string, unknown>),
+    meta(`${base}&level=account&filtering=${filtCapt}&fields=${fBase},reach,frequency,cpm,ctr,clicks`),
   ];
+  reqs.push(meta(`${base}&level=campaign&time_increment=1&fields=campaign_name,inline_link_clicks,actions&limit=1000`));
   if (comAnuncios) {
     reqs.push(
       meta(
@@ -244,8 +255,34 @@ async function lerMeta(since: string, until: string, comAnuncios: boolean) {
       ),
     );
   }
-  const [tot, serie, camps, ads, adsMeta] = await Promise.all(reqs);
-  return { tot, serie, camps, ads, adsMeta } as Record<string, { data?: Record<string, unknown>[] } | undefined>;
+  const [tot, serieBruta, camps, totC, serieAcoes, ads, adsMeta] = await Promise.all(reqs);
+  const porDia = new Map<string, { date_start: string; spend: number; impressions: number; inline_link_clicks: number; actions: Map<string, number> }>();
+  for (const r of ((serieBruta as { data?: Record<string, unknown>[] }).data || [])) {
+    if (!ehCampanhaHermesWeek(String(r.campaign_name || ""))) continue;
+    const k = String(r.date_start);
+    const x = porDia.get(k) ?? { date_start: k, spend: 0, impressions: 0, inline_link_clicks: 0, actions: new Map<string, number>() };
+    x.spend += Number(r.spend || 0);
+    x.impressions += Number(r.impressions || 0);
+    porDia.set(k, x);
+  }
+  for (const r of ((serieAcoes as { data?: Record<string, unknown>[] } | undefined)?.data || [])) {
+    if (!ehCampanhaHermesWeek(String(r.campaign_name || ""))) continue;
+    const k = String(r.date_start);
+    const x = porDia.get(k) ?? { date_start: k, spend: 0, impressions: 0, inline_link_clicks: 0, actions: new Map<string, number>() };
+    x.inline_link_clicks += Number(r.inline_link_clicks || 0);
+    for (const a of (r.actions as MetaAction[] | undefined) || []) x.actions.set(a.action_type, (x.actions.get(a.action_type) || 0) + Number(a.value || 0));
+    porDia.set(k, x);
+  }
+  const serie = {
+    data: [...porDia.values()].map((x) => ({
+      date_start: x.date_start,
+      spend: String(x.spend),
+      impressions: String(x.impressions),
+      inline_link_clicks: String(x.inline_link_clicks),
+      actions: [...x.actions.entries()].map(([action_type, value]) => ({ action_type, value: String(value) })),
+    })),
+  };
+  return { tot, serie, camps, totC, ads, adsMeta } as Record<string, { data?: Record<string, unknown>[] } | undefined>;
 }
 
 // ============================================================
@@ -449,9 +486,11 @@ export async function montar(pedido: string, opts: { leve?: boolean; cal?: Ciclo
   // ============================================================
   // TRÁFEGO (Meta)
   // ============================================================
-  const tot = (m?.tot?.data?.[0] || {}) as Record<string, unknown>;
+  const totTodas = (m?.tot?.data?.[0] || {}) as Record<string, unknown>; // venda + distribuição: só o gasto
+  const tot = (m?.totC?.data?.[0] || {}) as Record<string, unknown>; // só captação: CPM, CTR, cliques, página, checkout
   const acts = tot.actions as MetaAction[] | undefined;
-  const gasto = Number(tot.spend || 0);
+  const gasto = Number(totTodas.spend || 0);
+  const gastoCapt = Number(tot.spend || 0);
   const impressoes = Number(tot.impressions || 0);
   const cliquesLink = Number(tot.inline_link_clicks || 0) || act(acts, "link_click");
   const lpv = act(acts, "landing_page_view", "omni_landing_page_view");
@@ -485,7 +524,10 @@ export async function montar(pedido: string, opts: { leve?: boolean; cal?: Ciclo
       const nome = String(c.campaign_name);
       return { nome, gasto: Number(c.spend), tipo: ehDistribuicao(nome) ? ("distribuicao" as const) : ("captacao" as const) };
     });
-  const verbaDistrib = manual.verba_distribuicao ?? 0;
+  const gastoDistApi = campanhas.filter((c) => c.tipo === "distribuicao").reduce((s, c) => s + c.gasto, 0);
+  // O boost entra pela Meta (gasto de verdade). Verba lançada à mão só vale se a Meta não achou distribuição,
+  // senão o gasto seria contado duas vezes.
+  const verbaDistrib = gastoDistApi > 0 ? 0 : (manual.verba_distribuicao ?? 0);
 
   const vendasPagas = origem.anuncio;
   const trafego: Dados["trafego"] = {
@@ -496,22 +538,22 @@ export async function montar(pedido: string, opts: { leve?: boolean; cal?: Ciclo
     cpm: tot.cpm ? Number(tot.cpm) : null,
     ctr: tot.ctr ? Number(tot.ctr) : null,
     cliquesLink,
-    cpcLink: div(gasto, cliquesLink),
+    cpcLink: div(gastoCapt, cliquesLink),
     lpv,
     ic,
     compraPixel,
     dias: diasComGasto,
-    verbaDia: diasComGasto ? gasto / diasComGasto : null,
+    verbaDia: diasComGasto ? gastoCapt / diasComGasto : null,
     connect: pct(lpv, cliquesLink),
     pagCheckout: pct(ic, lpv),
     checkoutCompra: pct(vendasPagas, ic),
     convPagina: pct(vendasPagas, lpv),
-    custoIc: div(gasto, ic),
+    custoIc: div(gastoCapt, ic),
     vendasPagas,
     cpaPago: div(gasto, vendasPagas),
     outrasCampanhas,
     campanhas,
-    distribuicaoPct: verbaDistrib > 0 ? pct(verbaDistrib, gasto + verbaDistrib) : null,
+    distribuicaoPct: gastoDistApi > 0 ? pct(gastoDistApi, gasto) : verbaDistrib > 0 ? pct(verbaDistrib, gasto + verbaDistrib) : null,
     serie,
   };
 
@@ -561,18 +603,22 @@ export async function montar(pedido: string, opts: { leve?: boolean; cal?: Ciclo
       vendas,
       vendasPixel: act(acoes, "omni_purchase", "purchase"),
       cpa: vendas ? g / vendas : null,
-      veredito: veredito({ formato, imp, ctr, hook, hold, body, vendas, gasto: g }),
+      veredito: ehDistribuicao(nome)
+        ? { rotulo: "Distribuição", cor: "neutro" as const, acao: "Mede visita ao perfil e seguidor novo, não venda. Julgue pelo app do Instagram." }
+        : veredito({ formato, imp, ctr, hook, hold, body, vendas, gasto: g }),
     };
   });
   criativos.sort((a, b) => b.vendas - a.vendas || b.gasto - a.gasto);
-  const ativos = [...metaAds.values()].filter((a) => a.effective_status === "ACTIVE");
+  // a batelada do método são os criativos de venda: o reel de distribuição fica de fora
+  const deVenda = [...metaAds.values()].filter((a) => !ehDistribuicao(String(a.name || "")));
+  const ativos = deVenda.filter((a) => a.effective_status === "ACTIVE");
   const fmt = (n: string) => (/_vid_/i.test(n) ? "video" : /_car_/i.test(n) ? "carrossel" : /_est_/i.test(n) ? "estatico" : "outro");
   const batelada = {
     ativos: ativos.length,
     video: ativos.filter((a) => fmt(String(a.name)) === "video").length,
     estatico: ativos.filter((a) => fmt(String(a.name)) === "estatico").length,
     carrossel: ativos.filter((a) => fmt(String(a.name)) === "carrossel").length,
-    novos7d: [...metaAds.values()].filter(
+    novos7d: deVenda.filter(
       (a) => a.created_time && agora.getTime() - new Date(String(a.created_time)).getTime() < 7 * 86400e3,
     ).length,
   };
@@ -875,7 +921,9 @@ function ler(d: Dados): Leitura[] {
   // meta de ingressos com projeção
   if (f === "captacao") {
     const restante = (new Date(d.ciclo.captFim).getTime() - Date.now()) / 86400e3;
-    const ultimos = v.porDia.slice(-4, -1);
+    // só dias que já passaram: a série vai até o fim da captação e os dias futuros zeravam o ritmo
+    const hojeBr = new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10);
+    const ultimos = v.porDia.filter((x) => x.dia < hojeBr).slice(-3);
     const ritmo = ultimos.length ? ultimos.reduce((s, x) => s + x.ingressos, 0) / ultimos.length : 0;
     const proj = Math.round(v.ingressos + ritmo * Math.max(0, restante));
     const c = proj >= v.meta ? "bom" : proj >= v.meta * 0.7 ? "atencao" : "ruim";
@@ -888,7 +936,10 @@ function ler(d: Dados): Leitura[] {
     });
   }
 
-  if (t.gasto > 0 && v.roasPago !== null) {
+  // Com poucos dias e pouca impressão a leitura é ruído (regra do método: 5.000 impressões e 48-72h).
+  if (t.gasto > 0 && v.roasPago !== null && (t.dias < 4 || t.impressoes < IMPRESSOES_MIN_JULGAR)) {
+    L.push({ nivel: "info", area: "Tráfego", titulo: `ROAS do anúncio parcial em ${v.roasPago.toFixed(2).replace(".", ",")}`, texto: `${t.dias} dia${t.dias === 1 ? "" : "s"} de gasto e ${t.impressoes.toLocaleString("pt-BR")} impressões. Só vale ler a partir de 4 dias e 5.000 impressões.` });
+  } else if (t.gasto > 0 && v.roasPago !== null) {
     const r = v.roasPago;
     const rs = r.toFixed(2).replace(".", ",");
     const obs = `Só o que o anúncio trouxe (${t.vendasPagas} ingressos + bumps deles). Com a bio junto: ${(v.roas ?? 0).toFixed(2).replace(".", ",")}.`;
@@ -906,7 +957,7 @@ function ler(d: Dados): Leitura[] {
   else if (t.distribuicaoPct !== null && (t.distribuicaoPct < 10 || t.distribuicaoPct > 25)) L.push({ nivel: "atencao", area: "Tráfego", titulo: `Distribuição em ${p(t.distribuicaoPct)} da verba`, texto: "A faixa do método é 10% a 25%.", acao: "Ajuste 5 pontos por semana até achar o equilíbrio." });
 
   // criativos
-  const dinheiroParado = d.criativos.filter((c) => c.impressoes >= IMPRESSOES_MIN_JULGAR && c.vendas === 0 && c.status === "ACTIVE");
+  const dinheiroParado = d.criativos.filter((c) => c.impressoes >= IMPRESSOES_MIN_JULGAR && c.vendas === 0 && c.status === "ACTIVE" && c.veredito.rotulo !== "Distribuição");
   const gastoParado = dinheiroParado.reduce((s, c) => s + c.gasto, 0);
   const total = d.criativos.reduce((s, c) => s + c.gasto, 0);
   if (dinheiroParado.length && total > 0) L.push({ nivel: gastoParado / total > 0.4 ? "ruim" : "atencao", area: "Criativos", titulo: `${dinheiroParado.length} anúncios ativos sem venda`, texto: `Queimaram ${brl(gastoParado)} (${p((gastoParado / total) * 100)} da verba) já com volume pra julgar.`, acao: "Quem tá ruim sai. Puxe a verba pros campeões e faça variações de gancho deles." });
@@ -942,7 +993,8 @@ function ler(d: Dados): Leitura[] {
   }
 
   // backend
-  if (d.backend.conv !== null) {
+  // só existe conversão da Formação depois que o carrinho abriu: antes disso 0% não é resultado
+  if (d.backend.conv !== null && (f === "carrinho" || f === "pos")) {
     const cv = d.backend.conv;
     L.push(
       cv < 5
