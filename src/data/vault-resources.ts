@@ -37,6 +37,39 @@ const COMO_INSTALAR: Secao = {
 
 export const RESOURCES: Resource[] = [
   {
+    slug: "agente-habitos-alimentares",
+    titulo: "Agente de hábitos alimentares: blueprint traduzido",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "O blueprint completo de um agente do Hermes que explica rótulos, organiza o seu diário de comida e marca o que é estimativa, em português, com um pedido pronto para colar no Hermes.",
+    intro:
+      "Um blueprint publicado em inglês, traduzido e organizado em um PDF. Ele descreve as rotinas, a memória, as ferramentas, as regras e as automações opcionais de um agente que ajuda você a entender os registros de comida que você escolhe manter. No fim, uma página com o pedido pronto para você colar no seu Hermes.",
+    arquivo: "/redreply/pdfs/agente-habitos-alimentares.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF de 9 páginas, em português: para que serve, o que o agente faz, as quatro rotinas (gatilho, ação e resultado), o que ele precisa, lembra e usa, as regras e automações, como personalizar, o pedido pronto para o Hermes e um passo a passo de primeiro teste.",
+      },
+      {
+        titulo: "As regras do agente",
+        texto:
+          "Sem tratamento de dieta, diagnóstico nem suplementos. Porções desconhecidas ficam como estimativa. Sem garantia de perda de peso ou de alergia. Acompanhamento voluntário, com apagar a pedido. Compartilhamento só com a sua aprovação. Automações só depois do setup e de um teste manual.",
+      },
+      {
+        titulo: "Aviso",
+        texto:
+          "O agente organiza registros que você escolhe manter. Ele não substitui orientação de um profissional de saúde.",
+      },
+      {
+        titulo: "De onde vem",
+        texto:
+          "Blueprint publicado por @HermesWatcher em 21/10/2026. Tradução e organização: @redpro.ia. O pedido pronto é uma organização do blueprint feita por @redpro.ia, não um texto do autor original.",
+      },
+    ],
+  },
+  {
     slug: "rea-oh-my-hermes",
     titulo: "REA + Oh My Hermes: passo a passo",
     categoria: "Guias",
