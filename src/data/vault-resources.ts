@@ -37,6 +37,34 @@ const COMO_INSTALAR: Secao = {
 
 export const RESOURCES: Resource[] = [
   {
+    slug: "oh-my-hermes-passo-a-passo",
+    titulo: "Oh My Hermes: passo a passo",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "Como instalar o Oh My Hermes, configurar o modelo de cada categoria de tarefa e medir na sua própria conta se valeu a pena, em português.",
+    intro:
+      "O Oh My Hermes é uma camada de operação por cima do Hermes Agent: pontua cada pedido, escolhe o modelo e o esforço de cada tarefa, traz mais de cem skills de especialista e uma memória revisada. Este guia reúne o que a documentação do projeto diz, na ordem de uso: pré-requisitos, instalação, omh setup e omh doctor, modelo por categoria e um método para comparar tempo e custo antes e depois.",
+    arquivo: "/redreply/pdfs/oh-my-hermes-passo-a-passo.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF de 10 páginas, em português, com os comandos prontos: o que o Oh My Hermes acrescenta ao Hermes, pré-requisitos, instalação (inclusive o caminho mais seguro, fixando o commit), omh setup e omh doctor, as 12 categorias de modelo e esforço, o roteamento e a tela ao vivo, as skills e a memória, como medir na sua conta, e como atualizar ou desinstalar.",
+      },
+      {
+        titulo: "Sobre os números",
+        texto:
+          "O projeto publica um teste do próprio autor: mesmas tarefas de código, mesmo modelo, 18 de 30 resolvidas nos dois casos, com custo de US$ 4,29 para US$ 0,66 e tempo de 23 para 5 minutos. É um resultado do autor, em um modelo. O guia mostra como medir o seu.",
+      },
+      {
+        titulo: "De onde vem",
+        texto:
+          "Projeto: github.com/rlaope/oh-my-hermes (licença MIT). Guia: @redpro.ia, baseado na documentação do projeto consultada em 21/10/2026. O projeto muda rápido: confira o README antes de instalar.",
+      },
+    ],
+  },
+  {
     slug: "agente-habitos-alimentares",
     titulo: "Agente de hábitos alimentares: blueprint traduzido",
     categoria: "Guias",
