@@ -37,6 +37,39 @@ const COMO_INSTALAR: Secao = {
 
 export const RESOURCES: Resource[] = [
   {
+    slug: "rea-oh-my-hermes",
+    titulo: "REA + Oh My Hermes: passo a passo",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "O passo a passo para instalar o plugin oficial do REA no Hermes, ligar o Oh My Hermes e fazer a primeira análise, com os cuidados da documentação.",
+    intro:
+      "O REA virou plugin oficial do Hermes e o Oh My Hermes acrescenta uma camada que escolhe o modelo de cada tarefa. Reuni num PDF o que a documentação dos dois diz, na ordem de instalação: ambiente, plugin, primeira análise, Oh My Hermes, configuração e modelo por categoria.",
+    arquivo: "/redreply/pdfs/rea-oh-my-hermes.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF de 11 páginas, em português, com os comandos prontos para copiar: conferir o ambiente, instalar o plugin do REA, rodar a primeira análise, instalar e configurar o Oh My Hermes, escolher o modelo de cada categoria de tarefa e juntar as duas peças.",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "Você precisa do Hermes 0.22.0 ou mais novo e do Node.js 22.19+, 24.11+ ou 26+ (as versões 23 e 25 não são suportadas). Para decompilar programa nativo, o REA usa uma ferramenta sua: Ghidra com JDK, Hopper ou IDA.",
+      },
+      {
+        titulo: "Cuidados",
+        texto:
+          "Algumas ferramentas do REA executam coisas na sua máquina, e o Hermes não pergunta antes. O PDF traz a lista e o que fazer. Analise só software seu ou que você tenha autorização para analisar.",
+      },
+      {
+        titulo: "De onde vem",
+        texto:
+          "Baseado na documentação do plugin (Nous Research) e nos repositórios do REA (morluto, MIT) e do Oh My Hermes (rlaope, MIT), consultados em 21/10/2026. As ferramentas mudam rápido: confira o README antes de instalar.",
+      },
+    ],
+  },
+  {
     slug: "100-dicas-hermes",
     titulo: "100 dicas do Hermes",
     categoria: "Guias",
