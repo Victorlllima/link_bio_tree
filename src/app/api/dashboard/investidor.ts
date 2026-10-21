@@ -15,6 +15,23 @@ import { montar, gastoDepoisDas20, em, type CicloCal } from "./montar";
 const DIA = 86400e3;
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
+export function caixaDe(liberado: number, receitaTotal: number, gasto: number, proxima: string | null) {
+  const lib = Math.max(0, liberado);
+  const devolvido = Math.min(lib, gasto);
+  const lucro = Math.max(0, lib - gasto);
+  const parte = lucro * ACORDO.parteInvestidor;
+  return {
+    liberado: r2(lib),
+    aLiberar: r2(Math.max(0, receitaTotal - lib)),
+    devolvido: r2(devolvido),
+    lucro: r2(lucro),
+    parteInvestidor: r2(parte),
+    parteRedpro: r2(lucro - parte),
+    transferivelHoje: r2(devolvido + parte),
+    proximaLiberacao: proxima,
+  };
+}
+
 export async function montarInvestidor(cal: CicloCal[]): Promise<RespInvestidor> {
   const agora = Date.now();
   const dados = await Promise.all(cal.map((c) => montar(c.d0, { leve: true, cal })));
@@ -89,6 +106,7 @@ export async function montarInvestidor(cal: CicloCal[]): Promise<RespInvestidor>
       taxaHotmart: r2(d.financeiro.taxaHotmart),
       reembolsos: r2(reembolsos),
       impostoReceita: r2(impostoReceita),
+      receitaLiberada: r2(fora ? 0 : d.financeiro.liberado),
       ingressos: d.vendas.ingressos,
       receitaFront: r2(d.vendas.receitaFront),
       liquidoFront: r2(d.vendas.liquidoFront),
@@ -105,6 +123,8 @@ export async function montarInvestidor(cal: CicloCal[]): Promise<RespInvestidor>
     };
   });
 
+  const proximas = dados.filter((d, i) => !linhas[i].foraDoAcordo && d.financeiro.proximaLiberacao).map((d) => d.financeiro.proximaLiberacao as string).sort();
+  const proximaLib = proximas[0] ?? null;
   const noAcordo = linhas.filter((l) => !l.foraDoAcordo);
   const soma = (f: (l: LinhaInvestidor) => number) => r2(noAcordo.reduce((s, l) => s + f(l), 0));
   const somaTodas = (f: (l: LinhaInvestidor) => number) => r2(linhas.reduce((s, l) => s + f(l), 0));
@@ -144,6 +164,8 @@ export async function montarInvestidor(cal: CicloCal[]): Promise<RespInvestidor>
     linhas,
     total: {
       gasto: soma((l) => l.gasto),
+      liberado: soma((l) => l.receitaLiberada),
+      caixa: caixaDe(soma((l) => l.receitaLiberada), soma((l) => l.receitaLiquida), soma((l) => l.gasto), proximaLib),
       gastoMeta: soma((l) => l.gastoMeta),
       taxaMeta: soma((l) => l.taxaMeta),
       receitaBruta: soma((l) => l.receitaBruta),

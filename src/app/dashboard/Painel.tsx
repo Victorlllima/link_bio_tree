@@ -1045,7 +1045,7 @@ function Investidor({ atual }: { atual: string }) {
                     <tr><td>Receita bruta (ingressos, extras e Formação)</td><td className="dir num">{fR(t.receitaBruta)}</td></tr>
                     <tr><td>Taxa da Hotmart <span className="dim3">(real, venda a venda)</span></td><td className="dir num c-amarelo">− {fR(t.taxaHotmart)}</td></tr>
                     <tr><td>Reembolsos e chargebacks <span className="dim3">(automático)</span></td><td className="dir num c-amarelo">− {fR(t.reembolsos)}</td></tr>
-                    <tr><td>Imposto sobre a receita <span className="dim3">({r.taxas.impostoSobreReceitaPct > 0 ? `${fN(r.taxas.impostoSobreReceitaPct, 2)}%` : "a definir"})</span></td><td className="dir num c-amarelo">− {fR(t.impostoReceita)}</td></tr>
+                    <tr><td>Imposto sobre a receita <span className="dim3">({r.taxas.impostoSobreReceitaPct > 0 ? `${fN(r.taxas.impostoSobreReceitaPct, 2)}%` : "não entra, decisão do acordo"})</span></td><td className="dir num c-amarelo">− {fR(t.impostoReceita)}</td></tr>
                     <tr><td><b>Receita que cobre o investimento</b></td><td className="dir num"><b className="brass">{fR(t.receitaLiquida)}</b></td></tr>
                   </tbody>
                 </table>
@@ -1055,13 +1055,23 @@ function Investidor({ atual }: { atual: string }) {
                   <thead><tr><th>Investimento</th><th className="dir">Valor</th></tr></thead>
                   <tbody>
                     <tr><td>Gasto de mídia mostrado pela Meta</td><td className="dir num">{fR(t.gastoMeta)}</td></tr>
-                    <tr><td>Imposto da Meta na fatura <span className="dim3">({r.taxas.metaSobreGastoPct > 0 ? `${fN(r.taxas.metaSobreGastoPct, 2)}%` : "a definir"})</span></td><td className="dir num c-amarelo">+ {fR(t.taxaMeta)}</td></tr>
+                    <tr><td>Imposto da Meta na fatura <span className="dim3">({r.taxas.metaSobreGastoPct > 0 ? `${fN(r.taxas.metaSobreGastoPct, 2)}%` : "a definir: fatura do investidor"})</span></td><td className="dir num c-amarelo">+ {fR(t.taxaMeta)}</td></tr>
                     <tr><td><b>Pago pelo investidor</b></td><td className="dir num"><b className="brass">{fR(t.gasto)}</b></td></tr>
                   </tbody>
                 </table>
               </div>
             </div>
-            {(r.taxas.metaSobreGastoPct === 0 || r.taxas.impostoSobreReceitaPct === 0) && <div className="aviso">Há taxa em 0% marcada como "a definir": informe o percentual do imposto que a Meta soma à fatura e o do imposto sobre a receita para a conta refletir o que sai de verdade. A taxa da Hotmart e os reembolsos já entram sozinhos.</div>}
+            {r.taxas.metaSobreGastoPct === 0 && <div className="aviso">O imposto que a Meta soma à fatura ainda não entrou: a fatura é do investidor. Quando ele informar o percentual, o gasto pago por ele e a devolução sobem na mesma proporção. A taxa da Hotmart e os reembolsos já entram sozinhos.</div>}
+          </Bloco>
+
+          <Bloco titulo="Caixa: o que já pode ser transferido" sub="Só o dinheiro que a Hotmart já liberou. O primeiro dinheiro devolve o investimento; o que passar disso divide em 30% investidor e 70% RedPro.">
+            <div className="g4">
+              <Kpi rotulo="Já liberado pela Hotmart" valor={fR(t.caixa.liberado)} sub={`ainda a liberar ${fR(t.caixa.aLiberar)}${t.caixa.proximaLiberacao ? ` · próxima em ${ddmm(brDiaDe(t.caixa.proximaLiberacao))}` : ""}`} />
+              <Kpi rotulo="Devolução do investimento" valor={fR(t.caixa.devolvido)} sub={`de ${fR(t.gasto)} que o investidor pagou`} />
+              <Kpi rotulo="30% do investidor, já realizado" valor={fR(t.caixa.parteInvestidor)} sub={`lucro já em caixa ${fR(t.caixa.lucro)}`} />
+              <Kpi rotulo="Pode transferir hoje ao investidor" valor={fR(t.caixa.transferivelHoje)} sub={`RedPro fica com ${fR(t.caixa.parteRedpro)} do lucro em caixa`} />
+            </div>
+            <div className="dica">Cartão libera em 30 dias (medido no extrato). Pix, boleto e PayPal usam o fim da garantia, 7 dias, como estimativa: confira uma venda dessas no extrato da Hotmart antes de contar com o valor. Se a conta pela venda aprovada (acima) e a conta pelo caixa (aqui) divergem, a diferença é dinheiro vendido que ainda não caiu.</div>
           </Bloco>
 
           {foco && !foco.foraDoAcordo && (
@@ -1086,7 +1096,7 @@ function Investidor({ atual }: { atual: string }) {
               <table className="tab">
                 <thead>
                   <tr>
-                    <th>Turma</th><th className="dir">Acordo</th><th className="dir">Gasto real</th><th className="dir">Receita líquida</th>
+                    <th>Turma</th><th className="dir">Acordo</th><th className="dir">Gasto real</th><th className="dir">Receita líquida</th><th className="dir">Já liberado</th>
                     <th className="dir">Devolvido</th><th className="dir">Saldo a devolver</th><th className="dir">Lucro</th>
                     <th className="dir">Investidor {fN(a.parteInvestidor * 100, 0)}%</th><th className="dir">RedPro {fN((1 - a.parteInvestidor) * 100, 0)}%</th>
                   </tr>
@@ -1098,7 +1108,7 @@ function Investidor({ atual }: { atual: string }) {
                       <td className="dir num dim3">—</td>
                       <td className="dir num dim">{fR(l.gasto)}</td>
                       <td className="dir num dim">{fR(l.receitaLiquida)}</td>
-                      <td className="dir num dim3">—</td><td className="dir num dim3">—</td><td className="dir num dim3">—</td><td className="dir num dim3">—</td><td className="dir num dim3">—</td>
+                      <td className="dir num dim3">—</td><td className="dir num dim3">—</td><td className="dir num dim3">—</td><td className="dir num dim3">—</td><td className="dir num dim3">—</td><td className="dir num dim3">—</td>
                     </tr>
                   ) : (
                     <tr key={l.d0} className={l.d0 === foco?.d0 ? "atual" : ""}>
@@ -1106,6 +1116,7 @@ function Investidor({ atual }: { atual: string }) {
                       <td className="dir num">{fR(l.acordo, 0)}<div className="dim3" style={{ fontSize: 10.5 }}>{l.dias} dias</div></td>
                       <td className={`dir num ${l.emCaptacao ? corGasto(l.gasto, l.acordoAteHoje) : ""}`}>{fR(l.gasto)}</td>
                       <td className="dir num">{fR(l.receitaLiquida)}</td>
+                      <td className="dir num">{fR(l.receitaLiberada)}<div className="dim3" style={{ fontSize: 10.5 }}>{l.receitaLiquida > 0 ? `${fN((l.receitaLiberada / l.receitaLiquida) * 100, 0)}%` : ""}</div></td>
                       <td className="dir num">{fR(l.devolvido)}</td>
                       <td className={`dir num ${l.saldoDepois > 0 ? "c-amarelo" : ""}`}>{fR(l.saldoDepois)}</td>
                       <td className="dir num">{fR(l.excedente)}</td>
@@ -1115,7 +1126,7 @@ function Investidor({ atual }: { atual: string }) {
                   ))}
                   <tr>
                     <td><b>Total</b></td><td className="dir num">{fR(r.linhas.reduce((s, l) => s + l.acordo, 0), 0)}</td>
-                    <td className="dir num"><b className="brass">{fR(t.gasto)}</b></td><td className="dir num"><b className="brass">{fR(t.receitaLiquida)}</b></td>
+                    <td className="dir num"><b className="brass">{fR(t.gasto)}</b></td><td className="dir num"><b className="brass">{fR(t.receitaLiquida)}</b></td><td className="dir num"><b className="brass">{fR(t.liberado)}</b></td>
                     <td className="dir num"><b className="brass">{fR(t.devolvido)}</b></td><td className="dir num"><b className="brass">{fR(t.saldoDevedor)}</b></td>
                     <td className="dir num"><b className="brass">{fR(t.excedente)}</b></td><td className="dir num"><b className="brass">{fR(t.parteInvestidor)}</b></td><td className="dir num"><b className="brass">{fR(t.parteRedpro)}</b></td>
                   </tr>
@@ -1370,6 +1381,13 @@ function RecorteView({ r }: { r: Recorte }) {
               <Kpi rotulo="30% do investidor" valor={fR(iv.parteInvestidor)} sub="parte do lucro" />
               <Kpi rotulo="70% RedPro" valor={fR(iv.parteRedpro)} sub="o que sobra para a RedPro AI Academy" />
             </div>
+            <div className="g4" style={{ marginTop: 14 }}>
+              <Kpi rotulo="Já liberado pela Hotmart" valor={fR(iv.caixa.liberado)} sub={`ainda a liberar ${fR(iv.caixa.aLiberar)}${iv.caixa.proximaLiberacao ? ` · próxima em ${ddmm(brDiaDe(iv.caixa.proximaLiberacao))}` : ""}`} />
+              <Kpi rotulo="Devolução em caixa" valor={fR(iv.caixa.devolvido)} sub={`de ${fR(iv.gasto)} pagos pelo investidor`} />
+              <Kpi rotulo="30% já realizado em caixa" valor={fR(iv.caixa.parteInvestidor)} sub={`lucro em caixa ${fR(iv.caixa.lucro)}`} />
+              <Kpi rotulo="Pode transferir hoje" valor={fR(iv.caixa.transferivelHoje)} sub="só com o dinheiro já liberado pela Hotmart" />
+            </div>
+            <div className="dica">Cartão libera em 30 dias (medido). Pix, boleto e PayPal usam o fim da garantia, 7 dias, como estimativa: confira no extrato da Hotmart.</div>
             {iv.antes && <div className="dica">Antes da entrada do investidor, nesta janela: gasto {fR(iv.antes.gasto)} pago pela RedPro e receita líquida {fR(iv.antes.receitaLiquida)}. Fica fora da conta dele.</div>}
           </>
         ) : null}
@@ -1384,7 +1402,7 @@ function RecorteView({ r }: { r: Recorte }) {
                 <tr><td>Receita bruta</td><td className="dir num">{fR(t.receitaBruta)}</td></tr>
                 <tr><td>Taxa da Hotmart <span className="dim3">(real, venda a venda)</span></td><td className="dir num c-amarelo">− {fR(r.taxas.hotmart)}</td></tr>
                 <tr><td>Reembolsos e chargebacks</td><td className="dir num c-amarelo">− {fR(r.taxas.reembolsos)}</td></tr>
-                <tr><td>Imposto sobre a receita <span className="dim3">({r.taxas.receitaPct > 0 ? `${fN(r.taxas.receitaPct, 2)}%` : "a definir"})</span></td><td className="dir num c-amarelo">− {fR(r.taxas.receitaValor)}</td></tr>
+                <tr><td>Imposto sobre a receita <span className="dim3">({r.taxas.receitaPct > 0 ? `${fN(r.taxas.receitaPct, 2)}%` : "não entra, decisão do acordo"})</span></td><td className="dir num c-amarelo">− {fR(r.taxas.receitaValor)}</td></tr>
                 <tr><td><b>Receita que cobre o investimento</b></td><td className="dir num"><b className="brass">{fR(iv.receitaLiquida)}</b></td></tr>
               </tbody>
             </table>
@@ -1394,7 +1412,7 @@ function RecorteView({ r }: { r: Recorte }) {
               <thead><tr><th>Investimento</th><th className="dir">Valor</th></tr></thead>
               <tbody>
                 <tr><td>Gasto de mídia mostrado pela Meta</td><td className="dir num">{fR(iv.gastoMeta)}</td></tr>
-                <tr><td>Imposto da Meta na fatura <span className="dim3">({r.taxas.metaPct > 0 ? `${fN(r.taxas.metaPct, 2)}%` : "a definir"})</span></td><td className="dir num c-amarelo">+ {fR(r.taxas.metaValor)}</td></tr>
+                <tr><td>Imposto da Meta na fatura <span className="dim3">({r.taxas.metaPct > 0 ? `${fN(r.taxas.metaPct, 2)}%` : "a definir: fatura do investidor"})</span></td><td className="dir num c-amarelo">+ {fR(r.taxas.metaValor)}</td></tr>
                 <tr><td><b>Pago pelo investidor</b></td><td className="dir num"><b className="brass">{fR(iv.gasto)}</b></td></tr>
               </tbody>
             </table>

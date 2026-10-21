@@ -250,10 +250,16 @@ export const ACORDO = { captacaoDia: 150, distribuicaoDia: 50, parteInvestidor: 
 //     de 9,9% + R$2,49). Reembolso e chargeback saem do líquido, também automático.
 //   - metaSobreGastoPct: imposto/IOF que a Meta soma ao gasto na fatura do cartão. O que o investidor paga de
 //     verdade é o gasto + isso, e é isso que volta para ele. Preencher com o % da fatura da Meta.
-//   - impostoSobreReceitaPct: imposto da RedPro sobre a receita líquida, descontado ANTES de dividir o lucro.
-//     Deixar 0 se o imposto não deve sair antes da divisão dos 30/70.
-// Enquanto estiver em 0, o painel mostra "a definir" ao lado da taxa.
+//   - impostoSobreReceitaPct: FICA EM 0 por decisão do Red (21/10/2026): o acordo é 30/70 do lucro depois de
+//     pagar o investimento, sem imposto antes da divisão.
+//   - metaSobreGastoPct: a fatura da Meta é do investidor, o Red não sabe o percentual. Fica em 0 ("a definir")
+//     até o investidor informar; quando informar, é só preencher aqui.
 export const TAXAS = { metaSobreGastoPct: 0, impostoSobreReceitaPct: 0 };
+
+// LIBERAÇÃO DO DINHEIRO NA HOTMART (para saber o que já pode ser transferido ao investidor).
+// Cartão: D+30, medido no extrato em 20/09/2026. Pix, boleto e PayPal: a API da Hotmart não informa a data de
+// liberação; o painel usa o fim da garantia (7 dias) como estimativa. NÃO medido: conferir no extrato da Hotmart.
+export const LIBERACAO_DIAS = { cartao: 30, outros: 7 };
 export const PRECO_FORMACAO_PADRAO = 997; // Red, 04/10/2026
 
 export const PRODUTOS = {

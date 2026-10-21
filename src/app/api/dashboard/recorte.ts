@@ -12,7 +12,8 @@
 // comissão do produtor. A Meta só entrega gasto por dia: o recorte é por dia inteiro.
 // ============================================================
 import { PRODUTOS, PRECO_INGRESSO, PRECO_FORMACAO_PADRAO } from "@/app/dashboard/metas";
-import { ACORDO, TAXAS } from "@/app/dashboard/metas";
+import { ACORDO, TAXAS, LIBERACAO_DIAS } from "@/app/dashboard/metas";
+import { caixaDe } from "./investidor";
 import type { Recorte, RecorteDia, RecorteBloco, ModoRecorte } from "@/app/dashboard/tipos";
 import { sb, meta, ehCampanhaHermesWeek, ehDistribuicao, dia, em, brDia, r2, PRODUTO_FORMACAO, type Compra } from "./montar";
 
@@ -91,7 +92,7 @@ export async function montarRecorte(modo: ModoRecorte, deIn?: string | null, ate
 
   // ---------- Hotmart (webhook) ----------
   const prodIds: string[] = [PRODUTOS.ingresso, ...PRODUTOS.bumps.map((b) => b.id), PRODUTO_FORMACAO];
-  const selCompra = "transacao,evento,produto_id,email,valor,criado_em,origem:payload->data->purchase->origin,comissoes:payload->data->commissions";
+  const selCompra = "transacao,evento,produto_id,email,valor,criado_em,origem:payload->data->purchase->origin,comissoes:payload->data->commissions,pagamento:payload->data->purchase->payment->>type";
   let compras: Compra[] = [];
   try {
     compras = await sb<Compra[]>(`hotmart_compras?select=${selCompra}&produto_id=in.(${prodIds.join(",")})&order=criado_em.asc&limit=10000`);
@@ -191,6 +192,15 @@ export async function montarRecorte(modo: ModoRecorte, deIn?: string | null, ate
   }, 0);
   const cliquesLink = Number(tot.inline_link_clicks || 0);
 
+  // ---------- o que a Hotmart já liberou (cartão D+30; demais formas ao fim da garantia, estimativa) ----------
+  const desdeMs = em(ate < INICIO_BABY ? ate : de > INICIO_BABY ? de : INICIO_BABY, "00:00").getTime();
+  const liberaEm = (c: Compra) => new Date(c.criado_em).getTime() + (/CREDIT/i.test(c.pagamento || "") ? LIBERACAO_DIAS.cartao : LIBERACAO_DIAS.outros) * 86400e3;
+  const vendasInv = todas.filter((c) => new Date(c.criado_em).getTime() >= desdeMs && !(c.transacao && reembTx.has(c.transacao)));
+  const precoDe = (c: Compra) => (c.produto_id === PRODUTOS.ingresso ? PRECO_INGRESSO : c.produto_id === PRODUTO_FORMACAO ? PRECO_FORMACAO_PADRAO : PRODUTOS.bumps.find((b) => b.id === c.produto_id)?.preco || 0);
+  const liberadoInv = vendasInv.filter((c) => liberaEm(c) <= Date.now()).reduce((s, c) => s + liquidoDe(c, precoDe(c)), 0);
+  const proximasLib = vendasInv.map(liberaEm).filter((t) => t > Date.now());
+  const proximaLib = proximasLib.length ? new Date(Math.min(...proximasLib)).toISOString() : null;
+
   // ---------- regra do acordo (30% do lucro) a partir da entrada do investidor ----------
   const desdeInv = ate < INICIO_BABY ? null : de > INICIO_BABY ? de : INICIO_BABY;
   const dentro = serie.filter((x) => desdeInv !== null && x.dia >= desdeInv);
@@ -206,7 +216,7 @@ export async function montarRecorte(modo: ModoRecorte, deIn?: string | null, ate
   const parteInv = excedente * ACORDO.parteInvestidor;
   const antes = antesLst.length && de < INICIO_BABY ? { gasto: r2(antesLst.reduce((s, x) => s + x.gasto, 0)), receitaLiquida: r2(antesLst.reduce((s, x) => s + x.liquido, 0)) } : null;
 
-  if (TAXAS.metaSobreGastoPct === 0 || TAXAS.impostoSobreReceitaPct === 0) avisos.push("Taxas a definir: imposto da Meta sobre o gasto e imposto sobre a receita estão em 0%. A taxa da Hotmart e os reembolsos já entram sozinhos.");
+  if (TAXAS.metaSobreGastoPct === 0) avisos.push("O imposto que a Meta soma à fatura ainda não entrou na conta: a fatura é do investidor. A taxa da Hotmart e os reembolsos já entram sozinhos.");
   if (modo === "periodo") avisos.push("Período sem saldo anterior: o gasto é coberto primeiro e o resto divide 30/70 dentro da janela. O acumulado do acordo, turma a turma, está na aba Investidor.");
   if (de < INICIO_BABY) avisos.push(`Antes de ${INICIO_BABY.slice(8, 10)}/${INICIO_BABY.slice(5, 7)} o tráfego foi pago pela RedPro. A conta do investidor só conta daí em diante.`);
   avisos.push("A Meta entrega gasto por dia: o recorte vai de 00h a 23h59. A divisão por turma (corte às 20h de segunda) está na aba Investidor.");
@@ -262,6 +272,7 @@ export async function montarRecorte(modo: ModoRecorte, deIn?: string | null, ate
     outrasCampanhas: [...outras.entries()].map(([nome, gasto]) => ({ nome, gasto: r2(gasto) })).filter((x) => x.gasto > 0),
     investidor: {
       desde: desdeInv,
+      caixa: caixaDe(desdeInv ? liberadoInv : 0, rInv, gInv, proximaLib),
       gastoMeta: r2(gMetaInv),
       antes,
       gasto: r2(gInv),

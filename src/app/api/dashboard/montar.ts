@@ -17,7 +17,7 @@
 //   carrinho  = D0+7 06h50 → 21h · vendas da Formação contam até D0+14
 // ============================================================
 
-import { REGUAS, avaliar, QUEDA_AULA, PRODUTOS, PRECO_INGRESSO, PRECO_FORMACAO_PADRAO, IMPRESSOES_MIN_JULGAR, type Cor } from "@/app/dashboard/metas";
+import { REGUAS, avaliar, QUEDA_AULA, PRODUTOS, PRECO_INGRESSO, PRECO_FORMACAO_PADRAO, IMPRESSOES_MIN_JULGAR, LIBERACAO_DIAS, type Cor } from "@/app/dashboard/metas";
 import type { Dados, Criativo, Leitura, Aula, Resumo, DiaTrafego, Fase } from "@/app/dashboard/tipos";
 
 const SB = "https://supabase.redpro.com.br/rest/v1";
@@ -793,6 +793,12 @@ export async function montar(pedido: string, opts: { leve?: boolean; cal?: Ciclo
   );
   const aprovadasDaTurma = [...ingressosTx, ...PRODUTOS.bumps.flatMap((b) => aprovadas(b.id, captIni, captFim)), ...backendTx];
   const reembolsado = aprovadasDaTurma.filter((c) => c.transacao && reembTx.has(c.transacao)).reduce((s, c) => s + (liquidoDe(c) ?? 0), 0);
+  // o que a Hotmart já liberou: cartão D+30, demais formas ao fim da garantia (estimativa, ver LIBERACAO_DIAS)
+  const liberaEm = (c: Compra) => new Date(c.criado_em).getTime() + (/CREDIT/i.test(c.pagamento || "") ? LIBERACAO_DIAS.cartao : LIBERACAO_DIAS.outros) * 86400e3;
+  const semReembolso = aprovadasDaTurma.filter((c) => !(c.transacao && reembTx.has(c.transacao)));
+  const liberado = semReembolso.filter((c) => liberaEm(c) <= Date.now()).reduce((s, c) => s + (liquidoDe(c) ?? 0), 0);
+  const proximas = semReembolso.map(liberaEm).filter((t) => t > Date.now());
+  const proximaLiberacao = proximas.length ? new Date(Math.min(...proximas)).toISOString() : null;
   const financeiro: Dados["financeiro"] = {
     investimento,
     trafego: gasto,
@@ -802,6 +808,8 @@ export async function montar(pedido: string, opts: { leve?: boolean; cal?: Ciclo
     receitaLiquida,
     taxaHotmart: r2(Math.max(0, receitaBruta - receitaLiquida)),
     reembolsado: r2(reembolsado),
+    liberado: r2(liberado),
+    proximaLiberacao,
     lucro: receitaLiquida - investimento,
     roasTotal: div(receitaBruta, investimento),
     margem: pct(receitaLiquida - investimento, receitaBruta),

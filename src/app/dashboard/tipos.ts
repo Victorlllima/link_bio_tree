@@ -218,6 +218,8 @@ export interface Dados {
     receitaLiquida: number;
     taxaHotmart: number; // bruto menos a comissão do produtor
     reembolsado: number; // líquido das vendas da turma que viraram reembolso ou chargeback
+    liberado: number; // líquido que a Hotmart já liberou (cartão D+30, demais ao fim da garantia: estimativa)
+    proximaLiberacao: string | null;
     lucro: number;
     roasTotal: number | null;
     margem: number | null;
@@ -252,6 +254,7 @@ export interface LinhaInvestidor {
   taxaHotmart: number;
   reembolsos: number;
   impostoReceita: number;
+  receitaLiberada: number; // parte da receita que a Hotmart já liberou
   gastoMeta: number; // o que a Meta mostra
   taxaMeta: number; // imposto sobre o gasto na fatura (parâmetro)
   ingressos: number;
@@ -283,6 +286,18 @@ export interface BaseSimulador {
   formacaoLiquida: number; // por venda
 }
 
+// Conta pelo caixa: só o que a Hotmart já liberou (o primeiro dinheiro devolve o investimento, o resto divide 30/70).
+export interface CaixaInvestidor {
+  liberado: number;
+  aLiberar: number;
+  devolvido: number;
+  lucro: number;
+  parteInvestidor: number;
+  parteRedpro: number;
+  transferivelHoje: number; // devolução + parte do lucro, só com o dinheiro já liberado
+  proximaLiberacao: string | null;
+}
+
 export interface RespInvestidor {
   geradoEm: string;
   base: BaseSimulador;
@@ -298,6 +313,8 @@ export interface RespInvestidor {
     impostoReceita: number;
     gastoMeta: number;
     taxaMeta: number;
+    liberado: number;
+    caixa: CaixaInvestidor;
     devolvido: number;
     saldoDevedor: number;
     excedente: number;
@@ -368,6 +385,7 @@ export type Recorte = {
   // regra do acordo aplicada à janela, a partir da entrada do investidor (05/10)
   investidor: {
     desde: string | null;
+    caixa: CaixaInvestidor;
     gastoMeta: number;
     antes: { gasto: number; receitaLiquida: number } | null;
     gasto: number;
