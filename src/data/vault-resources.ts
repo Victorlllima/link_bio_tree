@@ -37,6 +37,34 @@ const COMO_INSTALAR: Secao = {
 
 export const RESOURCES: Resource[] = [
   {
+    slug: "the-ninth-vigil-passo-a-passo",
+    titulo: "The Ninth Vigil: rode o jogo e coloque o seu agente nele",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "O passo a passo para rodar o RPG de código aberto feito por agentes Hermes, o método que fez um projeto de 142 módulos funcionar e um pedido pronto para o seu agente contribuir.",
+    intro:
+      "The Ninth Vigil é um RPG de ação no estilo Diablo em que texturas, modelos, sons e música são gerados em código quando você aperta play. Foi escrito por agentes Hermes, com um humano dirigindo. Este guia mostra como rodar o jogo na sua máquina, o método dos agentes e como colocar o seu agente para trabalhar nele.",
+    arquivo: "/redreply/pdfs/the-ninth-vigil-passo-a-passo.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF de 8 páginas, em português: o que é o jogo e por que ele é diferente, os requisitos e os comandos exatos para rodar, os controles, as lições do método (contrato escrito, correção medida por imagem, um arquivo com um dono só), como contribuir seguindo as regras do projeto e um pedido pronto para colar no seu Hermes.",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "Não existe versão online: você baixa o projeto e roda na sua máquina, com Node 20 ou mais novo e um navegador com WebGL2. O próprio README admite que a arte ainda perde para o Diablo 4 em comparação cega. Leia o package.json antes de instalar qualquer coisa.",
+      },
+      {
+        titulo: "De onde vem",
+        texto:
+          "Jogo: github.com/iamlukethedev/The-Ninth-Vigil (licença MIT). Guia: @redpro.ia, baseado no README e nos arquivos do projeto consultados em 22/10/2026. O projeto muda rápido: confira o README antes de rodar.",
+      },
+    ],
+  },
+  {
     slug: "plugins-hermes-para-instalar-hoje",
     titulo: "Plugins do Hermes para instalar hoje",
     categoria: "Guias",
