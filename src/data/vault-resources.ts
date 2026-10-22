@@ -37,6 +37,34 @@ const COMO_INSTALAR: Secao = {
 
 export const RESOURCES: Resource[] = [
   {
+    slug: "plugins-hermes-para-instalar-hoje",
+    titulo: "Plugins do Hermes para instalar hoje",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "Dez plugins do catálogo do Hermes com o comando exato, o que cada um exige e os cuidados antes de instalar, em português.",
+    intro:
+      "O catálogo de plugins do Hermes funciona como uma loja de apps, e cada plugin dá um poder novo ao agente. Este guia separa dez deles, com o comando de instalação, os passos extras de cada um (login, conexão, gateway) e o que precisa existir antes: conta Premium, versão mínima de um programa, um dispositivo.",
+    arquivo: "/redreply/pdfs/plugins-hermes-para-instalar-hoje.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF de 9 páginas, em português: como o catálogo funciona (instalar, ativar, selos Oficial, Verificado e Comunidade, commit fixo), uma página para cada um dos quatro plugins do vídeo (LetsFG, gadget, Blender e Spotify), seis plugins extras em formato compacto (X Chat, TouchDesigner, Home Assistant, REA, TinyFish e Meshy) e uma página de cuidados antes de instalar.",
+      },
+      {
+        titulo: "Antes de instalar",
+        texto:
+          "Plugin roda código e pode tocar contas e arquivos. Revisado pelos mantenedores não quer dizer auditado: comece pelos oficiais e verificados, leia o commit fixado e confira o que cada um pede. O Spotify exige conta Premium para controlar a reprodução e o Blender exige a versão 5.1 ou mais nova.",
+      },
+      {
+        titulo: "De onde vem",
+        texto:
+          "Catálogo: hermes-agent.nousresearch.com/docs/plugins, consultado em 21/10/2026. Vídeo-fonte: @HermesWatcher. Guia: @redpro.ia. O catálogo muda rápido: confira a página de cada plugin antes de instalar.",
+      },
+    ],
+  },
+  {
     slug: "oh-my-hermes-passo-a-passo",
     titulo: "Oh My Hermes: passo a passo",
     categoria: "Guias",
