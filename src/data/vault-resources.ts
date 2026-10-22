@@ -37,6 +37,34 @@ const COMO_INSTALAR: Secao = {
 
 export const RESOURCES: Resource[] = [
   {
+    slug: "me-liga-passo-a-passo",
+    titulo: "Hermes Me liga: faça o seu agente te ligar no WhatsApp",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "O passo a passo do plugin que faz o Hermes ligar para o seu WhatsApp e atender quando você liga, com requisitos, custo, riscos e um pedido pronto para o seu agente conduzir a instalação.",
+    intro:
+      "O hermes-whatsapp-voice é um plugin da comunidade que dá ligações de voz ao vivo ao Hermes pelo WhatsApp comum. Ele liga para você em lembretes urgentes e alertas, atende quando você liga, resolve pedidos durante a chamada e manda um resumo no WhatsApp quando você desliga. Este guia mostra como instalar, parear o número do bot, ligar o servidor e testar.",
+    arquivo: "/redreply/pdfs/me-liga-passo-a-passo.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF de 7 páginas, em português: como o plugin funciona, requisitos e custo do áudio no Gemini, os riscos que o próprio README avisa, os comandos de instalação e pareamento, como ligar o servidor e testar, a segurança e os limites, e um pedido pronto para colar no seu Hermes, que pede o seu ok em cada etapa.",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "A ligação usa um protocolo do WhatsApp não oficial: pode quebrar com uma atualização e o uso automatizado pode violar os termos do app. Use um número reserva para o bot, nunca o seu principal. Você precisa de Hermes 0.21.5 ou mais novo e de uma chave do Gemini.",
+      },
+      {
+        titulo: "De onde vem",
+        texto:
+          "Plugin: github.com/ashwanthbalakrishnan5/hermes-whatsapp-voice (licença MIT, da comunidade, sem vínculo com a Nous Research nem com o WhatsApp). Guia: @redpro.ia, baseado no README e no plugin.yaml lidos em 22/10/2026. O projeto muda rápido: confira o README antes de instalar.",
+      },
+    ],
+  },
+  {
     slug: "workflow-record-passo-a-passo",
     titulo: "Hermes Record: ensine o Hermes mostrando uma vez",
     categoria: "Guias",
