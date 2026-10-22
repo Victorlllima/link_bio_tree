@@ -37,6 +37,34 @@ const COMO_INSTALAR: Secao = {
 
 export const RESOURCES: Resource[] = [
   {
+    slug: "workflow-record-passo-a-passo",
+    titulo: "Hermes Record: ensine o Hermes mostrando uma vez",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "O passo a passo do plugin que grava uma tarefa no navegador e deixa o Hermes transformar a gravação numa skill, com os limites de segurança e um pedido pronto para testar.",
+    intro:
+      "O workflow-record é um plugin do Hermes que observa o que você faz numa aba do Chrome e salva a demonstração num arquivo local. Depois o /learn transforma essa gravação numa skill que o Hermes repete sozinho. Este guia mostra como instalar, abrir o navegador, gravar, usar o /learn e o que o plugin não captura.",
+    arquivo: "/redreply/pdfs/workflow-record-passo-a-passo.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF de 7 páginas, em português: como o plugin funciona, os comandos para instalar, as três formas de abrir um navegador que o Hermes alcança, como gravar, como chamar o /learn, como as senhas são mascaradas e um pedido pronto para colar no seu Hermes, que pede o seu ok em cada etapa.",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "É um plugin de laboratório: o repositório diz que funciona, mas a Nous Research não dá suporte. Só campos de tipo senha são mascarados: uma chave de API digitada em campo comum fica gravada no arquivo, então revise o JSON antes de compartilhar. Comece por uma tarefa simples, num site sem dados sensíveis.",
+      },
+      {
+        titulo: "De onde vem",
+        texto:
+          "Plugin: github.com/NousResearch/hermes-labs-plugins, pasta workflow-record (licença MIT). Guia: @redpro.ia, baseado no README e no plugin.yaml lidos em 22/10/2026. O projeto muda rápido: confira o README antes de usar.",
+      },
+    ],
+  },
+  {
     slug: "the-ninth-vigil-passo-a-passo",
     titulo: "The Ninth Vigil: rode o jogo e coloque o seu agente nele",
     categoria: "Guias",
