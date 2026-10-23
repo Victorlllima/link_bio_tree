@@ -37,6 +37,34 @@ const COMO_INSTALAR: Secao = {
 
 export const RESOURCES: Resource[] = [
   {
+    slug: "black-october-o-que-fazer-hoje",
+    titulo: "Black October: o que fazer hoje (guia humano + agente)",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "O guia dos incidentes de 21 a 23 de outubro em duas camadas: a explicação em português simples para você decidir e o passo a passo técnico para o seu agente de IA executar, só lendo primeiro e pedindo a sua aprovação.",
+    intro:
+      "Railway, LiteLLM 1.107.0, PHP, Node.js, CLI da OVHcloud e firewalls Palo Alto: cada incidente aparece com um bloco para você e um bloco para o agente, com versões seguras, indicadores, comandos de verificação, a ordem de ação, um formato de relatório e um checklist em JSON.",
+    arquivo: "/redreply/pdfs/black-october-o-que-fazer-hoje.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF de 12 páginas, em português: o resumo do que está acontecendo, o protocolo do agente (somente leitura primeiro, sem imprimir segredos, aprovação antes de alterar), um inventário de leitura, um bloco por incidente, a tabela de builds e previsões da Palo Alto, as regras de acesso mínimo para agentes e o checklist legível por máquina.",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "Entregue o PDF ao seu agente e peça para rodar só o inventário. Ele devolve um relatório e não troca nem apaga nada sem o seu ok. Não rode Python nem pip antes de checar o LiteLLM. Datas de correção da Palo Alto são previsões do fabricante e podem mudar.",
+      },
+      {
+        titulo: "De onde vem",
+        texto:
+          "Avisos dos fabricantes e reportagens lidos entre 21 e 23/10/2026 (Railway, StepSecurity, CISA, Palo Alto, Node.js, OVHcloud). Guia: @redpro.ia. O quadro muda rápido: confirme no aviso oficial antes de agir. Este guia não substitui o seu time de segurança.",
+      },
+    ],
+  },
+  {
     slug: "me-liga-passo-a-passo",
     titulo: "Hermes Me liga: faça o seu agente te ligar no WhatsApp",
     categoria: "Guias",
