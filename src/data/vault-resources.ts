@@ -37,6 +37,34 @@ const COMO_INSTALAR: Secao = {
 
 export const RESOURCES: Resource[] = [
   {
+    slug: "limpe-sua-tv-com-claude-code",
+    titulo: "Limpe sua TV com Claude Code (guia humano + agente)",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "O passo a passo para tirar anúncios e apps inúteis de uma Android TV ou Google TV com um agente de IA, pelo Wi-Fi e sem root, com explicação simples para você e blocos técnicos para o seu agente executar.",
+    intro:
+      "Um guia em duas camadas: a explicação em português para você decidir e o passo a passo técnico para o seu agente de IA conduzir, com backup antes, apps desativados (nunca desinstalados), uma tela inicial nova no estilo da Apple TV, restauração em um comando e a porta ADB fechada no final.",
+    arquivo: "/redreply/pdfs/limpe-sua-tv-com-claude-code.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF de 10 páginas, em português: o que muda na sua TV, quais TVs funcionam, como ligar a depuração, o protocolo do agente, um pedido pronto para colar, as etapas de conexão, backup, desativação, tela inicial e restauração, o relatório final e um checklist em JSON.",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "Funciona em Android TV e Google TV. Fire TV só faz a limpeza e Samsung (Tizen) e LG (webOS) não funcionam. Faça o backup antes, mexa em lotes pequenos e desligue a depuração no fim. Algumas listas de pacotes já deixaram TVs sem ligar, por isso o guia insiste na restauração.",
+      },
+      {
+        titulo: "De onde vem",
+        texto:
+          "Projeto: github.com/Gathin23/cleanyourtv (licença MIT, site cleanyour.tv), lido em 24/10/2026. Guia: @redpro.ia. O projeto muda rápido: confira o README antes de agir.",
+      },
+    ],
+  },
+  {
     slug: "black-october-o-que-fazer-hoje",
     titulo: "Black October: o que fazer hoje (guia humano + agente)",
     categoria: "Guias",
