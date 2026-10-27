@@ -5,3 +5,6 @@ Allow: /
 # Fora do índice para que o acesso passe pelo funil, não pela busca.
 # Não é proteção de segurança — quem tem o link direto continua acessando.
 Disallow: /redreply/
+
+# Material da formação (Encontro 1), só por link direto.
+Disallow: /formacao/encontro-1/
