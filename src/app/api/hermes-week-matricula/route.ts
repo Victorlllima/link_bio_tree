@@ -50,6 +50,9 @@ async function salvar(d: Record<string, string>, ciclo: string) {
                     tempo_perdido: d.tempo_perdido || null,
                     o_que_quer: d.o_que_quer || null,
                     maior_duvida: d.maior_duvida || null,
+                    porque_pagou: d.porque_pagou || null,
+                    faixa_etaria: d.faixa_etaria || null,
+                    genero: d.genero || null,
                 }),
             },
         );
@@ -139,6 +142,7 @@ export async function POST(req: NextRequest) {
             `⏳ *Perde por semana:* ${TEMPO[d.tempo_perdido] || d.tempo_perdido || "—"}`,
             "",
             d.o_que_quer ? `🎯 *O que quer que ele faça:*\n${d.o_que_quer}` : "",
+            d.porque_pagou ? `💬 *O que fez comprar:*\n${d.porque_pagou}` : "",
             d.maior_duvida ? `😰 *Maior dúvida/medo:*\n${d.maior_duvida}` : "",
         ].filter(Boolean).join("\n");
 

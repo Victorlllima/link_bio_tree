@@ -40,6 +40,7 @@ type Form = {
   nome: string; email: string; ddi: string; whatsapp: string;
   profissao: string; sistema: string; ja_tentou: string; onde_travou: string;
   gasto_mes: string; tempo_perdido: string; o_que_quer: string;
+  porque_pagou: string; faixa_etaria: string; genero: string;
 };
 
 // DDIs mais comuns pro público do Red (Brasil default + países com brasileiros no exterior).
@@ -61,6 +62,7 @@ const INITIAL: Form = {
   nome: "", email: "", ddi: "+55", whatsapp: "",
   profissao: "", sistema: "", ja_tentou: "", onde_travou: "",
   gasto_mes: "", tempo_perdido: "", o_que_quer: "",
+  porque_pagou: "", faixa_etaria: "", genero: "",
 };
 
 export default function HermesWeekMatriculaPage({ grupoUrl }: { grupoUrl: string }) {
@@ -240,6 +242,30 @@ export default function HermesWeekMatriculaPage({ grupoUrl }: { grupoUrl: string
 
               <Field label="O que você quer que ele faça por você?" req>
                 <textarea style={S.textarea} rows={4} required minLength={4} value={form.o_que_quer} onChange={(e) => set("o_que_quer", e.target.value)} placeholder="Uma tarefa concreta, do seu dia. Ex: separar o que importa dos meus e-mails toda manhã e me mandar no Telegram." />
+              </Field>
+
+              <Field label="Com as suas palavras: o que te fez comprar hoje?">
+                <textarea style={S.textarea} rows={3} value={form.porque_pagou} onChange={(e) => set("porque_pagou", e.target.value)} placeholder="Pode ser curto. Escreva do jeito que você falaria para um amigo." />
+              </Field>
+
+              <Field label="Sua faixa de idade (opcional)">
+                <select style={S.select} value={form.faixa_etaria} onChange={(e) => set("faixa_etaria", e.target.value)}>
+                  <option value="">Prefiro não dizer</option>
+                  <option value="ate_24">Até 24 anos</option>
+                  <option value="25_34">25 a 34</option>
+                  <option value="35_44">35 a 44</option>
+                  <option value="45_54">45 a 54</option>
+                  <option value="55_mais">55 ou mais</option>
+                </select>
+              </Field>
+
+              <Field label="Gênero (opcional)">
+                <select style={S.select} value={form.genero} onChange={(e) => set("genero", e.target.value)}>
+                  <option value="">Prefiro não dizer</option>
+                  <option value="masculino">Masculino</option>
+                  <option value="feminino">Feminino</option>
+                  <option value="outro">Outro</option>
+                </select>
               </Field>
 
               <div role="status" aria-live="polite" style={aviso ? S.aviso : S.avisoVazio}>{aviso}</div>

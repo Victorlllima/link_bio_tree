@@ -43,3 +43,11 @@ alter table hermes_week_matriculas enable row level security;
 -- por (ciclo, email) sobrescreve em vez de duplicar.
 create index if not exists hermes_week_matriculas_ciclo_idx
   on hermes_week_matriculas (ciclo, criado_em desc);
+
+-- 28/10/2026: três colunas da análise psicográfica (briefing mestre em HERMES/4-MARKETING).
+-- porque_pagou: texto livre, "o que te fez comprar hoje?" (a palavra espontânea que o múltipla escolha não dá).
+-- faixa_etaria e genero: opcionais, para validar o Avatar Hermético com dado medido.
+alter table hermes_week_matriculas
+  add column if not exists porque_pagou text,
+  add column if not exists faixa_etaria text,
+  add column if not exists genero text;
