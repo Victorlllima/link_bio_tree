@@ -37,6 +37,34 @@ const COMO_INSTALAR: Secao = {
 
 export const RESOURCES: Resource[] = [
   {
+    slug: "hermes-watch",
+    titulo: "Hermes Watch: o Hermes no seu relógio (guia humano + agente)",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "O passo a passo para falar com o seu Hermes Agent pelo Amazfit Active 2: tocar em falar, ler e ouvir a resposta no pulso e aprovar mudanças de código de qualquer lugar, com explicação simples para você e blocos técnicos para o seu agente executar.",
+    intro:
+      "Um guia em duas camadas: a explicação em português para você decidir e o passo a passo técnico para o seu agente de IA conduzir, com a configuração, a voz para texto no seu PC, o relay protegido pelo Tailscale, o app no relógio, um roteiro de primeiro teste e os avisos de privacidade.",
+    arquivo: "/redreply/pdfs/hermes-watch.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF de 9 páginas, em português: o que o Hermes Watch faz, o que você precisa, as regras do agente com um pedido pronto para colar, as três etapas de instalação (configuração e voz, relay e Tailscale, app no relógio), um primeiro teste em quatro passos, privacidade, problemas comuns e as fontes.",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "Precisa de um PC Windows com o Hermes Agent e o API server ligados, Node 20+, Python 3.10+, Tailscale no PC e no celular, o Zeus CLI e uma conta de desenvolvedor Zepp. A voz das respostas passa pela Microsoft (edge-tts) e a localização vai com cada pergunta: o guia mostra como desligar as duas.",
+      },
+      {
+        titulo: "De onde vem",
+        texto:
+          "Projeto: github.com/bruceleroyjr/hermes-watch (licença MIT), README lido em 28/10/2026. É um projeto novo e pequeno, que muda rápido: confira o README antes de agir. Guia: @redpro.ia.",
+      },
+    ],
+  },
+  {
     slug: "limpe-sua-tv-com-claude-code",
     titulo: "Limpe sua TV com Claude Code (guia humano + agente)",
     categoria: "Guias",
