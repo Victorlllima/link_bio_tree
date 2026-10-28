@@ -154,7 +154,7 @@ export default function HermesWeekInteressePage() {
               </Field>
 
               <Field label="5. O que ainda te impede de dar esse passo?">
-                <textarea style={S.textarea} rows={3} value={form.trava} onChange={(e) => set("trava", e.target.value)} placeholder="Ex: o custo me assusta, não sei se aguento manter, já apanhei de agente que parou de funcionar…" />
+                <textarea style={S.textarea} rows={3} value={form.trava} onChange={(e) => set("trava", e.target.value)} placeholder="Escreva do seu jeito. Pode ser uma frase." />
               </Field>
 
               <button type="submit" disabled={!valido || sending} style={{ ...S.btn, opacity: valido && !sending ? 1 : 0.5, cursor: valido && !sending ? "pointer" : "not-allowed" }}>

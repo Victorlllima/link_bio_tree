@@ -40,6 +40,7 @@ type Form = {
   nome: string; email: string; ddi: string; whatsapp: string;
   profissao: string; sistema: string; ja_tentou: string; onde_travou: string;
   gasto_mes: string; tempo_perdido: string; o_que_quer: string;
+  porque_pagou: string; faixa_etaria: string; genero: string;
 };
 
 // DDIs mais comuns pro público do Red (Brasil default + países com brasileiros no exterior).
@@ -61,6 +62,7 @@ const INITIAL: Form = {
   nome: "", email: "", ddi: "+55", whatsapp: "",
   profissao: "", sistema: "", ja_tentou: "", onde_travou: "",
   gasto_mes: "", tempo_perdido: "", o_que_quer: "",
+  porque_pagou: "", faixa_etaria: "", genero: "",
 };
 
 export default function HermesWeekMatriculaPage() {
@@ -79,6 +81,7 @@ export default function HermesWeekMatriculaPage() {
   }, []);
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
+  const [aviso, setAviso] = useState("");
 
   const set = (k: keyof Form, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -92,7 +95,17 @@ export default function HermesWeekMatriculaPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!valido || sending) return;
+    if (sending) return;
+    if (!valido) { // o navegador já barra os vazios; isto cobre o resto e fala em voz alta o que falta
+      const falta = [
+        !form.nome && "seu nome", !form.email && "o e-mail da compra", !form.whatsapp && "o WhatsApp",
+        !form.sistema && "onde o agente vai rodar", !form.ja_tentou && "o que você já tentou", !form.onde_travou && "onde você empacou",
+        form.o_que_quer.trim().length <= 3 && "o que você quer que ele faça",
+      ].filter(Boolean);
+      setAviso(`Falta preencher: ${falta.join(", ")}.`);
+      return;
+    }
+    setAviso("");
     setSending(true);
     try {
       // Grava o WhatsApp já com o DDI na frente (ex: "+55 (61) 99999-9999").
@@ -110,12 +123,13 @@ export default function HermesWeekMatriculaPage() {
   }
 
   return (
-    <div style={S.root}>
+    <main className="hw-ficha" style={S.root}>
+      <style>{CSS}</style>
       <div style={S.wrap}>
         {done ? (
           <div style={S.doneBox}>
             <img src="/logo-academy.png" alt="RedPro AI Academy" style={S.logoDone} />
-            <div style={S.check}>✓</div>
+            <div style={S.check} aria-hidden="true">✓</div>
             <h1 style={S.h1}>Matrícula confirmada.</h1>
             <p style={S.lead}>
               Anotado. Vou usar suas respostas pra ajustar os exemplos das aulas, principalmente
@@ -136,23 +150,24 @@ export default function HermesWeekMatriculaPage() {
               semana funciona pra você.
             </p>
 
-            <form onSubmit={submit} style={S.form}>
+            <form onSubmit={submit} style={S.form} aria-describedby="hw-aviso-obrig">
+              <p id="hw-aviso-obrig" style={S.obrig}>Campos com <strong>*</strong> são obrigatórios.</p>
               <div style={S.secTit}>Seus dados</div>
 
-              <Field label="Seu nome">
-                <input style={S.input} value={form.nome} onChange={(e) => set("nome", e.target.value)} placeholder="Como você quer ser chamado" />
+              <Field label="Seu nome" req>
+                <input style={S.input} required autoComplete="name" value={form.nome} onChange={(e) => set("nome", e.target.value)} placeholder="Como você quer ser chamado" />
               </Field>
 
-              <Field label="O e-mail que você usou na compra">
-                <input style={S.input} type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="voce@email.com" />
+              <Field label="O e-mail que você usou na compra" req>
+                <input style={S.input} required autoComplete="email" type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="voce@email.com" />
               </Field>
 
-              <Field label="WhatsApp (com DDD)">
+              <Field label="WhatsApp (com DDD)" req>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <select style={{ ...S.select, width: 108 }} value={form.ddi} onChange={(e) => set("ddi", e.target.value)}>
+                  <select style={{ ...S.select, width: 124 }} aria-label="País do WhatsApp (DDI)" value={form.ddi} onChange={(e) => set("ddi", e.target.value)}>
                     {DDIS.map((d) => (<option key={d.code} value={d.code}>{d.label}</option>))}
                   </select>
-                  <input style={{ ...S.input, flex: 1 }} value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} placeholder="(61) 99999-9999" inputMode="tel" />
+                  <input style={{ ...S.input, flex: 1, minWidth: 0 }} required aria-label="Número de WhatsApp com DDD" autoComplete="tel-national" value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} placeholder="(61) 99999-9999" inputMode="tel" />
                 </div>
               </Field>
 
@@ -162,8 +177,8 @@ export default function HermesWeekMatriculaPage() {
 
               <div style={S.secTit}>Sua máquina</div>
 
-              <Field label="Onde o agente vai rodar?">
-                <select style={S.select} value={form.sistema} onChange={(e) => set("sistema", e.target.value)}>
+              <Field label="Onde o agente vai rodar?" req>
+                <select style={S.select} required value={form.sistema} onChange={(e) => set("sistema", e.target.value)}>
                   <option value="">Selecione</option>
                   <option value="windows">Windows</option>
                   <option value="mac">macOS</option>
@@ -186,8 +201,8 @@ export default function HermesWeekMatriculaPage() {
 
               <div style={S.secTit}>Onde você está</div>
 
-              <Field label="O que você já tentou antes?">
-                <select style={S.select} value={form.ja_tentou} onChange={(e) => set("ja_tentou", e.target.value)}>
+              <Field label="O que você já tentou antes?" req>
+                <select style={S.select} required value={form.ja_tentou} onChange={(e) => set("ja_tentou", e.target.value)}>
                   <option value="">Selecione</option>
                   <option value="nunca">Nunca montei um agente</option>
                   <option value="openclaw">Já mexi com OpenClaw</option>
@@ -197,8 +212,8 @@ export default function HermesWeekMatriculaPage() {
                 </select>
               </Field>
 
-              <Field label="E onde você empacou?">
-                <select style={S.select} value={form.onde_travou} onChange={(e) => set("onde_travou", e.target.value)}>
+              <Field label="E onde você empacou?" req>
+                <select style={S.select} required value={form.onde_travou} onChange={(e) => set("onde_travou", e.target.value)}>
                   <option value="">Selecione</option>
                   <option value="instalacao">Na instalação, nunca saiu do lugar</option>
                   <option value="parou">Funcionou, depois parou e eu não soube por quê</option>
@@ -219,29 +234,65 @@ export default function HermesWeekMatriculaPage() {
                 </select>
               </Field>
 
-              <Field label="O que você quer que ele faça por você?">
-                <textarea style={S.textarea} rows={3} value={form.o_que_quer} onChange={(e) => set("o_que_quer", e.target.value)} placeholder="Uma tarefa concreta, do seu dia. Ex: separar o que importa dos meus e-mails toda manhã e me mandar no Telegram." />
+              <Field label="O que você quer que ele faça por você?" req>
+                <textarea style={S.textarea} rows={4} required minLength={4} value={form.o_que_quer} onChange={(e) => set("o_que_quer", e.target.value)} placeholder="Uma tarefa concreta, do seu dia. Ex: separar o que importa dos meus e-mails toda manhã e me mandar no Telegram." />
               </Field>
 
-              <button type="submit" disabled={!valido || sending} style={{ ...S.btn, opacity: !valido || sending ? 0.45 : 1 }}>
+              <Field label="Com as suas palavras: o que te fez comprar hoje?">
+                <textarea style={S.textarea} rows={3} value={form.porque_pagou} onChange={(e) => set("porque_pagou", e.target.value)} placeholder="Pode ser curto. Escreva do jeito que você falaria para um amigo." />
+              </Field>
+
+              <Field label="Sua faixa de idade (opcional)">
+                <select style={S.select} value={form.faixa_etaria} onChange={(e) => set("faixa_etaria", e.target.value)}>
+                  <option value="">Prefiro não dizer</option>
+                  <option value="ate_24">Até 24 anos</option>
+                  <option value="25_34">25 a 34</option>
+                  <option value="35_44">35 a 44</option>
+                  <option value="45_54">45 a 54</option>
+                  <option value="55_mais">55 ou mais</option>
+                </select>
+              </Field>
+
+              <Field label="Gênero (opcional)">
+                <select style={S.select} value={form.genero} onChange={(e) => set("genero", e.target.value)}>
+                  <option value="">Prefiro não dizer</option>
+                  <option value="masculino">Masculino</option>
+                  <option value="feminino">Feminino</option>
+                  <option value="outro">Outro</option>
+                </select>
+              </Field>
+
+              <div role="status" aria-live="polite" style={aviso ? S.aviso : S.avisoVazio}>{aviso}</div>
+              <button type="submit" disabled={sending} aria-disabled={sending} style={{ ...S.btn, opacity: sending ? 0.7 : 1 }}>
                 {sending ? "Enviando..." : "Confirmar matrícula"}
               </button>
             </form>
           </>
         )}
       </div>
-    </div>
+    </main>
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, children, req }: { label: string; children: React.ReactNode; req?: boolean }) {
   return (
     <label style={S.field}>
-      <span style={S.fieldLabel}>{label}</span>
+      <span style={S.fieldLabel}>{label}{req && <span style={{ color: "#E8A33D" }} aria-hidden="true"> *</span>}{req && <span style={S.somenteLeitor}> (obrigatório)</span>}</span>
       {children}
     </label>
   );
 }
+
+/* Acessibilidade (26/10/2026): um aluno com deficiência visual não achava os campos (borda 1,1:1 no fundo).
+   Campos com borda clara (>= 3:1), foco visível, seta nos seletores, placeholder legível. */
+const SETA = "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23F5F5F5' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>\")";
+const CSS = `
+.hw-ficha input:focus-visible, .hw-ficha select:focus-visible, .hw-ficha textarea:focus-visible, .hw-ficha button:focus-visible, .hw-ficha a:focus-visible { outline: 3px solid #E8A33D; outline-offset: 3px; }
+.hw-ficha input::placeholder, .hw-ficha textarea::placeholder { color: #A8A8A8; opacity: 1; }
+.hw-ficha input:invalid:not(:placeholder-shown), .hw-ficha textarea:invalid:not(:placeholder-shown) { border-color: #FF8A80; }
+.hw-ficha button:not(:disabled):hover { filter: brightness(1.08); }
+`;
+const CAMPO = { background: "#1C1C1C", border: "2px solid #9A9A9A", borderRadius: 10, padding: "14px 16px", color: "#FFFFFF", fontSize: 16, fontFamily: "inherit" } as const;
 
 // Paleta âmbar da Hermes Week (#E8A33D), a mesma de /hermes-week/obrigado.
 const S: Record<string, React.CSSProperties> = {
@@ -249,14 +300,18 @@ const S: Record<string, React.CSSProperties> = {
   wrap: { maxWidth: 560, width: "100%" },
   kicker: { fontSize: 12, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#E8A33D", marginBottom: 18 },
   h1: { fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 900, fontSize: "clamp(28px, 5vw, 42px)", lineHeight: 1.05, letterSpacing: "-0.03em", marginBottom: 12 },
-  lead: { color: "#B8B8B8", fontSize: 16, lineHeight: 1.6, marginBottom: 36 },
+  lead: { color: "#D0D0D0", fontSize: 17, lineHeight: 1.6, marginBottom: 36 },
   form: { display: "flex", flexDirection: "column", gap: 20 },
-  secTit: { fontSize: 12, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#8A8A8A", marginTop: 12, paddingBottom: 6, borderBottom: "1px solid #1F1F1F" },
+  secTit: { fontSize: 14, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#C9C9C9", marginTop: 12, paddingBottom: 6, borderBottom: "2px solid #6F6F6F" },
+  obrig: { fontSize: 14, color: "#C9C9C9", margin: 0 },
+  aviso: { background: "#3A1414", border: "2px solid #FF8A80", color: "#FFFFFF", borderRadius: 10, padding: "12px 14px", fontSize: 15, lineHeight: 1.5 },
+  avisoVazio: { minHeight: 0 },
+  somenteLeitor: { position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap" },
   field: { display: "flex", flexDirection: "column", gap: 8 },
-  fieldLabel: { fontSize: 14, fontWeight: 500, color: "#F5F5F5" },
-  input: { background: "#141414", border: "1px solid #1F1F1F", borderRadius: 10, padding: "13px 15px", color: "#F5F5F5", fontSize: 15, fontFamily: "inherit", outline: "none" },
-  select: { background: "#141414", border: "1px solid #1F1F1F", borderRadius: 10, padding: "13px 15px", color: "#F5F5F5", fontSize: 15, fontFamily: "inherit", outline: "none", appearance: "none" },
-  textarea: { background: "#141414", border: "1px solid #1F1F1F", borderRadius: 10, padding: "13px 15px", color: "#F5F5F5", fontSize: 15, fontFamily: "inherit", outline: "none", resize: "vertical" },
+  fieldLabel: { fontSize: 16, fontWeight: 600, color: "#FFFFFF", lineHeight: 1.4 },
+  input: { ...CAMPO },
+  select: { ...CAMPO, appearance: "none", WebkitAppearance: "none", backgroundImage: SETA, backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center", paddingRight: 44 },
+  textarea: { ...CAMPO, resize: "vertical", minHeight: 96 },
   btn: { background: "#E8A33D", color: "#0A0A0C", fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 17, padding: "17px", borderRadius: 10, border: "none", marginTop: 8 },
   doneBox: { textAlign: "center", paddingTop: 40 },
   logo: { height: 204, display: "block", margin: "0 auto 26px" },
