@@ -37,6 +37,34 @@ const COMO_INSTALAR: Secao = {
 
 export const RESOURCES: Resource[] = [
   {
+    slug: "10-skills-gratis-hermes",
+    titulo: "10 skills grátis pro Hermes (guia humano + agente)",
+    categoria: "Guias",
+    destaque: true,
+    novo: true,
+    resumo: "As dez skills gratuitas que transformam o Hermes de chatbot em agente que trabalha, cada uma com o que resolve, o comando de instalação, um teste para ver funcionando e os avisos de segurança, com explicação simples para você e blocos técnicos para o seu agente executar.",
+    intro:
+      "Um guia em duas camadas: a explicação em português para você decidir e o passo a passo técnico para o seu agente de IA conduzir, com Ponytail, Planning With Files, I Have ADHD, Diagram Design, Taste Skill, Hyperframes, Scientific Agent Skills, Agent Reach, Gbrain e Cybersecurity Skills.",
+    arquivo: "/redreply/pdfs/10-skills-gratis-hermes.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF de 12 páginas, em português: as dez skills em uma tabela, como instalar skills e plugins no Hermes, as regras do agente com um pedido pronto para colar, o comando e um teste de cada skill, o passo a passo do Gbrain, os cuidados com o pacote de Cybersecurity e um atalho para instalar várias de uma vez.",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "Precisa do Hermes Agent funcionando. Algumas skills pedem Node 22+, Python 3.10+, FFmpeg ou Bun. Comece por Ponytail, Planning With Files e I Have ADHD, que não pedem chave de API. O pacote de Cybersecurity é da comunidade, não é oficial da Anthropic, e skills de segurança ou de leitura com login só valem para o que é seu.",
+      },
+      {
+        titulo: "De onde vem",
+        texto:
+          "Repositórios públicos de cada skill (licenças MIT ou Apache-2.0), lidos em 28/10/2026. São projetos de terceiros e mudam rápido: confira o README antes de agir. Guia: @redpro.ia.",
+      },
+    ],
+  },
+  {
     slug: "hermes-watch",
     titulo: "Hermes Watch: o Hermes no seu relógio (guia humano + agente)",
     categoria: "Guias",
