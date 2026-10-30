@@ -1178,6 +1178,33 @@ export const RESOURCES: Resource[] = [
       },
     ],
   },
+  {
+    slug: "advanced-delegation",
+    titulo: "Advanced Delegation no Hermes",
+    categoria: "Guias",
+    novo: true,
+    resumo: "O passo a passo para o Hermes mandar cada tarefa para o modelo certo, ou para outro perfil seu.",
+    intro:
+      "Advanced Delegation é um plugin oficial da Nous Research para o Hermes Agent. Ele deixa cada subagente seguir a sua própria rota: um modelo rápido, um modelo profundo, um modelo local ou um perfil inteiro do Hermes. Vale para quem já usa o Hermes em trabalhos grandes e quer gastar menos tempo e menos dinheiro em cada tarefa.",
+    arquivo: "/redreply/pdfs/advanced-delegation.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF com o passo a passo completo, o pedido pronto para colar no seu Hermes e as fontes oficiais. Os passos:\\n1. Confira a versão\n2. Instale o plugin\n3. Escolha o modo\n4. Crie as rotas de modelo\n5. Defina a rota padrão\n6. Libere outros perfis\n7. Confira e teste",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "• Precisa do Hermes 0.22.5 ou mais novo. Da 0.22.0 à 0.22.4 o plugin nem instala.\\n• O plugin é instalado por perfil. Instale no perfil que distribui as tarefas.\\n• Só um modo fica ativo por vez: padrão, rotas de modelo ou rotas de perfil.\\n• Uma mudança de rota só vale numa sessão nova. A conversa aberta continua como estava.\\n• Prefira apontar o provedor na rota em vez de colar a chave de API. Chave colada na rota fica em texto aberto no config.yaml.\\n• Só libere perfis em que você confia. O subagente usa as credenciais, o SOUL.md e as regras de terminal daquele perfil.",
+      },
+      {
+        titulo: "Onde conferir",
+        texto:
+          "O plugin é oficial da Nous Research. As fontes estão no final do PDF: a página do plugin na documentação do Hermes e o README do repositório oficial.",
+      },
+    ],
+  },
 ];
 
 export function getResource(slug: string): Resource | undefined {
