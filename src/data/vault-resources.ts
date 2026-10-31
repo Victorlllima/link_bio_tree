@@ -1205,6 +1205,33 @@ export const RESOURCES: Resource[] = [
       },
     ],
   },
+  {
+    slug: "c-mera-de-seguran-a-vira-cinem",
+    titulo: "Câmera de segurança vira cinema",
+    categoria: "Guias",
+    novo: true,
+    resumo: "Os dois prompts em português para transformar uma gravação de câmera de rua numa cena de filme com o Claude e o Seedance 2.0.",
+    intro:
+      "São dois passos. Primeiro o Claude assiste à cena e escreve o roteiro dos planos. Depois o Seedance 2.0 refaz o vídeo com cara de filme e mantém o que aconteceu de verdade. Vale para quem cria conteúdo e quer tirar uma cena viral de uma gravação crua sem saber filmar.",
+    arquivo: "/redreply/pdfs/c-mera-de-seguran-a-vira-cinem.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF com o passo a passo completo, o pedido pronto para colar no seu Hermes e as fontes oficiais. Os passos:\n1. Escolha e corte a cena\n2. Mande a cena para o Claude\n3. Cole o prompt de análise\n4. Confira o final\n5. Abra o Seedance 2.0 no Dreamina\n6. Suba o mesmo vídeo e cole o roteiro\n7. Gere e ajuste",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "• Na lista oficial de arquivos do Claude não aparece vídeo, só documentos e imagens (JPEG, PNG, GIF, WebP). Se o vídeo não subir, mande prints da cena em ordem, um por segundo.\n• No Dreamina, o Seedance 2.0 aceita até 3 vídeos de referência por projeto, cada um com até 15 segundos. Corte a gravação no trecho principal antes de subir.\n• Gravação de câmera mostra pessoas reais. Use cena pública ou com autorização e não exponha rosto nem placa de quem não aceitou aparecer.",
+      },
+      {
+        titulo: "Onde conferir",
+        texto:
+          "As fontes consultadas estão no final do PDF.",
+      },
+    ],
+  },
 ];
 
 export function getResource(slug: string): Resource | undefined {
