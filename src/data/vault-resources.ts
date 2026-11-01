@@ -1286,6 +1286,33 @@ export const RESOURCES: Resource[] = [
       },
     ],
   },
+  {
+    slug: "computador-lento-7-pedidos-pro-seu-agent",
+    titulo: "Computador lento: 7 pedidos pro seu agente",
+    categoria: "Guias",
+    novo: true,
+    resumo: "Os 7 pedidos prontos para colar no seu agente de IA e descobrir o que está travando o seu computador, um de cada vez.",
+    intro:
+      "Computador lento quase nunca é velho: é cheio de coisa que você não vê. Estes 7 pedidos fazem o seu agente de IA olhar, explicar e propor, sempre pedindo a sua aprovação antes de mexer em qualquer coisa. Comece pelo pedido 1, que só olha, e vá em ordem.",
+    arquivo: "/redreply/pdfs/computador-lento-7-pedidos-pro-seu-agent.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF com o passo a passo completo, o pedido pronto para colar no seu Hermes e as fontes oficiais. Os passos:\n1. O diagnóstico\n2. O que abre sozinho\n3. O espaço em disco\n4. A memória e o navegador\n5. O que está desatualizado\n6. O que não devia estar ali\n7. A rotina semanal",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "• Faça um pedido de cada vez, na ordem. O pedido 1 só observa e é seguro para começar.\n• Nenhum pedido manda o agente apagar, fechar ou instalar sozinho: ele lista, explica e espera o seu ok.\n• O que o agente consegue ver depende do sistema (Windows, Mac ou Linux) e das permissões que você deu a ele. Se faltar permissão, ele avisa.\n• Não prometemos um ganho de velocidade: o guia mostra o que está pesando e deixa a decisão com você.",
+      },
+      {
+        titulo: "Onde conferir",
+        texto:
+          "As fontes consultadas estão no final do PDF.",
+      },
+    ],
+  },
 ];
 
 export function getResource(slug: string): Resource | undefined {
