@@ -46,6 +46,10 @@ const PRODUTOS: Record<string, string> = {
     "8551624": "Oferta extra — Segundo cérebro com o Hermes (R$47)",
     "8552026": "De Um Agente a Um Squad (R$697)",
     "8660306": "Formação Arquiteto de Agentes (R$1.497)",
+    // Imersão RedPro (25 e 26/11/2026; Red, 31/10/2026): ingresso com lotes por data (R$44, R$53, R$62) e gravação.
+    // No mapa para o CAPI disparar Purchase. Sem audiência do Resend de propósito (interessados-imersao é de quem preencheu a ficha).
+    "8852419": "Imersão RedPro — Ingresso",
+    "8852453": "Imersão RedPro — Gravação",
 };
 
 const PRODUTO_HERMES_WEEK = "8443182";
