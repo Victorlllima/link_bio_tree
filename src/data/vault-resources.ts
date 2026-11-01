@@ -1259,6 +1259,33 @@ export const RESOURCES: Resource[] = [
       },
     ],
   },
+  {
+    slug: "som-profissional-nas-edicoes-do-claude",
+    titulo: "Som profissional nas edições do Claude",
+    categoria: "Guias",
+    novo: true,
+    resumo: "As 3 ferramentas grátis que dão som de verdade ao seu agente, com link e passo a passo.",
+    intro:
+      "O Claude edita bem a imagem, mas o som que ele coloca costuma ser fraco. Este guia junta 3 ferramentas gratuitas que resolvem isso: uma cria efeitos em código, outra coloca gravações reais no quadro certo e a terceira busca milhões de sons livres. Vale para quem edita vídeo com o Claude Code e quer um acabamento melhor sem pagar nada.",
+    arquivo: "/redreply/pdfs/som-profissional-nas-edicoes-do-claude.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF com o passo a passo completo, o pedido pronto para colar no seu Hermes e as fontes oficiais. Os passos:\n1. Separe o que precisa\n2. Earshot: instale\n3. Earshot: ligue ao Claude Code\n4. Real SFX: instale a skill\n5. Openverse: busque sons livres\n6. Teste no seu vídeo",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "• As ferramentas rodam no Claude Code. Você precisa de Python 3.10 ou mais novo e do FFmpeg instalados.\n• O Earshot baixa cerca de 1,1 GB de modelos no primeiro uso e roda só na CPU.\n• O Real SFX vem com 78 sons de interface livres (CC0). Para sons de moedas ou aplausos, use o Openverse.\n• O Openverse sem cadastro limita a 20 buscas por minuto e 200 por dia. Ele não confere cada licença, então filtre por CC0 e confira a página de origem.\n• Reinicie o Claude Code depois de instalar o Real SFX.",
+      },
+      {
+        titulo: "Onde conferir",
+        texto:
+          "As fontes consultadas estão no final do PDF.",
+      },
+    ],
+  },
 ];
 
 export function getResource(slug: string): Resource | undefined {
