@@ -1340,6 +1340,33 @@ export const RESOURCES: Resource[] = [
       },
     ],
   },
+  {
+    slug: "seu-jarvis-em-um-fim-de-semana",
+    titulo: "Seu Jarvis em um fim de semana",
+    categoria: "Guias",
+    novo: true,
+    resumo: "O passo a passo em 9 etapas para montar um agente de IA que conhece o seu negócio, usa as suas ferramentas e responde falando.",
+    intro:
+      "Você não precisa criar um modelo de IA. Precisa ligar as peças certas: um lugar para o agente viver, um modelo que pensa, memória, ferramentas e uma voz. Este guia dá as 9 etapas na ordem e, em cada uma, o pedido pronto para colar no seu agente de IA (no Claude Code, no Hermes ou no que você usa). Reserve um fim de semana.",
+    arquivo: "/redreply/pdfs/seu-jarvis-em-um-fim-de-semana.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF com o passo a passo completo, o pedido pronto para colar no seu Hermes e as fontes oficiais. Os passos:\n1. Dê um lar ao seu agente\n2. Instale um harness agêntico\n3. Escolha o cérebro\n4. Ensine quem você é\n5. Dê memória persistente\n6. Adicione skills\n7. Conecte as ferramentas\n8. Ligue os canais\n9. Monte a interface Jarvis",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "• Cada serviço citado tem custo, limites e termos próprios. Confira antes de contratar ou conectar.\n• Dê ao agente só as permissões de que ele precisa. E-mail, agenda e arquivos são dados sensíveis: comece com acesso de leitura e libere escrita aos poucos.\n• Este guia é um roteiro de montagem, não um produto pronto: o resultado depende das ferramentas e das versões que você usar.",
+      },
+      {
+        titulo: "Onde conferir",
+        texto:
+          "As fontes consultadas estão no final do PDF.",
+      },
+    ],
+  },
 ];
 
 export function getResource(slug: string): Resource | undefined {
