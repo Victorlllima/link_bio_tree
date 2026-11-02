@@ -15,8 +15,12 @@
  * e não deve acontecer no meio da captação da turma 2.
  */
 
-// Ofertas adicionais (order bumps) da Hermes Week na Hotmart.
-export const BUMPS_HERMES_WEEK: ReadonlySet<string> = new Set(["8551535", "8551609", "8551624"]);
+// Ofertas adicionais (order bumps) na Hotmart: os 3 guias da Hermes Week e, desde 02/11/2026, a
+// gravação da Imersão (8852453, bump do checkout do ingresso 8852419). Sem ela aqui, a gravação
+// dispararia `Purchase` e repetiria o erro de 09/10 (CPA enxergado em 1/3 do real). O bump chega
+// ao webhook com o id do próprio produto (conferido nas 138 vendas do guia 8551535).
+// O conjunto também pula a audiência do Resend no webhook (`ehAdicional`), o que vale para a gravação.
+export const BUMPS_HERMES_WEEK: ReadonlySet<string> = new Set(["8551535", "8551609", "8551624", "8852453"]);
 
 // Formação Arquiteto de Agentes (R$1.497, fundador R$697). Decisão do Red (19/10/2026): vai à Meta
 // como evento personalizado, nunca como `Purchase`, para o valor alto não entrar no sinal que
