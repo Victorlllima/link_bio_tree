@@ -1313,6 +1313,33 @@ export const RESOURCES: Resource[] = [
       },
     ],
   },
+  {
+    slug: "pace-do-claude-no-seu-celular",
+    titulo: "Pace do Claude no seu celular",
+    categoria: "Guias",
+    novo: true,
+    resumo: "O prompt pronto para o seu agente construir o app que mostra, numa notificação fixa, quanto você já gastou de cada janela do Claude, no Android ou no iPhone.",
+    intro:
+      "A assinatura do Claude tem duas janelas: a de 5 horas e a da semana. O pace compara o quanto você usou com o quanto do tempo já passou. Se você usou menos, dá para acelerar; se usou mais, é hora de segurar. Este guia tem os pedidos para o seu agente de IA construir isso no seu celular, com as duas contas se você tiver (pessoal e empresa).",
+    arquivo: "/redreply/pdfs/pace-do-claude-no-seu-celular.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF com o passo a passo completo, o pedido pronto para colar no seu Hermes e as fontes oficiais. Os passos:\n1. Entenda a conta do pace\n2. Android: peça o app ao seu agente\n3. Android: o login das contas\n4. Android: instale e libere\n5. iPhone: widget com Scriptable\n6. Como ler e usar",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "• Isto usa o endereço interno de uso do Claude (api.anthropic.com/api/oauth/usage), o mesmo do Claude Code. Não é API pública: a Anthropic pode mudar ou bloquear sem aviso.\n• O login usa o fluxo de acesso do Claude Code, que não é previsto para apps de terceiros. Faça por sua conta e risco, só com as suas contas.\n• No Android a notificação fica fixa e atualiza a cada 5 minutos. No iPhone não existe notificação fixa: o caminho é um widget, e o iOS decide quando atualiza.\n• O pace é aproximado, e o caminho do iPhone foi descrito mas não foi testado num aparelho.",
+      },
+      {
+        titulo: "Onde conferir",
+        texto:
+          "As fontes consultadas estão no final do PDF.",
+      },
+    ],
+  },
 ];
 
 export function getResource(slug: string): Resource | undefined {
