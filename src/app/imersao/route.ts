@@ -17,7 +17,7 @@ import { lerImersaoConfig, contarInscritosDoLote } from "@/lib/imersao-config";
  * ==========================================================================*/
 
 const URL_CANONICA = "https://redpro.com.br/imersao";
-const TITULO = "Imersão Arquiteto de Agentes | Hermes, seu funcionário que não dorme";
+const TITULO = "Imersão Arquiteto de Agentes | Seu time de IA que não dorme";
 const DESCRICAO =
     "Duas noites ao vivo. Um agente com ferramentas, memórias e um servidor só dele. Dia 1: instala o Hermes e vê tudo o que ele faz. Dia 2: o Hermes vai para um servidor e você monta seus squads de agentes.";
 const PIXEL_ID = "1543917230170877";
