@@ -128,7 +128,7 @@ const html = (grupo: string) => `
     <div class="bloco">
       <div class="tit"><span class="num">2</span> Salve as duas noites na agenda</div>
       <p>Baixe o arquivo e abra no seu calendário. Ele cria os dois encontros, com um lembrete uma hora antes.</p>
-      <div class="acao-cta"><a href="/imersao/agenda.ics" class="btn">Salvar na agenda</a></div>
+      <div class="acao-cta"><a href="/imersao/agenda.ics" class="btn">Adicionar à agenda</a></div>
     </div>
 
     <p class="rodape">
