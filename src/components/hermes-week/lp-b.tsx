@@ -24,14 +24,16 @@
  *  gatilho a 80% da tela). Sem os runtimes: ver `movimento.tsx`.
  * ==========================================================================*/
 
-import { Manrope, Sora, Space_Mono } from "next/font/google";
+import { Manrope, Space_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { checkoutUrl } from "./checkout";
 import { ImgReal, inline, legendaImg, MOSTRAR_PLACEHOLDER, PAPEL_IMG, Pixel } from "./comum";
 import { compartilhado, type Bloco, type Img, type No, type Variante } from "./conteudo";
 import type { CicloFormatado } from "@/lib/ciclo-atual";
 import { Revela } from "./movimento";
 
-const display = Sora({ subsets: ["latin"], weight: ["600", "800"], variable: "--b-display", display: "swap" });
+/* Sora self-hosted (latin, variável 600-800): o next/font/google do Sora quebrava o build da Vercel (Turbopack). */
+const display = localFont({ src: "./fonts/Sora-latin-var.woff2", weight: "600 800", variable: "--b-display", display: "swap" });
 const ui = Manrope({ subsets: ["latin"], weight: ["400", "600"], variable: "--b-ui", display: "swap" });
 const mono = Space_Mono({ subsets: ["latin"], weight: ["400", "700"], variable: "--b-mono", display: "swap" });
 
