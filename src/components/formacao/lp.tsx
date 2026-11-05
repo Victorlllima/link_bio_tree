@@ -213,8 +213,8 @@ export function LpFormacao({ dataInicio, inicial, fontes }: { dataInicio: string
           trabalho do outro, e você sabe quanto isso custa por mês antes de ligar.
         </p>
         <p className="fm-p">
-          Se você nunca instalou um agente, comece pela <a href="/hermes-week">Hermes Week</a>. Em cinco encontros
-          você sai com o seu instalado e respondendo.
+          Se você ainda não instalou um agente, instale o primeiro antes de entrar. A Formação parte de quem já tem
+          um agente respondendo.
         </p>
       </section>
 
@@ -248,8 +248,7 @@ export function LpFormacao({ dataInicio, inicial, fontes }: { dataInicio: string
           <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 0 }}>
             <h2 id="qe" className="fm-h2">Red</h2>
             <p className="fm-p">
-              Fundador da RedPro AI Academy e Arquiteto de Soluções Agênticas. É quem dá as aulas da Hermes Week e da
-              Formação.
+              Fundador da RedPro AI Academy e Arquiteto de Soluções Agênticas. É quem dá as aulas da Formação.
             </p>
           </div>
         </div>
@@ -282,10 +281,10 @@ export function LpFormacao({ dataInicio, inicial, fontes }: { dataInicio: string
         <h2 id="fq" className="fm-h2">Perguntas</h2>
         <div className="fm-faq">
           <div>
-            <h3>Preciso ter feito a Hermes Week?</h3>
+            <h3>Preciso já ter um agente instalado?</h3>
             <p className="fm-p">
-              Ajuda bastante. A Formação parte de quem já tem um agente instalado. Se esse não é o seu caso, a{" "}
-              <a href="/hermes-week">Hermes Week</a> é o caminho mais curto até lá.
+              Sim. A Formação parte de quem já tem um agente instalado e respondendo. Se esse ainda não é o seu caso,
+              instale o primeiro antes de entrar.
             </p>
           </div>
           <div>
