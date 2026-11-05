@@ -99,6 +99,7 @@ async function metaCapi(
     eventId: string,
     evento: EventoCapi = "Purchase",
     produto?: { id: string; nome: string },
+    fbc = "",
 ) {
     // Nome da var alinhado com /api/meta-capi, que já roda em produção.
     const token = process.env.META_CAPI_ACCESS_TOKEN || process.env.META_CAPI_TOKEN;
@@ -110,6 +111,8 @@ async function metaCapi(
     if (nome) user_data.fn = [sha256(nome.split(" ")[0])];
     const ph = normalizarFone(fone);
     if (ph) user_data.ph = [sha256(ph)];
+    // fbc vem do checkout via origin.xcod (a LP acrescenta xcod=<fbc>); só aceita o formato fb.<n>.<ts>.<fbclid>.
+    if (/^fb\.\d\.\d+\..+/.test(fbc)) user_data.fbc = [fbc];
 
     try {
         const res = await fetch(`https://graph.facebook.com/v21.0/${pixel}/events?access_token=${token}`, {
@@ -464,7 +467,7 @@ export async function POST(req: NextRequest) {
 
         const [capi, lista] = await Promise.all([
             produtoConhecido
-                ? metaCapi(email, nome, fone, valor, moeda, transacao, nomeEventoCapi, { id: produtoId, nome: produtoNome })
+                ? metaCapi(email, nome, fone, valor, moeda, transacao, nomeEventoCapi, { id: produtoId, nome: produtoNome }, String(((purchase?.origin as Record<string, unknown> | undefined)?.xcod) ?? "").trim())
                 : Promise.resolve({ ok: true as const }),
             ehAdicional ? Promise.resolve({ ok: true as const }) : resend(email, nome, produtoId),
         ]);
