@@ -4,7 +4,7 @@ import { LpFormacao } from "@/components/formacao/lp";
 import { calcularCarrinho } from "@/components/formacao/carrinho";
 import { lerCicloAtual } from "@/lib/ciclo-atual";
 
-/* /formacao · LP da Formação Arquiteto de Agentes (R$997, Hotmart 8660306)
+/* /formacao · LP da Formação Arquiteto de Agentes (R$1.500, Hotmart 8660306)
  *
  * Planejamento, decisões do Red e custo do voo: Starlight/HERMES/4-MARKETING/
  * landing-formacao-3d/ (PLANO-DO-VOO.md, FACHADAS.md) e .claude/LOG-DE-ACOES.md,
@@ -13,7 +13,7 @@ import { lerCicloAtual } from "@/lib/ciclo-atual";
 
 const titulo = "Formação Arquiteto de Agentes · RedPro AI Academy";
 const descricao =
-  "Sete módulos e 66 aulas para tirar o seu agente da máquina e montar um time que roda 24 horas. Inscrições na segunda depois de cada Hermes Week.";
+  "Sete módulos para tirar o seu agente da máquina e montar um time que roda 24 horas. Inscrições abertas na noite 2 da Imersão e até a segunda seguinte, às 23h59.";
 
 export const metadata: Metadata = {
   title: titulo,

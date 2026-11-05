@@ -24,7 +24,6 @@ import {
   MODULOS,
   PRECO_FORMACAO,
   SUPORTE,
-  TOTAL_AULAS,
   TOTAL_QUADROS,
   TRECHOS,
   type Trecho,
@@ -187,11 +186,14 @@ export function LpFormacao({ dataInicio, inicial, fontes }: { dataInicio: string
   }, [dataInicio]);
 
   const quando = dataCurta(carrinho.abre);
+  const ate = dataCurta(carrinho.fecha);
   const ctaHref = carrinho.aberto ? `${CHECKOUT_FORMACAO}?checkoutMode=10&src=lp-formacao` : "#inscricao";
   const ctaTexto = carrinho.aberto ? "Quero entrar na Formação" : "Avise-me quando abrir";
   const status = carrinho.aberto
-    ? "Inscrições abertas hoje até as 21h."
-    : `Próximas inscrições na ${quando}, das 7h às 21h.`;
+    ? `Inscrições abertas até ${ate}, às 23h59.`
+    : carrinho.encerrado
+      ? "Inscrições encerradas. Entre na lista de espera para a próxima abertura."
+      : `As inscrições abrem na ${quando}, na noite 2 da Imersão.`;
 
   return (
     <div className={`fm ${fontes}`}>
@@ -218,9 +220,9 @@ export function LpFormacao({ dataInicio, inicial, fontes }: { dataInicio: string
 
       <section className="fm-sec" id="grade" aria-labelledby="gr">
         <span className="fm-eyebrow">
-          {MODULOS.length} módulos · {TOTAL_AULAS} aulas
+          {MODULOS.length} módulos
         </span>
-        <h2 id="gr" className="fm-h2">As {TOTAL_AULAS} aulas</h2>
+        <h2 id="gr" className="fm-h2">As aulas, módulo por módulo</h2>
         <p className="fm-p">A mesma lista das salas do voo, módulo por módulo.</p>
         <div className="fm-grade">
           {MODULOS.map((m) => (
@@ -228,7 +230,6 @@ export function LpFormacao({ dataInicio, inicial, fontes }: { dataInicio: string
               <summary>
                 <span className="n">Módulo {m.n}</span>
                 <span className="t">{m.nome}</span>
-                <span className="q">{m.aulas.length} aulas</span>
               </summary>
               <ol>
                 {m.aulas.map((a) => (
@@ -259,7 +260,7 @@ export function LpFormacao({ dataInicio, inicial, fontes }: { dataInicio: string
           <span className="fm-eyebrow">Inscrição</span>
           <h2 id="of" className="fm-h2">Formação Arquiteto de Agentes</h2>
           <ul>
-            <li>{MODULOS.length} módulos e {TOTAL_AULAS} aulas</li>
+            <li>{MODULOS.length} módulos, do agente ao time</li>
             <li>Acesso pela área de membros da RedPro AI Academy, na Hotmart</li>
             <li>Suporte por e-mail em {SUPORTE}</li>
           </ul>
@@ -269,12 +270,11 @@ export function LpFormacao({ dataInicio, inicial, fontes }: { dataInicio: string
               <a className="fm-btn fm-acao" href={ctaHref}>
                 {ctaTexto}
               </a>
-              <span className="fm-status">As inscrições fecham hoje às 21h.</span>
+              <span className="fm-status">As inscrições fecham {ate}, às 23h59.</span>
             </div>
           ) : (
-            <ListaEspera quando={quando} />
+            <ListaEspera aviso={carrinho.encerrado ? "As inscrições desta turma encerraram." : `As inscrições abrem na ${quando}, na noite 2 da Imersão.`} />
           )}
-          <p className="fm-gar">7 dias de garantia. Pediu, devolvo. Sem pergunta.</p>
         </div>
       </section>
 
@@ -293,17 +293,13 @@ export function LpFormacao({ dataInicio, inicial, fontes }: { dataInicio: string
             <p className="fm-p">
               Vai. No módulo 2 o agente vai para um servidor (VPS), que tem mensalidade própria, e os modelos de IA
               cobram pelo uso. Uma aula do módulo 2 mostra qual servidor comprar sem pagar mais do que precisa, e a
-              última do módulo 4 mostra quanto o squad custa rodando.
+              última do módulo 4 mostra quanto o seu time de agentes custa rodando.
             </p>
-          </div>
-          <div>
-            <h3>E se eu entrar e não gostar?</h3>
-            <p className="fm-p">Você tem 7 dias. Pediu, devolvo. Sem pergunta.</p>
           </div>
           <div>
             <h3>Quando abrem as inscrições?</h3>
             <p className="fm-p">
-              Na segunda depois de cada Hermes Week, das 7h às 21h. A próxima é {quando}.
+              Na noite 2 da Imersão, {quando}, e ficam abertas até {ate}, às 23h59.
             </p>
           </div>
         </div>
@@ -557,7 +553,7 @@ function Voo(props: { reduzido: boolean; status: string; ctaHref: string; ctaTex
           <span className="fm-eyebrow">Formação Arquiteto de Agentes</span>
           <h1 className="fm-h1">Um time de agentes rodando 24 horas, fora do seu computador</h1>
           <p className="fm-deck">
-            Sete módulos e {TOTAL_AULAS} aulas. Role a tela para entrar no laboratório e ver cada uma.
+            Sete módulos. Role a tela para entrar no laboratório e ver cada uma.
           </p>
           <span className="fm-status">{status}</span>
           <div className="fm-hero-acoes">
@@ -596,7 +592,7 @@ function Voo(props: { reduzido: boolean; status: string; ctaHref: string; ctaTex
   );
 }
 
-function ListaEspera({ quando }: { quando: string }) {
+function ListaEspera({ aviso }: { aviso: string }) {
   const [estado, setEstado] = useState<"livre" | "enviando" | "ok" | "erro">("livre");
   async function enviar(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -617,7 +613,7 @@ function ListaEspera({ quando }: { quando: string }) {
   return (
     <form className="fm-form" onSubmit={enviar}>
       <p className="fm-p">
-        As inscrições abrem na {quando}, das 7h às 21h. Deixe seu contato para entrar na lista de espera.
+        {aviso} Deixe seu contato para entrar na lista de espera.
       </p>
       <label className="fm-eyebrow" htmlFor="fm-nome">Nome</label>
       <input id="fm-nome" name="nome" required autoComplete="name" />

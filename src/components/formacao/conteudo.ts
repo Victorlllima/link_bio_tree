@@ -10,7 +10,7 @@
  * ==========================================================================*/
 
 export const CHECKOUT_FORMACAO = "https://pay.hotmart.com/J107893534P";
-export const PRECO_FORMACAO = 997;
+export const PRECO_FORMACAO = 1500;
 export const SUPORTE = "suporte@redpro.com.br";
 
 export type Modulo = {
@@ -60,8 +60,8 @@ export const MODULOS: Modulo[] = [
   },
   {
     n: 3,
-    nome: "De um agente a um squad",
-    fachada: "De um Agente a um Squad",
+    nome: "Memória, skills e rotinas do seu agente",
+    fachada: "Memória, skills e rotinas",
     cor: "#6ee38a",
     aulas: [
       "A memória que não pode virar bagunça",
