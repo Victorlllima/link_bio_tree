@@ -2,15 +2,15 @@
  * Pós-compra da Imersão Arquiteto de Agentes (ingresso 8852419). Adaptação do que o webhook já faz
  * para a Hermes Week (ION, 05/11/2026).
  *
- * TRAVA DE ENVIO: os e-mails abaixo são TEXTO PROVISÓRIO (a BEACON adapta os da Week).
- * `EMAIL_APROVADO_PELO_RED` fica `false` até o Red aprovar o texto; só então um commit vira para `true`.
- * Com `false`, nenhum e-mail da Imersão sai para aluno. O aviso no Telegram não depende desta trava.
+ * TRAVA DE ENVIO: `EMAIL_APROVADO_PELO_RED` (true só para o e-mail 1, ok do Red 05/11). Sem link do grupo ou com
+ * reembolso/chargeback da transação, o e-mail não sai. O aviso no Telegram não depende desta trava.
  */
 import { primeiroNome } from "./wpp-humanizar";
 import type { ImersaoConfig } from "./imersao-config";
 
 export const PRODUTO_IMERSAO_INGRESSO = "8852419";
-export const EMAIL_APROVADO_PELO_RED = false;
+/** Ok do Red em 05/11/2026 só para o e-mail 1. O e-mail 2 (D+1) NÃO foi aprovado e não existe mais no código. */
+export const EMAIL_APROVADO_PELO_RED = true;
 
 /** Início da noite 1 (25/11, 19h BRT). O e-mail 2 (D+1) só é agendado se cair antes de a sala abrir. */
 const INICIO_EVENTO = Date.parse("2026-11-25T18:45:00-03:00");
@@ -46,42 +46,37 @@ const moldura = (corpo: string) => `
     <div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:520px;margin:0 auto;background:#080808;color:#f5f5f5;padding:36px 28px;border-radius:16px">${corpo}
     </div>`;
 
-/** E-MAIL 1: confirmação imediata. Texto provisório. */
-export function emailConfirmacaoImersao(nome: string, cfg: Pick<ImersaoConfig, "linkGrupo" | "linkPreinstalacao">) {
-    const p = primeiroNome(nome) || "Arquiteto";
-    const grupo = cfg.linkGrupo
-        ? `<p style="font-size:14.5px;line-height:1.55;color:#a3a3a3;margin:0 0 14px">É no grupo que chegam os avisos e o link da sala.</p>${botao(cfg.linkGrupo, "👉 Entrar no grupo", "#25D366")}`
-        : `<p style="font-size:14.5px;line-height:1.55;color:#a3a3a3;margin:0">O link do grupo chega por e-mail em breve. Qualquer dúvida: suporte@redpro.com.br.</p>`;
-    const pre = cfg.linkPreinstalacao
-        ? `<p style="font-size:14.5px;line-height:1.55;color:#a3a3a3;margin:0 0 14px">Deixa o computador pronto antes da primeira noite.</p>${botao(cfg.linkPreinstalacao, "Fazer a pré-instalação")}`
-        : "";
-    const html = moldura(`
-      <h1 style="font-size:24px;font-weight:800;margin:0 0 18px;line-height:1.3">Fala, ${p}.</h1>
-      <p style="font-size:16px;line-height:1.6;color:#c9c9c9;margin:0 0 16px">Seu ingresso da <strong style="color:#fff">Imersão Arquiteto de Agentes</strong> está confirmado.</p>
-      <p style="font-size:15px;line-height:1.6;color:#c9c9c9;margin:0 0 22px"><strong style="color:#fff">Quarta 25/11 e quinta 26/11, das 19h às 22h (horário de Brasília).</strong> A sala abre às 18h45.</p>
-      <div style="background:#141414;border:1px solid #1f1f1f;border-radius:12px;padding:20px 22px;margin:0 0 14px">
-        <p style="font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8a8a8a;margin:0 0 10px">Entra no grupo</p>${grupo}
-      </div>${pre ? `
-      <div style="background:#141414;border:1px solid rgba(232,163,61,.42);border-radius:12px;padding:20px 22px;margin:0 0 14px">${pre}
-      </div>` : ""}
-      <div style="background:#141414;border:1px solid #1f1f1f;border-radius:12px;padding:20px 22px;margin:0 0 22px">
-        <p style="font-size:14.5px;line-height:1.55;color:#a3a3a3;margin:0 0 14px">Salva as duas noites na sua agenda.</p>${botao(AGENDA_ICS, "Salvar na agenda", "#f5f5f5")}
-      </div>
-      <p style="font-size:14px;line-height:1.6;color:#8a8a8a;margin:0 0 20px">Tudo isso também está em ${OBRIGADO.replace("https://", "")}.</p>
-      <p style="font-size:15px;color:#c9c9c9;margin:0">Te vejo na quarta.<br><strong style="color:#fff">Red</strong></p>`);
-    return { subject: "Você tá dentro: Imersão Arquiteto de Agentes, 25 e 26/11, 19h", html };
+/** E-MAIL 1: confirmação imediata. Texto A da BEACON (posto-BEACON-2/resposta.md), com os 2 cortes do Red de 05/11
+ *  (sem o passo da pré-instalação, sem a frase "Uma pessoa lê."). Palavras literais. */
+export const ASSUNTO_CONFIRMACAO = "Sua vaga na Imersão está confirmada (25 e 26/11, 19h)";
+export const PRECABECALHO_CONFIRMACAO = "Entre no grupo da turma agora. É por lá que saem os avisos.";
+
+const esc = (v: string) => v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const P = "font-size:15px;line-height:1.6;color:#c9c9c9;margin:0 0 14px";
+const link = (href: string) => `<a href="${href}" style="color:#E8A33D">${href}</a>`;
+
+/** Devolve null se não há link do grupo: o e-mail não sai sem ele (regra do Red, 05/11). */
+export function emailConfirmacaoImersao(nome: string, cfg: Pick<ImersaoConfig, "linkGrupo">) {
+    if (!cfg.linkGrupo) return null;
+    const p = primeiroNome(nome);
+    const html = `<span style="display:none;max-height:0;overflow:hidden;opacity:0">${PRECABECALHO_CONFIRMACAO}</span>` + moldura(`
+      <p style="${P}">${p ? `Oi, ${esc(p)}.` : "Oi,"}</p>
+      <p style="${P}">Deu certo: sua vaga na Imersão Arquiteto de Agentes está garantida.</p>
+      <p style="${P};margin-bottom:6px"><strong style="color:#fff">Quando:</strong></p>
+      <ul style="${P};padding-left:20px">
+        <li>Quarta, 25/11, das 19h às 22h</li>
+        <li>Quinta, 26/11, das 19h às 22h</li>
+        <li>Horário de Brasília. A sala abre 15 minutos antes, às 18h45.</li>
+      </ul>
+      <p style="${P}"><strong style="color:#fff">Faça agora, em 2 passos (leva uns 2 minutos):</strong></p>
+      <ol style="${P};padding-left:20px">
+        <li style="margin-bottom:10px"><strong style="color:#fff">Entre no grupo da turma:</strong> ${link(cfg.linkGrupo)}<br>É onde eu aviso tudo e onde você tira dúvida antes do evento.</li>
+        <li><strong style="color:#fff">Coloque as duas noites na sua agenda:</strong> ${link(OBRIGADO)} (o botão "Adicionar à agenda" baixa o arquivo .ics com as duas datas).</li>
+      </ol>
+      <p style="${P}">O link da transmissão chega por e-mail e no grupo perto do evento. Não precisa guardar nada agora.</p>
+      <p style="${P}">Qualquer problema (pagamento, acesso, link que não abriu), responda este e-mail ou escreva para suporte@redpro.com.br.</p>
+      <p style="${P}">Nos vemos na quarta.</p>
+      <p style="font-size:15px;color:#fff;font-weight:700;margin:0">Red</p>`);
+    return { subject: ASSUNTO_CONFIRMACAO, html };
 }
 
-/** E-MAIL 2: boas-vindas e contexto, agendado D+1 09h BRT. Texto provisório. */
-export function emailBoasVindasImersao(nome: string, cfg: Pick<ImersaoConfig, "linkGrupo">) {
-    const p = primeiroNome(nome) || "Arquiteto";
-    const grupo = cfg.linkGrupo
-        ? `<div style="background:#141414;border:1px solid #1f1f1f;border-radius:12px;padding:20px 22px;margin:0 0 22px"><p style="font-size:14.5px;line-height:1.55;color:#a3a3a3;margin:0 0 14px">Se ainda não entrou no grupo, entra agora. É por lá que o link da sala chega.</p>${botao(cfg.linkGrupo, "👉 Entrar no grupo", "#25D366")}</div>`
-        : "";
-    const html = moldura(`
-      <h1 style="font-size:22px;font-weight:800;margin:0 0 18px;line-height:1.3">Fala ${p}.</h1>
-      <p style="font-size:16px;line-height:1.6;color:#c9c9c9;margin:0 0 16px">Passando para te lembrar das duas noites da Imersão: quarta 25/11 e quinta 26/11, às 19h.</p>
-      <p style="font-size:15px;line-height:1.6;color:#c9c9c9;margin:0 0 22px">Vai ser ao vivo, com a gente construindo junto. Deixa o computador por perto.</p>${grupo}
-      <p style="font-size:15px;color:#c9c9c9;margin:0">Até lá.<br><strong style="color:#fff">Red</strong></p>`);
-    return { subject: "O que esperar da Imersão", html };
-}
