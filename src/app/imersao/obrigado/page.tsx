@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { lerImersaoConfig } from "@/lib/imersao-config";
 import { EVENTO } from "@/components/imersao/lote";
 
-/* /imersao/obrigado  ·  pós-compra da Imersão. Três passos: entrar no grupo da turma,
-   fazer a pré-instalação e salvar as duas noites na agenda. Os links do grupo e da
-   pré-instalação vêm da tabela imersao_config; sem eles, a página avisa que o link chega
-   por e-mail em vez de mandar a pessoa para um destino errado. */
+/* /imersao/obrigado  ·  pós-compra da Imersão. Dois passos (igual ao e-mail 1 aprovado):
+   entrar no grupo da turma e salvar as duas noites na agenda. O link do grupo vem da
+   tabela imersao_config; sem ele, a página avisa que o link chega por e-mail em vez de
+   mandar a pessoa para um destino errado. */
 
 const SUPORTE = "suporte@redpro.com.br";
 
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   description: "Seu ingresso da Imersão está garantido. Veja o que fazer antes da primeira noite.",
 };
 
-const html = (grupo: string, pre: string) => `
+const html = (grupo: string) => `
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@200;400;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -72,9 +72,8 @@ const html = (grupo: string, pre: string) => `
     background: var(--card); border: 1px solid var(--linha); border-radius: 14px;
     padding: 26px; margin-bottom: 16px; text-align: left;
   }
-  /* O bloco 1 é o único que exige AÇÃO — sem entrar no grupo o comprador
-     não recebe os links das aulas. A borda âmbar existe pra ele não passar
-     batido no meio dos outros dois. */
+  /* O bloco 1 exige AÇÃO — sem entrar no grupo o comprador
+     não recebe os links das aulas. A borda âmbar destaca o passo. */
   .ob-root .bloco.acao { border-color: rgba(232,163,61,.42); }
   .ob-root .bloco .tit {
     font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 18px;
@@ -114,7 +113,7 @@ const html = (grupo: string, pre: string) => `
     <img src="/logo-academy.png" alt="RedPro AI Academy" class="marca" width="220" height="220" />
     <div class="check">✓</div>
     <h1>Você está <em>dentro.</em></h1>
-    <p class="lead">Seu ingresso da Imersão está garantido. Ao vivo, ${EVENTO.extenso}, ${EVENTO.horario} (horário de Brasília). Antes da primeira noite, três coisas.</p>
+    <p class="lead">Seu ingresso da Imersão está garantido. Ao vivo, ${EVENTO.extenso}, ${EVENTO.horario} (horário de Brasília). A sala abre às 18h45. Faça agora, em 2 passos (leva uns 2 minutos).</p>
 
     <div class="bloco acao">
       <div class="tit"><span class="num">1</span> Entre no grupo da turma</div>
@@ -126,18 +125,8 @@ const html = (grupo: string, pre: string) => `
       }
     </div>
 
-    <div class="bloco acao">
-      <div class="tit"><span class="num">2</span> Faça a pré-instalação</div>
-      <p>Quem chega com o agente instalado aproveita a noite 1 por inteiro. <strong>Deixe o computador por perto</strong>, porque você constrói junto, ao vivo.</p>
-      ${
-        pre
-          ? `<div class="acao-cta"><a href="${pre}" class="btn">Abrir o guia de pré-instalação</a></div>`
-          : `<div class="aviso">O guia de pré-instalação chega no seu e-mail antes da primeira noite.</div>`
-      }
-    </div>
-
     <div class="bloco">
-      <div class="tit"><span class="num">3</span> Salve as duas noites na agenda</div>
+      <div class="tit"><span class="num">2</span> Salve as duas noites na agenda</div>
       <p>Baixe o arquivo e abra no seu calendário. Ele cria os dois encontros, com um lembrete uma hora antes.</p>
       <div class="acao-cta"><a href="/imersao/agenda.ics" class="btn">Salvar na agenda</a></div>
     </div>
@@ -153,5 +142,5 @@ export const revalidate = 60;
 
 export default async function ImersaoObrigadoPage() {
   const cfg = await lerImersaoConfig(60);
-  return <div dangerouslySetInnerHTML={{ __html: html(cfg.linkGrupo, cfg.linkPreinstalacao) }} />;
+  return <div dangerouslySetInnerHTML={{ __html: html(cfg.linkGrupo) }} />;
 }
