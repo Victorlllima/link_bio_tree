@@ -5,7 +5,7 @@ import { lerCicloAtual } from "@/lib/ciclo-atual";
 import { BUMPS_HERMES_WEEK, eventoCapi, type EventoCapi } from "@/lib/capi-eventos";
 import { lerImersaoConfig } from "@/lib/imersao-config";
 import {
-    PRODUTO_IMERSAO_INGRESSO, EMAIL_APROVADO_PELO_RED, loteDaOferta,
+    PRODUTO_IMERSAO_INGRESSO, PRODUTO_IMERSAO_GRAVACAO, EMAIL_APROVADO_PELO_RED, loteDaOferta,
     emailConfirmacaoImersao,
 } from "@/lib/imersao-posvenda";
 
@@ -321,8 +321,9 @@ async function enviarResendImersao(email: string, mail: { subject: string; html:
 
 // Só o e-mail 1 (confirmação). O e-mail 2 (D+1) não foi aprovado pelo Red e não existe.
 // Não envia: sem link do grupo; transação já reembolsada/estornada (webhook atrasado); reenvio da Hotmart.
-async function emailsImersao(email: string, nome: string, transacao: string, reenvio: boolean) {
+async function emailsImersao(email: string, nome: string, transacao: string, reenvio: boolean, paiBump = "", gravacao = false) {
     if (reenvio) return { e1: { ok: true as const, pulado: "reenvio" } };
+    if (gravacao && (await gravacaoComIngresso(email, paiBump))) return { e1: { ok: true as const, pulado: "gravacao com ingresso" } };
     const cfg = await lerImersaoConfig(0);
     const mail = emailConfirmacaoImersao(nome, cfg);
     if (!mail) return { e1: { ok: false as const, erro: "link_grupo vazio: e-mail NÃO enviado" } };
@@ -330,6 +331,27 @@ async function emailsImersao(email: string, nome: string, transacao: string, ree
         if (await jaGravada(transacao, ev)) return { e1: { ok: true as const, pulado: ev } };
     }
     return { e1: await enviarResendImersao(email, mail) };
+}
+
+// Gravação (8852453): o e-mail 1 sai só para quem NÃO tem o ingresso no mesmo pedido (1 e-mail por comprador).
+// Pula se: o bump é filho de um pedido que não está gravado ainda (assume ingresso; o webhook do ingresso envia)
+// ou está gravado como ingresso; ou o mesmo e-mail já tem o ingresso aprovado.
+async function gravacaoComIngresso(email: string, parent: string): Promise<boolean> {
+    const key = process.env.SUPABASE_SERVICE_KEY;
+    if (!key) return false;
+    const h = { apikey: key, Authorization: `Bearer ${key}` };
+    const q = async (f: string) => {
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/hotmart_compras?${f}&select=produto_id&limit=1`, { headers: h, cache: "no-store" });
+        return r.ok ? ((await r.json()) as { produto_id: string }[]) : [];
+    };
+    try {
+        if ((await q(`email=eq.${encodeURIComponent(email.toLowerCase())}&produto_id=eq.${PRODUTO_IMERSAO_INGRESSO}&evento=eq.PURCHASE_APPROVED`)).length) return true;
+        if (parent) {
+            const pai = await q(`transacao=eq.${encodeURIComponent(parent)}`);
+            return !pai.length || pai[0].produto_id === PRODUTO_IMERSAO_INGRESSO;
+        }
+    } catch {}
+    return false;
 }
 
 // O aviso repetia 4 vezes por pedido com bump; aqui só o ingresso avisa, então é 1 por pedido.
@@ -408,7 +430,7 @@ export async function POST(req: NextRequest) {
     console.log(`[hotmart] ${evento} · produto=${produtoId} · email=${email} · tx=${transacao}`);
 
     // Só para o aviso do ingresso da Imersão: precisa saber, antes de gravar, se a Hotmart está reenviando.
-    const reenvio = evento === "PURCHASE_APPROVED" && produtoId === PRODUTO_IMERSAO_INGRESSO ? await jaGravada(transacao, evento) : false;
+    const reenvio = evento === "PURCHASE_APPROVED" && (produtoId === PRODUTO_IMERSAO_INGRESSO || produtoId === PRODUTO_IMERSAO_GRAVACAO) ? await jaGravada(transacao, evento) : false;
 
     // Grava sempre — qualquer evento vira histórico. Idempotente por (transacao, evento).
     const gravou = await gravar({
@@ -465,7 +487,9 @@ export async function POST(req: NextRequest) {
         const mailHW1 = ehHermesWeek ? await enviarEmailConfirmacaoHermesWeek(email, nome) : null;
         const mailHW2 = ehHermesWeek ? await enviarEmailBoasVindasHermesWeek(email, nome) : null;
         const ehImersao = produtoId === PRODUTO_IMERSAO_INGRESSO;
-        const mailIM = ehImersao && EMAIL_APROVADO_PELO_RED ? await emailsImersao(email, nome, transacao, reenvio) : null;
+        const ehGravacao = produtoId === PRODUTO_IMERSAO_GRAVACAO;
+        const paiBump = String(((purchase?.order_bump as Record<string, unknown> | undefined)?.parent_purchase_transaction) ?? "");
+        const mailIM = (ehImersao || ehGravacao) && EMAIL_APROVADO_PELO_RED ? await emailsImersao(email, nome, transacao, reenvio, paiBump, ehGravacao) : null;
         if (!produtoConhecido) {
             console.warn(`[hotmart] produto ${produtoId} fora do mapa — CAPI ignorado (evento de teste?)`);
         }
@@ -522,7 +546,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
             ok: true, evento, gravou: gravou.ok, capi: capi.ok, resend: lista.ok,
             email_hermes_week: ehHermesWeek ? { e1: mailHW1?.ok ?? false, e2: mailHW2?.ok ?? false } : null,
-            email_imersao: mailIM ? { e1: mailIM.e1.ok } : ehImersao ? "desligado" : null,
+            email_imersao: mailIM ? { e1: mailIM.e1.ok } : ehImersao || ehGravacao ? "desligado" : null,
         });
     }
 

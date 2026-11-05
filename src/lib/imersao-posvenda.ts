@@ -9,6 +9,7 @@ import { primeiroNome } from "./wpp-humanizar";
 import type { ImersaoConfig } from "./imersao-config";
 
 export const PRODUTO_IMERSAO_INGRESSO = "8852419";
+export const PRODUTO_IMERSAO_GRAVACAO = "8852453";
 /** Ok do Red em 05/11/2026 só para o e-mail 1. O e-mail 2 (D+1) NÃO foi aprovado e não existe mais no código. */
 export const EMAIL_APROVADO_PELO_RED = true;
 
