@@ -3,6 +3,11 @@ import crypto from "crypto";
 import { emailConfirmacao as emailConfirmacaoHermesWeek, emailBoasVindas as emailBoasVindasHermesWeek, emailRecuperacao as emailRecuperacaoHermesWeek } from "@/lib/mensagens-hermesweek";
 import { lerCicloAtual } from "@/lib/ciclo-atual";
 import { BUMPS_HERMES_WEEK, eventoCapi, type EventoCapi } from "@/lib/capi-eventos";
+import { lerImersaoConfig } from "@/lib/imersao-config";
+import {
+    PRODUTO_IMERSAO_INGRESSO, EMAIL_APROVADO_PELO_RED, loteDaOferta, agendamentoD1Imersao,
+    emailConfirmacaoImersao, emailBoasVindasImersao,
+} from "@/lib/imersao-posvenda";
 
 /**
  * Webhook da Hotmart — hub de pós-compra.
@@ -193,6 +198,9 @@ async function enviarEmailRecuperacao(email: string, nome: string, motivo: "expi
 const AUDIENCIA_POR_PRODUTO: Record<string, string | undefined> = {
     "8039631": process.env.RESEND_IAA_AUDIENCE_ID,       // IAA → compradores-r17
     "8443182": process.env.RESEND_HERMESWEEK_AUDIENCE_ID, // Ingresso → Hermes Week (criar audiência nova no Resend, ver HERMES/CHECKLIST-VIRADA-CICLO.md)
+    // Ingresso da Imersão. Dormente: sem a env, `audienciaMapeada` é falso e nada falha nem alerta.
+    // Liga criando a audiência no Resend e pondo o id em RESEND_IMERSAO_AUDIENCE_ID (decisão do Red).
+    [PRODUTO_IMERSAO_INGRESSO]: process.env.RESEND_IMERSAO_AUDIENCE_ID,
 };
 
 async function resend(email: string, nome: string, produtoId: string) {
@@ -294,6 +302,52 @@ async function enviarEmailBoasVindasHermesWeek(email: string, nome: string) {
     }
 }
 
+// Pós-compra do ingresso da Imersão: e-mail 1 imediato e e-mail 2 agendado D+1 09h, em série como na Week.
+// Texto provisório; a trava EMAIL_APROVADO_PELO_RED (lib/imersao-posvenda) impede o envio até o ok do Red.
+async function enviarResendImersao(email: string, mail: { subject: string; html: string }, quando?: string) {
+    const key = process.env.RESEND_API_KEY;
+    if (!key || !email) return { ok: false, erro: "sem RESEND_API_KEY ou email" };
+    try {
+        const res = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ from: REMETENTE, to: [email], subject: mail.subject, html: mail.html, ...(quando ? { scheduled_at: quando } : {}) }),
+        });
+        if (!res.ok) return { ok: false, erro: `${res.status} ${await res.text()}` };
+        return { ok: true };
+    } catch (e) {
+        return { ok: false, erro: String(e) };
+    }
+}
+
+async function emailsImersao(email: string, nome: string) {
+    const cfg = await lerImersaoConfig(0);
+    const e1 = await enviarResendImersao(email, emailConfirmacaoImersao(nome, cfg));
+    const quando = agendamentoD1Imersao();
+    // Compra em cima do evento: o D+1 cairia depois da sala abrir. Não é falha, não agenda.
+    const e2 = quando ? await enviarResendImersao(email, emailBoasVindasImersao(nome, cfg), quando) : { ok: true as const, pulado: true };
+    return { e1, e2 };
+}
+
+// O aviso repetia 4 vezes por pedido com bump; aqui só o ingresso avisa, então é 1 por pedido.
+// A Hotmart reenvia o webhook em caso de timeout: o aviso só sai se esta transação ainda não estava gravada.
+async function jaGravada(transacao: string, evento: string): Promise<boolean> {
+    const key = process.env.SUPABASE_SERVICE_KEY;
+    if (!key) return false;
+    try {
+        const res = await fetch(
+            `${SUPABASE_URL}/rest/v1/hotmart_compras?transacao=eq.${encodeURIComponent(transacao)}&evento=eq.${evento}&select=id&limit=1`,
+            { headers: { apikey: key, Authorization: `Bearer ${key}` }, cache: "no-store" },
+        );
+        if (!res.ok) return false;
+        return ((await res.json()) as unknown[]).length > 0;
+    } catch {
+        return false;
+    }
+}
+
+const mdSeguro = (v: string) => v.replace(/[_*`\[\]]/g, " ");
+
 async function telegram(msg: string) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chat = process.env.TELEGRAM_CHAT_ID;
@@ -350,6 +404,9 @@ export async function POST(req: NextRequest) {
 
     console.log(`[hotmart] ${evento} · produto=${produtoId} · email=${email} · tx=${transacao}`);
 
+    // Só para o aviso do ingresso da Imersão: precisa saber, antes de gravar, se a Hotmart está reenviando.
+    const reenvio = evento === "PURCHASE_APPROVED" && produtoId === PRODUTO_IMERSAO_INGRESSO ? await jaGravada(transacao, evento) : false;
+
     // Grava sempre — qualquer evento vira histórico. Idempotente por (transacao, evento).
     const gravou = await gravar({
         transacao,
@@ -404,6 +461,8 @@ export async function POST(req: NextRequest) {
          * ---------------------------------------------------------------- */
         const mailHW1 = ehHermesWeek ? await enviarEmailConfirmacaoHermesWeek(email, nome) : null;
         const mailHW2 = ehHermesWeek ? await enviarEmailBoasVindasHermesWeek(email, nome) : null;
+        const ehImersao = produtoId === PRODUTO_IMERSAO_INGRESSO;
+        const mailIM = ehImersao && EMAIL_APROVADO_PELO_RED ? await emailsImersao(email, nome) : null;
         if (!produtoConhecido) {
             console.warn(`[hotmart] produto ${produtoId} fora do mapa — CAPI ignorado (evento de teste?)`);
         }
@@ -411,9 +470,30 @@ export async function POST(req: NextRequest) {
         if (!lista.ok) console.error("[hotmart] Resend audiência:", lista.erro);
         if (mailHW1 && !mailHW1.ok) console.error("[hotmart] e-mail 1 Hermes Week:", mailHW1.erro);
         if (mailHW2 && !mailHW2.ok) console.error("[hotmart] e-mail 2 Hermes Week:", mailHW2.erro);
+        if (mailIM && !mailIM.e1.ok) console.error("[hotmart] e-mail 1 Imersão:", mailIM.e1.erro);
+        if (mailIM && !mailIM.e2.ok) console.error("[hotmart] e-mail 2 Imersão:", mailIM.e2.erro);
+
+        // Aviso de venda do ingresso da Imersão (reativado em 05/11/2026 só para o 8852419): lote e sck.
+        if (ehImersao && !reenvio) {
+            const oferta = String(((purchase?.offer as Record<string, unknown> | undefined)?.code) ?? "");
+            const sck = String(((purchase?.origin as Record<string, unknown> | undefined)?.sck) ?? "");
+            const l = loteDaOferta(oferta);
+            await telegram(
+                [
+                    `🎟️ *Ingresso Imersão vendido*`,
+                    "",
+                    `👤 ${mdSeguro(nome) || "—"}`,
+                    `📧 ${mdSeguro(email) || "—"}`,
+                    `💵 ${moeda} ${valor.toFixed(2)}`,
+                    `📦 ${l ? `lote ${l.lote} (R$ ${l.preco})` : `lote desconhecido (oferta ${mdSeguro(oferta) || "—"})`}`,
+                    `🏷️ sck: ${sck ? "`" + sck.replace(/`/g, "") + "`" : "—"}`,
+                ].join("\n"),
+            );
+        }
 
         /* O aviso de cada venda no Telegram saiu em 09/10/2026 (Red): a Hotmart já avisa, e o
-         * aviso repetido chegava 4 vezes por pedido com bump. Só sobra o alerta de falha:
+         * aviso repetido chegava 4 vezes por pedido com bump. Só sobra o alerta de falha
+         * (e, desde 05/11/2026, o aviso do ingresso da Imersão 8852419, 1 por pedido, ver abaixo):
          * se o banco, o CAPI, o Resend ou um e-mail do pós-compra falhar, ninguém fica no escuro. */
         const audienciaMapeada = Boolean(AUDIENCIA_POR_PRODUTO[produtoId]);
         const falhas: string[] = [];
@@ -422,6 +502,8 @@ export async function POST(req: NextRequest) {
         if (!lista.ok && audienciaMapeada) falhas.push(`Resend (audiência): ${"erro" in lista ? lista.erro : "falhou"}`);
         if (ehHermesWeek && !mailHW1?.ok) falhas.push("e-mail 1 da Hermes Week (confirmação)");
         if (ehHermesWeek && !mailHW2?.ok) falhas.push("e-mail 2 da Hermes Week (não agendou)");
+        if (mailIM && !mailIM.e1.ok) falhas.push("e-mail 1 da Imersão (confirmação)");
+        if (mailIM && !mailIM.e2.ok) falhas.push("e-mail 2 da Imersão (não agendou)");
         if (falhas.length) {
             await telegram(
                 [
@@ -439,6 +521,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
             ok: true, evento, gravou: gravou.ok, capi: capi.ok, resend: lista.ok,
             email_hermes_week: ehHermesWeek ? { e1: mailHW1?.ok ?? false, e2: mailHW2?.ok ?? false } : null,
+            email_imersao: mailIM ? { e1: mailIM.e1.ok, e2: mailIM.e2.ok } : ehImersao ? "desligado" : null,
         });
     }
 
