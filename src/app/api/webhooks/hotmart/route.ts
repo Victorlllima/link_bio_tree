@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import crypto from "crypto";
 import { emailConfirmacao as emailConfirmacaoHermesWeek, emailBoasVindas as emailBoasVindasHermesWeek, emailRecuperacao as emailRecuperacaoHermesWeek } from "@/lib/mensagens-hermesweek";
 import { lerCicloAtual } from "@/lib/ciclo-atual";
@@ -57,6 +57,8 @@ const PRODUTOS: Record<string, string> = {
     "8852453": "Imersão RedPro — Gravação",
 };
 
+export const maxDuration = 60;
+
 const PRODUTO_HERMES_WEEK = "8443182";
 
 const sha256 = (v: string) => crypto.createHash("sha256").update(v.trim().toLowerCase()).digest("hex");
@@ -100,6 +102,7 @@ async function metaCapi(
     evento: EventoCapi = "Purchase",
     produto?: { id: string; nome: string },
     fbc = "",
+    extra: { eventTime?: number; fbp?: string } = {},
 ) {
     // Nome da var alinhado com /api/meta-capi, que já roda em produção.
     const token = process.env.META_CAPI_ACCESS_TOKEN || process.env.META_CAPI_TOKEN;
@@ -114,6 +117,8 @@ async function metaCapi(
     // fbc vem do checkout via origin.xcod (a LP acrescenta xcod=<fbc>); só aceita o formato fb.<n>.<ts>.<fbclid>.
     if (/^fb\.\d\.\d+\..+/.test(fbc)) user_data.fbc = [fbc];
 
+    if (extra.fbp) user_data.fbp = [extra.fbp];
+
     try {
         const res = await fetch(`https://graph.facebook.com/v21.0/${pixel}/events?access_token=${token}`, {
             method: "POST",
@@ -121,7 +126,7 @@ async function metaCapi(
             body: JSON.stringify({
                 data: [{
                     event_name: evento,
-                    event_time: Math.floor(Date.now() / 1000),
+                    event_time: extra.eventTime ?? Math.floor(Date.now() / 1000),
                     action_source: "website",
                     event_id: eventId,
                     user_data,
@@ -135,10 +140,33 @@ async function metaCapi(
                 }],
             }),
         });
-        if (!res.ok) return { ok: false, erro: `${res.status} ${await res.text()}` };
+        const texto = await res.text();
+        console.log(`[hotmart] capi: ${evento} ${eventId} -> ${res.status} ${texto.slice(0, 200)}`);
+        if (!res.ok) return { ok: false, erro: `${res.status} ${texto}` };
+        let recebidos = 0;
+        try { recebidos = Number(JSON.parse(texto).events_received ?? 0); } catch { /* resposta não-JSON */ }
+        if (recebidos < 1) return { ok: false, erro: `events_received=${recebidos} ${texto.slice(0, 200)}` };
         return { ok: true };
     } catch (e) {
         return { ok: false, erro: String(e) };
+    }
+}
+
+// Valor da compra no pixel = ingresso + order bumps do MESMO pedido (a Hotmart manda cada bump em webhook
+// próprio, com purchase.order_bump.parent_purchase_transaction = transação do ingresso).
+async function valorDoPedido(transacaoPai: string, valorIngresso: number): Promise<number> {
+    const key = process.env.SUPABASE_SERVICE_KEY;
+    if (!key) return valorIngresso;
+    try {
+        const url =
+            `${SUPABASE_URL}/rest/v1/hotmart_compras?evento=eq.PURCHASE_APPROVED&select=valor` +
+            `&payload->data->purchase->order_bump->>parent_purchase_transaction=eq.${encodeURIComponent(transacaoPai)}`;
+        const res = await fetch(url, { headers: { apikey: key, Authorization: `Bearer ${key}` } });
+        if (!res.ok) return valorIngresso;
+        const linhas = (await res.json()) as { valor: number | null }[];
+        return valorIngresso + linhas.reduce((t, l) => t + Number(l.valor ?? 0), 0);
+    } catch {
+        return valorIngresso;
     }
 }
 
@@ -465,9 +493,28 @@ export async function POST(req: NextRequest) {
         const ehAdicional = BUMPS_HERMES_WEEK.has(produtoId);
         const nomeEventoCapi = eventoCapi(produtoId);
 
+        const xcodCapi = String(((purchase?.origin as Record<string, unknown> | undefined)?.xcod) ?? "").trim();
+        // event_time real da aprovação (Hotmart manda em ms); reentrega do webhook não vira "compra de agora".
+        const aprovadoMs = Number(purchase?.approved_date ?? 0);
+        const eventTimeCapi = aprovadoMs > 0 && Date.now() - aprovadoMs < 7 * 86400_000 ? Math.floor(aprovadoMs / 1000) : undefined;
+        // Ingresso da Imersão: o Purchase leva ingresso + bumps do pedido. Os bumps chegam em webhooks próprios
+        // 10 a 20s depois, então o envio espera (fora da resposta) e soma o que já foi gravado.
+        const capiAdiado = produtoConhecido && produtoId === PRODUTO_IMERSAO_INGRESSO && nomeEventoCapi === "Purchase";
+        if (capiAdiado) {
+            after(async () => {
+                await new Promise((r) => setTimeout(r, 30_000));
+                const total = await valorDoPedido(transacao, valor);
+                const r = await metaCapi(email, nome, fone, total, moeda, transacao, "Purchase", { id: produtoId, nome: produtoNome }, xcodCapi, { eventTime: eventTimeCapi });
+                if (!r.ok) {
+                    console.error("[hotmart] CAPI:", r.erro);
+                    await telegram(`⚠️ Meta CAPI: Purchase ${transacao} falhou: ${r.erro}`).catch(() => {});
+                }
+            });
+        }
+
         const [capi, lista] = await Promise.all([
-            produtoConhecido
-                ? metaCapi(email, nome, fone, valor, moeda, transacao, nomeEventoCapi, { id: produtoId, nome: produtoNome }, String(((purchase?.origin as Record<string, unknown> | undefined)?.xcod) ?? "").trim())
+            produtoConhecido && !capiAdiado
+                ? metaCapi(email, nome, fone, valor, moeda, transacao, nomeEventoCapi, { id: produtoId, nome: produtoNome }, xcodCapi, { eventTime: eventTimeCapi })
                 : Promise.resolve({ ok: true as const }),
             ehAdicional ? Promise.resolve({ ok: true as const }) : resend(email, nome, produtoId),
         ]);
