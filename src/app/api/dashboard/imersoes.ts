@@ -3,7 +3,7 @@
 // Config por edição em src/app/dashboard/imersoes.ts. Tudo roda no servidor: o token nunca vai ao cliente.
 // ============================================================
 import { EDICOES, type EdicaoCfg } from "@/app/dashboard/imersoes";
-import type { CriativoImersao, DadosImersao, DiaImersao, EventoSerie, LoteImersaoRes, RespComparacaoEventos, Fonte } from "@/app/dashboard/tipos";
+import type { GrupoCriativo, CriativoImersao, DadosImersao, DiaImersao, EventoSerie, LoteImersaoRes, RespComparacaoEventos, Fonte } from "@/app/dashboard/tipos";
 import { montar, type CicloCal } from "./montar";
 
 const SB = "https://supabase.redpro.com.br/rest/v1";
@@ -65,21 +65,31 @@ export function edicaoPorId(id: string | null): EdicaoCfg {
 
 const loteDoDia = (ed: EdicaoCfg, d: string) => ed.lotes.find((l) => d >= l.ini && (l.fim === null || d <= l.fim))?.n ?? null;
 
-// O sck do ingresso é im-A-<utm_campaign>. Liga a venda a um anúncio por (1) ID do anúncio em qualquer campo da origem,
-// (2) nome do anúncio igual a algum valor da origem. Sem casar, a venda fica "anúncio sem criativo".
-function atribuir(origem: Record<string, unknown> | null, ads: Map<string, string>, porNome: Map<string, string>, campanhaId: string) {
-  if (!origem) return { tipo: "outra" as const, adId: null };
+// O sck do ingresso tem duas formas (decisão do Red, 06/11):
+//  - antiga: im-A-<nome do criativo> (ex.: im-A-car-case-ao-vivo). Soma conjuntos (Q+F): vira venda de CRIATIVO.
+//  - nova (a partir de 13/11): im-A-<ad.name> (ex.: im-A-Q_car-case-ao-vivo_sp). Casa com UM anúncio: vira venda de ANÚNCIO.
+// Fallback legado: ID numérico do anúncio em qualquer campo da origem. Sem casar, fica "anúncio sem criativo".
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+// chave do criativo: tira o prefixo de conjunto (Q_, F_) e o sufixo _sp do nome do anúncio
+export const chaveCriativo = (nome: string) => norm(nome.toLowerCase().replace(/^im-a-/, "").replace(/^[a-z]_/, "").replace(/_sp$/, ""));
+
+type Atrib = { tipo: "anuncio" | "criativo" | "anuncio-sem-criativo" | "outra"; adId: string | null; chave: string | null };
+function atribuir(origem: Record<string, unknown> | null, ads: Map<string, string>, porNome: Map<string, string[]>, grupos: Set<string>, campanhaId: string): Atrib {
+  if (!origem) return { tipo: "outra", adId: null, chave: null };
   const valores = Object.values(origem).filter((v): v is string => typeof v === "string" && !!v);
   const texto = valores.join(" ");
-  for (const m of texto.match(/\d{12,}/g) || []) if (ads.has(m)) return { tipo: "anuncio" as const, adId: m };
-  const norm = (s: string) => s.toLowerCase().replace(/^im-a-/, "").replace(/[^a-z0-9]/g, "");
+  for (const m of texto.match(/\d{12,}/g) || []) if (ads.has(m)) return { tipo: "anuncio", adId: m, chave: null };
   for (const v of valores) {
-    const hit = porNome.get(norm(decodeURIComponent(v.replace(/\+/g, " "))));
-    if (hit) return { tipo: "anuncio" as const, adId: hit };
+    let cru = v;
+    try { cru = decodeURIComponent(v.replace(/\+/g, " ")); } catch {}
+    const hit = porNome.get(norm(cru.replace(/^im-a-/i, "")));
+    if (hit?.length === 1) return { tipo: "anuncio", adId: hit[0], chave: null }; // nome do anúncio único: venda do anúncio
+    const ch = chaveCriativo(cru);
+    if (ch && grupos.has(ch)) return { tipo: "criativo", adId: null, chave: ch }; // nome repetido em conjuntos ou forma antiga
   }
   const sck = String(origem.sck || "");
-  if (/^im-/i.test(sck) || texto.includes(campanhaId)) return { tipo: "anuncio-sem-criativo" as const, adId: null };
-  return { tipo: "outra" as const, adId: null };
+  if (/^im-/i.test(sck) || texto.includes(campanhaId)) return { tipo: "anuncio-sem-criativo", adId: null, chave: null };
+  return { tipo: "outra", adId: null, chave: null };
 }
 
 export async function montarImersao(id: string | null): Promise<DadosImersao> {
@@ -114,16 +124,16 @@ export async function montarImersao(id: string | null): Promise<DadosImersao> {
 
   // ---------- anúncios ----------
   const nomeAd = new Map<string, string>();
-  const porNome = new Map<string, string>();
-  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
-  for (const a of adsInfoRaw) {
-    nomeAd.set(String(a.id), String(a.name));
-    porNome.set(norm(String(a.name)), String(a.id));
-  }
-  for (const r of adsInsRaw) {
-    nomeAd.set(String(r.ad_id), String(r.ad_name));
-    porNome.set(norm(String(r.ad_name)), String(r.ad_id));
-  }
+  const porNome = new Map<string, string[]>();
+  const regNome = (id: string, nome: string) => {
+    nomeAd.set(id, nome);
+    const k = norm(nome);
+    const l = porNome.get(k) ?? [];
+    if (!l.includes(id)) porNome.set(k, [...l, id]);
+  };
+  for (const a of adsInfoRaw) regNome(String(a.id), String(a.name));
+  for (const r of adsInsRaw) regNome(String(r.ad_id), String(r.ad_name));
+  const grupos = new Set([...nomeAd.values()].map(chaveCriativo));
 
   // ---------- vendas (Hotmart) ----------
   const aprov = (prod: string) => {
@@ -151,15 +161,19 @@ export async function montarImersao(id: string | null): Promise<DadosImersao> {
   };
 
   const vendasPorAd = new Map<string, number>();
+  const vendasPorGrupo = new Map<string, number>(); // venda só de criativo (forma antiga ou nome repetido): não separa conjunto
   let vendasAnuncio = 0;
   let semCriativo = 0;
   const tipoDe = new Map<string, "anuncio" | "anuncio-sem-criativo" | "outra">();
   for (const c of ingressosTx) {
-    const a = atribuir(c.origem, nomeAd, porNome, ed.campanha.id);
-    tipoDe.set(c.transacao, a.tipo);
+    const a = atribuir(c.origem, nomeAd, porNome, grupos, ed.campanha.id);
+    tipoDe.set(c.transacao, a.tipo === "criativo" ? "anuncio" : a.tipo);
     if (a.tipo === "anuncio" && a.adId) {
       vendasAnuncio++;
       vendasPorAd.set(a.adId, (vendasPorAd.get(a.adId) || 0) + 1);
+    } else if (a.tipo === "criativo" && a.chave) {
+      vendasAnuncio++;
+      vendasPorGrupo.set(a.chave, (vendasPorGrupo.get(a.chave) || 0) + 1);
     } else if (a.tipo === "anuncio-sem-criativo") semCriativo++;
   }
 
@@ -225,27 +239,45 @@ export async function montarImersao(id: string | null): Promise<DadosImersao> {
     const gasto = num(r.spend), imp = num(r.impressions), cl = num(r.inline_link_clicks);
     const lpv = acao(r, LPV), ic = acao(r, IC), vp = acao(r, COMPRA);
     const vendas = vendasPorAd.get(adId) || 0;
+    const chave = chaveCriativo(nomeAd.get(adId) ?? adId);
+    const naoSep = vendasPorGrupo.get(chave) || 0; // venda do criativo que não dá para separar por anúncio
     const ctr = imp ? (100 * cl) / imp : null;
     const motivos: string[] = [];
     const ativo = status === "ACTIVE";
     if (status === "DISAPPROVED" || status === "WITH_ISSUES") motivos.push(`reprovado ou com problema (${status})`);
     else if (ativo && imp === 0) motivos.push("sem entrega (0 impressões)");
     else if (imp >= m.impMinJulgar && ctr !== null && ctr < m.ctrMinLink) motivos.push(`CTR do link ${ctr.toFixed(2)}% abaixo de ${m.ctrMinLink}% com ${Math.round(imp)} impressões`);
-    if (gasto >= m.cpaCorte && vendas === 0) motivos.push(`gastou R$ ${gasto.toFixed(0)} (corte R$ ${m.cpaCorte}) sem venda no banco`);
+    if (naoSep > 0) { /* venda do criativo não separa o anúncio: o corte por venda vale só no criativo */ }
+    else if (gasto >= m.cpaCorte && vendas === 0) motivos.push(`gastou R$ ${gasto.toFixed(0)} (corte R$ ${m.cpaCorte}) sem venda no banco`);
     else if (vendas > 0 && gasto / vendas > m.cpaCorte) motivos.push(`CPA R$ ${(gasto / vendas).toFixed(0)} acima do corte de R$ ${m.cpaCorte}`);
     return {
       adId, nome: nomeAd.get(adId) ?? adId, conjunto: String(adset), status, thumb, gasto, impressoes: imp, cliquesLink: cl,
-      ctr, cpc: div(gasto, cl), lpv, custoLpv: div(gasto, lpv), ic, vendas, vendasPixel: vp, cpa: div(gasto, vendas),
+      ctr, cpc: div(gasto, cl), lpv, custoLpv: div(gasto, lpv), ic, vendas, chave, vendasPixel: vp, cpa: div(gasto, vendas),
       cortar: ativo && motivos.length > 0, motivos,
     };
   }).filter((c) => c.gasto > 0 || c.status === "ACTIVE");
+
+  // ---------- criativos agrupados (Q+F somados) ----------
+  const porChave = new Map<string, CriativoImersao[]>();
+  for (const c of criativos) porChave.set(c.chave, [...(porChave.get(c.chave) || []), c]);
+  const criativosAgrupados: GrupoCriativo[] = [...porChave.entries()].map(([chave, ads]) => {
+    const soma = (f: (c: CriativoImersao) => number) => ads.reduce((t, c) => t + f(c), 0);
+    const gasto = soma((c) => c.gasto), lpv = soma((c) => c.lpv);
+    const vendasAd = soma((c) => c.vendas), vendasCriativo = vendasPorGrupo.get(chave) || 0, vendas = vendasAd + vendasCriativo;
+    return {
+      chave, nome: ads.map((c) => c.nome.replace(/^[A-Za-z]_/, "").replace(/_sp$/i, "")).sort((a, b) => a.length - b.length)[0],
+      anuncios: ads.length, ativos: ads.filter((c) => c.status === "ACTIVE").length, gasto, impressoes: soma((c) => c.impressoes),
+      cliquesLink: soma((c) => c.cliquesLink), lpv, ic: soma((c) => c.ic), vendas, vendasPorAnuncio: vendasAd, vendasPorCriativo: vendasCriativo,
+      cpa: div(gasto, vendas), custoLpv: div(gasto, lpv),
+    };
+  }).sort((a, b) => b.gasto - a.gasto);
 
   // ---------- conjuntos ----------
   const conjuntos = ed.campanha.conjuntos.map((cj) => {
     const rs = adsInsRaw.filter((r) => String(r.adset_id) === cj.id);
     const s = (f: (r: Linha) => number) => rs.reduce((t, r) => t + f(r), 0);
     const gasto = s((r) => num(r.spend));
-    const vendas = criativos.filter((c) => rs.some((r) => String(r.ad_id) === c.adId)).reduce((t, c) => t + c.vendas, 0);
+    const vendas = criativos.filter((c) => rs.some((r) => String(r.ad_id) === c.adId)).reduce((t, c) => t + c.vendas, 0); // só venda separada por anúncio
     return { id: cj.id, nome: cj.nome, gasto, impressoes: s((r) => num(r.impressions)), cliquesLink: s((r) => num(r.inline_link_clicks)), lpv: s((r) => acao(r, LPV)), ic: s((r) => acao(r, IC)), vendas, cpa: div(gasto, vendas) };
   });
 
@@ -285,6 +317,7 @@ export async function montarImersao(id: string | null): Promise<DadosImersao> {
     },
     bumps, serie, lotes, conjuntos,
     criativos: criativos.sort((a, b) => b.gasto - a.gasto),
+    criativosAgrupados,
   };
 }
 

@@ -181,7 +181,7 @@ function Criativos({ d }: { d: DadosImersao }) {
     { k: "cpc", rot: "CPC link", val: (c) => c.cpc, fmt: (c) => fR(c.cpc) },
     { k: "custoLpv", rot: "Custo/visita", val: (c) => c.custoLpv, fmt: (c) => fR(c.custoLpv) },
     { k: "ic", rot: "IC", val: (c) => c.ic, fmt: (c) => fN(c.ic) },
-    { k: "vendas", rot: "Vendas (sck)", val: (c) => c.vendas, fmt: (c) => fN(c.vendas) },
+    { k: "vendas", rot: "Vendas (sck do anúncio)", val: (c) => c.vendas, fmt: (c) => fN(c.vendas) },
     { k: "cpa", rot: "CPA", val: (c) => c.cpa, fmt: (c) => fR(c.cpa, 0), cor: (c) => corCpa(c.cpa, m.cpaMeta, m.cpaCorte) },
   ];
   const lista = useMemo(() => {
@@ -209,7 +209,33 @@ function Criativos({ d }: { d: DadosImersao }) {
         <Kpi rotulo="Custo por visita (campanha)" valor={fR(d.total.lpv ? d.total.gasto / d.total.lpv : null)} sub={`CPC link ${fR(d.total.cliquesLink ? d.total.gasto / d.total.cliquesLink : null)}`} />
       </div>
       <Bloco
-        titulo="Criativos"
+        titulo="Por criativo"
+        sub="Anúncios de mesmo nome em conjuntos diferentes somados (Q+F). A venda entra pelo sck: im-A-<criativo> (forma antiga, não separa conjunto) ou im-A-Q_<criativo>_sp (a partir de 13/11, vai para o anúncio)."
+      >
+        <div className="tab-wrap">
+          <table className="tab">
+            <thead><tr><th>Criativo</th><th className="dir">Anúncios</th><th className="dir">Gasto</th><th className="dir">Custo/visita</th><th className="dir">IC</th><th className="dir">Vendas</th><th className="dir">Por anúncio</th><th className="dir">Só criativo</th><th className="dir">CPA</th></tr></thead>
+            <tbody>
+              {d.criativosAgrupados.length === 0 && <tr><td colSpan={9} className="vazio">Sem criativos.</td></tr>}
+              {d.criativosAgrupados.map((g) => (
+                <tr key={g.chave}>
+                  <td>{g.nome}</td>
+                  <td className="dir num">{g.ativos}/{g.anuncios}</td>
+                  <td className="dir num">{fR(g.gasto, 0)}</td>
+                  <td className="dir num">{fR(g.custoLpv)}</td>
+                  <td className="dir num">{fN(g.ic)}</td>
+                  <td className="dir num">{fN(g.vendas)}</td>
+                  <td className="dir num">{fN(g.vendasPorAnuncio)}</td>
+                  <td className="dir num">{fN(g.vendasPorCriativo)}</td>
+                  <td className={`dir num ${corCpa(g.cpa, m.cpaMeta, m.cpaCorte)}`}>{fR(g.cpa, 0)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Bloco>
+      <Bloco
+        titulo="Por anúncio"
         sub={`Clique no cabeçalho para ordenar. Corte (régua da ZENITH): anúncio ativo reprovado ou sem entrega; CTR do link abaixo de ${m.ctrMinLink}% com ${fN(m.impMinJulgar)}+ impressões; gasto de R$ ${m.cpaCorte} sem venda; CPA acima de R$ ${m.cpaCorte}.`}
         acao={<div className="seg">{(["todos", "ativos", "cortar"] as const).map((x) => <button key={x} className={so === x ? "on" : ""} onClick={() => setSo(x)}>{{ todos: "Todos", ativos: "Ativos", cortar: `Cortar (${nCortar})` }[x]}</button>)}</div>}
       >

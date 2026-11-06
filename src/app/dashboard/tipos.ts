@@ -456,11 +456,30 @@ export interface CriativoImersao {
   lpv: number;
   custoLpv: number | null;
   ic: number;
-  vendas: number; // Hotmart, pelo sck
+  vendas: number; // Hotmart, pelo sck, só quando o sck nomeia este anúncio (forma nova: im-A-Q_nome_sp)
+  chave: string; // chave do criativo: nome sem prefixo de conjunto (Q_/F_) nem _sp
   vendasPixel: number;
   cpa: number | null;
   cortar: boolean;
   motivos: string[];
+}
+
+// Criativo = anúncios de mesmo nome em conjuntos diferentes (Q+F) somados.
+export interface GrupoCriativo {
+  chave: string;
+  nome: string;
+  anuncios: number;
+  ativos: number;
+  gasto: number;
+  impressoes: number;
+  cliquesLink: number;
+  lpv: number;
+  ic: number;
+  vendas: number; // por anúncio + por criativo
+  vendasPorAnuncio: number; // sck nova: nomeia o anúncio (separa conjunto)
+  vendasPorCriativo: number; // sck antiga: só o criativo (soma Q+F)
+  cpa: number | null;
+  custoLpv: number | null;
 }
 
 export interface DadosImersao {
@@ -504,6 +523,7 @@ export interface DadosImersao {
   lotes: LoteImersaoRes[];
   conjuntos: { id: string; nome: string; gasto: number; impressoes: number; cliquesLink: number; lpv: number; ic: number; vendas: number; cpa: number | null }[];
   criativos: CriativoImersao[];
+  criativosAgrupados: GrupoCriativo[];
 }
 
 export interface EventoSerie {
