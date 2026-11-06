@@ -3,11 +3,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshCw, Eye, EyeOff } from "lucide-react";
 import "./painel.css";
+import Imersoes from "./ImersoesView";
 import type { Dados, Resumo, RespInvestidor, LinhaInvestidor, BaseSimulador, Recorte } from "./tipos";
 import { REGUAS, REGRAS_OURO, avaliar, PRECO_INGRESSO, PRODUTOS, ROAS_ESCALA, PASSO_MAX_VERBA } from "./metas";
 import { Kpi, LinhaRegua, Bloco, Alerta, Funil, Area, Barras, Calor, Ponto, ReguaDica, fN, fR, fP, fX, metaTexto } from "./ui";
 
-type Aba = "geral" | "trafego" | "criativos" | "vendas" | "grupo" | "aulas" | "formacao" | "financeiro" | "investidor" | "comparativo" | "lancar" | "reguas";
+type Aba = "geral" | "trafego" | "criativos" | "vendas" | "grupo" | "aulas" | "formacao" | "financeiro" | "investidor" | "comparativo" | "imersoes" | "lancar" | "reguas";
 
 const NAV: { id: Aba; rot: string; sepDepois?: boolean }[] = [
   { id: "geral", rot: "Visão geral", sepDepois: true },
@@ -19,7 +20,8 @@ const NAV: { id: Aba; rot: string; sepDepois?: boolean }[] = [
   { id: "formacao", rot: "Carrinho", sepDepois: true },
   { id: "financeiro", rot: "Financeiro" },
   { id: "investidor", rot: "Investidor" },
-  { id: "comparativo", rot: "Comparativo", sepDepois: true },
+  { id: "comparativo", rot: "Comparativo" },
+  { id: "imersoes", rot: "Imersões", sepDepois: true },
   { id: "lancar", rot: "Lançar números" },
   { id: "reguas", rot: "Réguas" },
 ];
@@ -273,6 +275,7 @@ export default function Painel() {
             {aba === "financeiro" && <Financeiro d={dados} />}
             {aba === "investidor" && <Investidor atual={dados.ciclo.d0} />}
             {aba === "comparativo" && <Comparativo atual={dados.ciclo.d0} />}
+            {aba === "imersoes" && <Imersoes />}
             {aba === "lancar" && <Lancar lista={lista} padrao={padraoLancar || dados.ciclo.d0} salvo={() => carregar(sel)} />}
             {aba === "reguas" && <Reguas />}
           </>

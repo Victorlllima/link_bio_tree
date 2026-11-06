@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { montar, listarCiclos, resumir } from "./montar";
 import { montarInvestidor } from "./investidor";
+import { montarImersao, compararEventos } from "./imersoes";
 import { montarRecorte } from "./recorte";
 import { lpsgAutorizado } from "@/lib/lpsg-auth";
 
@@ -9,6 +10,8 @@ import { lpsgAutorizado } from "@/lib/lpsg-auth";
 // GET /api/dashboard?comparativo=1      → resumo de todas as turmas
 // GET /api/dashboard?investidor=1       → gasto, devolução e divisão 30/70 por turma
 // GET /api/dashboard?recorte=total_baby|total_geral|periodo[&de=YYYY-MM-DD&ate=YYYY-MM-DD] → mesmos números de qualquer janela de datas
+// GET /api/dashboard?imersao=<id>       → funil, lotes e criativos de uma edição da Imersão (config em dashboard/imersoes.ts)
+// GET /api/dashboard?eventos=1[&imersao=<id>] → evento a evento: Imersões e turmas da Hermes Week, por dia relativo (D-n)
 // Mesmo login do /lpsg (cookie lpsg_auth).
 
 export const dynamic = "force-dynamic";
@@ -31,6 +34,14 @@ export async function GET(req: Request) {
     if (modoRecorte === "periodo" || modoRecorte === "total_baby" || modoRecorte === "total_geral") {
       const r = await montarRecorte(modoRecorte, url.searchParams.get("de"), url.searchParams.get("ate"));
       return NextResponse.json({ ...r, ciclos: lista });
+    }
+
+    if (url.searchParams.get("eventos")) {
+      return NextResponse.json(await compararEventos(cal, url.searchParams.get("imersao")));
+    }
+
+    if (url.searchParams.get("imersao")) {
+      return NextResponse.json(await montarImersao(url.searchParams.get("imersao")));
     }
 
     if (url.searchParams.get("investidor")) {

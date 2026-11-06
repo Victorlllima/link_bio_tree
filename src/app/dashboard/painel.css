@@ -360,7 +360,7 @@
 
 @media (max-width: 1280px) {
   .hw .par { grid-template-columns: 1fr; }
-  .hw .g-8-4 { grid-template-columns: 1fr; }
+  .hw .g-8-4 { grid-template-columns: minmax(0, 1fr); }
   .hw .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hw .hero { grid-template-columns: 1fr; }
   .hw .hero-r { border-left: 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }

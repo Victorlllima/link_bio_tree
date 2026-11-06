@@ -401,3 +401,122 @@ export type Recorte = {
   avisos: string[];
   ciclos: { d0: string; nome: string; indice: number }[];
 };
+
+// ---------- aba Imersões ----------
+export interface DiaImersao {
+  dia: string;
+  dn: number; // dias até a noite 1 (negativo = antes; 0 = noite 1)
+  lote: number | null;
+  gasto: number;
+  impressoes: number;
+  cliquesLink: number;
+  lpv: number;
+  ic: number;
+  compraPixel: number;
+  vendas: number; // ingressos aprovados na Hotmart (banco)
+  vendasAnuncio: number; // dessas, as que o sck liga a um anúncio
+  receita: number; // ingresso, bruto
+  receitaBumps: number;
+  bumps: number; // pedidos de bump
+}
+
+export interface LoteImersaoRes {
+  n: number;
+  preco: number;
+  ini: string;
+  fim: string | null;
+  atual: boolean;
+  dias: number;
+  gasto: number;
+  impressoes: number;
+  cliquesLink: number;
+  lpv: number;
+  ic: number;
+  vendas: number;
+  receita: number;
+  receitaBumps: number;
+  bumps: number;
+  cpa: number | null;
+  roas: number | null;
+  taxaBump: number | null;
+  convPagina: number | null;
+}
+
+export interface CriativoImersao {
+  adId: string;
+  nome: string;
+  conjunto: string;
+  status: string;
+  thumb: string | null;
+  gasto: number;
+  impressoes: number;
+  cliquesLink: number;
+  ctr: number | null; // link
+  cpc: number | null; // link
+  lpv: number;
+  custoLpv: number | null;
+  ic: number;
+  vendas: number; // Hotmart, pelo sck
+  vendasPixel: number;
+  cpa: number | null;
+  cortar: boolean;
+  motivos: string[];
+}
+
+export interface DadosImersao {
+  geradoEm: string;
+  edicao: { id: string; nome: string; numero: number; noite1: string; noite2: string; carrinhoFecha: string };
+  edicoes: { id: string; nome: string; numero: number }[];
+  fontes: { meta: Fonte; hotmart: Fonte };
+  metas: { cpaMeta: number; cpaCorte: number; ctrMinLink: number; impMinJulgar: number; verbaDia: number; ingressosMeta: number | null };
+  fase: { rotulo: string; detalhe: string; dnHoje: number };
+  total: {
+    gasto: number;
+    impressoes: number;
+    cliquesLink: number;
+    lpv: number;
+    ic: number;
+    compraPixel: number;
+    vendas: number;
+    vendasAnuncio: number;
+    vendasAnuncioSemCriativo: number;
+    vendasOutras: number;
+    receita: number;
+    receitaBumps: number;
+    receitaTotal: number;
+    liquido: number;
+    cpa: number | null;
+    cpaAnuncio: number | null;
+    roas: number | null;
+    roasAnuncio: number | null;
+    ctr: number | null;
+    cpm: number | null;
+    connect: number | null;
+    convPagina: number | null;
+    pagCheckout: number | null;
+    checkoutCompra: number | null;
+    taxaBump: number | null;
+    pendentes: number;
+    reembolsos: number;
+  };
+  bumps: { id: string; nome: string; preco: number; vendas: number; take: number | null; receita: number }[];
+  serie: DiaImersao[];
+  lotes: LoteImersaoRes[];
+  conjuntos: { id: string; nome: string; gasto: number; impressoes: number; cliquesLink: number; lpv: number; ic: number; vendas: number; cpa: number | null }[];
+  criativos: CriativoImersao[];
+}
+
+export interface EventoSerie {
+  id: string;
+  nome: string;
+  tipo: "imersao" | "hermes-week";
+  d0: string; // dia do evento (noite 1 / Aula 1)
+  atual: boolean;
+  dias: { dn: number; gasto: number; impressoes: number; cliquesLink: number; lpv: number; ic: number; ingressos: number; receita: number }[];
+}
+
+export interface RespComparacaoEventos {
+  geradoEm: string;
+  dnHoje: number | null; // D-n de hoje na edição em curso
+  eventos: EventoSerie[];
+}
