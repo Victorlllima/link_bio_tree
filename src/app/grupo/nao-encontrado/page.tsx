@@ -1,24 +1,34 @@
 import type { Metadata } from "next";
 
-/* Destino de qualquer /grupo/<token> que não pôde entregar o convite. Página provisória do ION;
-   a IRIS pode trocar o visual. Nunca mostra o link do grupo. */
-export const metadata: Metadata = {
-    title: "Link do grupo | Imersão Arquiteto de Agentes",
-    robots: { index: false, follow: false },
-};
+/* /grupo/nao-encontrado  ·  destino do redirecionador do grupo quando o token não existe
+   ou não é de um ingresso válido. Nunca mostra o link do grupo. O WhatsApp da Amanda vem
+   da env AMANDA_WHATSAPP (só dígitos com DDI, ex.: 55619XXXXXXXX); sem ela, só o e-mail. */
 
 const SUPORTE = "suporte@redpro.com.br";
 
+export const metadata: Metadata = {
+  title: "Ingresso não encontrado | RedPro AI Academy",
+  robots: { index: false, follow: false },
+};
+
 export default function GrupoNaoEncontrado() {
-    return (
-        <main style={{ minHeight: "100vh", background: "#0A0A0C", color: "#F5F5F5", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "ui-monospace, monospace" }}>
-            <div style={{ maxWidth: 480, lineHeight: 1.6 }}>
-                <h1 style={{ fontSize: 22, marginBottom: 12 }}>Não consegui liberar o grupo por esse link.</h1>
-                <p style={{ color: "#B8B8B8", marginBottom: 12 }}>
-                    Use o link do e-mail de confirmação da compra. Se já usou e não funcionou, ou se a compra foi feita com outro e-mail, escreva para{" "}
-                    <a href={`mailto:${SUPORTE}`} style={{ color: "#E8A33D" }}>{SUPORTE}</a> com o e-mail da compra. A gente libera na hora.
-                </p>
-            </div>
-        </main>
-    );
+  const zap = (process.env.AMANDA_WHATSAPP ?? "").replace(/\D/g, "");
+  return (
+    <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#0a0a0a", color: "#f4f4f4", padding: 16, fontFamily: "system-ui, sans-serif" }}>
+      <div style={{ maxWidth: 440, width: "100%", textAlign: "center" }}>
+        <h1 style={{ fontSize: 26, lineHeight: 1.2, margin: "0 0 12px" }}>Não achamos o seu ingresso</h1>
+        <p style={{ fontSize: 16, lineHeight: 1.5, color: "#c8c8c8", margin: "0 0 20px" }}>
+          Se você comprou a Imersão, fale com o suporte e a gente resolve.
+        </p>
+        <p style={{ fontSize: 16, margin: "0 0 10px" }}>
+          E-mail: <a href={`mailto:${SUPORTE}`} style={{ color: "#ff4d4d" }}>{SUPORTE}</a>
+        </p>
+        {zap && (
+          <p style={{ fontSize: 16, margin: 0 }}>
+            <a href={`https://wa.me/${zap}`} style={{ color: "#ff4d4d" }}>WhatsApp da Amanda</a>
+          </p>
+        )}
+      </div>
+    </main>
+  );
 }
