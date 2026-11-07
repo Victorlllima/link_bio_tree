@@ -113,8 +113,18 @@ function Funil({ d }: { d: DadosImersao }) {
   const pontos = linhas.map(({ s, v }) => ({ x: ddmm(s.dia), y: met === "gasto" ? v.gasto : met === "vendas" ? v.vendas : met === "lpv" ? v.lpv : v.vendas ? v.gasto / v.vendas : 0 }));
   const fmt = met === "gasto" || met === "cpa" ? (n: number) => `R$${fN(n)}` : (n: number) => fN(n);
   const semVenda = t.vendas === 0;
+  const alvo = m.ingressosMeta;
+  const pctMeta = alvo ? Math.min(100, (t.vendas / alvo) * 100) : 0;
   return (
     <>
+      {alvo ? (
+        <div className="aviso info" role="status" style={{ display: "block" }}>
+          <div>Meta de ingressos: <b>{fN(t.vendas)} de {fN(alvo)}</b> ({Math.round((t.vendas / alvo) * 100)}%){t.vendas >= alvo ? " · meta batida" : ` · faltam ${fN(alvo - t.vendas)}`}</div>
+          <div style={{ height: 8, marginTop: 8, background: "rgba(255,255,255,0.08)", borderRadius: 4, overflow: "hidden" }} aria-hidden="true">
+            <div style={{ width: `${pctMeta}%`, height: "100%", background: "var(--info)" }} />
+          </div>
+        </div>
+      ) : null}
       <div className="g4">
         <Kpi rotulo="Investido" valor={fR(t.gasto)} sub={`${d.serie.filter((s) => s.gasto > 0).length} dias · meta de verba R$ ${m.verbaDia}/dia`} />
         <Kpi rotulo="Ingressos (Hotmart)" valor={fN(t.vendas)} sub={`${t.vendasAnuncio + t.vendasAnuncioSemCriativo} do anúncio · ${t.vendasOutras} outras origens · pixel ${fN(t.compraPixel)}`} />

@@ -62,7 +62,7 @@ export const EDICOES: EdicaoCfg[] = [
       { n: 3, preco: 62, ini: "2026-11-20", fim: null, oferta: "95tgc1no" },
     ],
     precoIngressoPadrao: 44,
-    // meta ~R$48 e corte R$67 no lote 1 (QG 1.5, ok do Red em 04/11); o resto vem da régua da ZENITH (corte.py)
-    metas: { cpaMeta: 48, cpaCorte: 67, ctrMinLink: 0.6, impMinJulgar: 5000, verbaDia: 250, ingressosMeta: null },
+    // meta ~R$48 e corte R$67 no lote 1 (QG 1.5, ok do Red em 04/11); ingressosMeta 50 = meta da Turma 1 (Red, 07/11, QG 1.5); o resto vem da régua da ZENITH (corte.py)
+    metas: { cpaMeta: 48, cpaCorte: 67, ctrMinLink: 0.6, impMinJulgar: 5000, verbaDia: 250, ingressosMeta: 50 },
   },
 ];
