@@ -58,9 +58,42 @@ export default function Imersoes() {
       <Cab d={d} ed={ed || d.edicao.id} setEd={setEd} sub={sub} setSub={setSub} />
       {!d.fontes.meta.ok && <div className="aviso ruim">Meta: {d.fontes.meta.erro}</div>}
       {!d.fontes.hotmart.ok && <div className="aviso ruim">Hotmart (banco): {d.fontes.hotmart.erro}</div>}
+      <AvisoLote d={d} />
       {sub === "funil" && <Funil d={d} />}
       {sub === "criativos" && <Criativos d={d} />}
       {sub === "eventos" && <Eventos d={d} />}
+    </>
+  );
+}
+
+// Aviso de virada de lote (QG 1.2: lote 2 em 13/11 e lote 3 em 20/11, sempre à 00h -03:00).
+// Calcula no navegador pelo calendário dos lotes que já vêm na resposta; "hoje" é a data em GMT-3.
+function AvisoLote({ d }: { d: DadosImersao }) {
+  const hoje = new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10);
+  const dias = (a: string, b: string) => Math.round((Date.parse(`${a}T12:00:00Z`) - Date.parse(`${b}T12:00:00Z`)) / 86400e3);
+  const virou = d.lotes.find((l) => l.n > 1 && dias(hoje, l.ini) >= 0 && dias(hoje, l.ini) <= 2);
+  const prox = d.lotes.filter((l) => l.n > 1 && l.ini > hoje).sort((a, b) => a.ini.localeCompare(b.ini))[0];
+  const linhas: { txt: string; urgente: boolean }[] = [];
+  if (virou) {
+    const x = dias(hoje, virou.ini);
+    linhas.push({
+      txt: `Lote ${virou.n} virou ${x === 0 ? "hoje" : `há ${x} dia${x > 1 ? "s" : ""}`} (${ddmm(virou.ini)}, R$ ${virou.preco}). Acompanhe o CPA por 48 h e não mexa em página nem criativo no mesmo dia.`,
+      urgente: true,
+    });
+  }
+  if (prox) {
+    const f = dias(prox.ini, hoje);
+    linhas.push({
+      txt: f === 1 ? `Faltam 1 dia para o lote ${prox.n} (R$ ${prox.preco}): vira amanhã, ${ddmm(prox.ini)}, à 00h.` : `Faltam ${f} dias para o lote ${prox.n} (R$ ${prox.preco}): vira em ${ddmm(prox.ini)} à 00h.`,
+      urgente: f <= 2,
+    });
+  }
+  if (!linhas.length) return null;
+  return (
+    <>
+      {linhas.map((l, i) => (
+        <div key={i} className={l.urgente ? "aviso" : "aviso info"} role="status">{l.txt}</div>
+      ))}
     </>
   );
 }
