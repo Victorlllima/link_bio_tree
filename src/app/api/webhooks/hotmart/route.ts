@@ -109,15 +109,16 @@ async function metaCapi(
     const pixel = PIXEL_ID;
     if (!token) return { ok: false, erro: "META_CAPI_ACCESS_TOKEN ausente" };
 
-    const user_data: Record<string, string[]> = {};
+    // fbc e fbp são STRING (a Graph recusa array com 400); em/fn/ph são arrays de hash.
+    const user_data: Record<string, string | string[]> = {};
     if (email) user_data.em = [sha256(email)];
     if (nome) user_data.fn = [sha256(nome.split(" ")[0])];
     const ph = normalizarFone(fone);
     if (ph) user_data.ph = [sha256(ph)];
     // fbc vem do checkout via origin.xcod (a LP acrescenta xcod=<fbc>); só aceita o formato fb.<n>.<ts>.<fbclid>.
-    if (/^fb\.\d\.\d+\..+/.test(fbc)) user_data.fbc = [fbc];
+    if (/^fb\.\d\.\d+\..+/.test(fbc)) user_data.fbc = fbc;
 
-    if (extra.fbp) user_data.fbp = [extra.fbp];
+    if (extra.fbp) user_data.fbp = extra.fbp;
 
     try {
         const res = await fetch(`https://graph.facebook.com/v21.0/${pixel}/events?access_token=${token}`, {
