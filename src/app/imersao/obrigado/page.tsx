@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { lerImersaoConfig } from "@/lib/imersao-config";
+import { TOKEN_RE, urlDoGrupo } from "@/lib/imersao-grupo";
 import { EVENTO } from "@/components/imersao/lote";
 
 /* /imersao/obrigado  ·  pós-compra da Imersão. Dois passos (igual ao e-mail 1 aprovado):
@@ -138,9 +138,12 @@ const html = (grupo: string) => `
 </div>
 `;
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
-export default async function ImersaoObrigadoPage() {
-  const cfg = await lerImersaoConfig(60);
-  return <div dangerouslySetInnerHTML={{ __html: html(cfg.linkGrupo) }} />;
+/* O convite cru do grupo nunca aparece aqui (Pedido 9). O botão só existe com ?t=<token> (link nosso);
+   sem token, vale o aviso "o link chega no seu e-mail". */
+export default async function ImersaoObrigadoPage({ searchParams }: { searchParams: Promise<{ t?: string | string[] }> }) {
+  const t = (await searchParams).t;
+  const token = typeof t === "string" && TOKEN_RE.test(t) ? t : "";
+  return <div dangerouslySetInnerHTML={{ __html: html(token ? urlDoGrupo(token) : "") }} />;
 }

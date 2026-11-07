@@ -5,6 +5,7 @@
  * TRAVA DE ENVIO: `EMAIL_APROVADO_PELO_RED` (true só para o e-mail 1, ok do Red 05/11). Sem link do grupo ou com
  * reembolso/chargeback da transação, o e-mail não sai. O aviso no Telegram não depende desta trava.
  */
+import { urlDoGrupo } from "@/lib/imersao-grupo";
 import { primeiroNome } from "./wpp-humanizar";
 import type { ImersaoConfig } from "./imersao-config";
 
@@ -57,8 +58,9 @@ const P = "font-size:15px;line-height:1.6;color:#c9c9c9;margin:0 0 14px";
 const link = (href: string) => `<a href="${href}" style="color:#E8A33D">${href}</a>`;
 
 /** Devolve null se não há link do grupo: o e-mail não sai sem ele (regra do Red, 05/11). */
-export function emailConfirmacaoImersao(nome: string, cfg: Pick<ImersaoConfig, "linkGrupo">) {
-    if (!cfg.linkGrupo) return null;
+export function emailConfirmacaoImersao(nome: string, cfg: Pick<ImersaoConfig, "linkGrupo">, token: string) {
+    if (!cfg.linkGrupo || !token) return null;
+    const linkDoGrupo = urlDoGrupo(token); // nunca o convite cru (Pedido 9)
     const p = primeiroNome(nome);
     const html = `<span style="display:none;max-height:0;overflow:hidden;opacity:0">${PRECABECALHO_CONFIRMACAO}</span>` + moldura(`
       <p style="${P}">${p ? `Oi, ${esc(p)}.` : "Oi,"}</p>
@@ -71,7 +73,7 @@ export function emailConfirmacaoImersao(nome: string, cfg: Pick<ImersaoConfig, "
       </ul>
       <p style="${P}"><strong style="color:#fff">Faça agora, em 2 passos (leva uns 2 minutos):</strong></p>
       <ol style="${P};padding-left:20px">
-        <li style="margin-bottom:10px"><strong style="color:#fff">Entre no grupo da turma:</strong> ${link(cfg.linkGrupo)}<br>É onde eu aviso tudo e onde você tira dúvida antes do evento.</li>
+        <li style="margin-bottom:10px"><strong style="color:#fff">Entre no grupo da turma:</strong> ${link(linkDoGrupo)}<br>É onde eu aviso tudo e onde você tira dúvida antes do evento.</li>
         <li><strong style="color:#fff">Coloque as duas noites na sua agenda:</strong> ${link(OBRIGADO)} (o botão "Adicionar à agenda" baixa o arquivo .ics com as duas datas).</li>
       </ol>
       <p style="${P}">O link da transmissão chega por e-mail e no grupo perto do evento. Não precisa guardar nada agora.</p>

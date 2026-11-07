@@ -4,6 +4,7 @@ import { emailConfirmacao as emailConfirmacaoHermesWeek, emailBoasVindas as emai
 import { lerCicloAtual } from "@/lib/ciclo-atual";
 import { BUMPS_HERMES_WEEK, eventoCapi, type EventoCapi } from "@/lib/capi-eventos";
 import { lerImersaoConfig } from "@/lib/imersao-config";
+import { garantirToken } from "@/lib/imersao-grupo";
 import {
     PRODUTO_IMERSAO_INGRESSO, PRODUTO_IMERSAO_GRAVACAO, EMAIL_APROVADO_PELO_RED, loteDaOferta,
     emailConfirmacaoImersao,
@@ -365,7 +366,9 @@ async function emailsImersao(email: string, nome: string, transacao: string, ree
     if (reenvio) return { e1: { ok: true as const, pulado: "reenvio" } };
     if (gravacao && (await gravacaoComIngresso(email, paiBump))) return { e1: { ok: true as const, pulado: "gravacao com ingresso" } };
     const cfg = await lerImersaoConfig(0);
-    const mail = emailConfirmacaoImersao(nome, cfg);
+    const token = await garantirToken(transacao);
+    if (!token) return { e1: { ok: false as const, erro: "token do grupo não gerado: e-mail NÃO enviado" } };
+    const mail = emailConfirmacaoImersao(nome, cfg, token);
     if (!mail) return { e1: { ok: false as const, erro: "link_grupo vazio: e-mail NÃO enviado" } };
     for (const ev of ["PURCHASE_REFUNDED", "PURCHASE_CHARGEBACK"]) {
         if (await jaGravada(transacao, ev)) return { e1: { ok: true as const, pulado: ev } };
