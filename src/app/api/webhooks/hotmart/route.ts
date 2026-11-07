@@ -153,23 +153,31 @@ async function metaCapi(
     }
 }
 
-// Valor da compra no pixel = ingresso + order bumps do MESMO pedido (a Hotmart manda cada bump em webhook
-// próprio, com purchase.order_bump.parent_purchase_transaction = transação do ingresso).
-async function valorDoPedido(transacaoPai: string, valorIngresso: number): Promise<number> {
+// Order bumps do MESMO pedido: a Hotmart manda cada bump em webhook próprio, com
+// purchase.order_bump.parent_purchase_transaction = transação do ingresso.
+async function bumpsDoPedido(transacaoPai: string): Promise<{ produto_id: string; valor: number }[]> {
     const key = process.env.SUPABASE_SERVICE_KEY;
-    if (!key) return valorIngresso;
+    if (!key) return [];
     try {
         const url =
-            `${SUPABASE_URL}/rest/v1/hotmart_compras?evento=eq.PURCHASE_APPROVED&select=valor` +
-            `&payload->data->purchase->order_bump->>parent_purchase_transaction=eq.${encodeURIComponent(transacaoPai)}`;
+            `${SUPABASE_URL}/rest/v1/hotmart_compras?evento=eq.PURCHASE_APPROVED&select=produto_id,valor,transacao` +
+            `&payload->data->purchase->order_bump->>parent_purchase_transaction=eq.${encodeURIComponent(transacaoPai)}&order=id.asc`;
         const res = await fetch(url, { headers: { apikey: key, Authorization: `Bearer ${key}` } });
-        if (!res.ok) return valorIngresso;
-        const linhas = (await res.json()) as { valor: number | null }[];
-        return valorIngresso + linhas.reduce((t, l) => t + Number(l.valor ?? 0), 0);
+        if (!res.ok) return [];
+        const linhas = (await res.json()) as { produto_id: string; valor: number | null }[];
+        return linhas.map((l) => ({ produto_id: String(l.produto_id), valor: Number(l.valor ?? 0) }));
     } catch {
-        return valorIngresso;
+        return [];
     }
 }
+
+const NOME_BUMP: Record<string, string> = {
+    "8852453": "Gravação da Imersão",
+    "8551535": "100 plugins do Hermes",
+    "8551609": "50 casos de uso do Hermes",
+    "8551624": "Segundo cérebro com o Hermes",
+};
+const brl = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
 
 /* ----------------------------------------------------------------------------
  * RECUPERAÇÃO DE CARRINHO (ORION, 11/09/2026)
@@ -501,18 +509,6 @@ export async function POST(req: NextRequest) {
         // Ingresso da Imersão: o Purchase leva ingresso + bumps do pedido. Os bumps chegam em webhooks próprios
         // 10 a 20s depois, então o envio espera (fora da resposta) e soma o que já foi gravado.
         const capiAdiado = produtoConhecido && produtoId === PRODUTO_IMERSAO_INGRESSO && nomeEventoCapi === "Purchase";
-        if (capiAdiado) {
-            after(async () => {
-                await new Promise((r) => setTimeout(r, 30_000));
-                const total = await valorDoPedido(transacao, valor);
-                const r = await metaCapi(email, nome, fone, total, moeda, transacao, "Purchase", { id: produtoId, nome: produtoNome }, xcodCapi, { eventTime: eventTimeCapi });
-                if (!r.ok) {
-                    console.error("[hotmart] CAPI:", r.erro);
-                    await telegram(`⚠️ Meta CAPI: Purchase ${transacao} falhou: ${r.erro}`).catch(() => {});
-                }
-            });
-        }
-
         const [capi, lista] = await Promise.all([
             produtoConhecido && !capiAdiado
                 ? metaCapi(email, nome, fone, valor, moeda, transacao, nomeEventoCapi, { id: produtoId, nome: produtoNome }, xcodCapi, { eventTime: eventTimeCapi })
@@ -550,48 +546,39 @@ export async function POST(req: NextRequest) {
         if (mailHW2 && !mailHW2.ok) console.error("[hotmart] e-mail 2 Hermes Week:", mailHW2.erro);
         if (mailIM && !mailIM.e1.ok) console.error("[hotmart] e-mail 1 Imersão:", mailIM.e1.erro);
 
-        // Aviso de venda do ingresso da Imersão (reativado em 05/11/2026 só para o 8852419): lote e sck.
-        if (ehImersao && !reenvio) {
+        // Ingresso da Imersão: os bumps do pedido chegam em webhooks próprios 10 a 20s depois. Por isso o Purchase da
+        // Meta e o aviso de venda esperam 30s (fora da resposta, via after) e somam ingresso + bumps do pedido.
+        if (ehImersao) {
             const oferta = String(((purchase?.offer as Record<string, unknown> | undefined)?.code) ?? "");
             const sck = String(((purchase?.origin as Record<string, unknown> | undefined)?.sck) ?? "");
             const l = loteDaOferta(oferta);
-            await telegram(
-                [
-                    `🎟️ *Ingresso Imersão vendido*`,
-                    "",
-                    `👤 ${mdSeguro(nome) || "—"}`,
-                    `📧 ${mdSeguro(email) || "—"}`,
-                    `💵 ${moeda} ${valor.toFixed(2)}`,
-                    `📦 ${l ? `lote ${l.lote} (R$ ${l.preco})` : `lote desconhecido (oferta ${mdSeguro(oferta) || "—"})`}`,
-                    `🏷️ sck: ${sck ? "`" + sck.replace(/`/g, "") + "`" : "—"}`,
-                ].join("\n"),
-            );
-        }
-
-        /* O aviso de cada venda no Telegram saiu em 09/10/2026 (Red): a Hotmart já avisa, e o
-         * aviso repetido chegava 4 vezes por pedido com bump. Só sobra o alerta de falha
-         * (e, desde 05/11/2026, o aviso do ingresso da Imersão 8852419, 1 por pedido, ver abaixo):
-         * se o banco, o CAPI, o Resend ou um e-mail do pós-compra falhar, ninguém fica no escuro. */
-        const audienciaMapeada = Boolean(AUDIENCIA_POR_PRODUTO[produtoId]);
-        const falhas: string[] = [];
-        if (!gravou.ok) falhas.push("não gravou no banco");
-        if (!capi.ok) falhas.push(`Meta CAPI: ${"erro" in capi ? capi.erro : "falhou"}`);
-        if (!lista.ok && audienciaMapeada) falhas.push(`Resend (audiência): ${"erro" in lista ? lista.erro : "falhou"}`);
-        if (ehHermesWeek && !mailHW1?.ok) falhas.push("e-mail 1 da Hermes Week (confirmação)");
-        if (ehHermesWeek && !mailHW2?.ok) falhas.push("e-mail 2 da Hermes Week (não agendou)");
-        if (mailIM && !mailIM.e1.ok) falhas.push("e-mail 1 da Imersão (confirmação)");
-        if (falhas.length) {
-            await telegram(
-                [
-                    `⚠️ *Pós-compra com falha* — ${produtoNome}`,
-                    "",
-                    `👤 ${nome || "—"}`,
-                    `📧 ${email || "—"}`,
-                    `💵 ${moeda} ${valor.toFixed(2)}`,
-                    "",
-                    ...falhas.map((f) => `• ${f}`),
-                ].join("\n"),
-            );
+            after(async () => {
+                await new Promise((r) => setTimeout(r, 30_000));
+                const bumps = await bumpsDoPedido(transacao);
+                const total = valor + bumps.reduce((t, b) => t + b.valor, 0);
+                if (capiAdiado) {
+                    const r = await metaCapi(email, nome, fone, total, moeda, transacao, "Purchase", { id: produtoId, nome: produtoNome }, xcodCapi, { eventTime: eventTimeCapi });
+                    if (!r.ok) {
+                        console.error("[hotmart] CAPI:", r.erro);
+                        await telegram(`⚠️ Meta CAPI: Purchase ${transacao} falhou: ${r.erro}`).catch(() => {});
+                    }
+                }
+                if (!reenvio) {
+                    await telegram(
+                        [
+                            `🎟️ *Ingresso Imersão vendido*`,
+                            "",
+                            `👤 ${mdSeguro(nome) || "—"}`,
+                            `📧 ${mdSeguro(email) || "—"}`,
+                            `💵 ${moeda} ${valor.toFixed(2)}`,
+                            ...bumps.map((b) => `➕ ${NOME_BUMP[b.produto_id] ?? PRODUTOS[b.produto_id] ?? b.produto_id} ${brl(b.valor)}`),
+                            `🧾 Total do pedido: ${brl(total)}`,
+                            `📦 ${l ? `lote ${l.lote} (R$ ${l.preco})` : `lote desconhecido (oferta ${mdSeguro(oferta) || "—"})`}`,
+                            `🏷️ sck: ${sck ? "`" + sck.replace(/`/g, "") + "`" : "—"}`,
+                        ].join("\n"),
+                    ).catch((e) => console.error("[hotmart] telegram:", e));
+                }
+            });
         }
 
         return NextResponse.json({
