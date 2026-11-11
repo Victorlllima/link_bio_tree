@@ -1,8 +1,8 @@
-import { loteVigente, dadosDoLote, listaLotes, EVENTO } from "@/components/imersao/lote";
+import { loteVigente, dadosDoLote, listaLotes, pctVendido, EVENTO } from "@/components/imersao/lote";
 import { checkoutUrl } from "@/components/imersao/checkout";
 import { pixelScriptImersao } from "@/components/imersao/pixel";
 import { LP_IMERSAO_HTML } from "@/components/imersao/lp-imersao-html";
-import { lerImersaoConfig, contarInscritosDoLote } from "@/lib/imersao-config";
+import { lerImersaoConfig, contarVendidosPorLote } from "@/lib/imersao-config";
 
 /* ============================================================================
  *  /imersao  ·  Imersão Arquiteto de Agentes (ao vivo, duas noites)
@@ -21,6 +21,16 @@ const TITULO = "Imersão Arquiteto de Agentes | Seu time de IA que não dorme";
 const DESCRICAO =
     "Duas noites ao vivo. Um agente com ferramentas, memórias e um servidor só dele. Dia 1: instala o Hermes e vê tudo o que ele faz. Dia 2: o Hermes vai para um servidor e você monta seus squads de agentes.";
 const PIXEL_ID = "1543917230170877";
+
+/* Microsoft Clarity: só carrega com NEXT_PUBLIC_CLARITY_ID preenchido (Vercel). Vazio = nada. */
+const CLARITY_ID = (process.env.NEXT_PUBLIC_CLARITY_ID ?? "").trim();
+const CLARITY = /^[a-z0-9]+$/i.test(CLARITY_ID)
+    ? `<script>
+(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","${CLARITY_ID}");
+</script>`
+    : "";
 
 /* O lote muda por data e a config por edição na tabela: 60 s de cache. */
 export const revalidate = 60;
@@ -61,15 +71,16 @@ fbq('track', 'PageView');
 <noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=${PIXEL_ID}&ev=PageView&noscript=1"></noscript>`;
 
 export async function GET() {
-    const cfg = await lerImersaoConfig(60);
-    const { lote, encerrado } = loteVigente(new Date(), { loteForcado: cfg.loteForcado, encerrado: cfg.encerrado });
+    const [cfg, vendidos] = await Promise.all([lerImersaoConfig(60), contarVendidosPorLote(60)]);
+    const { lote, encerrado } = loteVigente(new Date(), {
+        loteForcado: cfg.loteForcado,
+        encerrado: cfg.encerrado,
+        vendidos,
+        limite: cfg.limiteLote,
+    });
 
-    // barra de % só com limite real e contagem real
-    let vendidoPct: number | null = null;
-    if (cfg.limiteLote && cfg.limiteLote > 0) {
-        const n = await contarInscritosDoLote(lote.n, 60);
-        if (n !== null) vendidoPct = Math.min(100, Math.round((n / cfg.limiteLote) * 100));
-    }
+    // barra de % só com contagem real; 0% não aparece (a página esconde)
+    const vendidoPct = pctVendido(lote, vendidos, cfg.limiteLote);
 
     const dados = {
         evento: { chip: EVENTO.chip, extenso: EVENTO.extenso, horario: EVENTO.horario, noite1: EVENTO.noite1, noite2: EVENTO.noite2 },
@@ -86,7 +97,7 @@ export async function GET() {
 
     // funções como substituto: "$" nos textos (R$) não pode virar padrão de replace
     const html = LP_IMERSAO_HTML.replace("__HEAD_META__", () => HEAD_META)
-        .replace("__PIXEL_BASE__", () => PIXEL_BASE)
+        .replace("__PIXEL_BASE__", () => PIXEL_BASE + CLARITY)
         .replace("__IM_DADOS__", () => dadosJs)
         .replace("__PIXEL_VARIANTE__", () => pixel);
 
