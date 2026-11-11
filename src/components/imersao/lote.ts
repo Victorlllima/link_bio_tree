@@ -6,8 +6,8 @@
 export type Lote = { n: 1 | 2 | 3; preco: number; oferta: string; inicio: string; fim: string };
 
 export const LOTES: readonly Lote[] = [
-    { n: 1, preco: 44, oferta: "sn552kkr", inicio: "2026-11-03T00:00:00-03:00", fim: "2026-11-13T00:00:00-03:00" },
-    { n: 2, preco: 53, oferta: "2q6t3s89", inicio: "2026-11-13T00:00:00-03:00", fim: "2026-11-20T00:00:00-03:00" },
+    { n: 1, preco: 44, oferta: "sn552kkr", inicio: "2026-11-03T00:00:00-03:00", fim: "2026-11-16T00:00:00-03:00" },
+    { n: 2, preco: 53, oferta: "2q6t3s89", inicio: "2026-11-16T00:00:00-03:00", fim: "2026-11-20T00:00:00-03:00" },
     { n: 3, preco: 62, oferta: "95tgc1no", inicio: "2026-11-20T00:00:00-03:00", fim: "2026-11-25T19:00:00-03:00" },
 ];
 
