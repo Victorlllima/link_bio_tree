@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
+import { TOKEN_RE, urlDoGrupo } from "@/lib/imersao-grupo";
 import { EVENTO } from "@/components/imersao/lote";
 
-/* /imersao/obrigado  ·  pós-compra da Imersão: salvar as duas noites na agenda e, quando houver, a ficha do negócio. */
+/* /imersao/obrigado  ·  pós-compra da Imersão. Dois passos (igual ao e-mail 1 aprovado):
+   entrar no grupo de avisos e salvar as duas noites na agenda. O link do grupo vem da
+   tabela imersao_config; sem ele, a página avisa que o link chega por e-mail em vez de
+   mandar a pessoa para um destino errado. */
 
 const SUPORTE = "suporte@redpro.com.br";
 
@@ -11,7 +15,7 @@ export const metadata: Metadata = {
   description: "Seu ingresso da Imersão está garantido. Veja o que fazer antes da primeira noite.",
 };
 
-const html = (ficha: string) => `
+const html = (grupo: string, ficha: string) => `
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@200;400;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -45,7 +49,7 @@ const html = (ficha: string) => `
      primeira coisa que o comprador vê depois de pagar, e até agora não dizia de
      quem ela é. Tamanho subiu de 44px pra 220px a pedido do Red (08/09, 5x).
      O clamp existe porque o card tem 620px: em tela estreita uma altura fixa de
-     220px comeria metade da primeira dobra e empurraria o primeiro botão, que é
+     220px comeria metade da primeira dobra e empurraria o botão do grupo, que é
      a única ação da página, pra fora do campo de visão. */
   .ob-root .marca {
     height: clamp(180px, 38vw, 220px); width: auto; display: block;
@@ -68,7 +72,7 @@ const html = (ficha: string) => `
     background: var(--card); border: 1px solid var(--linha); border-radius: 14px;
     padding: 26px; margin-bottom: 16px; text-align: left;
   }
-  /* O bloco 1 exige AÇÃO — sem salvar a agenda o comprador
+  /* O bloco 1 exige AÇÃO — sem entrar no grupo o comprador
      não recebe os links das aulas. A borda âmbar destaca o passo. */
   .ob-root .bloco.acao { border-color: rgba(232,163,61,.42); }
   .ob-root .bloco .tit {
@@ -111,8 +115,18 @@ const html = (ficha: string) => `
     <h1>Você está <em>dentro.</em></h1>
     <p class="lead">Seu ingresso da Imersão está garantido. Ao vivo, ${EVENTO.extenso}, ${EVENTO.horario} (horário de Brasília). A sala abre às 18h45. Faça agora (leva uns 2 minutos).</p>
 
+    <div class="bloco acao">
+      <div class="tit"><span class="num">1</span> Entre no grupo de avisos da Imersão</div>
+      <p>No grupo só admin manda mensagem: o link de cada noite e todos os avisos saem por lá. <strong>Quem não entra no grupo não recebe os links.</strong></p>
+      ${
+        grupo
+          ? `<div class="acao-cta"><a href="${grupo}" class="btn">Entrar no grupo do WhatsApp</a></div>`
+          : `<div class="aviso">O link do grupo chega no seu e-mail. Se não tiver chegado até o dia anterior à primeira noite, escreva para <a class="txt" href="mailto:${SUPORTE}">${SUPORTE}</a>.</div>`
+      }
+    </div>
+
     <div class="bloco">
-      <div class="tit"><span class="num">1</span> Salve as duas noites na agenda</div>
+      <div class="tit"><span class="num">2</span> Salve as duas noites na agenda</div>
       <p>Baixe o arquivo e abra no seu calendário. Ele cria os dois encontros, com um lembrete uma hora antes.</p>
       <div class="acao-cta"><a href="/imersao/agenda.ics" class="btn">Adicionar à agenda</a></div>
     </div>
@@ -120,7 +134,7 @@ const html = (ficha: string) => `
     ${
       ficha
         ? `<div class="bloco acao">
-      <div class="tit"><span class="num">2</span> Preencha a ficha do seu negócio</div>
+      <div class="tit"><span class="num">3</span> Preencha a ficha do seu negócio</div>
       <p>Um modelo curto para o seu agente conhecer a sua empresa antes da primeira noite.</p>
       <div class="acao-cta"><a href="${ficha}" class="btn">Abrir a ficha do negócio</a></div>
     </div>`
@@ -136,8 +150,10 @@ const html = (ficha: string) => `
 
 export const dynamic = "force-dynamic";
 
-/* A Imersão não tem grupo (Red, 12/11). Aqui ficam a agenda das duas noites e a ficha do negócio
-   (AMANDA). O link da ficha vem de IMERSAO_FICHA_URL; sem ele, o bloco não aparece. */
-export default function ImersaoObrigadoPage() {
-  return <div dangerouslySetInnerHTML={{ __html: html(process.env.IMERSAO_FICHA_URL ?? "") }} />;
+/* O convite cru do grupo nunca aparece aqui (Pedido 9). O botão só existe com ?t=<token> (link nosso);
+   sem token, vale o aviso "o link chega no seu e-mail". */
+export default async function ImersaoObrigadoPage({ searchParams }: { searchParams: Promise<{ t?: string | string[] }> }) {
+  const t = (await searchParams).t;
+  const token = typeof t === "string" && TOKEN_RE.test(t) ? t : "";
+  return <div dangerouslySetInnerHTML={{ __html: html(token ? urlDoGrupo(token) : "", process.env.IMERSAO_FICHA_URL ?? "") }} />;
 }
