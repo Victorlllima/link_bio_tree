@@ -24,7 +24,7 @@ revoke all on imersao_config from anon, authenticated;
 insert into imersao_config (id) values (true) on conflict (id) do nothing;
 
 -- Ingressos aprovados e ainda de pé (sem reembolso, cancelamento ou chargeback depois), com o lote da oferta.
--- Ofertas: sn552kkr = lote 1 (R$ 44), 2q6t3s89 = lote 2 (R$ 53), 95tgc1no = lote 3 (R$ 62). Produto 8852419.
+-- Ofertas: sn552kkr = lote 1 (R$ 44), 2q6t3s89 = lote 2 (R$ 47), 95tgc1no = lote 3 (R$ 52). Produto 8852419.
 create or replace view imersao_inscritos as
 select
   c.transacao,

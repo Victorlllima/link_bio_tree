@@ -4,8 +4,8 @@
  * link_preinstalacao, encerrado. Qualquer falha cai no fallback, e quem manda é o calendário
  * de lote.ts.
  *
- * "% vendido" só existe com limite real (limite_lote) e contagem real em imersao_inscritos.
- * Sem os dois, vendidoPct é null e a página não mostra barra.
+ * "% vendido": contagem real de imersao_vendas_por_lote sobre o limite do lote (20/20/10 em
+ * lote.ts, ou limite_lote se preenchido). Sem contagem, vendidoPct é null e a página não mostra barra.
  */
 const SUPABASE_URL = "https://supabase.redpro.com.br";
 
@@ -46,17 +46,27 @@ export async function lerImersaoConfig(revalidar = 60): Promise<ImersaoConfig> {
     }
 }
 
-/** Inscritos do lote (tabela do ION). Null se não der para contar de verdade. */
-export async function contarInscritosDoLote(lote: number, revalidar = 60): Promise<number | null> {
+/**
+ * Vendas aprovadas por lote (view imersao_vendas_por_lote, sem reembolso, cancelamento ou
+ * chargeback). Só contagem, nada de dado pessoal. Null se não der para contar de verdade:
+ * aí a página esconde a barra e a virada fica só por data.
+ */
+export async function contarVendidosPorLote(revalidar = 60): Promise<Record<number, number> | null> {
     try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/imersao_inscritos?select=id&lote=eq.${lote}`, {
-            headers: { ...headers(), Prefer: "count=exact", Range: "0-0" },
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/imersao_vendas_por_lote?select=lote,vendidos`, {
+            headers: headers(),
             next: { revalidate: revalidar },
         });
         if (!res.ok) return null;
-        const total = res.headers.get("content-range")?.split("/")[1];
-        const n = total ? Number(total) : NaN;
-        return Number.isFinite(n) ? n : null;
+        const rows = await res.json();
+        if (!Array.isArray(rows)) return null;
+        const out: Record<number, number> = {};
+        for (const r of rows) {
+            const lote = Number(r?.lote);
+            const n = Number(r?.vendidos);
+            if (Number.isInteger(lote) && Number.isFinite(n)) out[lote] = n;
+        }
+        return out;
     } catch {
         return null;
     }
