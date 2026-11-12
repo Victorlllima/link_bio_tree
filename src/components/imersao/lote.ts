@@ -19,17 +19,17 @@ export type Lote = {
 
 export const LOTES: readonly Lote[] = [
     { n: 1, preco: 44, oferta: "sn552kkr", inicio: "2026-11-03T00:00:00-03:00", fim: "2026-11-16T00:00:00-03:00", limite: 20 },
-    { n: 2, preco: 53, oferta: "2q6t3s89", inicio: "2026-11-16T00:00:00-03:00", fim: "2026-11-20T00:00:00-03:00", limite: 20 },
-    { n: 3, preco: 62, oferta: "95tgc1no", inicio: "2026-11-20T00:00:00-03:00", fim: "2026-11-25T19:00:00-03:00", limite: 10 },
+    { n: 2, preco: 47, oferta: "2q6t3s89", inicio: "2026-11-16T00:00:00-03:00", fim: "2026-11-20T00:00:00-03:00", limite: 20 },
+    { n: 3, preco: 52, oferta: "95tgc1no", inicio: "2026-11-20T00:00:00-03:00", fim: "2026-11-25T19:00:00-03:00", limite: 10 },
 ];
 
-/* Lote extra (acima de 50 ingressos). PENDENTE: a oferta de R$ 77 ainda não existe na Hotmart.
+/* Lote extra (acima de 50 ingressos). PENDENTE: a oferta de R$ 57 ainda não existe na Hotmart.
    Enquanto `oferta` estiver vazia, o lote extra nunca fica vigente (a página e o botão seguem no
    lote 3). Quando a MIRA criar a oferta, preencher aqui e no CASE da view imersao_inscritos
    (migração imersao_lote_extra_pre_checkout.sql). O limite de 10 é provisório: a barra recomeça nele. */
 export const LOTE_EXTRA: Lote = {
     n: 4,
-    preco: 77,
+    preco: 57,
     oferta: "",
     inicio: "2026-11-03T00:00:00-03:00",
     fim: "2026-11-25T19:00:00-03:00",
@@ -102,7 +102,7 @@ export type DadosLote = {
     rotulo: string;
     preco: string;
     precoNum: string;
-    /** preço cheio riscado ("de R$ 62"), só quando o lote atual é mais barato */
+    /** preço cheio riscado ("de R$ 52"), só quando o lote atual é mais barato */
     de: string | null;
     ate: string;
     proximoPreco: string | null;

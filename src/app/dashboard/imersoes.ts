@@ -58,8 +58,8 @@ export const EDICOES: EdicaoCfg[] = [
     },
     lotes: [
       { n: 1, preco: 44, ini: "2026-11-03", fim: "2026-11-12", oferta: "sn552kkr" },
-      { n: 2, preco: 53, ini: "2026-11-13", fim: "2026-11-19", oferta: "2q6t3s89" },
-      { n: 3, preco: 62, ini: "2026-11-20", fim: null, oferta: "95tgc1no" },
+      { n: 2, preco: 47, ini: "2026-11-13", fim: "2026-11-19", oferta: "2q6t3s89" },
+      { n: 3, preco: 52, ini: "2026-11-20", fim: null, oferta: "95tgc1no" },
     ],
     precoIngressoPadrao: 44,
     // meta ~R$48 e corte R$67 no lote 1 (QG 1.5, ok do Red em 04/11); ingressosMeta 50 = meta da Turma 1 (Red, 07/11, QG 1.5); o resto vem da régua da ZENITH (corte.py)

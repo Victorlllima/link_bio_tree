@@ -2,7 +2,7 @@
 -- AINDA NÃO RODADA EM PRODUÇÃO. Rodar no Postgres do Supabase self-hosted (vps-redpro, supabase-db),
 -- mesmo padrão de imersao_config.sql. Idempotente.
 
--- 1) lote_forcado aceita 4 (lote extra, ~R$ 77, abre acima de 50 ingressos).
+-- 1) lote_forcado aceita 4 (lote extra, ~R$ 57, abre acima de 50 ingressos).
 alter table imersao_config drop constraint if exists imersao_config_lote;
 alter table imersao_config add constraint imersao_config_lote
   check (lote_forcado is null or lote_forcado between 1 and 4);
