@@ -34,8 +34,8 @@ export function GET() {
         "TZNAME:-03",
         "END:STANDARD",
         "END:VTIMEZONE",
-        evento("imersao-noite-1", EVENTO.noite1Inicio, EVENTO.noite1Fim, "Imersão Arquiteto de Agentes · Noite 1", "Seu agente nasce e trabalha. Ao vivo, das 19h às 22h (Brasília)."),
-        evento("imersao-noite-2", EVENTO.noite2Inicio, EVENTO.noite2Fim, "Imersão Arquiteto de Agentes · Noite 2", "Seu agente 24 horas e o seu time. Ao vivo, das 19h às 22h (Brasília)."),
+        evento("imersao-noite-1", EVENTO.noite1Inicio, EVENTO.noite1Fim, "Imersão Arquiteto de Agentes · Noite 1", "Instalação e todas as funcionalidades do seu agente no Hermes Desktop. Ao vivo, das 19h às 22h (Brasília)."),
+        evento("imersao-noite-2", EVENTO.noite2Inicio, EVENTO.noite2Fim, "Imersão Arquiteto de Agentes · Noite 2", "Seu agente no servidor, 24 horas, e o seu Squad. Ao vivo, das 19h às 22h (Brasília)."),
         "END:VCALENDAR",
     ].join("\r\n");
     return new Response(ics, {

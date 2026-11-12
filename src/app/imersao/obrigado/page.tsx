@@ -73,7 +73,7 @@ const html = (grupo: string) => `
     padding: 26px; margin-bottom: 16px; text-align: left;
   }
   /* O bloco 1 exige AÇÃO — sem entrar no grupo o comprador
-     não recebe os links das aulas. A borda âmbar destaca o passo. */
+     não recebe os links das noites. A borda âmbar destaca o passo. */
   .ob-root .bloco.acao { border-color: rgba(232,163,61,.42); }
   .ob-root .bloco .tit {
     font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 18px;
