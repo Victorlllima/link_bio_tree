@@ -1367,6 +1367,33 @@ export const RESOURCES: Resource[] = [
       },
     ],
   },
+  {
+    slug: "10-agentes-que-vendem",
+    titulo: "10 agentes que vendem",
+    categoria: "Guias",
+    novo: true,
+    resumo: "O passo a passo de cada um: o que faz, o que você precisa e o pedido pronto para o seu agente montar.",
+    intro:
+      "Agente não é chatbot: chatbot responde, agente faz o trabalho do pedido até a entrega. Serve a quem quer montar na mão e a quem quer colar o pedido no Hermes ou no Claude Code. Comece por UM, o que mais tira dinheiro do seu negócio hoje, e teste com 5 casos reais antes do próximo.",
+    arquivo: "/redreply/pdfs/10-agentes-que-vendem.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF com o passo a passo completo, o pedido pronto para colar no seu Hermes e as fontes oficiais. Os passos:\n1. Agente de Voz\n2. Agente de Orçamento\n3. Agente de Leads\n4. Agente de Resposta\n5. Agente de Follow-up\n6. Agente de Bastidor\n7. Agente de Propostas\n8. Agente de Marketing\n9. Agente de Conteúdo\n10. Agente Recrutador",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "• Antes de ligar qualquer agente para cliente, teste com você mesmo como cliente.\n• Agente que fala com cliente precisa de um humano de plantão para os casos que ele não sabe resolver.\n• Use a API oficial do WhatsApp (WhatsApp Business Platform). Automação em número pessoal pode levar a bloqueio.",
+      },
+      {
+        titulo: "Onde conferir",
+        texto:
+          "As fontes consultadas estão no final do PDF.",
+      },
+    ],
+  },
 ];
 
 export function getResource(slug: string): Resource | undefined {
