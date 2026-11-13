@@ -19,7 +19,7 @@ import { lerImersaoConfig, contarVendidosPorLote } from "@/lib/imersao-config";
 const URL_CANONICA = "https://redpro.com.br/imersao";
 const TITULO = "Imersão Arquiteto de Agentes | Seu Squad de agentes trabalhando 24 horas";
 const DESCRICAO =
-    "Monte seu Squad de agentes de IA trabalhando 24 horas pra você, em duas noites. Ao vivo, 25 e 26/11, das 19h às 22h: noite 1, o Hermes no seu computador; noite 2, numa VPS sua com o seu Squad.";
+    "Monte seu Squad de agentes de IA trabalhando 24 horas pra você, em duas noites. Ao vivo, 25 e 26/11, das 19h às 22h: noite 1, seu agente nasce e trabalha; noite 2, uma VPS sua e o seu Squad de 4 agentes.";
 const PIXEL_ID = "1543917230170877";
 
 /* Microsoft Clarity: só carrega com NEXT_PUBLIC_CLARITY_ID preenchido (Vercel). Vazio = nada. */
