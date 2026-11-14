@@ -119,3 +119,44 @@ export async function estadoNumeroOficial() {
         return { ok: false, erro: String(e) };
     }
 }
+
+/**
+ * Template com botão de URL dinâmica e devolução do `wamid` (id da mensagem), para o log de entrega.
+ * `botaoUrl` é o texto que entra no {{1}} do FIM da URL do botão (ex.: token do grupo). Template de
+ * botão estático não passa `botaoUrl`. Cabeçalho de texto sem variável não precisa de parâmetro.
+ */
+export async function enviarTemplateComBotao(
+    destino: string,
+    template: string,
+    variaveis: string[] = [],
+    botaoUrl?: string,
+    idioma = "pt_BR",
+): Promise<{ ok: true; wamid: string } | { ok: false; erro: string }> {
+    const { token, phoneId } = cfg();
+    if (!token || !phoneId) return { ok: false, erro: "credenciais ausentes" };
+    const numero = normalizarDestinoOficial(destino);
+    if (!numero) return { ok: false, erro: "destino vazio ou inválido" };
+
+    const components: Record<string, unknown>[] = [];
+    if (variaveis.length) components.push({ type: "body", parameters: variaveis.map((v) => ({ type: "text", text: v })) });
+    if (botaoUrl) components.push({ type: "button", sub_type: "url", index: "0", parameters: [{ type: "text", text: botaoUrl }] });
+
+    try {
+        const res = await fetch(`${GRAPH}/${phoneId}/messages`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+                messaging_product: "whatsapp",
+                to: numero,
+                type: "template",
+                template: { name: template, language: { code: idioma }, ...(components.length ? { components } : {}) },
+            }),
+        });
+        const txt = await res.text();
+        if (!res.ok) return { ok: false, erro: `${res.status} ${txt.slice(0, 300)}` };
+        const wamid = JSON.parse(txt)?.messages?.[0]?.id as string | undefined;
+        return wamid ? { ok: true, wamid } : { ok: false, erro: "sem wamid na resposta" };
+    } catch (e) {
+        return { ok: false, erro: String(e) };
+    }
+}
