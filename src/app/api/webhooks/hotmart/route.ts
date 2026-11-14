@@ -5,6 +5,7 @@ import { lerCicloAtual } from "@/lib/ciclo-atual";
 import { BUMPS_HERMES_WEEK, eventoCapi, type EventoCapi } from "@/lib/capi-eventos";
 import { lerImersaoConfig } from "@/lib/imersao-config";
 import { garantirToken } from "@/lib/imersao-grupo";
+import { enviarA1DaCompra } from "@/lib/wpp-oficial-campanha";
 import {
     PRODUTO_IMERSAO_INGRESSO, PRODUTO_IMERSAO_GRAVACAO, EMAIL_APROVADO_PELO_RED, loteDaOferta,
     emailConfirmacaoImersao,
@@ -565,6 +566,13 @@ export async function POST(req: NextRequest) {
                         console.error("[hotmart] CAPI:", r.erro);
                         await telegram(`⚠️ Meta CAPI: Purchase ${transacao} falhou: ${r.erro}`).catch(() => {});
                     }
+                }
+                // WhatsApp oficial (A1): sai depois dos bumps, uma vez por transação. Desligado por 3 travas até o Red liberar.
+                // Nunca derruba o webhook: qualquer falha só vira log (e aviso no Telegram quando o envio estava armado).
+                if (!reenvio) {
+                    const wa = await enviarA1DaCompra({ transacao, nome, fone, token: (await garantirToken(transacao)) ?? "" });
+                    console.log(`[hotmart] wpp oficial A1 ${transacao}: ${wa.enviado ? "enviado" : "não enviado"} (${wa.motivo})`);
+                    if (!wa.enviado && /^(erro|\d{3} )/.test(wa.motivo)) await telegram(`⚠️ WhatsApp oficial A1 falhou (${transacao}): ${mdSeguro(wa.motivo).slice(0, 200)}`).catch(() => {});
                 }
                 if (!reenvio) {
                     await telegram(
