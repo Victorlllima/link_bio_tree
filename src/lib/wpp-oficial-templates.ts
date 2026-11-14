@@ -16,17 +16,20 @@ export type TemplateDef = {
 };
 
 export const TEMPLATES: Record<string, TemplateDef> = {
-    A1: { nome: "imersao_confirmacao_v2", categoria: "UTILITY", nVars: 3, botao: "token-grupo", marketing: false },
-    A2: { nome: "imersao_falta_grupo_v1", categoria: "UTILITY", nVars: 2, botao: "token-grupo", marketing: false },
-    B1: { nome: "imersao_vespera_v2", categoria: "MARKETING", nVars: 3, botao: "token-grupo", marketing: true },
-    B2: { nome: "imersao_dia_d_v2", categoria: "MARKETING", nVars: 3, botao: "token-grupo", marketing: true },
-    B3: { nome: "imersao_ao_vivo_v2", categoria: "MARKETING", nVars: 2, botao: "sala", marketing: true },
-    B4: { nome: "imersao_manual_vps_v1", categoria: "UTILITY", nVars: 2, botao: "caminho", marketing: false },
-    B5: { nome: "imersao_gravacao_v1", categoria: "UTILITY", nVars: 2, botao: "caminho", marketing: false },
-    C1: { nome: "formacao_carrinho_aberto_v1", categoria: "MARKETING", nVars: 4, botao: "estatico", marketing: true, formacao: true },
-    C2: { nome: "formacao_ao_vivo_acaba_v1", categoria: "MARKETING", nVars: 4, botao: "estatico", marketing: true, formacao: true },
-    C3: { nome: "formacao_fechamento_v1", categoria: "MARKETING", nVars: 3, botao: "estatico", marketing: true, formacao: true },
-    // C4, D1 e D2: acrescentar aqui quando o mapa fechar nome e variáveis (o arquivo do RIGEL é a fonte).
+    // Nomes/versões conferidos na Meta em 14/11/2026 (todos APPROVED, UTILITY, pt_BR; WABA 982945829973742).
+    A1: { nome: "imersao_confirmacao_v4", categoria: "UTILITY", nVars: 3, botao: "token-grupo", marketing: false },
+    A2: { nome: "imersao_falta_grupo_v2", categoria: "UTILITY", nVars: 2, botao: "token-grupo", marketing: false },
+    B1: { nome: "imersao_vespera_v4", categoria: "UTILITY", nVars: 3, botao: "token-grupo", marketing: false },
+    B2: { nome: "imersao_dia_d_v3", categoria: "UTILITY", nVars: 3, botao: "token-grupo", marketing: false },
+    B3: { nome: "imersao_ao_vivo_v3", categoria: "UTILITY", nVars: 2, botao: "sala", marketing: false },
+    B4: { nome: "imersao_manual_vps_v2", categoria: "UTILITY", nVars: 2, botao: "caminho", marketing: false },
+    B5: { nome: "imersao_gravacao_v2", categoria: "UTILITY", nVars: 2, botao: "caminho", marketing: false },
+    C1: { nome: "formacao_carrinho_aberto_v3", categoria: "UTILITY", nVars: 4, botao: "estatico", marketing: false, formacao: true },
+    C2: { nome: "formacao_ao_vivo_acaba_v3", categoria: "UTILITY", nVars: 4, botao: "estatico", marketing: false, formacao: true },
+    C3: { nome: "formacao_fechamento_v2", categoria: "UTILITY", nVars: 2, botao: "estatico", marketing: false, formacao: true },
+    C4: { nome: "formacao_ultimas_horas_v5", categoria: "UTILITY", nVars: 2, botao: "estatico", marketing: false, formacao: true },
+    D1: { nome: "formacao_aula_hoje_v2", categoria: "UTILITY", nVars: 3, botao: "nenhum", marketing: false, formacao: true },
+    D2: { nome: "formacao_ao_vivo_v2", categoria: "UTILITY", nVars: 2, botao: "sala", marketing: false, formacao: true },
 };
 
 /** Monta variáveis do corpo e o texto do botão. `extra` traz os valores do momento (data, hora, preço…), nunca fixos em código. */
