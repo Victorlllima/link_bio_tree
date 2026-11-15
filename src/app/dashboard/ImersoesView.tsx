@@ -6,10 +6,12 @@
 import { useEffect, useMemo, useState } from "react";
 import type { DadosImersao, CriativoImersao, RespComparacaoEventos, EventoSerie } from "./tipos";
 import { Kpi, Bloco, Area, fN, fR, fP, fX } from "./ui";
+import { REGUAS, avaliar } from "./metas";
 
 const ddmm = (d: string) => `${d.slice(8, 10)}/${d.slice(5, 7)}`;
 const dnRot = (n: number) => (n === 0 ? "D0" : n < 0 ? `D${n}` : `D+${n}`);
 type Sub = "funil" | "criativos" | "eventos";
+type Periodo = "7d" | "3d" | "ontem" | "tudo";
 
 function Cab({ d, ed, setEd, sub, setSub }: { d: DadosImersao; ed: string; setEd: (s: string) => void; sub: Sub; setSub: (s: Sub) => void }) {
   return (
@@ -33,6 +35,34 @@ function Cab({ d, ed, setEd, sub, setSub }: { d: DadosImersao; ed: string; setEd
   );
 }
 
+const diasEntre = (a: string, b: string) => Math.round((Date.parse(`${a}T12:00:00Z`) - Date.parse(`${b}T12:00:00Z`)) / 86400e3);
+
+// Observação do dia: salva ao sair do campo. Sem a tabela no banco, fica bloqueada com aviso.
+function Obs({ edicao, dia, inicial, ativo }: { edicao: string; dia: string; inicial: string | null; ativo: boolean }) {
+  const [txt, setTxt] = useState(inicial ?? "");
+  const [salvo, setSalvo] = useState(inicial ?? "");
+  const [estado, setEstado] = useState<"" | "salvando" | "ok" | "erro">("");
+  const salvar = () => {
+    if (txt.trim() === salvo.trim()) return;
+    setEstado("salvando");
+    fetch("/api/dashboard/imersao-obs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ edicao, dia, texto: txt }) })
+      .then((r) => r.json())
+      .then((j) => { if (j.error) setEstado("erro"); else { setSalvo(txt); setEstado("ok"); } })
+      .catch(() => setEstado("erro"));
+  };
+  return (
+    <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
+      <input className="sel" style={{ minWidth: 180, fontSize: 12, padding: "4px 8px" }} value={txt} maxLength={500} disabled={!ativo}
+        placeholder={ativo ? "anotar o dia…" : "falta criar a tabela"}
+        onChange={(e) => { setTxt(e.target.value); setEstado(""); }} onBlur={salvar} onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
+        aria-label={`Observação de ${ddmm(dia)}`} />
+      {estado === "salvando" && <span className="dim3">…</span>}
+      {estado === "ok" && <span className="c-verde">✓</span>}
+      {estado === "erro" && <span className="c-vermelho" title="não salvou">!</span>}
+    </span>
+  );
+}
+
 const corCpa = (v: number | null, meta: number, corte: number) => (v === null ? "" : v <= meta ? "" : v <= corte ? "c-amarelo" : "c-vermelho");
 
 export default function Imersoes() {
@@ -40,16 +70,20 @@ export default function Imersoes() {
   const [d, setD] = useState<DadosImersao | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [sub, setSub] = useState<Sub>("funil");
+  const [periodo, setPeriodo] = useState<Periodo>("tudo");
+  const [carregando, setCarregando] = useState(false);
 
   useEffect(() => {
     let vivo = true;
     setErro(null);
-    fetch(`/api/dashboard?imersao=${encodeURIComponent(ed || "ultima")}`, { cache: "no-store" })
+    setCarregando(true);
+    fetch(`/api/dashboard?imersao=${encodeURIComponent(ed || "ultima")}&periodo=${periodo}`, { cache: "no-store" })
       .then((r) => r.json())
       .then((j) => { if (!vivo) return; if (j.error) setErro(j.error); else { setD(j); if (!ed) setEd(j.edicao.id); } })
-      .catch((e) => vivo && setErro(String(e)));
+      .catch((e) => vivo && setErro(String(e)))
+      .finally(() => vivo && setCarregando(false));
     return () => { vivo = false; };
-  }, [ed]);
+  }, [ed, periodo]);
 
   if (erro) return <div className="aviso ruim">Não consegui montar as Imersões: {erro}</div>;
   if (!d) return <div className="vazio">Lendo a Meta e a Hotmart da edição.</div>;
@@ -60,13 +94,13 @@ export default function Imersoes() {
       {!d.fontes.hotmart.ok && <div className="aviso ruim">Hotmart (banco): {d.fontes.hotmart.erro}</div>}
       <AvisoLote d={d} />
       {sub === "funil" && <Funil d={d} />}
-      {sub === "criativos" && <Criativos d={d} />}
+      {sub === "criativos" && <Criativos d={d} periodo={periodo} setPeriodo={setPeriodo} carregando={carregando} />}
       {sub === "eventos" && <Eventos d={d} />}
     </>
   );
 }
 
-// Aviso de virada de lote (QG 1.2: lote 2 em 13/11 e lote 3 em 20/11, sempre à 00h -03:00).
+// Aviso de virada de lote (lote 2 em 16/11 e lote 3 em 20/11, sempre à 00h -03:00) e do lote extra, que abre por contagem.
 // Calcula no navegador pelo calendário dos lotes que já vêm na resposta; "hoje" é a data em GMT-3.
 function AvisoLote({ d }: { d: DadosImersao }) {
   const hoje = new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10);
@@ -88,6 +122,14 @@ function AvisoLote({ d }: { d: DadosImersao }) {
       urgente: f <= 2,
     });
   }
+  const x = d.loteExtra;
+  if (x) {
+    const v = d.total.vendas;
+    if (v >= x.aPartirDe)
+      linhas.push({ txt: `Passou de ${x.aPartirDe} ingressos (${v}): é a hora do lote extra de R$ ${x.preco}.${x.oferta ? "" : " A oferta ainda não existe na Hotmart: peça à MIRA."}`, urgente: true });
+    else if (x.aPartirDe - v <= 10)
+      linhas.push({ txt: `Faltam ${x.aPartirDe - v} ingressos para o lote extra de R$ ${x.preco}${x.oferta ? "." : " (oferta ainda não criada na Hotmart)."}`, urgente: !x.oferta });
+  }
   if (!linhas.length) return null;
   return (
     <>
@@ -104,12 +146,18 @@ function Funil({ d }: { d: DadosImersao }) {
   const [modo, setModo] = useState<"dia" | "acum">("dia");
   const [met, setMet] = useState<"gasto" | "vendas" | "cpa" | "lpv">("vendas");
   const linhas = useMemo(() => {
-    let a = { gasto: 0, impressoes: 0, cliquesLink: 0, lpv: 0, ic: 0, vendas: 0, receita: 0, receitaBumps: 0, bumps: 0 };
+    let a = { gasto: 0, impressoes: 0, cliquesLink: 0, lpv: 0, ic: 0, vendas: 0, receita: 0, receitaBumps: 0, bumps: 0, liquido: 0, vendasCarrinho: 0, receitaCarrinho: 0 };
+    const alvo = d.metas.ingressosMeta;
     return d.serie.map((s) => {
-      a = { gasto: a.gasto + s.gasto, impressoes: a.impressoes + s.impressoes, cliquesLink: a.cliquesLink + s.cliquesLink, lpv: a.lpv + s.lpv, ic: a.ic + s.ic, vendas: a.vendas + s.vendas, receita: a.receita + s.receita, receitaBumps: a.receitaBumps + s.receitaBumps, bumps: a.bumps + s.bumps };
-      return { s, v: modo === "dia" ? s : a };
+      // meta do dia (Baldan): o que falta para a meta ÷ dias de venda que sobram até a noite 1, contando o próprio dia
+      const restam = diasEntre(d.edicao.noite1, s.dia);
+      const meta = alvo && restam > 0 ? Math.max(0, Math.ceil((alvo - a.vendas) / restam)) : null;
+      a = { gasto: a.gasto + s.gasto, impressoes: a.impressoes + s.impressoes, cliquesLink: a.cliquesLink + s.cliquesLink, lpv: a.lpv + s.lpv, ic: a.ic + s.ic, vendas: a.vendas + s.vendas, receita: a.receita + s.receita, receitaBumps: a.receitaBumps + s.receitaBumps, bumps: a.bumps + s.bumps, liquido: a.liquido + s.liquido, vendasCarrinho: a.vendasCarrinho + s.vendasCarrinho, receitaCarrinho: a.receitaCarrinho + s.receitaCarrinho };
+      return { s, v: modo === "dia" ? s : a, meta };
     });
-  }, [d.serie, modo]);
+  }, [d.serie, modo, d.metas.ingressosMeta, d.edicao.noite1]);
+  const hojeBR = new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10);
+  const temCarrinho = !!d.carrinho;
   const pontos = linhas.map(({ s, v }) => ({ x: ddmm(s.dia), y: met === "gasto" ? v.gasto : met === "vendas" ? v.vendas : met === "lpv" ? v.lpv : v.vendas ? v.gasto / v.vendas : 0 }));
   const fmt = met === "gasto" || met === "cpa" ? (n: number) => `R$${fN(n)}` : (n: number) => fN(n);
   const semVenda = t.vendas === 0;
@@ -137,10 +185,18 @@ function Funil({ d }: { d: DadosImersao }) {
         <Kpi rotulo="Visitas da LP · carregamento" valor={`${fN(t.lpv)} · ${fP(t.connect)}`} sub="visitas ÷ cliques no link" />
         <Kpi rotulo="Checkout · conversão da página" valor={`${fN(t.ic)} · ${fP(t.convPagina)}`} sub={`IC ÷ visitas ${fP(t.pagCheckout)} · compra ÷ IC ${fP(t.checkoutCompra)}`} />
       </div>
+      {d.carrinho && (
+        <div className="g4" style={{ marginTop: 14 }}>
+          <Kpi rotulo={`${d.carrinho.nome} vendidos`} valor={fN(d.carrinho.vendas)} sub={d.carrinho.porOferta.map((o) => `${fN(o.vendas)} a ${fR(o.preco, 0)} (${o.nome})`).join(" · ")} />
+          <Kpi rotulo={`Conversão ingresso → ${d.carrinho.nome}`} valor={fP(d.carrinho.conversao)} sub="vendas do carrinho ÷ ingressos" />
+          <Kpi rotulo={`Receita ${d.carrinho.nome}`} valor={fR(d.carrinho.receita, 0)} sub={`${fR(d.carrinho.liquido, 0)} líquidos`} />
+          <Kpi rotulo="Lucro do lançamento" valor={fR(t.liquido + d.carrinho.liquido - t.gasto, 0)} sub="líquido de ingresso, bumps e carrinho − investido" />
+        </div>
+      )}
       {semVenda && <div className="aviso">Ainda não há ingresso aprovado no banco para esta edição. Gasto e funil da Meta já aparecem; vendas, receita, CPA e ROAS entram com a primeira compra aprovada.</div>}
       <Bloco
         titulo="Desempenho por dia"
-        sub="Dia a dia ou acumulado desde a abertura das vendas."
+        sub="Controle diário: meta do dia = o que falta para a meta ÷ dias de venda até a noite 1. Lucro = líquido (ingresso, bumps e carrinho) − investido. A observação fica salva por dia."
         acao={<div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <div className="seg">{(["dia", "acum"] as const).map((x) => <button key={x} className={modo === x ? "on" : ""} onClick={() => setModo(x)}>{x === "dia" ? "Por dia" : "Acumulado"}</button>)}</div>
           <div className="seg">{(["vendas", "gasto", "cpa", "lpv"] as const).map((x) => <button key={x} className={met === x ? "on" : ""} onClick={() => setMet(x)}>{{ vendas: "Ingressos", gasto: "Investido", cpa: "CPA", lpv: "Visitas" }[x]}</button>)}</div>
@@ -149,28 +205,49 @@ function Funil({ d }: { d: DadosImersao }) {
         <Area pontos={pontos} fmt={fmt} />
         <div className="tab-wrap" style={{ marginTop: 14 }}>
           <table className="tab">
-            <thead><tr><th>Dia</th><th>Lote</th><th className="dir">Investido</th><th className="dir">Impr.</th><th className="dir">Cliques</th><th className="dir">Visitas</th><th className="dir">IC</th><th className="dir">Ingressos</th><th className="dir">Receita</th><th className="dir">Bumps</th><th className="dir">Taxa bump</th><th className="dir">CPA</th><th className="dir">ROAS</th></tr></thead>
+            <thead><tr><th>Dia</th><th>Lote</th><th className="dir">Investido</th><th className="dir">Impr.</th><th className="dir">Cliques</th><th className="dir">Visitas</th><th className="dir">IC</th><th className="dir">Ingressos</th><th className="dir">Meta do dia</th><th className="dir">Receita</th><th className="dir">Bumps</th><th className="dir">Taxa bump</th>{temCarrinho && <th className="dir">{d.carrinho!.nome}</th>}<th className="dir">CPA</th><th className="dir">ROAS</th><th className="dir">Líquido</th><th className="dir">Lucro</th><th className="dir">ROI</th><th>Observação</th></tr></thead>
             <tbody>
-              {[...linhas].reverse().map(({ s, v }) => {
+              {[...linhas].reverse().flatMap(({ s, v, meta }, i, arr) => {
                 const cpa = v.vendas ? v.gasto / v.vendas : null;
-                return (
+                const lucro = v.liquido - v.gasto;
+                const emCurso = s.dia === hojeBR;
+                const ok = meta === null ? null : s.vendas >= meta;
+                const ant = arr[i + 1]?.s; // dia anterior (a lista está invertida)
+                const lote = ant && s.lote !== null && ant.lote !== null && s.lote !== ant.lote ? d.lotes.find((l) => l.n === s.lote) : null;
+                const linha = (
                   <tr key={s.dia}>
                     <td><b>{ddmm(s.dia)}</b> <span className="dim3">{dnRot(s.dn)}</span></td>
                     <td>{s.lote ?? "—"}</td>
                     <td className="dir num">{fR(v.gasto, 0)}</td><td className="dir num">{fN(v.impressoes)}</td><td className="dir num">{fN(v.cliquesLink)}</td>
                     <td className="dir num">{fN(v.lpv)}</td><td className="dir num">{fN(v.ic)}</td><td className="dir num"><b>{fN(v.vendas)}</b></td>
+                    <td className={`dir num ${ok === null || emCurso ? "" : ok ? "c-verde" : "c-vermelho"}`} title={meta === null ? "depois da noite 1 não há meta diária de ingresso" : emCurso ? "dia em curso" : undefined}>
+                      {meta === null ? "—" : <>{fN(meta)} {emCurso ? <span className="dim3">em curso</span> : ok ? "✓" : "✗"}</>}
+                    </td>
                     <td className="dir num">{fR(v.receita + v.receitaBumps, 0)}</td><td className="dir num">{fN(v.bumps)}</td>
                     <td className="dir num">{v.vendas ? fP((v.bumps / v.vendas) * 100, 0) : "—"}</td>
+                    {temCarrinho && <td className="dir num">{v.vendasCarrinho ? <>{fN(v.vendasCarrinho)} <span className="dim3">{fR(v.receitaCarrinho, 0)}</span></> : "—"}</td>}
                     <td className={`dir num ${corCpa(cpa, m.cpaMeta, m.cpaCorte)}`}>{fR(cpa, 0)}</td>
-                    <td className="dir num">{v.gasto ? fX((v.receita + v.receitaBumps) / v.gasto) : "—"}</td>
+                    <td className="dir num">{v.gasto ? fX((v.receita + v.receitaBumps + v.receitaCarrinho) / v.gasto) : "—"}</td>
+                    <td className="dir num">{fR(v.liquido, 0)}</td>
+                    <td className={`dir num ${v.gasto || v.liquido ? (lucro >= 0 ? "c-verde" : "c-vermelho") : ""}`}>{v.gasto || v.liquido ? fR(lucro, 0) : "—"}</td>
+                    <td className={`dir num ${v.gasto ? (lucro >= 0 ? "c-verde" : "c-vermelho") : ""}`}>{v.gasto ? fP((lucro / v.gasto) * 100, 0) : "—"}</td>
+                    <td><Obs edicao={d.edicao.id} dia={s.dia} inicial={s.obs} ativo={d.obsDisponivel} /></td>
                   </tr>
                 );
+                if (!lote) return [linha];
+                const de = d.lotes.find((l) => l.n === ant!.lote);
+                return [
+                  linha,
+                  <tr key={`${s.dia}-lote`} className="atual">
+                    <td colSpan={99} style={{ fontSize: 12 }}><b>Virada de lote</b> em {ddmm(s.dia)}: lote {de?.n} ({fR(de?.preco ?? null, 0)}) → lote {lote.n} ({fR(lote.preco, 0)})</td>
+                  </tr>,
+                ];
               })}
             </tbody>
           </table>
         </div>
       </Bloco>
-      <Bloco titulo="Por lote" sub="Gasto e vendas do dia caem no lote vigente nele (viradas à 00h de 13/11 e 20/11).">
+      <Bloco titulo="Por lote" sub={`Gasto e vendas do dia caem no lote vigente nele (viradas à 00h de ${d.lotes.slice(1).map((l) => ddmm(l.ini)).join(" e ")}).${d.loteExtra ? ` Lote extra de R$ ${d.loteExtra.preco} a partir de ${d.loteExtra.aPartirDe} ingressos.` : ""}`}>
         <div className="tab-wrap">
           <table className="tab">
             <thead><tr><th>Lote</th><th>Janela</th><th className="dir">Preço</th><th className="dir">Investido</th><th className="dir">Visitas</th><th className="dir">Ingressos</th><th className="dir">Conv. página</th><th className="dir">Receita</th><th className="dir">Taxa bump</th><th className="dir">CPA</th><th className="dir">ROAS</th></tr></thead>
@@ -210,7 +287,8 @@ function Funil({ d }: { d: DadosImersao }) {
 
 // ============================================================
 type Col = { k: string; rot: string; val: (c: CriativoImersao) => number | string | null; fmt: (c: CriativoImersao) => string; cor?: (c: CriativoImersao, d: DadosImersao) => string };
-function Criativos({ d }: { d: DadosImersao }) {
+const corRegua = (chave: string, v: number | null) => { const c = avaliar(REGUAS[chave], v); return c === "neutro" ? "" : `c-${c}`; };
+function Criativos({ d, periodo, setPeriodo, carregando }: { d: DadosImersao; periodo: Periodo; setPeriodo: (p: Periodo) => void; carregando: boolean }) {
   const m = d.metas;
   const [ord, setOrd] = useState<{ k: string; asc: boolean }>({ k: "gasto", asc: false });
   const [so, setSo] = useState<"todos" | "ativos" | "cortar">("todos");
@@ -223,8 +301,12 @@ function Criativos({ d }: { d: DadosImersao }) {
     { k: "ctr", rot: "CTR link", val: (c) => c.ctr, fmt: (c) => fP(c.ctr, 2), cor: (c) => (c.ctr !== null && c.impressoes >= m.impMinJulgar && c.ctr < m.ctrMinLink ? "c-vermelho" : "") },
     { k: "cpc", rot: "CPC link", val: (c) => c.cpc, fmt: (c) => fR(c.cpc) },
     { k: "custoLpv", rot: "Custo/visita", val: (c) => c.custoLpv, fmt: (c) => fR(c.custoLpv) },
+    { k: "hook", rot: "Hook", val: (c) => c.hook, fmt: (c) => fP(c.hook, 1), cor: (c) => corRegua("hook_rate", c.hook) },
+    { k: "hold", rot: "Hold", val: (c) => c.hold, fmt: (c) => fP(c.hold, 1), cor: (c) => corRegua("hold_rate", c.hold) },
     { k: "ic", rot: "IC", val: (c) => c.ic, fmt: (c) => fN(c.ic) },
+    { k: "taxaCheckout", rot: "Checkout (IC ÷ visitas)", val: (c) => (c.lpv ? (c.ic / c.lpv) * 100 : null), fmt: (c) => fP(c.lpv ? (c.ic / c.lpv) * 100 : null, 1) },
     { k: "vendas", rot: "Vendas (sck do anúncio)", val: (c) => c.vendas, fmt: (c) => fN(c.vendas) },
+    { k: "conv", rot: "Conversão (vendas ÷ IC)", val: (c) => (c.ic ? (c.vendas / c.ic) * 100 : null), fmt: (c) => fP(c.ic ? (c.vendas / c.ic) * 100 : null, 1) },
     { k: "cpa", rot: "CPA", val: (c) => c.cpa, fmt: (c) => fR(c.cpa, 0), cor: (c) => corCpa(c.cpa, m.cpaMeta, m.cpaCorte) },
   ];
   const lista = useMemo(() => {
@@ -243,8 +325,14 @@ function Criativos({ d }: { d: DadosImersao }) {
   const nCortar = d.criativos.filter((c) => c.cortar).length;
   const nAtivos = d.criativos.filter((c) => c.status === "ACTIVE").length;
   const vendasLigadas = d.criativos.reduce((s, c) => s + c.vendas, 0);
+  const rotPeriodo = { "7d": "7 dias", "3d": "3 dias", ontem: "Ontem", tudo: "Tudo" } as const;
   return (
     <>
+      <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: 14 }}>
+        <span className="dim3">Período</span>
+        <div className="seg">{(["7d", "3d", "ontem", "tudo"] as const).map((x) => <button key={x} className={periodo === x ? "on" : ""} onClick={() => setPeriodo(x)} disabled={carregando}>{rotPeriodo[x]}</button>)}</div>
+        <span className="dim3">{carregando ? "atualizando…" : `${ddmm(d.periodo.de)} a ${ddmm(d.periodo.ate)} · vale para criativos e conjuntos`}</span>
+      </div>
       <div className="g4">
         <Kpi rotulo="Anúncios ativos" valor={fN(nAtivos)} sub={`${d.criativos.length} com gasto ou ativos`} />
         <Kpi rotulo="Pelo critério de corte" valor={fN(nCortar)} sub="ativos que a ZENITH cortaria" />
@@ -303,7 +391,7 @@ function Criativos({ d }: { d: DadosImersao }) {
             </tbody>
           </table>
         </div>
-        <div className="dica">CTR abaixo de 2% é alerta, não veredito; só vale julgar com 5 mil impressões. A venda vem do banco da Hotmart, ligada ao anúncio pelo sck/utm. O pixel não serve aqui: ele conta cada bump como compra (pixel total na campanha: {fN(d.total.compraPixel)}).</div>
+        <div className="dica">Hook = views de 3 s ÷ impressões (régua {REGUAS.hook_rate.min}% a {REGUAS.hook_rate.ideal}%); hold = views de 75% ÷ views de 3 s (régua {REGUAS.hold_rate.min}% a {REGUAS.hold_rate.ideal}%). Só aparece em vídeo. CTR abaixo de 2% é alerta, não veredito; só vale julgar com 5 mil impressões. A venda vem do banco da Hotmart, ligada ao anúncio pelo sck/utm. O pixel não serve aqui: ele conta cada bump como compra (pixel total na campanha: {fN(d.total.compraPixel)}).</div>
       </Bloco>
     </>
   );
