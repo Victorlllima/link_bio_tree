@@ -25,6 +25,10 @@ export interface EdicaoCfg {
   produtos: { ingresso: string; bumps: { id: string; nome: string; preco: number; exclusivo?: boolean }[] };
   campanha: { id: string; nome: string; conjuntos: { id: string; nome: string }[] };
   lotes: LoteCfg[];
+  // lote que só abre por contagem (não por data). oferta null = ainda não criada na Hotmart.
+  loteExtra?: { preco: number; aPartirDe: number; oferta: string | null };
+  // produto vendido no pitch e no carrinho (ofertas em ordem: a primeira vale até `ate`)
+  carrinho?: { produto: string; nome: string; ofertas: { codigo: string; nome: string; preco: number; ate?: string }[] };
   precoIngressoPadrao: number;
   metas: { cpaMeta: number; cpaCorte: number; ctrMinLink: number; impMinJulgar: number; verbaDia: number; ingressosMeta: number | null };
 }
@@ -36,7 +40,7 @@ export const EDICOES: EdicaoCfg[] = [
     nome: "Imersão 1 · 25 e 26/nov",
     noite1: "2026-11-25",
     noite2: "2026-11-26",
-    carrinhoFecha: "2026-11-30T23:59:00-03:00",
+    carrinhoFecha: "2026-12-10T23:59:00-03:00",
     captacaoIni: "2026-11-03",
     gastoIni: "2026-11-04",
     produtos: {
@@ -57,10 +61,21 @@ export const EDICOES: EdicaoCfg[] = [
       ],
     },
     lotes: [
-      { n: 1, preco: 44, ini: "2026-11-03", fim: "2026-11-12", oferta: "sn552kkr" },
-      { n: 2, preco: 47, ini: "2026-11-13", fim: "2026-11-19", oferta: "2q6t3s89" },
+      // lote 1 foi estendido até 15/11 (lote_forcado=1 até a virada de 16/11 00h, MIRA)
+      { n: 1, preco: 44, ini: "2026-11-03", fim: "2026-11-15", oferta: "sn552kkr" },
+      { n: 2, preco: 47, ini: "2026-11-16", fim: "2026-11-19", oferta: "2q6t3s89" },
       { n: 3, preco: 52, ini: "2026-11-20", fim: null, oferta: "95tgc1no" },
     ],
+    loteExtra: { preco: 57, aPartirDe: 50, oferta: null },
+    // EA² (produto 8660306): R$ 1.250 ao vivo até 23h59 de 26/11, depois R$ 1.500 até 10/12 (ESTADO-ATUAL, 15/11)
+    carrinho: {
+      produto: "8660306",
+      nome: "EA²",
+      ofertas: [
+        { codigo: "4vj21bfg", nome: "ao vivo", preco: 1250, ate: "2026-11-26T23:59:00-03:00" },
+        { codigo: "24mnfz2e", nome: "depois do evento", preco: 1500 },
+      ],
+    },
     precoIngressoPadrao: 44,
     // meta ~R$48 e corte R$67 no lote 1 (QG 1.5, ok do Red em 04/11); ingressosMeta 50 = meta da Turma 1 (Red, 07/11, QG 1.5); o resto vem da régua da ZENITH (corte.py)
     metas: { cpaMeta: 48, cpaCorte: 67, ctrMinLink: 0.6, impMinJulgar: 5000, verbaDia: 250, ingressosMeta: 50 },

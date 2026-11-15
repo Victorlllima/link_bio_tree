@@ -418,6 +418,10 @@ export interface DiaImersao {
   receita: number; // ingresso, bruto
   receitaBumps: number;
   bumps: number; // pedidos de bump
+  liquido: number; // o que fica para o produtor: ingresso + bumps + carrinho (comissão PRODUCER ou preço × 0,86)
+  vendasCarrinho: number; // vendas do produto do carrinho (EA²) no dia
+  receitaCarrinho: number;
+  obs: string | null; // observação do dia (controle diário)
 }
 
 export interface LoteImersaoRes {
@@ -460,6 +464,9 @@ export interface CriativoImersao {
   chave: string; // chave do criativo: nome sem prefixo de conjunto (Q_/F_) nem _sp
   vendasPixel: number;
   cpa: number | null;
+  views3s: number; // reproduções de 3 s (vídeo)
+  hook: number | null; // views 3 s ÷ impressões (%), só vídeo
+  hold: number | null; // views 75% ÷ views 3 s (%), só vídeo
   cortar: boolean;
   motivos: string[];
 }
@@ -489,6 +496,17 @@ export interface DadosImersao {
   fontes: { meta: Fonte; hotmart: Fonte };
   metas: { cpaMeta: number; cpaCorte: number; ctrMinLink: number; impMinJulgar: number; verbaDia: number; ingressosMeta: number | null };
   fase: { rotulo: string; detalhe: string; dnHoje: number };
+  periodo: { chave: string; de: string; ate: string };
+  loteExtra: { preco: number; aPartirDe: number; oferta: string | null } | null;
+  carrinho: {
+    nome: string;
+    vendas: number;
+    receita: number;
+    liquido: number;
+    conversao: number | null; // vendas ÷ ingressos (%)
+    porOferta: { codigo: string; nome: string; preco: number; vendas: number; receita: number }[];
+  } | null;
+  obsDisponivel: boolean; // a tabela de observações existe no banco
   total: {
     gasto: number;
     impressoes: number;
