@@ -7,10 +7,11 @@ import { useEffect, useMemo, useState } from "react";
 import type { DadosImersao, CriativoImersao, RespComparacaoEventos, EventoSerie } from "./tipos";
 import { Kpi, Bloco, Area, fN, fR, fP, fX } from "./ui";
 import { REGUAS, avaliar } from "./metas";
+import { OQueFazer, tetoCpa, decisaoAnuncio } from "./Decisoes";
 
 const ddmm = (d: string) => `${d.slice(8, 10)}/${d.slice(5, 7)}`;
 const dnRot = (n: number) => (n === 0 ? "D0" : n < 0 ? `D${n}` : `D+${n}`);
-type Sub = "funil" | "criativos" | "eventos";
+type Sub = "decisoes" | "funil" | "criativos" | "eventos";
 type Periodo = "7d" | "3d" | "ontem" | "tudo";
 
 function Cab({ d, ed, setEd, sub, setSub }: { d: DadosImersao; ed: string; setEd: (s: string) => void; sub: Sub; setSub: (s: Sub) => void }) {
@@ -26,8 +27,8 @@ function Cab({ d, ed, setEd, sub, setSub }: { d: DadosImersao; ed: string; setEd
           {d.edicoes.map((e) => <option key={e.id} value={e.id}>{e.nome}</option>)}
         </select>
         <div className="seg">
-          {(["funil", "criativos", "eventos"] as const).map((s) => (
-            <button key={s} className={sub === s ? "on" : ""} onClick={() => setSub(s)}>{{ funil: "Funil", criativos: "Criativos", eventos: "Evento a evento" }[s]}</button>
+          {(["decisoes", "funil", "criativos", "eventos"] as const).map((s) => (
+            <button key={s} className={sub === s ? "on" : ""} onClick={() => setSub(s)}>{{ decisoes: "O que fazer", funil: "Funil", criativos: "Criativos", eventos: "Evento a evento" }[s]}</button>
           ))}
         </div>
       </div>
@@ -69,7 +70,7 @@ export default function Imersoes() {
   const [ed, setEd] = useState("");
   const [d, setD] = useState<DadosImersao | null>(null);
   const [erro, setErro] = useState<string | null>(null);
-  const [sub, setSub] = useState<Sub>("funil");
+  const [sub, setSub] = useState<Sub>("decisoes");
   const [periodo, setPeriodo] = useState<Periodo>("tudo");
   const [carregando, setCarregando] = useState(false);
 
@@ -93,6 +94,7 @@ export default function Imersoes() {
       {!d.fontes.meta.ok && <div className="aviso ruim">Meta: {d.fontes.meta.erro}</div>}
       {!d.fontes.hotmart.ok && <div className="aviso ruim">Hotmart (banco): {d.fontes.hotmart.erro}</div>}
       <AvisoLote d={d} />
+      {sub === "decisoes" && <OQueFazer d={d} />}
       {sub === "funil" && <Funil d={d} />}
       {sub === "criativos" && <Criativos d={d} periodo={periodo} setPeriodo={setPeriodo} carregando={carregando} />}
       {sub === "eventos" && <Eventos d={d} />}
@@ -323,6 +325,7 @@ function Criativos({ d, periodo, setPeriodo, carregando }: { d: DadosImersao; pe
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [d.criativos, ord, so]);
   const nCortar = d.criativos.filter((c) => c.cortar).length;
+  const teto = tetoCpa(d);
   const nAtivos = d.criativos.filter((c) => c.status === "ACTIVE").length;
   const vendasLigadas = d.criativos.reduce((s, c) => s + c.vendas, 0);
   const rotPeriodo = { "7d": "7 dias", "3d": "3 dias", ontem: "Ontem", tudo: "Tudo" } as const;
@@ -384,6 +387,7 @@ function Criativos({ d, periodo, setPeriodo, carregando }: { d: DadosImersao; pe
                     <td key={col.k} className={`${col.k === "nome" || col.k === "conjunto" || col.k === "status" ? "" : "dir num"} ${col.cor ? col.cor(c, d) : ""}`}>
                       {col.fmt(c)}
                       {col.k === "nome" && c.cortar && <div className="c-vermelho" style={{ fontSize: 11 }}>{c.motivos.join("; ")}</div>}
+                      {col.k === "nome" && (() => { const x = decisaoAnuncio(c, teto, m.impMinJulgar); return x.porque ? <div style={{ fontSize: 11, whiteSpace: "normal", maxWidth: 320 }}><b className={x.cor === "neutro" ? "dim" : `c-${x.cor}`}>{x.rot}</b> <span className="dim3">{x.porque}</span></div> : null; })()}
                     </td>
                   ))}
                 </tr>
