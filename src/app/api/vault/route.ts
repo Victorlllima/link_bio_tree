@@ -13,10 +13,34 @@ export async function POST(req: Request) {
   if (bloqueio) return bloqueio;
 
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const { email, resource } = await req.json();
+  const { email, whatsapp, resource, consentimento } = await req.json();
+  const fone = typeof whatsapp === "string" ? whatsapp.replace(/\D/g, "") : "";
 
   if (!email || typeof email !== "string" || !/.+@.+\..+/.test(email)) {
     return NextResponse.json({ error: "Email inválido" }, { status: 400 });
+  }
+  if (fone.length < 10 || fone.length > 13 || consentimento !== true) {
+    return NextResponse.json({ error: "WhatsApp inválido" }, { status: 400 });
+  }
+
+  // lead com WhatsApp para a venda pelo WhatsApp (Red, 16/11/2026): tabela vault_leads no Supabase.
+  // Não segura o acesso: se a gravação falhar, o lead entra mesmo assim e o erro vai pro log.
+  const key = process.env.SUPABASE_SERVICE_KEY;
+  if (key) {
+    await fetch("https://supabase.redpro.com.br/rest/v1/vault_leads", {
+      method: "POST",
+      headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({
+        email: email.trim().toLowerCase().slice(0, 160),
+        whatsapp: fone,
+        recurso: typeof resource === "string" ? resource.slice(0, 120) || null : null,
+        consentimento: true,
+        user_agent: (req.headers.get("user-agent") ?? "").slice(0, 300) || null,
+      }),
+    }).then(async (r) => { if (!r.ok) console.error("vault_leads: falha ao gravar", r.status, await r.text()); })
+      .catch((e) => console.error("vault_leads:", e));
+  } else {
+    console.error("vault_leads: SUPABASE_SERVICE_KEY ausente");
   }
 
   // resolve a audiência (usa a do .env, senão cria uma vez)
