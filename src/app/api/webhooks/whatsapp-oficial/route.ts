@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 /**
  * Webhook da Cloud API (Meta): status de entrega (sent/delivered/read/failed) e opt-out ("SAIR").
  * GET = handshake (hub.verify_token = WHATSAPP_OFICIAL_VERIFY_TOKEN). POST = confere X-Hub-Signature-256 com o app secret.
- * NÃO configurado na Meta ainda (aguarda ok do Red). Não envia nada.
+ * Reenvia o corpo ao Chatwoot quando CHATWOOT_WEBHOOK_BASE existe.
  */
 export const dynamic = "force-dynamic";
 const URL_ = "https://supabase.redpro.com.br";
@@ -26,6 +26,17 @@ export async function POST(req: NextRequest) {
     if (sig.length !== esperado.length || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(esperado))) return new NextResponse("assinatura inválida", { status: 401 });
 
     const corpo = JSON.parse(raw);
+
+    // Repasse ao Chatwoot (16/11/2026): o callback da conta é um só, então reenviamos o corpo intacto ao webhook do
+    // canal WhatsApp Cloud do Chatwoot para o Red acompanhar e responder as conversas. Falha aqui nunca derruba o resto.
+    const cw = process.env.CHATWOOT_WEBHOOK_BASE;
+    if (cw) {
+        const fones = new Set<string>();
+        for (const e of corpo.entry || []) for (const c of e.changes || []) { const d = c.value?.metadata?.display_phone_number; if (d) fones.add(String(d).replace(/\D/g, "")); }
+        await Promise.allSettled([...fones].map((f) => fetch(`${cw}/webhooks/whatsapp/+${f}`, {
+            method: "POST", headers: { "Content-Type": "application/json" }, body: raw, signal: AbortSignal.timeout(4000),
+        })));
+    }
     for (const e of corpo.entry || []) for (const c of e.changes || []) {
         const v = c.value || {};
         for (const s of v.statuses || []) {
