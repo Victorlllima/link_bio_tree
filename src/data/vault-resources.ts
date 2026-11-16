@@ -1394,6 +1394,33 @@ export const RESOURCES: Resource[] = [
       },
     ],
   },
+  {
+    slug: "setup-orion",
+    titulo: "Setup Orion",
+    categoria: "Guias",
+    novo: true,
+    resumo: "O Opus planeja, os agentes Haiku fazem o trabalho. O setup de Claude Code do vídeo: o Opus 5.5 no esforço extra comanda, agentes Haiku 5.5 executam por um quadragésimo do preço, cada agente recebe uma meta e uma checagem, a memória é compactada cedo e as skills melhoram depois de cada sessão.",
+    intro:
+      "Este é o guia do vídeo do Orion. Um pedido pronto monta tudo, e ele está no fim do guia. Cole no Claude Code aberto na pasta do seu projeto. Ele te mostra cada arquivo antes de escrever e, no final, te diz os dois ajustes que você faz à mão. Orion é o nome que eu dou a esse setup. Não é um produto da Anthropic, mas a ideia é deles. A própria página da Anthropic sobre o Haiku diz que um modelo mais inteligente, como o Fable ou o Opus, pode planejar o trabalho e passar subtarefas para o Haiku, o que torna prático rodar muitos agentes em paralelo. Tudo o que vem a seguir é essa frase, montada para rodar do mesmo jeito em toda sessão.",
+    arquivo: "/redreply/pdfs/setup-orion.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF com o passo a passo completo, o pedido pronto para colar no seu Hermes e as fontes oficiais. Os passos:\n1. O Opus 5.5 no esforço extra é o chefe\n2. Os agentes Haiku 5.5 fazem o trabalho\n3. O agente construtor\n4. Todo agente recebe uma meta e uma checagem\n5. Compacte em 40%, ou 60% nos trabalhos grandes\n6. Um sistema de pastas só\n7. Skills que melhoram depois de cada sessão\n8. Quanto custa",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "• Tudo aqui é Claude Code no terminal.\n• Os preços são os da página de preços da Anthropic em novembro de 2026.",
+      },
+      {
+        titulo: "Onde conferir",
+        texto:
+          "As fontes consultadas estão no final do PDF.",
+      },
+    ],
+  },
 ];
 
 export function getResource(slug: string): Resource | undefined {
