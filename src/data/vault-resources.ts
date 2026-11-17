@@ -37,6 +37,33 @@ const COMO_INSTALAR: Secao = {
 
 export const RESOURCES: Resource[] = [
   {
+    slug: "agente-no-whatsapp-hermes",
+    titulo: "Agente de IA no WhatsApp",
+    categoria: "Guias",
+    novo: true,
+    resumo: "O passo a passo para montar, com o Hermes e a API oficial da Meta, um agente que atende seus clientes no WhatsApp.",
+    intro:
+      "Um agente que lê cada mensagem, responde preço, anota encomenda e marca horário enquanto você dorme. Este guia mostra cada clique, do app na Meta ao número da empresa no ar.",
+    arquivo: "/redreply/pdfs/agente-no-whatsapp-hermes.pdf",
+    secoes: [
+      {
+        titulo: "O que é",
+        texto:
+          "Um guia em PDF com 9 passos numerados: instalar o Hermes, criar o app na Meta, copiar as chaves, ligar o WhatsApp, criar o link público, dar personalidade ao agente, ligar memória e ferramentas, testar e colocar o número real no ar.",
+      },
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Os comandos prontos para copiar, um modelo de personalidade para o atendente, os 4 erros que travam quase todo mundo e um pedido pronto para o seu agente montar com você.",
+      },
+      {
+        titulo: "Para quem é",
+        texto:
+          "Para quem tem um negócio que vive no WhatsApp e quer atender rápido sem ficar preso no celular. Não precisa saber programar: é seguir os passos na ordem.",
+      },
+    ],
+  },
+  {
     slug: "10-skills-gratis-hermes",
     titulo: "10 skills grátis pro Hermes (guia humano + agente)",
     categoria: "Guias",
