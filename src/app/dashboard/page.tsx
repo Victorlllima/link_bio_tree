@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Painel from "./Painel";
 
 export const metadata: Metadata = {
-  title: "Painel · Hermes Week e Imersões",
+  title: "Painel · Imersão Arquiteto de Agentes",
   robots: { index: false, follow: false },
 };
 

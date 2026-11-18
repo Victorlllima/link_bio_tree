@@ -95,6 +95,7 @@
   box-shadow: 0 0 12px 1px rgba(228, 205, 151, 0.55);
 }
 .hw .nav .sep { width: 1px; background: var(--line); margin: 12px 8px; flex: none; }
+.hw .nav .grupo-rot { align-self: center; flex: none; font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ivory3, var(--ivory2)); opacity: 0.6; padding: 0 8px 0 4px; white-space: nowrap; }
 .hw .nav .alerta-pt { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--bad); margin-left: 8px; vertical-align: 2px; }
 
 /* ---------- conteúdo ---------- */
@@ -410,3 +411,4 @@
 }
 .hw .ciclo optgroup { background: #101012; color: var(--ivory3); font-style: normal; }
 @media (max-width: 720px) { .hw .ciclo { flex-wrap: wrap; } .hw .ciclo .datas { margin-left: 0; } }
+.hw .crt-meta b { white-space: nowrap; }

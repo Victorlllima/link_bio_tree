@@ -449,6 +449,7 @@ export interface LoteImersaoRes {
 export interface CriativoImersao {
   adId: string;
   nome: string;
+  campanha: string; // rótulo da campanha (Vendas, Teste, Remarketing…)
   conjunto: string;
   status: string;
   thumb: string | null;
@@ -493,6 +494,7 @@ export interface DadosImersao {
   geradoEm: string;
   edicao: { id: string; nome: string; numero: number; noite1: string; noite2: string; carrinhoFecha: string };
   edicoes: { id: string; nome: string; numero: number }[];
+  campanhas: { nome: string; rot: string }[];
   fontes: { meta: Fonte; hotmart: Fonte };
   metas: { cpaMeta: number; cpaCorte: number; ctrMinLink: number; impMinJulgar: number; verbaDia: number; ingressosMeta: number | null };
   fase: { rotulo: string; detalhe: string; dnHoje: number };
@@ -539,7 +541,7 @@ export interface DadosImersao {
   bumps: { id: string; nome: string; preco: number; vendas: number; take: number | null; receita: number }[];
   serie: DiaImersao[];
   lotes: LoteImersaoRes[];
-  conjuntos: { id: string; nome: string; gasto: number; impressoes: number; cliquesLink: number; lpv: number; ic: number; vendas: number; cpa: number | null }[];
+  conjuntos: { id: string; nome: string; campanha: string; gasto: number; impressoes: number; cliquesLink: number; lpv: number; ic: number; vendas: number; cpa: number | null }[];
   criativos: CriativoImersao[];
   criativosAgrupados: GrupoCriativo[];
 }
