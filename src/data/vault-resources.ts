@@ -1448,6 +1448,33 @@ export const RESOURCES: Resource[] = [
       },
     ],
   },
+  {
+    slug: "navegador-hermes",
+    titulo: "O navegador do Hermes",
+    categoria: "Guias",
+    novo: true,
+    resumo: "O Hermes Desktop tem um navegador de verdade ao lado do chat. Ele navega sozinho enquanto você assiste, e no modo comentário você aponta o que quer mudar na página e ele corrige.",
+    intro:
+      "Este é o guia do vídeo do navegador do Hermes. Tudo aqui vem da documentação oficial do Hermes Desktop, da Nous Research. No fim tem um pedido pronto para você colar no chat do Hermes e testar o recurso na hora.",
+    arquivo: "/redreply/pdfs/navegador-hermes.pdf",
+    secoes: [
+      {
+        titulo: "O que você recebe",
+        texto:
+          "Um PDF com o passo a passo completo, o pedido pronto para colar no seu Hermes e as fontes oficiais. Os passos:\n1. Abra o Hermes Desktop\n2. O navegador mora ao lado do chat\n3. Peça e assista ele navegar\n4. Ative o modo comentário\n5. Mande os comentários para o Hermes\n6. Esconda sem perder a página",
+      },
+      {
+        titulo: "Antes de começar",
+        texto:
+          "• O navegador embutido é do Hermes Desktop, o aplicativo. No terminal (CLI e TUI) ele não aparece.\n• O app roda em macOS com chip Apple, Windows e Linux.",
+      },
+      {
+        titulo: "Onde conferir",
+        texto:
+          "As fontes consultadas estão no final do PDF.",
+      },
+    ],
+  },
 ];
 
 export function getResource(slug: string): Resource | undefined {
