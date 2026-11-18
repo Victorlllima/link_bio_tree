@@ -23,7 +23,9 @@ export interface EdicaoCfg {
   captacaoIni: string; // primeiro dia de venda do ingresso
   gastoIni: string; // primeiro dia de gasto da campanha
   produtos: { ingresso: string; bumps: { id: string; nome: string; preco: number; exclusivo?: boolean }[] };
-  campanha: { id: string; nome: string; conjuntos: { id: string; nome: string }[] };
+  // todas as campanhas da edição (vendas, teste, remarketing, escala). Gasto, cliques e anúncios somam todas.
+  // Os conjuntos saem da Meta pelo gasto; não precisa listar aqui.
+  campanhas: { id: string; nome: string; rot: string }[];
   lotes: LoteCfg[];
   // lote que só abre por contagem (não por data). oferta null = ainda não criada na Hotmart.
   loteExtra?: { preco: number; aPartirDe: number; oferta: string | null };
@@ -52,14 +54,14 @@ export const EDICOES: EdicaoCfg[] = [
         { id: "8551535", nome: "Os 100 melhores plugins", preco: 27 },
       ],
     },
-    campanha: {
-      id: "120250898290330175",
-      nome: "IMS_041126_VEN_001",
-      conjuntos: [
-        { id: "120250898295650175", nome: "Quente" },
-        { id: "120250898296070175", nome: "Frio" },
-      ],
-    },
+    campanhas: [
+      { id: "120250898290330175", nome: "IMS_041126_VEN_001", rot: "Vendas" },
+      { id: "120251075125500175", nome: "IMS_141126_TESTE_001", rot: "Teste" },
+      { id: "120251075125940175", nome: "IMS_141126_RMKT_001", rot: "Remarketing" },
+      { id: "120251075124110175", nome: "IMS_141126_ESC_VEN_001", rot: "Escala vendas" },
+      { id: "120251075124210175", nome: "IMS_141126_ESC_IMP_001", rot: "Escala impressões" },
+      { id: "120251075126000175", nome: "IMS_141126_E4_CORREDOR_001", rot: "Corredor" },
+    ],
     lotes: [
       // lote 1 foi estendido até 15/11 (lote_forcado=1 até a virada de 16/11 00h, MIRA)
       { n: 1, preco: 44, ini: "2026-11-03", fim: "2026-11-15", oferta: "sn552kkr" },
@@ -81,3 +83,9 @@ export const EDICOES: EdicaoCfg[] = [
     metas: { cpaMeta: 48, cpaCorte: 67, ctrMinLink: 0.6, impMinJulgar: 5000, verbaDia: 250, ingressosMeta: 50 },
   },
 ];
+
+/** Nome curto do conjunto: "02 RMKT | cupom 50% | checkout..." vira "RMKT · cupom 50%"; "02 Frio | aberto Brasil" vira "Frio". */
+export function nomeConjunto(bruto: string): string {
+  const [a, b] = bruto.replace(/^\d+\s*/, "").split("|").map((x) => x.trim());
+  return b && b.length <= 12 ? `${a} · ${b}` : a;
+}

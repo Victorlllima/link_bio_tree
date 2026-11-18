@@ -1,6 +1,7 @@
 "use client";
 
-// Aba "Imersões": funil por dia e acumulado, lotes, criativos e comparação evento a evento.
+// Imersão Arquiteto de Agentes (parte principal do painel): o que fazer, funil, criativos e evento a evento.
+// A seção é escolhida no menu do Painel (prop `sub`). A Hermes Week virou histórico no próprio Painel.
 // Os números vêm de /api/dashboard?imersao=<id> e ?eventos=1 (servidor lê Meta e Hotmart; nada secreto aqui).
 
 import { useEffect, useMemo, useState } from "react";
@@ -8,29 +9,26 @@ import type { DadosImersao, CriativoImersao, RespComparacaoEventos, EventoSerie 
 import { Kpi, Bloco, Area, fN, fR, fP, fX } from "./ui";
 import { REGUAS, avaliar } from "./metas";
 import { OQueFazer, tetoCpa, decisaoAnuncio } from "./Decisoes";
+import { nomeConjunto } from "./imersoes";
 
 const ddmm = (d: string) => `${d.slice(8, 10)}/${d.slice(5, 7)}`;
 const dnRot = (n: number) => (n === 0 ? "D0" : n < 0 ? `D${n}` : `D+${n}`);
-type Sub = "decisoes" | "funil" | "criativos" | "eventos";
+export type Sub = "decisoes" | "funil" | "criativos" | "eventos";
 type Periodo = "7d" | "3d" | "ontem" | "tudo";
 
-function Cab({ d, ed, setEd, sub, setSub }: { d: DadosImersao; ed: string; setEd: (s: string) => void; sub: Sub; setSub: (s: Sub) => void }) {
+const TITULO: Record<Sub, string> = { decisoes: "O que fazer agora", funil: "Funil", criativos: "Criativos", eventos: "Evento a evento" };
+function Cab({ d, ed, setEd, sub }: { d: DadosImersao; ed: string; setEd: (s: string) => void; sub: Sub }) {
   return (
     <div className="cab" style={{ alignItems: "flex-end", gap: 16, flexWrap: "wrap" }}>
       <div>
-        <div className="eyebrow">Imersões<span className="turma-chip">{d.fase.rotulo} · {d.fase.detalhe}</span></div>
-        <h1>{d.edicao.nome}</h1>
-        <p>Noites {ddmm(d.edicao.noite1)} e {ddmm(d.edicao.noite2)}. Carrinho fecha {ddmm(d.edicao.carrinhoFecha.slice(0, 10))} às 23h59. Vendas vêm da Hotmart (banco); gasto e cliques, da Meta.</p>
+        <div className="eyebrow">{d.edicao.nome}<span className="turma-chip">{d.fase.rotulo} · {d.fase.detalhe}</span></div>
+        <h1>{TITULO[sub]}</h1>
+        <p>Noites {ddmm(d.edicao.noite1)} e {ddmm(d.edicao.noite2)}. Carrinho fecha {ddmm(d.edicao.carrinhoFecha.slice(0, 10))} às 23h59. Vendas vêm da Hotmart (banco); gasto e cliques, da Meta, somando as campanhas {d.campanhas.map((c) => c.rot).join(", ")}.</p>
       </div>
       <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
         <select className="sel" value={ed} onChange={(e) => setEd(e.target.value)} aria-label="Edição da Imersão">
           {d.edicoes.map((e) => <option key={e.id} value={e.id}>{e.nome}</option>)}
         </select>
-        <div className="seg">
-          {(["decisoes", "funil", "criativos", "eventos"] as const).map((s) => (
-            <button key={s} className={sub === s ? "on" : ""} onClick={() => setSub(s)}>{{ decisoes: "O que fazer", funil: "Funil", criativos: "Criativos", eventos: "Evento a evento" }[s]}</button>
-          ))}
-        </div>
       </div>
     </div>
   );
@@ -66,11 +64,10 @@ function Obs({ edicao, dia, inicial, ativo }: { edicao: string; dia: string; ini
 
 const corCpa = (v: number | null, meta: number, corte: number) => (v === null ? "" : v <= meta ? "" : v <= corte ? "c-amarelo" : "c-vermelho");
 
-export default function Imersoes() {
+export default function Imersoes({ sub, tick = 0, onGerado, onSemAcesso }: { sub: Sub; tick?: number; onGerado?: (iso: string, carregando: boolean) => void; onSemAcesso?: () => void }) {
   const [ed, setEd] = useState("");
   const [d, setD] = useState<DadosImersao | null>(null);
   const [erro, setErro] = useState<string | null>(null);
-  const [sub, setSub] = useState<Sub>("decisoes");
   const [periodo, setPeriodo] = useState<Periodo>("tudo");
   const [carregando, setCarregando] = useState(false);
 
@@ -78,19 +75,22 @@ export default function Imersoes() {
     let vivo = true;
     setErro(null);
     setCarregando(true);
+    onGerado?.("", true);
     fetch(`/api/dashboard?imersao=${encodeURIComponent(ed || "ultima")}&periodo=${periodo}`, { cache: "no-store" })
-      .then((r) => r.json())
-      .then((j) => { if (!vivo) return; if (j.error) setErro(j.error); else { setD(j); if (!ed) setEd(j.edicao.id); } })
+      .then((r) => { if (r.status === 401) { onSemAcesso?.(); throw new Error("sem acesso"); } return r.json(); })
+      .then((j) => { if (!vivo) return; if (j.error) setErro(j.error); else { setErro(null); setD(j); onGerado?.(j.geradoEm, false); if (!ed) setEd(j.edicao.id); } })
       .catch((e) => vivo && setErro(String(e)))
-      .finally(() => vivo && setCarregando(false));
+      .finally(() => { if (vivo) { setCarregando(false); onGerado?.("", false); } });
     return () => { vivo = false; };
-  }, [ed, periodo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ed, periodo, tick]);
 
-  if (erro) return <div className="aviso ruim">Não consegui montar as Imersões: {erro}</div>;
-  if (!d) return <div className="vazio">Lendo a Meta e a Hotmart da edição.</div>;
+  if (erro && !d) return <div className="aviso ruim">Não consegui montar a Imersão: {erro}</div>;
+  if (!d) return <div className="vazio">Lendo a Meta e a Hotmart da Imersão.</div>;
   return (
     <>
-      <Cab d={d} ed={ed || d.edicao.id} setEd={setEd} sub={sub} setSub={setSub} />
+      <Cab d={d} ed={ed || d.edicao.id} setEd={setEd} sub={sub} />
+      {erro && <div className="aviso ruim">Última atualização falhou: {erro}</div>}
       {!d.fontes.meta.ok && <div className="aviso ruim">Meta: {d.fontes.meta.erro}</div>}
       {!d.fontes.hotmart.ok && <div className="aviso ruim">Hotmart (banco): {d.fontes.hotmart.erro}</div>}
       <AvisoLote d={d} />
@@ -269,10 +269,10 @@ function Funil({ d }: { d: DadosImersao }) {
         </div>
       </Bloco>
       <div className="g-8-4">
-        <Bloco titulo="Conjuntos" sub="Quente (engajou no perfil) contra Frio (aberto Brasil).">
+        <Bloco titulo="Conjuntos" sub="Todos os conjuntos com gasto, de todas as campanhas da Imersão.">
           <div className="tab-wrap"><table className="tab">
-            <thead><tr><th>Conjunto</th><th className="dir">Investido</th><th className="dir">Visitas</th><th className="dir">IC</th><th className="dir">Ingressos</th><th className="dir">CPA</th></tr></thead>
-            <tbody>{d.conjuntos.map((c) => <tr key={c.id}><td><b>{c.nome}</b></td><td className="dir num">{fR(c.gasto, 0)}</td><td className="dir num">{fN(c.lpv)}</td><td className="dir num">{fN(c.ic)}</td><td className="dir num">{fN(c.vendas)}</td><td className={`dir num ${corCpa(c.cpa, m.cpaMeta, m.cpaCorte)}`}>{fR(c.cpa, 0)}</td></tr>)}</tbody>
+            <thead><tr><th>Conjunto</th><th>Campanha</th><th className="dir">Investido</th><th className="dir">Visitas</th><th className="dir">IC</th><th className="dir">Ingressos</th><th className="dir">CPA</th></tr></thead>
+            <tbody>{d.conjuntos.map((c) => <tr key={c.id}><td><b>{c.nome}</b></td><td className="dim">{c.campanha}</td><td className="dir num">{fR(c.gasto, 0)}</td><td className="dir num">{fN(c.lpv)}</td><td className="dir num">{fN(c.ic)}</td><td className="dir num">{fN(c.vendas)}</td><td className={`dir num ${corCpa(c.cpa, m.cpaMeta, m.cpaCorte)}`}>{fR(c.cpa, 0)}</td></tr>)}</tbody>
           </table></div>
           <div className="dica">Ingressos por conjunto só contam as vendas que o sck liga a um anúncio.</div>
         </Bloco>
@@ -296,7 +296,8 @@ function Criativos({ d, periodo, setPeriodo, carregando }: { d: DadosImersao; pe
   const [so, setSo] = useState<"todos" | "ativos" | "cortar">("todos");
   const cols: Col[] = [
     { k: "nome", rot: "Anúncio", val: (c) => c.nome, fmt: (c) => c.nome },
-    { k: "conjunto", rot: "Conjunto", val: (c) => c.conjunto, fmt: (c) => c.conjunto.replace(/\s*\|.*/, "") },
+    { k: "campanha", rot: "Campanha", val: (c) => c.campanha, fmt: (c) => c.campanha },
+    { k: "conjunto", rot: "Conjunto", val: (c) => c.conjunto, fmt: (c) => nomeConjunto(c.conjunto) },
     { k: "status", rot: "Status", val: (c) => c.status, fmt: (c) => (c.status === "ACTIVE" ? "Ativo" : c.status === "PAUSED" ? "Pausado" : c.status) },
     { k: "gasto", rot: "Gasto", val: (c) => c.gasto, fmt: (c) => fR(c.gasto, 0) },
     { k: "impressoes", rot: "Impr.", val: (c) => c.impressoes, fmt: (c) => fN(c.impressoes) },
@@ -342,6 +343,7 @@ function Criativos({ d, periodo, setPeriodo, carregando }: { d: DadosImersao; pe
         <Kpi rotulo="Vendas ligadas a anúncio" valor={fN(vendasLigadas)} sub={`${d.total.vendasAnuncioSemCriativo} do anúncio sem criativo identificado`} />
         <Kpi rotulo="Custo por visita (campanha)" valor={fR(d.total.lpv ? d.total.gasto / d.total.lpv : null)} sub={`CPC link ${fR(d.total.cliquesLink ? d.total.gasto / d.total.cliquesLink : null)}`} />
       </div>
+      <Galeria d={d} teto={teto} />
       <Bloco
         titulo="Por criativo"
         sub="Anúncios de mesmo nome em conjuntos diferentes somados (Q+F). A venda entra pelo sck: im-A-<criativo> (forma antiga, não separa conjunto) ou im-A-Q_<criativo>_sp (a partir de 13/11, vai para o anúncio)."
@@ -376,7 +378,7 @@ function Criativos({ d, periodo, setPeriodo, carregando }: { d: DadosImersao; pe
         <div className="tab-wrap">
           <table className="tab">
             <thead><tr>{cols.map((c) => (
-              <th key={c.k} className={c.k === "nome" || c.k === "conjunto" || c.k === "status" ? "" : "dir"} style={{ cursor: "pointer" }} onClick={() => setOrd((o) => ({ k: c.k, asc: o.k === c.k ? !o.asc : false }))} aria-sort={ord.k === c.k ? (ord.asc ? "ascending" : "descending") : "none"}>
+              <th key={c.k} className={c.k === "nome" || c.k === "campanha" || c.k === "conjunto" || c.k === "status" ? "" : "dir"} style={{ cursor: "pointer" }} onClick={() => setOrd((o) => ({ k: c.k, asc: o.k === c.k ? !o.asc : false }))} aria-sort={ord.k === c.k ? (ord.asc ? "ascending" : "descending") : "none"}>
                 {c.rot}{ord.k === c.k ? (ord.asc ? " ▲" : " ▼") : ""}
               </th>))}</tr></thead>
             <tbody>
@@ -384,7 +386,7 @@ function Criativos({ d, periodo, setPeriodo, carregando }: { d: DadosImersao; pe
               {lista.map((c) => (
                 <tr key={c.adId} style={c.cortar ? { background: "rgba(220,70,70,.10)" } : undefined}>
                   {cols.map((col) => (
-                    <td key={col.k} className={`${col.k === "nome" || col.k === "conjunto" || col.k === "status" ? "" : "dir num"} ${col.cor ? col.cor(c, d) : ""}`}>
+                    <td key={col.k} className={`${col.k === "nome" || col.k === "campanha" || col.k === "conjunto" || col.k === "status" ? "" : "dir num"} ${col.cor ? col.cor(c, d) : ""}`}>
                       {col.fmt(c)}
                       {col.k === "nome" && c.cortar && <div className="c-vermelho" style={{ fontSize: 11 }}>{c.motivos.join("; ")}</div>}
                       {col.k === "nome" && (() => { const x = decisaoAnuncio(c, teto, m.impMinJulgar); return x.porque ? <div style={{ fontSize: 11, whiteSpace: "normal", maxWidth: 320 }}><b className={x.cor === "neutro" ? "dim" : `c-${x.cor}`}>{x.rot}</b> <span className="dim3">{x.porque}</span></div> : null; })()}
@@ -398,6 +400,74 @@ function Criativos({ d, periodo, setPeriodo, carregando }: { d: DadosImersao; pe
         <div className="dica">Hook = views de 3 s ÷ impressões (régua {REGUAS.hook_rate.min}% a {REGUAS.hook_rate.ideal}%); hold = views de 75% ÷ views de 3 s (régua {REGUAS.hold_rate.min}% a {REGUAS.hold_rate.ideal}%). Só aparece em vídeo. CTR abaixo de 2% é alerta, não veredito; só vale julgar com 5 mil impressões. A venda vem do banco da Hotmart, ligada ao anúncio pelo sck/utm. O pixel não serve aqui: ele conta cada bump como compra (pixel total na campanha: {fN(d.total.compraPixel)}).</div>
       </Bloco>
     </>
+  );
+}
+
+// Galeria: todos os anúncios da Imersão com a capa, a campanha, o veredito e os números (mesmo formato da antiga aba da Hermes Week).
+type FiltroGal = "todos" | "ativos" | "vendendo" | "escalar" | "cortar" | "pausados";
+function Galeria({ d, teto }: { d: DadosImersao; teto: ReturnType<typeof tetoCpa> }) {
+  const m = d.metas;
+  const [f, setF] = useState<FiltroGal>("ativos");
+  const [camp, setCamp] = useState("todas");
+  const dec = (c: CriativoImersao) => decisaoAnuncio(c, teto, m.impMinJulgar);
+  const passa = (c: CriativoImersao, x: FiltroGal) =>
+    x === "todos" ? true : x === "ativos" ? c.status === "ACTIVE" : x === "pausados" ? c.status !== "ACTIVE" : x === "vendendo" ? c.vendas > 0 : x === "cortar" ? c.cortar : dec(c).cor === "verde";
+  const base = d.criativos.filter((c) => camp === "todas" || c.campanha === camp);
+  const lista = base.filter((c) => passa(c, f)).sort((a, b) => (b.status === "ACTIVE" ? 1 : 0) - (a.status === "ACTIVE" ? 1 : 0) || b.gasto - a.gasto);
+  const campanhas = [...new Set(d.criativos.map((c) => c.campanha))];
+  const rot: Record<FiltroGal, string> = { todos: "Todos", ativos: "Ativos", vendendo: "Vendendo", escalar: "Escalar", cortar: "Cortar", pausados: "Pausados" };
+  return (
+    <Bloco titulo="Todos os criativos" sub="Cada anúncio da Imersão, de todas as campanhas, com a capa e o veredito pela régua da ZENITH. A venda vem do sck na Hotmart.">
+      <div className="filtros">
+        {(Object.keys(rot) as FiltroGal[]).map((x) => (
+          <button key={x} className={`filtro ${f === x ? "on" : ""}`} onClick={() => setF(x)}>{rot[x]} <b>{base.filter((c) => passa(c, x)).length}</b></button>
+        ))}
+        {campanhas.length > 1 && (
+          <select className="sel" value={camp} onChange={(e) => setCamp(e.target.value)} aria-label="Campanha">
+            <option value="todas">Todas as campanhas</option>
+            {campanhas.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        )}
+      </div>
+      {lista.length === 0 ? <div className="vazio">Nenhum criativo neste filtro.</div> : (
+        <div className="grade-crt">
+          {lista.map((c) => {
+            const x = dec(c);
+            const video = c.hook !== null;
+            return (
+              <div className="card crt" key={c.adId}>
+                <div className="crt-capa">
+                  {c.thumb && <img src={c.thumb} alt="" referrerPolicy="no-referrer" loading="lazy" />}
+                  <span className={`crt-tag ${x.cor === "neutro" ? "" : `c-${x.cor}`}`}>{c.cortar ? "Cortar" : x.rot}</span>
+                  <span className="crt-fmt">{c.campanha} · {nomeConjunto(c.conjunto)}{c.status !== "ACTIVE" ? " · pausado" : ""}</span>
+                </div>
+                <div className="crt-corpo">
+                  <div className="crt-nome" title={c.nome}>{c.nome}</div>
+                  <div className="crt-meta">
+                    <div><small>Gasto</small><b className="num">{fR(c.gasto, 0)}</b></div>
+                    <div><small>Vendas</small><b className="num brass">{c.vendas}</b></div>
+                    <div><small>CPA</small><b className={`num ${corCpa(c.cpa, m.cpaMeta, m.cpaCorte)}`}>{fR(c.cpa, 0)}</b></div>
+                    <div><small>CTR link</small><b className={`num ${c.ctr !== null && c.impressoes >= m.impMinJulgar && c.ctr < m.ctrMinLink ? "c-vermelho" : ""}`}>{fP(c.ctr, 2)}</b></div>
+                    {video ? (
+                      <>
+                        <div><small>Hook</small><b className={`num ${corRegua("hook_rate", c.hook)}`}>{fP(c.hook)}</b></div>
+                        <div><small>Hold</small><b className={`num ${corRegua("hold_rate", c.hold)}`}>{fP(c.hold)}</b></div>
+                      </>
+                    ) : (
+                      <>
+                        <div><small>Custo/visita</small><b className="num">{fR(c.custoLpv)}</b></div>
+                        <div><small>Checkouts</small><b className="num">{fN(c.ic)}</b></div>
+                      </>
+                    )}
+                  </div>
+                  {(c.cortar || x.porque) && <div className="crt-acao">{c.cortar ? c.motivos.join("; ") : x.porque}</div>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Bloco>
   );
 }
 

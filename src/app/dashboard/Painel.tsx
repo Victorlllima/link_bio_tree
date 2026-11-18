@@ -3,15 +3,25 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshCw, Eye, EyeOff } from "lucide-react";
 import "./painel.css";
-import Imersoes from "./ImersoesView";
+import Imersoes, { type Sub as SubIms } from "./ImersoesView";
 import type { Dados, Resumo, RespInvestidor, LinhaInvestidor, BaseSimulador, Recorte } from "./tipos";
 import { REGUAS, REGRAS_OURO, avaliar, PRECO_INGRESSO, PRODUTOS, ROAS_ESCALA, PASSO_MAX_VERBA } from "./metas";
 import { Kpi, LinhaRegua, Bloco, Alerta, Funil, Area, Barras, Calor, Ponto, ReguaDica, fN, fR, fP, fX, metaTexto } from "./ui";
 
-type Aba = "geral" | "trafego" | "criativos" | "vendas" | "grupo" | "aulas" | "formacao" | "financeiro" | "investidor" | "comparativo" | "imersoes" | "lancar" | "reguas";
+// Red, 18/11/2026: o painel agora é da Imersão Arquiteto de Agentes. A Hermes Week ficou só como histórico,
+// num grupo próprio do menu (os números dela só carregam quando uma aba do histórico é aberta).
+type AbaIms = "ims_decisoes" | "ims_funil" | "ims_criativos" | "ims_eventos";
+type AbaHw = "geral" | "trafego" | "criativos" | "vendas" | "grupo" | "aulas" | "formacao" | "financeiro" | "investidor" | "comparativo" | "lancar" | "reguas";
+type Aba = AbaIms | AbaHw;
+const SUB_IMS: Record<AbaIms, SubIms> = { ims_decisoes: "decisoes", ims_funil: "funil", ims_criativos: "criativos", ims_eventos: "eventos" };
+const ehIms = (a: Aba): a is AbaIms => a in SUB_IMS;
 
-const NAV: { id: Aba; rot: string; sepDepois?: boolean }[] = [
-  { id: "geral", rot: "Visão geral", sepDepois: true },
+const NAV: { id: Aba; rot: string; sepDepois?: boolean; grupoAntes?: string }[] = [
+  { id: "ims_decisoes", rot: "O que fazer" },
+  { id: "ims_funil", rot: "Funil" },
+  { id: "ims_criativos", rot: "Criativos" },
+  { id: "ims_eventos", rot: "Evento a evento", sepDepois: true },
+  { id: "geral", rot: "Visão geral", grupoAntes: "Histórico · Hermes Week" },
   { id: "trafego", rot: "Tráfego" },
   { id: "criativos", rot: "Criativos" },
   { id: "vendas", rot: "Ingressos", sepDepois: true },
@@ -20,8 +30,7 @@ const NAV: { id: Aba; rot: string; sepDepois?: boolean }[] = [
   { id: "formacao", rot: "Carrinho", sepDepois: true },
   { id: "financeiro", rot: "Financeiro" },
   { id: "investidor", rot: "Investidor" },
-  { id: "comparativo", rot: "Comparativo" },
-  { id: "imersoes", rot: "Imersões", sepDepois: true },
+  { id: "comparativo", rot: "Comparativo", sepDepois: true },
   { id: "lancar", rot: "Lançar números" },
   { id: "reguas", rot: "Réguas" },
 ];
@@ -79,7 +88,10 @@ export default function Painel() {
   const [geradoEm, setGeradoEm] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(false);
-  const [aba, setAba] = useState<Aba>("geral");
+  const [aba, setAba] = useState<Aba>("ims_decisoes");
+  const [tick, setTick] = useState(0); // recarrega a Imersão
+  const [imsGerado, setImsGerado] = useState<string | null>(null);
+  const [imsCarregando, setImsCarregando] = useState(false);
   const [privado, setPrivado] = useState(false);
 
   const carregar = useCallback(async (escolha: string, deP = "", ateP = "") => {
@@ -115,15 +127,26 @@ export default function Painel() {
 
   useEffect(() => {
     try {
-      const a = localStorage.getItem("hwd_aba") as Aba | null;
+      const a = localStorage.getItem("ims_aba") as Aba | null;
       if (a && NAV.some((n) => n.id === a)) setAba(a);
     } catch {}
-    carregar("");
-  }, [carregar]);
+  }, []);
+
+  // Hermes Week (histórico) só carrega quando uma aba dela é aberta
+  const hist = !ehIms(aba);
+  useEffect(() => {
+    if (hist && !fixo && !carregando && auth !== false) carregar(sel, de, ate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hist]);
 
   // atualiza sozinho a cada 2 min (30 s com o carrinho aberto) e pausa com a aba escondida
   const carrinhoAberto = !ehModoRecorte(sel) && fixo?.ciclo.fase.id === "carrinho";
   useEffect(() => {
+    if (!hist) {
+      // Imersão: atualiza a cada 2 min com a aba visível
+      const t = setInterval(() => document.visibilityState === "visible" && setTick((x) => x + 1), 120e3);
+      return () => clearInterval(t);
+    }
     if (!geradoEm) return;
     const ms = carrinhoAberto ? 30e3 : 120e3;
     const t = setInterval(() => {
@@ -135,12 +158,12 @@ export default function Painel() {
       clearInterval(t);
       document.removeEventListener("visibilitychange", vis);
     };
-  }, [geradoEm, sel, de, ate, carrinhoAberto, carregar]);
+  }, [hist, geradoEm, sel, de, ate, carrinhoAberto, carregar]);
 
   function irPara(a: Aba) {
     setAba(a);
     try {
-      localStorage.setItem("hwd_aba", a);
+      localStorage.setItem("ims_aba", a);
     } catch {}
     window.scrollTo({ top: 0 });
   }
@@ -168,15 +191,17 @@ export default function Painel() {
     e.preventDefault();
     setErroSenha(false);
     const r = await fetch("/api/lpsg/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: senha }) });
-    if (r.ok) carregar(sel, de, ate);
-    else setErroSenha(true);
+    if (!r.ok) return setErroSenha(true);
+    setAuth(true);
+    if (hist) carregar(sel, de, ate);
+    else setTick((x) => x + 1);
   }
 
   if (auth === false) {
     return (
       <div className="hw-login">
         <form onSubmit={entrar}>
-          <h1>Hermes Week</h1>
+          <h1>Imersão Arquiteto de Agentes</h1>
           <p>Painel do lançamento. Acesso restrito.</p>
           <input type="password" placeholder="Senha" value={senha} onChange={(e) => setSenha(e.target.value)} autoFocus aria-label="Senha" />
           {erroSenha && <div className="erro">Senha incorreta. Tente de novo.</div>}
@@ -186,7 +211,7 @@ export default function Painel() {
     );
   }
 
-  const modoRec = ehModoRecorte(sel);
+  const modoRec = hist && ehModoRecorte(sel);
   const dados: Dados | null = modoRec ? null : fixo;
   const alertasRuins = dados ? dados.leitura.filter((l) => l.nivel === "ruim").length : 0;
   const faseTexto = modoRec ? undefined : dados?.ciclo.fase.rotulo;
@@ -197,11 +222,11 @@ export default function Painel() {
       <header>
         <div className="mast">
           <div className="marca">
-            <b>Hermes Week</b>
-            <small>Painel do lançamento</small>
+            <b>{hist ? "Hermes Week" : "Imersão Arquiteto de Agentes"}</b>
+            <small>{hist ? "Histórico do lançamento antigo" : "Painel do lançamento"}</small>
           </div>
           <div className="esp" />
-          <div className="ciclo">
+          {hist && <div className="ciclo">
             <label htmlFor="hw-ciclo">Filtro</label>
             <select id="hw-ciclo" value={sel} onChange={(e) => escolher(e.target.value)}>
               <optgroup label="Turma">
@@ -222,21 +247,21 @@ export default function Painel() {
                 <input type="date" value={ate} min={de || undefined} max={brDiaDe(Date.now())} onChange={(e) => mudarData(de, e.target.value)} aria-label="Data final" />
               </span>
             )}
-          </div>
-          {faseTexto && (
+          </div>}
+          {hist && faseTexto && (
             <div className="fase">
               <Ponto cor="verde" />
               {faseTexto}
             </div>
           )}
-          {geradoEm && (
+          {(hist ? geradoEm : imsGerado) && (
             <div className="atualizado">
-              <Ponto cor={erro ? "amarelo" : "verde"} />
-              <span>{carregando ? "Atualizando" : `Atualizado às ${dmh(geradoEm).split(" ")[1]}`}</span>
+              <Ponto cor={hist && erro ? "amarelo" : "verde"} />
+              <span>{(hist ? carregando : imsCarregando) ? "Atualizando" : `Atualizado às ${dmh((hist ? geradoEm : imsGerado)!).split(" ")[1]}`}</span>
             </div>
           )}
-          <button className="iconb" onClick={() => carregar(sel, de, ate)} aria-label="Atualizar os números" disabled={carregando}>
-            <RefreshCw size={16} className={carregando ? "girando" : ""} />
+          <button className="iconb" onClick={() => (hist ? carregar(sel, de, ate) : setTick((x) => x + 1))} aria-label="Atualizar os números" disabled={hist ? carregando : imsCarregando}>
+            <RefreshCw size={16} className={(hist ? carregando : imsCarregando) ? "girando" : ""} />
           </button>
           <button className="iconb" onClick={() => setPrivado(!privado)} aria-label={privado ? "Mostrar valores" : "Ocultar valores"}>
             {privado ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -246,6 +271,7 @@ export default function Painel() {
           <nav className="nav" aria-label="Seções do painel">
             {NAV.map((n) => (
               <span key={n.id} style={{ display: "contents" }}>
+                {n.grupoAntes && <span className="grupo-rot">{n.grupoAntes}</span>}
                 <button className={aba === n.id ? "on" : ""} onClick={() => irPara(n.id)} aria-current={aba === n.id ? "page" : undefined}>
                   {n.rot}
                   {n.id === "geral" && alertasRuins > 0 && <span className="alerta-pt" aria-label={`${alertasRuins} problema`} />}
@@ -258,11 +284,19 @@ export default function Painel() {
       </header>
 
       <main className="wrap">
-        {erro && <div className="aviso ruim">Não consegui montar o painel: {erro}</div>}
-        {modoRec ? (
+        {!hist ? (
+          <Imersoes
+            sub={SUB_IMS[aba as AbaIms]}
+            tick={tick}
+            onGerado={(iso, c) => { setImsCarregando(c); if (iso) { setImsGerado(iso); setAuth(true); } }}
+            onSemAcesso={() => setAuth(false)}
+          />
+        ) : erro ? (
+          <div className="aviso ruim">Não consegui montar o histórico da Hermes Week: {erro}</div>
+        ) : modoRec ? (
           rec && rec.modo === sel ? <RecorteView r={rec} /> : <div className="vazio">Somando gasto e receita do período.</div>
         ) : !dados ? (
-          <div className="vazio">Montando os números do ciclo.</div>
+          <div className="vazio">Montando o histórico da Hermes Week.</div>
         ) : (
           <>
             {aba === "geral" && <Geral d={dados} />}
@@ -275,7 +309,6 @@ export default function Painel() {
             {aba === "financeiro" && <Financeiro d={dados} />}
             {aba === "investidor" && <Investidor atual={dados.ciclo.d0} />}
             {aba === "comparativo" && <Comparativo atual={dados.ciclo.d0} />}
-            {aba === "imersoes" && <Imersoes />}
             {aba === "lancar" && <Lancar lista={lista} padrao={padraoLancar || dados.ciclo.d0} salvo={() => carregar(sel)} />}
             {aba === "reguas" && <Reguas />}
           </>

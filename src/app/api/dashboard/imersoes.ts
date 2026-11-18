@@ -2,7 +2,7 @@
 // IMERSÕES — números de uma edição (Meta ao vivo + Hotmart pelo banco) e comparação evento a evento.
 // Config por edição em src/app/dashboard/imersoes.ts. Tudo roda no servidor: o token nunca vai ao cliente.
 // ============================================================
-import { EDICOES, type EdicaoCfg } from "@/app/dashboard/imersoes";
+import { EDICOES, nomeConjunto, type EdicaoCfg } from "@/app/dashboard/imersoes";
 import type { GrupoCriativo, CriativoImersao, DadosImersao, DiaImersao, EventoSerie, LoteImersaoRes, RespComparacaoEventos, Fonte } from "@/app/dashboard/tipos";
 import { montar, type CicloCal } from "./montar";
 
@@ -84,7 +84,7 @@ const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 export const chaveCriativo = (nome: string) => norm(nome.toLowerCase().replace(/^im-a-/, "").replace(/^[a-z]_/, "").replace(/_sp$/, ""));
 
 type Atrib = { tipo: "anuncio" | "criativo" | "anuncio-sem-criativo" | "outra"; adId: string | null; chave: string | null };
-function atribuir(origem: Record<string, unknown> | null, ads: Map<string, string>, porNome: Map<string, string[]>, grupos: Set<string>, campanhaId: string): Atrib {
+function atribuir(origem: Record<string, unknown> | null, ads: Map<string, string>, porNome: Map<string, string[]>, grupos: Set<string>, campanhaIds: string[]): Atrib {
   if (!origem) return { tipo: "outra", adId: null, chave: null };
   const valores = Object.values(origem).filter((v): v is string => typeof v === "string" && !!v);
   const texto = valores.join(" ");
@@ -98,7 +98,7 @@ function atribuir(origem: Record<string, unknown> | null, ads: Map<string, strin
     if (ch && grupos.has(ch)) return { tipo: "criativo", adId: null, chave: ch }; // nome repetido em conjuntos ou forma antiga
   }
   const sck = String(origem.sck || "");
-  if (/^im-/i.test(sck) || texto.includes(campanhaId)) return { tipo: "anuncio-sem-criativo", adId: null, chave: null };
+  if (/^im-/i.test(sck) || campanhaIds.some((id) => texto.includes(id))) return { tipo: "anuncio-sem-criativo", adId: null, chave: null };
   return { tipo: "outra", adId: null, chave: null };
 }
 
@@ -117,8 +117,11 @@ export async function montarImersao(id: string | null, periodo: Periodo = "tudo"
   const jan = janela(periodo, ed.gastoIni, hoje, until);
   const trAd = encodeURIComponent(JSON.stringify({ since: jan.de, until: jan.ate }));
   const noPeriodo = (c: Compra) => { const d = brDia(c.criado_em); return d >= jan.de && d <= jan.ate; };
-  const filtroCamp = encodeURIComponent(JSON.stringify([{ field: "campaign.id", operator: "EQUAL", value: ed.campanha.id }]));
-  const insAd = `act_${AD_ACCOUNT}/insights?level=ad&time_range=${trAd}&filtering=${filtroCamp}&fields=ad_id,ad_name,adset_id,adset_name,spend,impressions,inline_link_clicks,actions,video_p75_watched_actions&limit=500`;
+  const campIds = ed.campanhas.map((c) => c.id);
+  const campSet = new Set(campIds);
+  const rotCamp = new Map(ed.campanhas.map((c) => [c.id, c.rot]));
+  const filtroCamp = encodeURIComponent(JSON.stringify([{ field: "campaign.id", operator: "IN", value: campIds }]));
+  const insAd = `act_${AD_ACCOUNT}/insights?level=ad&time_range=${trAd}&filtering=${filtroCamp}&fields=ad_id,ad_name,adset_id,adset_name,campaign_id,spend,impressions,inline_link_clicks,actions,video_p75_watched_actions&limit=500`;
 
   let obsDisponivel = true;
   const [compras, diarioRaw, adsInsRaw, adsInfoRaw, obsRaw] = await Promise.all([
@@ -133,7 +136,11 @@ export async function montarImersao(id: string | null, periodo: Periodo = "tudo"
         })
       : Promise.resolve([] as Linha[]),
     ed.gastoIni <= until ? graph(insAd).catch(() => [] as Linha[]) : Promise.resolve([] as Linha[]),
-    graph(`${ed.campanha.id}/ads?fields=id,name,effective_status,adset%7Bid,name%7D,creative.thumbnail_width(300).thumbnail_height(300)%7Bthumbnail_url%7D&limit=200`).catch(() => [] as Linha[]),
+    Promise.all(
+      campIds.map((id) =>
+        graph(`${id}/ads?fields=id,name,effective_status,campaign_id,adset%7Bid,name%7D,creative.thumbnail_width(400).thumbnail_height(400)%7Bthumbnail_url,image_url%7D&limit=200`).catch(() => [] as Linha[]),
+      ),
+    ).then((xs) => xs.flat()),
     // observação do dia (controle diário). Sem a tabela, a coluna fica só leitura e avisa.
     sb<{ dia: string; texto: string }[]>(`imersao_dash_obs?edicao=eq.${encodeURIComponent(ed.id)}&select=dia,texto`).catch(() => {
       obsDisponivel = false;
@@ -186,7 +193,7 @@ export async function montarImersao(id: string | null, periodo: Periodo = "tudo"
   let semCriativo = 0;
   const tipoDe = new Map<string, "anuncio" | "anuncio-sem-criativo" | "outra">();
   for (const c of ingressosTx) {
-    const a = atribuir(c.origem, nomeAd, porNome, grupos, ed.campanha.id);
+    const a = atribuir(c.origem, nomeAd, porNome, grupos, campIds);
     tipoDe.set(c.transacao, a.tipo === "criativo" ? "anuncio" : a.tipo);
     const conta = noPeriodo(c); // a venda por anúncio segue o filtro de período do tracker
     if (a.tipo === "anuncio" && a.adId) {
@@ -209,7 +216,7 @@ export async function montarImersao(id: string | null, periodo: Periodo = "tudo"
   const pega = (d: string) => dias.get(d) ?? (dias.set(d, novoDia(d)), dias.get(d)!);
   for (let d = ed.captacaoIni; d <= until; d = dia(d, 1)) pega(d);
   for (const r of diarioRaw) {
-    if (String(r.campaign_id) !== ed.campanha.id) continue;
+    if (!campSet.has(String(r.campaign_id))) continue;
     const x = pega(String(r.date_start));
     x.gasto += num(r.spend);
     x.impressoes += num(r.impressions);
@@ -276,7 +283,9 @@ export async function montarImersao(id: string | null, periodo: Periodo = "tudo"
     const r = insPorId.get(adId) ?? {};
     const info = infoPorId.get(adId) as Linha | undefined;
     const adset = (info?.adset as Linha | undefined)?.name ?? r.adset_name ?? "?";
-    const thumb = ((info?.creative as Linha | undefined)?.thumbnail_url as string | undefined) ?? null;
+    const cr = info?.creative as Linha | undefined;
+    const thumb = ((cr?.image_url ?? cr?.thumbnail_url) as string | undefined) ?? null;
+    const campanha = rotCamp.get(String(info?.campaign_id ?? r.campaign_id ?? "")) ?? "?";
     const status = String(info?.effective_status ?? "?");
     const gasto = num(r.spend), imp = num(r.impressions), cl = num(r.inline_link_clicks);
     const lpv = acao(r, LPV), ic = acao(r, IC), vp = acao(r, COMPRA);
@@ -296,7 +305,7 @@ export async function montarImersao(id: string | null, periodo: Periodo = "tudo"
     else if (gasto >= m.cpaCorte && vendas === 0) motivos.push(`gastou R$ ${gasto.toFixed(0)} (corte R$ ${m.cpaCorte}) sem venda no banco`);
     else if (vendas > 0 && gasto / vendas > m.cpaCorte) motivos.push(`CPA R$ ${(gasto / vendas).toFixed(0)} acima do corte de R$ ${m.cpaCorte}`);
     return {
-      adId, nome: nomeAd.get(adId) ?? adId, conjunto: String(adset), status, thumb, gasto, impressoes: imp, cliquesLink: cl,
+      adId, nome: nomeAd.get(adId) ?? adId, campanha, conjunto: String(adset), status, thumb, gasto, impressoes: imp, cliquesLink: cl,
       ctr, cpc: div(gasto, cl), lpv, custoLpv: div(gasto, lpv), ic, vendas, chave, vendasPixel: vp, cpa: div(gasto, vendas),
       views3s: v3, hook: v3 && imp ? (v3 / imp) * 100 : null, hold: v3 ? (p75 / v3) * 100 : null,
       cortar: ativo && motivos.length > 0, motivos,
@@ -319,13 +328,17 @@ export async function montarImersao(id: string | null, periodo: Periodo = "tudo"
   }).sort((a, b) => b.gasto - a.gasto);
 
   // ---------- conjuntos ----------
-  const conjuntos = ed.campanha.conjuntos.map((cj) => {
-    const rs = adsInsRaw.filter((r) => String(r.adset_id) === cj.id);
+  // todos os conjuntos com gasto no período, de todas as campanhas da edição
+  const porAdset = new Map<string, Linha[]>();
+  for (const r of adsInsRaw) porAdset.set(String(r.adset_id), [...(porAdset.get(String(r.adset_id)) || []), r]);
+  const conjuntos = [...porAdset.entries()].map(([id, rs]) => {
     const s = (f: (r: Linha) => number) => rs.reduce((t, r) => t + f(r), 0);
     const gasto = s((r) => num(r.spend));
     const vendas = criativos.filter((c) => rs.some((r) => String(r.ad_id) === c.adId)).reduce((t, c) => t + c.vendas, 0); // só venda separada por anúncio
-    return { id: cj.id, nome: cj.nome, gasto, impressoes: s((r) => num(r.impressions)), cliquesLink: s((r) => num(r.inline_link_clicks)), lpv: s((r) => acao(r, LPV)), ic: s((r) => acao(r, IC)), vendas, cpa: div(gasto, vendas) };
-  });
+    const campanha = rotCamp.get(String(rs[0].campaign_id)) ?? "?";
+    const nome = nomeConjunto(String(rs[0].adset_name ?? id));
+    return { id, nome, campanha, gasto, impressoes: s((r) => num(r.impressions)), cliquesLink: s((r) => num(r.inline_link_clicks)), lpv: s((r) => acao(r, LPV)), ic: s((r) => acao(r, IC)), vendas, cpa: div(gasto, vendas) };
+  }).filter((c) => c.gasto > 0).sort((a, b) => b.gasto - a.gasto);
 
   // ---------- totais ----------
   const T = (k: keyof DiaImersao) => serie.reduce((s, x) => s + (x[k] as number), 0);
@@ -349,6 +362,7 @@ export async function montarImersao(id: string | null, periodo: Periodo = "tudo"
     geradoEm: agora.toISOString(),
     edicao: { id: ed.id, nome: ed.nome, numero: ed.numero, noite1: ed.noite1, noite2: ed.noite2, carrinhoFecha: ed.carrinhoFecha },
     edicoes: EDICOES.map((e) => ({ id: e.id, nome: e.nome, numero: e.numero })),
+    campanhas: ed.campanhas.map((c) => ({ nome: c.nome, rot: c.rot })),
     fontes,
     metas: ed.metas,
     fase: { ...fase, dnHoje },
