@@ -1475,6 +1475,33 @@ export const RESOURCES: Resource[] = [
       },
     ],
   },
+  {
+    slug: "5-agentes-gta",
+    titulo: "5 agentes das 5 missões",
+    categoria: "Guias",
+    novo: true,
+    resumo: "Os 5 agentes do carrossel das missões: monitoramento, atendimento, reativação, qualificação e indicação, com o prompt inicial de cada um.",
+    intro:
+      "Cinco tarefas que quase todo negócio deixa para depois, cada uma entregue a um agente de IA. Para cada missão você recebe o problema, o que o agente faz, como montar o seu e um prompt inicial pronto para colar.",
+    arquivo: "/redreply/pdfs/5-agentes-gta.pdf",
+    secoes: [
+      {
+        titulo: "O que é",
+        texto:
+          "Um guia em PDF com os cinco agentes: monitoramento da concorrência, atendimento de madrugada, reativação de quem parou de responder, qualificação de quem está pronto para comprar e indicação de clientes.",
+      },
+      {
+        titulo: "O que você recebe",
+        texto:
+          "• O problema de cada missão\n• O que o agente faz\n• Como montar o seu\n• Um prompt inicial para colar\n• Um cuidado antes de ligar",
+      },
+      {
+        titulo: "Quando usar",
+        texto:
+          "Comece pela missão que mais pesa na sua semana e ligue um agente por vez. Quando o primeiro estiver rodando sozinho, passe para o próximo.",
+      },
+    ],
+  },
 ];
 
 export function getResource(slug: string): Resource | undefined {
