@@ -79,8 +79,9 @@ export const EDICOES: EdicaoCfg[] = [
       ],
     },
     precoIngressoPadrao: 44,
-    // meta ~R$48 e corte R$67 no lote 1 (QG 1.5, ok do Red em 04/11); ingressosMeta 50 = meta da Turma 1 (Red, 07/11, QG 1.5); o resto vem da régua da ZENITH (corte.py)
-    metas: { cpaMeta: 48, cpaCorte: 67, ctrMinLink: 0.6, impMinJulgar: 5000, verbaDia: 250, ingressosMeta: 50 },
+    // corte = teto Baldan (ROAS 1) pelo ticket real de 20/11: (R$ 47 + R$ 27 de bumps) × 0,875 = R$ 64; meta = 20% abaixo do teto = R$ 51 (ok do Red em 20/11).
+    // verbaDia = VEN R$ 360 + RMKT R$ 30 desde 19/11 (TESTE pausada). ingressosMeta 50 = meta da Turma 1 (Red, 07/11, QG 1.5); o resto vem da régua da ZENITH (corte.py)
+    metas: { cpaMeta: 51, cpaCorte: 64, ctrMinLink: 0.6, impMinJulgar: 5000, verbaDia: 390, ingressosMeta: 50 },
   },
 ];
 
