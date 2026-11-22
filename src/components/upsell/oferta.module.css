@@ -1,0 +1,22 @@
+.root{position:relative;min-height:100svh;background:#050607 url(/upsell/placa.webp) center/cover no-repeat;color:#eef0f3;overflow-x:hidden}
+.shade{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 40%,rgba(5,6,7,.35),rgba(5,6,7,.84) 100%)}
+.wrap{position:relative;max-width:600px;margin:0 auto;padding:40px 22px calc(40px + env(safe-area-inset-bottom))}
+.rascunho{position:relative;z-index:2;background:#eef0f3;color:#050607;font-size:12px;letter-spacing:.12em;text-transform:uppercase;text-align:center;padding:8px 12px;font-weight:600}
+.logo{display:block;height:34px;width:auto;margin-bottom:52px}
+.tag{display:inline-flex;align-items:center;gap:12px;font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+.led{width:8px;height:8px;border-radius:50%;background:#4f86ff;box-shadow:0 0 10px 2px #4f86ff}
+.h1{font-weight:500;font-size:clamp(32px,8.6vw,50px);line-height:1.04;letter-spacing:-.035em;margin:20px 0 0}
+.lead{font-size:18px;line-height:1.5;color:rgba(238,240,243,.7);margin:18px 0 0}
+.itens{list-style:none;padding:0;margin:32px 0 0}
+.itens li{font-size:17px;line-height:1.4;padding:13px 0;border-top:1px solid rgba(238,240,243,.12)}
+.itens li:last-child{border-bottom:1px solid rgba(238,240,243,.12)}
+.preco{display:flex;flex-direction:column;gap:6px;margin:34px 0 0}
+.pl{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(238,240,243,.66)}
+.pv{font-weight:500;font-size:clamp(40px,11vw,60px);letter-spacing:-.04em;line-height:1}
+.pd{font-size:16px;line-height:1.45;color:rgba(238,240,243,.78)}
+.ancora{font-size:15px;color:rgba(238,240,243,.6);margin-top:4px}
+.nota{font-size:14px;line-height:1.5;color:rgba(238,240,243,.55);margin-top:4px}
+.btn{display:block;text-align:center;margin-top:34px;border-radius:999px;background:#4f86ff;color:#fff;font-size:14px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;padding:19px 24px;text-decoration:none;box-shadow:0 0 28px rgba(79,134,255,.45)}
+.recusar{display:block;text-align:center;margin-top:20px;padding:12px;font-size:16px;color:rgba(238,240,243,.78);text-decoration:underline;text-underline-offset:4px}
+.aviso{font-size:13px;line-height:1.55;color:rgba(238,240,243,.5);margin:26px 0 0}
+.sig{margin-top:40px;font-size:12px;letter-spacing:.1em;color:#8b9099}
