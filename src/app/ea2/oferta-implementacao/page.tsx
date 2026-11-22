@@ -3,7 +3,7 @@ import Oferta from "@/components/upsell/Oferta";
 import { LINK_ACEITAR_2, OFERTA_2, URL_OBRIGADO } from "@/components/upsell/config";
 
 export const metadata: Metadata = {
-  title: "Consultoria com implementação | RedPro AI Academy",
+  title: "Sua empresa no automático | RedPro AI Academy",
   robots: { index: false, follow: false },
 };
 
@@ -13,18 +13,18 @@ export default function Page() {
     <Oferta
       nome="implementacao"
       etapa="Mais um passo, opcional"
-      titulo="Quer que eu implemente com você, por 6 meses?"
-      lead="Consultoria de 6 meses com implementação dos agentes no seu negócio. Esta oferta aparece só aqui."
+      titulo="Sua empresa no automático"
+      lead="Eu e o Genix Lab implantamos os Squads na sua empresa e acompanhamos a operação por 6 meses. Esta oferta aparece só aqui."
       itens={[
-        "Implementação dos agentes no seu negócio",
-        "Acompanhamento durante 6 meses",
-        "FA², Formação Arquiteto de Agentes, incluída",
-        "EA² incluso",
+        "Implantação dos 2 Squads, marketing e desenvolvimento, na sua empresa, feita por mim e pelo Genix Lab",
+        "6 meses de operação acompanhada",
+        "EA² e FA², Formação Arquiteto de Agentes, inclusos",
+        "Genix OS ativo durante todo o contrato",
       ]}
-      precoLabel="Implementação"
+      precoLabel="Implantação"
       preco={OFERTA_2.implementacao}
       precoDetalhe={`mais ${OFERTA_2.mensal} por mês, durante ${OFERTA_2.meses} meses.`}
-      aceitarTexto="Sim, quero a consultoria"
+      aceitarTexto="Sim, quero minha empresa no automático"
       aceitarHref={LINK_ACEITAR_2}
       recusarTexto="Não, obrigado. Ir para a confirmação do EA²"
       recusarHref={URL_OBRIGADO}
