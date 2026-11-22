@@ -11,13 +11,12 @@ export const LINK_ACEITAR_2 = "#link-compra-upsell-2"; // MIRA cria na Hotmart
 export const URL_OBRIGADO = "/ea2/obrigado"; // página final do EA² (recusar nos dois upsells)
 export const URL_UPSELL_2 = "/ea2/oferta-implementacao"; // destino de quem aceita o 1 (ION encaminha)
 
-// Ancoragem: só ligar se o Red confirmar que a mentoria anual existe como oferta.
-export const ANCORA_MENTORIA_ANUAL = false;
-export const PRECO_MENTORIA_ANUAL = "R$ 20.000";
+// Mentoria anual de R$ 20.000 NÃO existe (Red, 21/11): sem ancoragem nela.
 
 export const OFERTA_1 = {
-  preco: "R$ 6.000", // PENDENTE: total (EA² + Formação) ou adicional ao EA² já pago?
-  precoNota: "Você já pagou o EA². O valor é referente ao upgrade para a Formação.",
+  preco: "R$ 6.000", // total EA² + FA² (Red, 21/11)
+  detalhe: "no total. Você já pagou R$ 1.250 no EA²: falta R$ 4.750.",
+  ancora: "Separado seria R$ 9.250: EA² R$ 1.250 + FA² avulsa R$ 8.000.",
 };
 
 export const OFERTA_2 = {

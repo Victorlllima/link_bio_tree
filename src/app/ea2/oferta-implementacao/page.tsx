@@ -19,7 +19,7 @@ export default function Page() {
       itens={[
         "Implementação dos agentes no seu negócio",
         "Acompanhamento durante 6 meses",
-        "Formação Arquiteto de Agentes incluída",
+        "FA², Formação Arquiteto de Agentes, incluída",
         "EA² incluso",
       ]}
       precoLabel="Implementação"
