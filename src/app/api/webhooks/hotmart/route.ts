@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { emailConfirmacao as emailConfirmacaoHermesWeek, emailBoasVindas as emailBoasVindasHermesWeek, emailRecuperacao as emailRecuperacaoHermesWeek } from "@/lib/mensagens-hermesweek";
 import { lerCicloAtual } from "@/lib/ciclo-atual";
 import { BUMPS_HERMES_WEEK, eventoCapi, type EventoCapi } from "@/lib/capi-eventos";
+import { classificarEa2, registrarFunilEa2, OFERTA_COM_GUIAS, guiasJaEnviados, enviarGuiasEa2 } from "@/lib/funil-ea2";
 import { lerImersaoConfig } from "@/lib/imersao-config";
 import { garantirToken } from "@/lib/imersao-grupo";
 import { enviarA1DaCompra } from "@/lib/wpp-oficial-campanha";
@@ -52,11 +53,14 @@ const PRODUTOS: Record<string, string> = {
     "8551609": "Oferta extra — 50 casos de uso do Hermes (R$37)",
     "8551624": "Oferta extra — Segundo cérebro com o Hermes (R$47)",
     "8552026": "De Um Agente a Um Squad (R$697)",
-    "8660306": "Formação Arquiteto de Agentes (R$1.497)",
     // Imersão RedPro (25 e 26/11/2026; Red, 31/10/2026): ingresso com lotes por data (R$44, R$47, R$52; lotes 2 e 3 baixados em 12/11) e gravação.
     // No mapa para o CAPI disparar Purchase. Sem audiência do Resend de propósito (interessados-imersao é de quem preencheu a ficha).
     "8852419": "Imersão RedPro — Ingresso",
     "8852453": "Imersão RedPro — Gravação",
+    // EA² e funil de upsell (Red, 22/11/2026). Mesmo gate do CAPI: produto fora do mapa grava e avisa, mas não dispara Purchase.
+    "8660306": "EA² — Experiência Arquiteto de Agentes",
+    "9039408": "FA² — Formação Arquiteto de Agentes",
+    "9039445": "Consultoria de Implementação de Agentes — 6 meses",
 };
 
 export const maxDuration = 60;
@@ -513,11 +517,37 @@ export async function POST(req: NextRequest) {
         // Ingresso da Imersão: o Purchase leva ingresso + bumps do pedido. Os bumps chegam em webhooks próprios
         // 10 a 20s depois, então o envio espera (fora da resposta) e soma o que já foi gravado.
         const capiAdiado = produtoConhecido && produtoId === PRODUTO_IMERSAO_INGRESSO && nomeEventoCapi === "Purchase";
+        // Funil EA² (22/11): classifica pela oferta, usa o valor real da oferta no Purchase (upsell 1 = R$4.750),
+        // registra no Supabase e avisa. Falha de registro alerta e nunca derruba o webhook.
+        // Teste ponta a ponta da ION: payload com ion_teste=true (só passa com o hottok) roda tudo menos o CAPI.
+        const testeIon = body.ion_teste === true;
+        const ofertaCod = String(((purchase?.offer as Record<string, unknown> | undefined)?.code) ?? "");
+        const ea2 = classificarEa2(produtoId, ofertaCod);
+        const valorCapi = ea2 && ea2.conhecida && !(valor > 0) ? ea2.valor : valor;
+        if (ea2) {
+            const reg = await registrarFunilEa2(SUPABASE_URL, { transacao, evento, etapa: ea2.etapa, oferta: ofertaCod, produto_id: produtoId, valor: valorCapi, email, nome, fone, aviso_enviado: false });
+            if (!reg.ok) await telegram(`⚠️ Funil EA²: falha ao registrar ${transacao} (${ea2.etapa}): ${mdSeguro("erro" in reg ? String(reg.erro) : "").slice(0, 200)}`);
+            if (!ea2.conhecida) await telegram(`⚠️ Funil EA²: oferta desconhecida \`${mdSeguro(ofertaCod) || "—"}\` no produto ${produtoId} (${transacao}). Purchase enviado com o valor do pedido.`);
+            const novoEa2 = reg.ok && "novo" in reg ? reg.novo !== false : true;
+            if (ea2.etapa === "upsell2_consultoria" && novoEa2) {
+                // NETO (equipe de WhatsApp) e Rigel; Amanda só recebe a marca de "não responder sozinha" (funil_ea2_eventos.etapa).
+                await telegram(`${testeIon ? "🧪 TESTE · " : ""}🚨 *UPSELL 2 ACEITO — Consultoria 6 meses*\n\n👤 ${mdSeguro(nome) || "—"}\n📧 ${mdSeguro(email) || "—"}\n📱 ${mdSeguro(fone) || "—"}\n💵 ${brl(valorCapi)}\n\nNETO atende. Amanda NÃO responde esse aluno sozinha.`);
+            }
+            // Guias de bônus: só a oferta ao vivo 4vj21bfg, uma vez por transação, fora da resposta.
+            if (ofertaCod === OFERTA_COM_GUIAS) {
+                after(async () => {
+                    if (await guiasJaEnviados(SUPABASE_URL, transacao)) return;
+                    const g = await enviarGuiasEa2(email, nome, REMETENTE);
+                    if (g.ok) await registrarFunilEa2(SUPABASE_URL, { transacao, evento: "GUIAS_ENVIADOS", etapa: "guias_bonus", oferta: ofertaCod, produto_id: produtoId, email, nome });
+                    else await telegram(`⚠️ Funil EA²: e-mail dos 3 guias falhou (${transacao}, ${mdSeguro(email)}): ${mdSeguro(String(g.erro)).slice(0, 200)}`);
+                });
+            }
+        }
         const [capi, lista] = await Promise.all([
-            produtoConhecido && !capiAdiado
-                ? metaCapi(email, nome, fone, valor, moeda, transacao, nomeEventoCapi, { id: produtoId, nome: produtoNome }, xcodCapi, { eventTime: eventTimeCapi })
+            produtoConhecido && !capiAdiado && !testeIon
+                ? metaCapi(email, nome, fone, valorCapi, moeda, transacao, nomeEventoCapi, { id: produtoId, nome: produtoNome }, xcodCapi, { eventTime: eventTimeCapi })
                 : Promise.resolve({ ok: true as const }),
-            ehAdicional ? Promise.resolve({ ok: true as const }) : resend(email, nome, produtoId),
+            ehAdicional || testeIon ? Promise.resolve({ ok: true as const }) : resend(email, nome, produtoId),
         ]);
 
         /* ------------------------------------------------------------------
