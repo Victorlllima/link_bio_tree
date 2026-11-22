@@ -8,7 +8,7 @@ export const PRECOS_CONFIRMADOS = false;
 // oferta só, sem esta página linkada em outro lugar. Conferir com a MIRA e a ION.
 export const LINK_ACEITAR_1 = "#link-compra-upsell-1"; // MIRA cria na Hotmart
 export const LINK_ACEITAR_2 = "#link-compra-upsell-2"; // MIRA cria na Hotmart
-export const URL_OBRIGADO = "/obrigado"; // ION define a página de obrigado do EA²
+export const URL_OBRIGADO = "/ea2/obrigado"; // página final do EA² (recusar nos dois upsells)
 export const URL_UPSELL_2 = "/ea2/oferta-implementacao"; // destino de quem aceita o 1 (ION encaminha)
 
 // Ancoragem: só ligar se o Red confirmar que a mentoria anual existe como oferta.
