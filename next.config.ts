@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
+  // Guias de bônus do EA² (22/11): PDFs privados que só saem anexados ao e-mail do webhook da Hotmart.
+  outputFileTracingIncludes: { "/api/webhooks/hotmart": ["./privado/guias-ea2/**"] },
   images: {
     remotePatterns: [
       {
