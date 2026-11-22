@@ -20,3 +20,6 @@
 .recusar{display:block;text-align:center;margin-top:20px;padding:12px;font-size:16px;color:rgba(238,240,243,.78);text-decoration:underline;text-underline-offset:4px}
 .aviso{font-size:13px;line-height:1.55;color:rgba(238,240,243,.5);margin:26px 0 0}
 .sig{margin-top:40px;font-size:12px;letter-spacing:.1em;color:#8b9099}
+.garantia{margin:28px 0 0;padding-top:18px;border-top:1px solid rgba(238,240,243,.12)}
+.garantia p{font-size:16px;line-height:1.5;color:rgba(238,240,243,.85);margin:8px 0 0}
+.datas{font-size:16px;line-height:1.55;color:rgba(238,240,243,.85);margin:26px 0 0}

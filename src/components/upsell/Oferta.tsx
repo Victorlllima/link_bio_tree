@@ -16,6 +16,7 @@ type Props = {
   preco: string;
   precoDetalhe?: string;
   nota?: string;
+  garantia?: string;
   ancora?: string;
   aceitarTexto: string;
   aceitarHref: string;
@@ -55,6 +56,13 @@ export default function Oferta(p: Props) {
           {p.ancora && <span className={styles.ancora}>{p.ancora}</span>}
           {p.nota && <span className={styles.nota}>{p.nota}</span>}
         </section>
+
+        {p.garantia && (
+          <section className={styles.garantia}>
+            <span className={`${styles.pl} ${mono.className}`}>Garantia</span>
+            <p>{p.garantia}</p>
+          </section>
+        )}
 
         <a className={styles.btn} href={p.aceitarHref}>
           {p.aceitarTexto}

@@ -28,6 +28,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ a
         </span>
         <h1 className={styles.h1}>Sua vaga no EA² está garantida.</h1>
         <p className={styles.lead}>O acesso chega no e-mail usado na compra. Se não aparecer em alguns minutos, olhe a caixa de spam.</p>
+        <p className={styles.datas}>Datas do 1º ciclo: Aula 3 em 17/12 e Aula 4 em 07/01 (pausa de fim de ano). A gravação de cada aula sai no mesmo dia.</p>
         {consultoria && (
           <p className={styles.lead}>Sobre a consultoria com implementação: nossa equipe fala com você em breve para combinar os próximos passos.</p>
         )}

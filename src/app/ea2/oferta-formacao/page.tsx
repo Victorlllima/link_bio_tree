@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 // UPSELL 1 do EA²: aparece só aqui, depois da compra. Aceitar vai ao checkout da FA².
-// Conteúdo: FA2-DEFINICAO.md (imersao-arquiteto-qg/03-baldan). Garantia: texto exato ainda a confirmar com o Red, fora da página.
+// Conteúdo: FA2-DEFINICAO.md (imersao-arquiteto-qg/03-baldan). Garantia: texto literal aprovado pelo Red em 21/11.
 export default function Page() {
   return (
     <Oferta
@@ -28,6 +28,7 @@ export default function Page() {
       preco={OFERTA_1.preco}
       precoDetalhe={OFERTA_1.detalhe}
       ancora={OFERTA_1.ancora}
+      garantia="Se você fizer todos os passos da jornada até o fim do mês 2 e não fechar o primeiro cliente, nós fazemos uma call de alinhamento e ações para os próximos 2 meses. Se ainda assim não fechar, eu devolvo seu dinheiro + R$ 500 do meu bolso."
       aceitarTexto="Sim, quero a FA²"
       aceitarHref={LINK_ACEITAR_1}
       recusarTexto="Não, obrigado. Ir para a confirmação do EA²"
