@@ -61,6 +61,7 @@ const PRODUTOS: Record<string, string> = {
     "8660306": "EA² — Experiência Arquiteto de Agentes",
     "9039408": "Mentoria Empresa Agêntica (ex-FA²)",
     "9039445": "Consultoria de Implementação de Agentes — 6 meses",
+    "9041032": "Consultoria · mensalidade (6 meses)",
 };
 
 export const maxDuration = 60;
@@ -524,8 +525,12 @@ export async function POST(req: NextRequest) {
         const ofertaCod = String(((purchase?.offer as Record<string, unknown> | undefined)?.code) ?? "");
         const ea2 = classificarEa2(produtoId, ofertaCod);
         const valorCapi = ea2 && ea2.conhecida && !(valor > 0) ? ea2.valor : valor;
+        // Assinatura (mensalidade da consultoria): recurrence_number 1 é a 1ª cobrança; 2+ são recorrentes, sem Purchase novo.
+        const recorrencia = Number(purchase?.recurrence_number ?? 0);
+        const cobrancaRecorrente = recorrencia > 1;
         if (ea2) {
-            const reg = await registrarFunilEa2(SUPABASE_URL, { transacao, evento, etapa: ea2.etapa, oferta: ofertaCod, produto_id: produtoId, valor: valorCapi, email, nome, fone, aviso_enviado: false });
+            const eventoEa2 = recorrencia > 0 ? `${evento}#${recorrencia}` : evento;
+            const reg = await registrarFunilEa2(SUPABASE_URL, { transacao, evento: eventoEa2, etapa: ea2.etapa, oferta: ofertaCod, produto_id: produtoId, valor: valorCapi, email, nome, fone, aviso_enviado: false });
             if (!reg.ok) await telegram(`⚠️ Funil EA²: falha ao registrar ${transacao} (${ea2.etapa}): ${mdSeguro("erro" in reg ? String(reg.erro) : "").slice(0, 200)}`);
             if (!ea2.conhecida) await telegram(`⚠️ Funil EA²: oferta desconhecida \`${mdSeguro(ofertaCod) || "—"}\` no produto ${produtoId} (${transacao}). Purchase enviado com o valor do pedido.`);
             const novoEa2 = reg.ok && "novo" in reg ? reg.novo !== false : true;
@@ -544,7 +549,7 @@ export async function POST(req: NextRequest) {
             }
         }
         const [capi, lista] = await Promise.all([
-            produtoConhecido && !capiAdiado && !testeIon
+            produtoConhecido && !capiAdiado && !testeIon && !cobrancaRecorrente
                 ? metaCapi(email, nome, fone, valorCapi, moeda, transacao, nomeEventoCapi, { id: produtoId, nome: produtoNome }, xcodCapi, { eventTime: eventTimeCapi })
                 : Promise.resolve({ ok: true as const }),
             ehAdicional || testeIon ? Promise.resolve({ ok: true as const }) : resend(email, nome, produtoId),

@@ -4,7 +4,7 @@ import crypto from "crypto";
 
 // Funil de upsell EA² (Red, 22/11/2026). Classifica a compra pela oferta, registra no Supabase
 // e diz se é o upsell 2 (consultoria), que avisa NETO e Rigel e marca o aluno para a Amanda não responder sozinha.
-export type EtapaEa2 = "ea2_oferta1" | "ea2_oferta2" | "upsell1_fa2" | "upsell2_consultoria" | "fa2_avulsa" | "fa2_renovacao" | "ea2_ingresso";
+export type EtapaEa2 = "ea2_oferta1" | "ea2_oferta2" | "upsell1_fa2" | "upsell2_consultoria" | "fa2_avulsa" | "fa2_renovacao" | "ea2_ingresso" | "consultoria_mensalidade";
 
 export const OFERTAS_EA2: Record<string, { etapa: EtapaEa2; valor: number }> = {
     "4vj21bfg": { etapa: "ea2_oferta1", valor: 1250 },
@@ -13,8 +13,11 @@ export const OFERTAS_EA2: Record<string, { etapa: EtapaEa2; valor: number }> = {
     "gig2ersp": { etapa: "upsell2_consultoria", valor: 12500 },
     "fo6p6zkb": { etapa: "fa2_avulsa", valor: 8000 },
     "l23ajx77": { etapa: "fa2_renovacao", valor: 5000 },
+    // Mensalidade da consultoria (assinatura 9041032, R$1.500 x 6), paga logo depois da entrada gig2ersp.
+    // Cada cobrança vira uma linha; no CAPI só a 1ª cobrança é Purchase (as recorrentes não duplicam receita).
+    "7inbqv2l": { etapa: "consultoria_mensalidade", valor: 1500 },
 };
-export const PRODUTOS_FUNIL_EA2 = new Set(["8660306", "9039408", "9039445"]);
+export const PRODUTOS_FUNIL_EA2 = new Set(["8660306", "9039408", "9039445", "9041032"]);
 
 export function classificarEa2(produtoId: string, oferta: string) {
     if (!PRODUTOS_FUNIL_EA2.has(produtoId)) return null;
