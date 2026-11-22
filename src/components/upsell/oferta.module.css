@@ -23,3 +23,8 @@
 .garantia{margin:28px 0 0;padding-top:18px;border-top:1px solid rgba(238,240,243,.12)}
 .garantia p{font-size:16px;line-height:1.5;color:rgba(238,240,243,.85);margin:8px 0 0}
 .datas{font-size:16px;line-height:1.55;color:rgba(238,240,243,.85);margin:26px 0 0}
+.passo2{margin:28px 0 8px;padding:24px 20px;border:1px solid rgba(79,134,255,.55);border-radius:18px;background:rgba(79,134,255,.08);box-shadow:0 0 34px rgba(79,134,255,.18)}
+.passo2 p{font-size:16px;line-height:1.55;color:rgba(238,240,243,.88);margin:12px 0 0}
+.passo2 .btn{margin-top:22px}
+.passo2Titulo{font-size:24px;line-height:1.2;font-weight:500;margin:14px 0 0;color:#eef0f3}
+.passo2 .passo2Nota{font-size:14px;color:rgba(238,240,243,.6);margin-top:16px}

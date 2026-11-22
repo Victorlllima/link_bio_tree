@@ -7,7 +7,10 @@ export const PRECOS_CONFIRMADOS = false;
 // ONE TIME OFFER: só é verdade se a Hotmart estiver configurada como upsell de uma
 // oferta só, sem esta página linkada em outro lugar. Conferir com a MIRA e a ION.
 export const LINK_ACEITAR_1 = "https://pay.hotmart.com/N108608837C?off=ioehae1s"; // FA² upsell EA²+FA², R$ 4.750 (MIRA, 22/11)
-export const LINK_ACEITAR_2 = "https://pay.hotmart.com/R108608890P?off=gig2ersp"; // Sua empresa no automático (6 meses), entrada R$ 12.500 (MIRA). Mensal R$ 1.500: pendente de decisão do Red
+export const LINK_ACEITAR_2 = "https://pay.hotmart.com/R108608890P?off=gig2ersp"; // Sua empresa no automático (6 meses), entrada R$ 12.500 (MIRA). Mensal à parte (LINK_MENSALIDADE)
+// Mensalidade da consultoria: assinatura separada (MIRA, produto 9041032, aprovado pelo Red 22/11).
+// A Hotmart não junta entrada e assinatura: o passo 2 aparece no obrigado com ?aceitou=consultoria.
+export const LINK_MENSALIDADE = "https://pay.hotmart.com/Y108611671X?off=7inbqv2l";
 export const URL_OBRIGADO = "/ea2/obrigado"; // página final do EA² (recusar nos dois upsells)
 export const URL_UPSELL_2 = "/ea2/oferta-implementacao"; // destino de quem aceita o 1 (ION encaminha)
 
