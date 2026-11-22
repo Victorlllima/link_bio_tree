@@ -57,6 +57,10 @@ const PRODUTOS: Record<string, string> = {
     // No mapa para o CAPI disparar Purchase. Sem audiência do Resend de propósito (interessados-imersao é de quem preencheu a ficha).
     "8852419": "Imersão RedPro — Ingresso",
     "8852453": "Imersão RedPro — Gravação",
+    // EA² e funil de upsell (Red, 22/11/2026). Mesmo gate do CAPI: produto fora do mapa grava e avisa, mas não dispara Purchase.
+    "8660306": "EA² — Experiência Arquiteto de Agentes",
+    "9039408": "FA² — Formação Arquiteto de Agentes",
+    "9039445": "Consultoria de Implementação de Agentes — 6 meses",
 };
 
 export const maxDuration = 60;
