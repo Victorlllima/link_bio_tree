@@ -9,7 +9,6 @@ export const metadata: Metadata = {
 
 // UPSELL 2: só quem aceitou o 1. Recusar vai à confirmação do EA².
 export default function Page() {
-  const total = "R$ 21.500";
   return (
     <Oferta
       nome="implementacao"
@@ -24,7 +23,7 @@ export default function Page() {
       ]}
       precoLabel="Implementação"
       preco={OFERTA_2.implementacao}
-      precoDetalhe={`mais ${OFERTA_2.mensal} por mês, durante ${OFERTA_2.meses} meses. Total: ${total}.`}
+      precoDetalhe={`mais ${OFERTA_2.mensal} por mês, durante ${OFERTA_2.meses} meses.`}
       aceitarTexto="Sim, quero a consultoria"
       aceitarHref={LINK_ACEITAR_2}
       recusarTexto="Não, obrigado. Ir para a confirmação do EA²"
