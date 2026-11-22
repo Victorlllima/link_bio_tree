@@ -12,6 +12,7 @@ export default function Page() {
   const total = "R$ 21.500";
   return (
     <Oferta
+      nome="implementacao"
       etapa="Mais um passo, opcional"
       titulo="Quer que eu implemente com você, por 6 meses?"
       lead="Consultoria de 6 meses com implementação dos agentes no seu negócio. Esta oferta aparece só aqui."

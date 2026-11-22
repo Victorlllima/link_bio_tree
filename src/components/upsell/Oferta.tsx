@@ -1,12 +1,13 @@
-import Link from "next/link";
 import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import styles from "./oferta.module.css";
 import { PRECOS_CONFIRMADOS } from "./config";
+import { Recusar, ViewOferta } from "./Track";
 
 const sans = Instrument_Sans({ subsets: ["latin"], weight: ["400", "500", "600"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"] });
 
 type Props = {
+  nome: "formacao" | "implementacao";
   etapa: string;
   titulo: string;
   lead: string;
@@ -26,6 +27,7 @@ type Props = {
 export default function Oferta(p: Props) {
   return (
     <main className={`${styles.root} ${sans.className}`}>
+      <ViewOferta nome={p.nome} />
       <div className={styles.shade} />
       {!PRECOS_CONFIRMADOS && (
         <div className={styles.rascunho}>Rascunho: preço e links ainda não confirmados</div>
@@ -57,9 +59,9 @@ export default function Oferta(p: Props) {
         <a className={styles.btn} href={p.aceitarHref}>
           {p.aceitarTexto}
         </a>
-        <Link className={styles.recusar} href={p.recusarHref}>
+        <Recusar nome={p.nome} className={styles.recusar} href={p.recusarHref}>
           {p.recusarTexto}
-        </Link>
+        </Recusar>
 
         <p className={styles.aviso}>{p.aviso}</p>
         <div className={`${styles.sig} ${mono.className}`}>@redpro.ia</div>

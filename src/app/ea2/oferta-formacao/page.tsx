@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <Oferta
+      nome="formacao"
       etapa="Sua vaga no EA² está garantida"
       titulo="Quer ir além com a Formação Arquiteto de Agentes?"
       lead="Esta oferta aparece só nesta página, agora, depois da sua compra do EA². Se não for para você, é só seguir sem ela."
