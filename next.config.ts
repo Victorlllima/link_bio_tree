@@ -37,11 +37,21 @@ const nextConfig: NextConfig = {
    *  sobre os anúncios.
    * ======================================================================== */
   async redirects() {
-    return ["a", "b", "c", "d", "e"].map((v) => ({
-      source: `/hermes-week/${v}`,
-      destination: "/hermes-week/g",
-      permanent: false,
-    }));
+    return [
+      ...["a", "b", "c", "d", "e"].map((v) => ({
+        source: `/hermes-week/${v}`,
+        destination: "/hermes-week/g",
+        permanent: false,
+      })),
+      // Instalador da Imersão (ION, 22/11/2026, ok do Red via Rigel): "curl -fsSL redpro.com.br/instalar"
+      // segue para o instalar.sh da última release do repositório público.
+      {
+        source: "/instalar",
+        destination:
+          "https://github.com/RedPro-AI-Solutions/instalador-imersao/releases/latest/download/instalar.sh",
+        permanent: false,
+      },
+    ];
   },
 };
 
