@@ -1,3 +1,6 @@
+import { readFile } from "fs/promises";
+import path from "path";
+
 // Funil de upsell EA² (Red, 22/11/2026). Classifica a compra pela oferta, registra no Supabase
 // e diz se é o upsell 2 (consultoria), que avisa NETO e Rigel e marca o aluno para a Amanda não responder sozinha.
 export type EtapaEa2 = "ea2_oferta1" | "ea2_oferta2" | "upsell1_fa2" | "upsell2_consultoria" | "fa2_avulsa" | "fa2_renovacao" | "ea2_ingresso";
@@ -24,10 +27,83 @@ export async function registrarFunilEa2(supabaseUrl: string, row: Record<string,
     try {
         const r = await fetch(`${supabaseUrl}/rest/v1/funil_ea2_eventos?on_conflict=transacao,evento`, {
             method: "POST",
-            headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=minimal" },
+            headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json", Prefer: "resolution=ignore-duplicates,return=representation" },
             body: JSON.stringify(row),
         });
-        return r.ok ? { ok: true } : { ok: false, erro: `${r.status} ${await r.text()}` };
+        if (!r.ok) return { ok: false, erro: `${r.status} ${await r.text()}` };
+        // novo=false: a Hotmart reentregou o mesmo evento; nada de aviso ou e-mail de novo.
+        return { ok: true, novo: ((await r.json()) as unknown[]).length > 0 };
+    } catch (e) {
+        return { ok: false, erro: String(e) };
+    }
+}
+
+/* ------------------------------------------------------------------
+ * GUIAS DE BÔNUS DO EA² (Red, 22/11/2026)
+ * Os 3 guias do Hermes saíram da área de membros do EA² e vão por e-mail
+ * só para quem comprou a oferta ao vivo 4vj21bfg. Uma vez por transação
+ * (marca GUIAS_ENVIADOS em funil_ea2_eventos). PDFs em privado/guias-ea2,
+ * fora do /public: só saem anexados a este e-mail.
+ * ---------------------------------------------------------------- */
+
+export const OFERTA_COM_GUIAS = "4vj21bfg";
+const GUIAS = [
+    { arquivo: "100-plugins-do-hermes.pdf", titulo: "100 plugins do Hermes" },
+    { arquivo: "50-casos-de-uso-do-hermes.pdf", titulo: "50 casos de uso do Hermes" },
+    { arquivo: "segundo-cerebro-com-o-hermes.pdf", titulo: "Segundo cérebro com o Hermes" },
+];
+
+const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+
+export function emailGuiasEa2(nome: string) {
+    const primeiro = esc((nome || "").trim().split(/\s+/)[0] || "");
+    const itens = GUIAS.map((g) => `<li style="margin:0 0 6px;">${g.titulo}</li>`).join("");
+    return {
+        subject: "Seus 3 guias de bônus do EA²",
+        html: `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
+<body style="margin:0;padding:0;background:#09090b;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#09090b;padding:40px 16px;"><tr><td align="center">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#111113;border:1px solid #1f1f23;border-radius:16px;"><tr><td style="padding:36px;">
+<p style="font-weight:900;font-size:18px;color:#fff;margin:0 0 24px;">RedPro AI Academy</p>
+<p style="font-size:15px;line-height:1.7;color:#d4d4d8;margin:0 0 16px;">Oi${primeiro ? " " + primeiro : ""},</p>
+<p style="font-size:15px;line-height:1.7;color:#d4d4d8;margin:0 0 16px;">Você garantiu o EA² na oferta ao vivo, e os 3 guias de bônus estão anexados a este e-mail:</p>
+<ul style="font-size:15px;line-height:1.7;color:#d4d4d8;margin:0 0 16px;padding-left:20px;">${itens}</ul>
+<p style="font-size:15px;line-height:1.7;color:#d4d4d8;margin:0 0 16px;">Guarde este e-mail. Se algum anexo não abrir, responda aqui que a equipe reenvia.</p>
+<p style="font-size:15px;line-height:1.7;color:#d4d4d8;margin:24px 0 0;">Red</p>
+</td></tr></table></td></tr></table></body></html>`,
+    };
+}
+
+export async function guiasJaEnviados(supabaseUrl: string, transacao: string): Promise<boolean> {
+    const key = process.env.SUPABASE_SERVICE_KEY;
+    if (!key) return true; // sem como checar: não arrisca mandar duas vezes
+    try {
+        const r = await fetch(`${supabaseUrl}/rest/v1/funil_ea2_eventos?transacao=eq.${encodeURIComponent(transacao)}&evento=eq.GUIAS_ENVIADOS&select=id`, {
+            headers: { apikey: key, Authorization: `Bearer ${key}` },
+        });
+        if (!r.ok) return true;
+        return ((await r.json()) as unknown[]).length > 0;
+    } catch {
+        return true;
+    }
+}
+
+export async function enviarGuiasEa2(email: string, nome: string, remetente: string) {
+    const key = process.env.RESEND_API_KEY;
+    if (!key || !email) return { ok: false, erro: "sem RESEND_API_KEY ou email" };
+    try {
+        const dir = path.join(process.cwd(), "privado", "guias-ea2");
+        const attachments = await Promise.all(
+            GUIAS.map(async (g) => ({ filename: g.arquivo, content: (await readFile(path.join(dir, g.arquivo))).toString("base64") })),
+        );
+        const mail = emailGuiasEa2(nome);
+        const res = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ from: remetente, to: [email], subject: mail.subject, html: mail.html, attachments }),
+        });
+        if (!res.ok) return { ok: false, erro: `${res.status} ${await res.text()}` };
+        return { ok: true };
     } catch (e) {
         return { ok: false, erro: String(e) };
     }
