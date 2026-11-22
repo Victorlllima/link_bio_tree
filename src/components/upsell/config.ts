@@ -2,7 +2,7 @@
 // Preços e links NÃO confirmados: enquanto PRECOS_CONFIRMADOS for false, as páginas
 // mostram a faixa "rascunho" e não devem ir ao ar.
 
-export const PRECOS_CONFIRMADOS = false;
+export const PRECOS_CONFIRMADOS = true;
 
 // ONE TIME OFFER: só é verdade se a Hotmart estiver configurada como upsell de uma
 // oferta só, sem esta página linkada em outro lugar. Conferir com a MIRA e a ION.
