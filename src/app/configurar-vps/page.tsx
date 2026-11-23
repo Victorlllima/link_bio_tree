@@ -18,7 +18,7 @@ const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"],
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Manual da VPS | Imersão Arquiteto de Agentes",
+  title: "Manual da VPS | RedPro Academy",
   robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
 };
 
@@ -53,16 +53,20 @@ function inline(s: string, chave: string): ReactNode[] {
 // O comando de instalação ganha a chave do aluno (só depois da senha)
 function comChave(texto: string, chave: string): string {
   if (!chave) return texto;
-  return texto.replaceAll(`${URL_INSTALAR} `, `"${URL_INSTALAR}?k=${chave}" `);
+  return texto
+    .replaceAll(`${URL_INSTALAR} `, `"${URL_INSTALAR}?k=${chave}" `)
+    .replaceAll("COLE_AQUI_O_LINK_DO_PASSO_4.2", `${URL_INSTALAR}?k=${chave}`)
+    .replaceAll("?k=CHAVE", `?k=${chave}`);
 }
 
-function Codigo({ codigo, pedido, chave }: { codigo: string; pedido: boolean; chave: string }) {
+function Codigo({ codigo, pedido, ficha, chave }: { codigo: string; pedido: boolean; ficha?: boolean; chave: string }) {
   const c = comChave(codigo, chave);
+  const tipo = ficha ? "ficha" : pedido ? "pedido" : "cmd";
   return (
-    <div className={pedido ? "cv-code cv-pedido" : "cv-code"}>
+    <div className={tipo === "cmd" ? "cv-code" : "cv-code cv-pedido"}>
       <div className="cv-code-topo">
-        <span>{pedido ? "Pedido para o agente" : "Terminal"}</span>
-        <BotaoCopiar texto={c} rotulo={pedido ? "Copiar pedido" : "Copiar"} />
+        <span>{tipo === "ficha" ? "Ficha da minha VPS" : tipo === "pedido" ? "Pedido para o agente" : "Terminal"}</span>
+        <BotaoCopiar texto={c} rotulo={tipo === "ficha" ? "Copiar ficha" : tipo === "pedido" ? "Copiar pedido" : "Copiar"} />
       </div>
       <pre>
         <code>{c}</code>
@@ -153,6 +157,13 @@ function renderBloco(b: Bloco, i: number, chave: string): ReactNode {
           {inline(b.texto, chave)}
         </p>
       );
+    case "guarde":
+      return (
+        <p key={i} className="cv-guarde">
+          <span>📌 Guarde isto agora</span>
+          {inline(b.texto, chave)}
+        </p>
+      );
     case "alerta":
       return (
         <p key={i} className="cv-alerta">
@@ -181,7 +192,7 @@ function renderBloco(b: Bloco, i: number, chave: string): ReactNode {
         />
       );
     case "codigo":
-      return <Codigo key={i} codigo={b.codigo} pedido={b.pedido} chave={chave} />;
+      return <Codigo key={i} codigo={b.codigo} pedido={b.pedido} ficha={b.ficha} chave={chave} />;
     case "tabela":
       return (
         <div key={i} className="cv-tabela">
@@ -240,7 +251,7 @@ function TelaSenha({ erro, semSenha }: { erro: boolean; semSenha: boolean }) {
   return (
     <main className="cv-gate">
       <div className="cv-gate-card">
-        <p className="cv-rotulo">Imersão Arquiteto de Agentes · Manual</p>
+        <p className="cv-rotulo">RedPro Academy · Manual da VPS</p>
         <h1>Configure a sua VPS</h1>
         <p className="cv-gate-txt">Digite a senha que o Red passou na aula.</p>
         <form method="post" action="/configurar-vps/entrar" className="cv-gate-form">
@@ -289,7 +300,7 @@ export default async function ConfigurarVps({ searchParams }: { searchParams: Pr
   return (
     <div className={`cv ${sans.variable} ${mono.variable}`}>
       <header className="cv-hero">
-        <p className="cv-rotulo">Imersão Arquiteto de Agentes · Manual</p>
+        <p className="cv-rotulo">RedPro Academy · Manual da VPS</p>
         <h1>
           Seus 3 agentes ligados <em>24 horas</em>
         </h1>
@@ -317,7 +328,7 @@ export default async function ConfigurarVps({ searchParams }: { searchParams: Pr
           {blocos.map((b, i) => (
             <Fragment key={i}>{renderBloco(b, i, chave)}</Fragment>
           ))}
-          <p className="cv-fim">Imersão Arquiteto de Agentes · RedPro</p>
+          <p className="cv-fim">RedPro Academy</p>
         </article>
       </div>
     </div>

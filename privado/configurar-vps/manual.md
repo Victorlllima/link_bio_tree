@@ -28,6 +28,8 @@ Resultado: uma VPS paga e ativa na Hostinger.
 
 Deu certo se: o painel da Hostinger mostra a sua VPS.
 
+📌 Guarde isto agora: o link do painel da Hostinger (`https://hpanel.hostinger.com`) e o e-mail da conta. Anote na sua [ficha da VPS](#ficha-da-minha-vps).
+
 ## Passo 2 · Configurar a VPS no painel
 Resultado: Ubuntu instalado, chave de acesso cadastrada e o IP anotado.
 
@@ -38,6 +40,8 @@ Resultado: Ubuntu instalado, chave de acesso cadastrada e o IP anotado.
 5. **Recursos adicionais:** deixe **Scanner Monarx** e **Gerenciador Docker** os dois **desmarcados** e clique em **Finalizar configuração**. O instalador já cuida da segurança e não usa Docker; dá para ligar depois no painel, se quiser. [print 08]
 6. Espere o status "Em execução" e anote o **IP**. [prints 09 e 10]
 Deu certo se: aparece um IP e o status em execução. [print 11]
+
+📌 Guarde isto agora: o **IP** da VPS e o **nome do servidor** (começa com `srv`, aparece no painel). Pode ir num Google Docs: não é segredo. A **senha do root**, se você criou uma, vai só no gerenciador de senhas, nunca em documento.
 
 ## Passo 3 · Criar a sua chave de acesso (SSH)
 Resultado: você tem uma chave para entrar na VPS sem senha.
@@ -78,34 +82,39 @@ Deu certo se: o terminal mostra algo como `root@...:~#`. Você está dentro da V
 
 ---
 
-## Passo 4 · O caminho rápido: o instalador (recomendado)
+## Passo 4 · O caminho rápido: o instalador pelo Console web (recomendado)
 Resultado: tudo dos passos 5 a 13 feito por você, com uma linha.
 
-Dentro da VPS (o terminal que mostra `root@`), cole:
+**4.1 Abrir o Console web.** No painel da Hostinger, abra a sua VPS e clique no botão **Console web**. Abre um terminal da VPS no próprio navegador, já como root (a linha termina em `root@...:~#`).
+
+**Atenção:** ao abrir, o Console web pode mostrar "New release '26.04.1 LTS' available" e sugerir `do-release-upgrade`. **Não rode esse comando.** O instalador é feito para o Ubuntu 24.04. [print 12]
+
+**4.2 Colar o comando.** Copie o comando abaixo com o botão de copiar e cole no Console web com **Ctrl+Shift+V** (ou botão direito → Colar). Depois aperte Enter.
 ```
 curl -fsSL https://redpro.com.br/instalar -o instalar.sh && bash instalar.sh
 ```
-O endereço leva ao script público em github.com/RedPro-AI-Solutions/instalador-imersao, onde você pode ler tudo o que ele faz antes de rodar.
+O comando já vem com a chave da sua turma. Ele só funciona copiado desta página: não mande para ninguém.
 
 O instalador mostra, em português, cada etapa, o que está fazendo e por quê. Ele vai te pedir, nesta ordem:
-1. **A sua chave pública** (só se não achou a do painel).
-2. **O teste da chave:** abra outra janela do terminal, entre com `ssh hermes@SEU_IP` e responda `s`. Só depois disso ele tranca a senha.
-3. **O cérebro:** `1` para Claude ou `2` para ChatGPT. Ele mostra um link; você abre no navegador do seu computador e autoriza.
-4. **Um bot por agente:** crie o bot no @BotFather, cole o token (ele não aparece na tela) e mande `/start` para o bot. O instalador mostra o nome de quem mandou e pergunta se é você: só essa pessoa vai poder usar o agente. Ainda não criou os bots? Digite `pular` e faça depois com `sudo instalar-imersao --so telegram`.
+1. **A sua chave:** se você cadastrou a chave no painel, ele pergunta "Usar essa mesma chave para o usuário hermes? [s/n]". Responda `s`. Só pede para colar a chave se não achou a do painel. [print 13]
+2. **O teste da chave:** no terminal do **seu computador** (não no Console web), entre com `ssh hermes@SEU_IP`. Se entrou sem pedir senha, volte ao Console web e responda `s`. Só depois disso ele tranca a senha. O Console web continua funcionando depois disso: ele não usa senha nem SSH.
+3. **O cérebro:** `1` para Claude ou `2` para ChatGPT. Ele mostra um link. Selecione o link inteiro com o mouse, copie com **Ctrl+Shift+C** (ou botão direito → Copiar), abra numa aba nova do navegador e autorize. Se o link quebrar em várias linhas, copie todas, do `https` até o fim. No Claude, ele te dá um código: cole no Console web com Ctrl+Shift+V e aperte Enter. No ChatGPT, você digita no navegador o código curto que aparece no Console web.
+4. **Um bot por agente:** crie o bot no @BotFather, cole o token no Console web (ele não aparece na tela, é assim mesmo: cole uma vez só e aperte Enter) e mande `/start` para o bot. O instalador mostra o nome de quem mandou e pergunta se é você: só essa pessoa vai poder usar o agente. Ainda não criou os bots? Digite `pular` e faça depois com `sudo instalar-imersao --so telegram`.
 
-Leva de 15 a 25 minutos. No fim, cada agente te manda um "oi" no Telegram.
+Leva de 15 a 25 minutos. Deixe a aba do Console web aberta até o fim. No fim, cada agente te manda um "oi" no Telegram.
 
 Deu certo se: a última linha diz **Tudo pronto** e chegaram três mensagens no Telegram.
 
-**Caiu a internet, fechou a janela, deu erro?** Entre de novo e rode o mesmo comando. O que já ficou pronto é pulado; ele continua de onde parou.
-Depois que a senha é trancada, entre como hermes e use `sudo instalar-imersao` (o instalador guarda uma cópia com esse nome):
+📌 Guarde isto agora: o **nome e o @ de cada bot** e a **conta de IA** em que você fez o login (o e-mail do Claude ou do ChatGPT). O **token de cada bot** vai só no gerenciador de senhas.
+
+**Caiu a internet, fechou a aba, deu erro?** Abra o Console web de novo e rode `sudo instalar-imersao` (o instalador guarda uma cópia com esse nome). O que já ficou pronto é pulado; ele continua de onde parou. O mesmo comando funciona pelo seu terminal, entrando com `ssh hermes@SEU_IP`:
 ```
 sudo instalar-imersao                      # continua de onde parou
 sudo instalar-imersao --listar             # mostra o que já está pronto
 sudo instalar-imersao --refazer telegram   # refaz uma etapa (ex.: trocar o token de um bot)
 ```
 
-### Passo 4B · O mesmo instalador, pedido a um agente de terminal (opcional)
+### Passo 4B · O mesmo instalador, pedido a um agente de terminal (opcional, no lugar do 4)
 Se você usa um agente de IA no terminal do seu computador (Claude Code, Codex ou Gemini CLI), pode pedir a ele para rodar o instalador por você. Ele faz tudo o que não precisa de você e, no fim, te mostra os comandos dos passos que só você pode fazer.
 
 **O que fica com você, e por quê:** entrar com a sua assinatura (Claude ou ChatGPT), colar o token de cada bot do Telegram e testar a sua chave antes de trancar a senha. Login, token e senha nunca vão para o chat de um agente. Esses passos você roda no **seu** terminal, com o comando que o instalador te entrega.
@@ -117,10 +126,10 @@ Antes, faça o **Passo 3.5** (a primeira entrada na VPS) uma vez no seu terminal
 - Codex: digite `codex` e Enter.
 - Gemini CLI: digite `gemini` e Enter.
 
-**2. Cole o pedido** (é o mesmo para os três; troque `SEU_IP` pelo IP e `claude` por `chatgpt` se a sua assinatura for do ChatGPT):
+**2. Cole o pedido** (é o mesmo para os três). Troque `SEU_IP` pelo IP e `claude` por `chatgpt` se a sua assinatura for do ChatGPT:
 ```
 Entre na minha VPS com "ssh root@SEU_IP" e rode o instalador da Imersão em modo agente, em segundo plano, guardando a saída num arquivo:
-ssh root@SEU_IP 'curl -fsSL https://redpro.com.br/instalar -o instalar.sh && nohup bash instalar.sh --agente --cerebro claude > instalar-agente.log 2>&1 &'
+ssh root@SEU_IP 'curl -fsSL "COLE_AQUI_O_LINK_DO_PASSO_4.2" -o instalar.sh && nohup bash instalar.sh --agente --cerebro claude > instalar-agente.log 2>&1 &'
 Ele leva de 15 a 25 minutos. Acompanhe com: ssh root@SEU_IP 'tail -n 40 instalar-agente.log'
 Pare de acompanhar quando aparecer a linha PENDENTES_DA_PESSOA. Se aparecer uma linha com ✖, me mostre o erro.
 Não me peça senha, token nem código de login no chat. No fim, me mostre os comandos que o instalador listou para eu rodar no meu terminal.
@@ -135,6 +144,8 @@ ssh -t root@SEU_IP 'sudo instalar-imersao'
 Rode isso numa janela do terminal **fora** do agente (abra uma janela nova). É ali que você faz o login, cola os tokens e testa a chave. O teste da chave vem por último: depois dele o root não entra mais, e você passa a usar `ssh -t hermes@SEU_IP 'sudo instalar-imersao'`.
 
 Deu certo se: a última linha diz **Tudo pronto** e chegaram três mensagens no Telegram.
+
+📌 Guarde isto agora: o **nome e o @ de cada bot** e a **conta de IA** em que você fez o login (o e-mail do Claude ou do ChatGPT). O **token de cada bot** vai só no gerenciador de senhas.
 
 Se usou o instalador (pelo 4 ou pelo 4B), pule para o **Passo 14 · O teste que importa**. Os passos 5 a 13 são o mesmo trabalho, à mão, para quem quer entender cada peça.
 
@@ -234,12 +245,14 @@ hermes auth add openai-codex --type oauth --no-browser
 ```
 Abra o link no navegador do seu computador e digite o código curto.
 
+📌 Guarde isto agora: a **conta de IA** em que você fez o login (o e-mail do Claude ou do ChatGPT). Anote na sua ficha.
+
 ## Passo 12 · Instalar os 3 agentes
 Por quê: cada agente é um perfil separado, com a sua alma (SOUL), habilidades e memória.
 
 **12.1 Baixar o pacote do Squad e os modelos da sua marca**
 ```
-mkdir -p ~/pacote && curl -fsSL https://github.com/RedPro-AI-Solutions/instalador-imersao/releases/download/v1.0.1/pacote-squad.tar.gz | tar -xz -C ~/pacote
+mkdir -p ~/pacote && curl -fsSL "https://redpro.com.br/instalar/arquivo/pacote-squad.tar.gz?k=CHAVE" | tar -xz -C ~/pacote
 cp -rn ~/pacote/marca ~/marca
 ```
 A pasta `~/marca` tem os modelos em branco (voz, contexto, provas, base de atendimento). O onboarding preenche com você.
@@ -277,6 +290,8 @@ Deu certo se: `hermes profile list` mostra os três.
 
 ## Passo 13 · Um bot do Telegram para cada agente e ligado 24 horas
 **13.1 Criar os bots.** No Telegram, fale com o **@BotFather**, mande `/newbot` e crie **três bots** (ex.: "Atendimento do João", "Carrosséis do João", "Páginas do João"). Cada um te dá um token. **Nunca use o mesmo token em dois agentes.**
+
+📌 Guarde isto agora: o **nome e o @ de cada bot** (na ficha) e o **token de cada um** (só no gerenciador de senhas, nunca em documento ou chat).
 
 **13.2 Guardar o token de cada um** (o `read -s` não mostra o que você cola). Repita para os três, trocando `mkt-atendimento` por `mkt-conteudo` e `mkt-landing`:
 ```
@@ -346,6 +361,22 @@ sudo instalar-imersao --so onboarding
 ```
 
 ---
+
+## Ficha da minha VPS
+Copie, cole num Google Docs ou nas suas notas e preencha. Aqui só vai o que **não é segredo**: senha do root e tokens dos bots ficam no gerenciador de senhas.
+```ficha
+FICHA DA MINHA VPS (RedPro Academy)
+Painel da Hostinger [Passo 1]: https://hpanel.hostinger.com
+E-mail da conta Hostinger [Passo 1]:
+IP da VPS [Passo 2, painel]:
+Nome do servidor, começa com srv [Passo 2, painel]:
+Usuário de acesso [Passo 4]: hermes
+Conta de IA do login, Claude ou ChatGPT, e-mail [Passo 4]:
+Bot de atendimento, nome e @ [Passo 4]:
+Bot de carrosséis, nome e @ [Passo 4]:
+Bot de landing pages, nome e @ [Passo 4]:
+Senha do root e tokens guardados em [seu gerenciador de senhas]:
+```
 
 ## Comandos do dia a dia (dentro da VPS, como `hermes`)
 | Para quê | Comando |

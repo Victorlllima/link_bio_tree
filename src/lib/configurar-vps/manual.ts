@@ -18,7 +18,8 @@ export type Bloco =
   | { t: "alerta"; texto: Inline }
   | { t: "lista"; ordenada: boolean; itens: Inline[] }
   | { t: "abas"; grupo: string; abas: { rotulo: string; texto: Inline }[] }
-  | { t: "codigo"; codigo: string; pedido: boolean }
+  | { t: "guarde"; texto: Inline } // 📌 Guarde isto agora
+  | { t: "codigo"; codigo: string; pedido: boolean; ficha?: boolean }
   | { t: "tabela"; cab: string[]; linhas: string[][] }
   | { t: "prints"; nums: string[] }
   | { t: "hr" };
@@ -85,7 +86,7 @@ export function lerManual(linkHostinger: string): { blocos: Bloco[]; indice: Ind
       const codigo = corpo.join("\n");
       // bloco de texto corrido (pedido ao agente) vs. comando
       const pedido = lang === "pedido" || /^(Entre|Leia|Quero|Crie|Faça)\b/.test(codigo);
-      blocos.push({ t: "codigo", codigo, pedido });
+      blocos.push({ t: "codigo", codigo, pedido, ficha: lang === "ficha" });
       continue;
     }
 
@@ -167,6 +168,8 @@ export function lerManual(linkHostinger: string): { blocos: Bloco[]; indice: Ind
     const texto = comPrints(l);
     if (/^\*\*[^*]+\*\*$/.test(texto) || (/^\*\*\d+(\.\d+)? [^*]+\*\*/.test(texto) && texto.replace(/^\*\*[^*]+\*\*/, "").length < 90)) {
       blocos.push({ t: "sub", texto });
+    } else if (texto.startsWith("📌 Guarde isto agora:")) {
+      blocos.push({ t: "guarde", texto: texto.replace(/^📌 Guarde isto agora:\s*/, "") });
     } else if (texto.startsWith("Resultado:")) {
       blocos.push({ t: "resultado", texto: texto.replace(/^Resultado:\s*/, "") });
     } else if (texto.startsWith("Deu certo se:")) {
@@ -194,4 +197,6 @@ export const LEGENDAS: Record<string, string> = {
   "09": "A Hostinger configurando a VPS (cerca de 3 minutos).",
   "10": "VPS pronta: o comando de acesso mostra o seu IP (borrado aqui).",
   "11": "Painel da VPS em atividade, com o IP (borrado aqui).",
+  "12": "Console web aberto. O aviso de \"New release 26.04\" aparece: não rode o do-release-upgrade.",
+  "13": "Instalador nas etapas 1 a 3. Na pergunta da chave, responda s.",
 };
