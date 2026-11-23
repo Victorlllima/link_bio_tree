@@ -59,7 +59,7 @@ const PRODUTOS: Record<string, string> = {
     "8852453": "Imersão RedPro — Gravação",
     // EA² e funil de upsell (Red, 22/11/2026). Mesmo gate do CAPI: produto fora do mapa grava e avisa, mas não dispara Purchase.
     "8660306": "EA² — Experiência Arquiteto de Agentes",
-    "9039408": "FA² — Formação Arquiteto de Agentes",
+    "9039408": "Mentoria Empresa Agêntica (ex-FA²)",
     "9039445": "Consultoria de Implementação de Agentes — 6 meses",
 };
 
