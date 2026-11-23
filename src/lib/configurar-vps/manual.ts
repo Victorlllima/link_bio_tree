@@ -165,7 +165,7 @@ export function lerManual(linkHostinger: string): { blocos: Bloco[]; indice: Ind
       continue;
     }
 
-    const texto = comPrints(l);
+    const texto = comPrints(l.replace(/^>\s?/, "")); // citação vira parágrafo/alerta
     if (/^\*\*[^*]+\*\*$/.test(texto) || (/^\*\*\d+(\.\d+)? [^*]+\*\*/.test(texto) && texto.replace(/^\*\*[^*]+\*\*/, "").length < 90)) {
       blocos.push({ t: "sub", texto });
     } else if (texto.startsWith("📌 Guarde isto agora:")) {
