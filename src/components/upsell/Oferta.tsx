@@ -2,6 +2,7 @@ import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import styles from "./oferta.module.css";
 import { PRECOS_CONFIRMADOS } from "./config";
 import { Recusar, ViewOferta } from "./Track";
+import FunilHotmart from "./FunilHotmart";
 
 const sans = Instrument_Sans({ subsets: ["latin"], weight: ["400", "500", "600"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"] });
@@ -64,12 +65,14 @@ export default function Oferta(p: Props) {
           </section>
         )}
 
-        <a className={styles.btn} href={p.aceitarHref}>
-          {p.aceitarTexto}
-        </a>
-        <Recusar nome={p.nome} className={styles.recusar} href={p.recusarHref}>
-          {p.recusarTexto}
-        </Recusar>
+        <FunilHotmart>
+          <a className={styles.btn} href={p.aceitarHref}>
+            {p.aceitarTexto}
+          </a>
+          <Recusar nome={p.nome} className={styles.recusar} href={p.recusarHref}>
+            {p.recusarTexto}
+          </Recusar>
+        </FunilHotmart>
 
         <p className={styles.aviso}>{p.aviso}</p>
         <div className={`${styles.sig} ${mono.className}`}>@redpro.ia</div>
