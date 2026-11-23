@@ -18,7 +18,7 @@ const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"],
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Manual da VPS | RedPro Academy",
+  title: "Manual da VPS | RedPro AI Academy",
   robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
 };
 
@@ -251,7 +251,7 @@ function TelaSenha({ erro, semSenha }: { erro: boolean; semSenha: boolean }) {
   return (
     <main className="cv-gate">
       <div className="cv-gate-card">
-        <p className="cv-rotulo">RedPro Academy · Manual da VPS</p>
+        <p className="cv-rotulo">RedPro AI Academy · Manual da VPS</p>
         <h1>Configure a sua VPS</h1>
         <p className="cv-gate-txt">Digite a senha que o Red passou na aula.</p>
         <form method="post" action="/configurar-vps/entrar" className="cv-gate-form">
@@ -300,7 +300,7 @@ export default async function ConfigurarVps({ searchParams }: { searchParams: Pr
   return (
     <div className={`cv ${sans.variable} ${mono.variable}`}>
       <header className="cv-hero">
-        <p className="cv-rotulo">RedPro Academy · Manual da VPS</p>
+        <p className="cv-rotulo">RedPro AI Academy · Manual da VPS</p>
         <h1>
           Seus 3 agentes ligados <em>24 horas</em>
         </h1>
@@ -328,7 +328,7 @@ export default async function ConfigurarVps({ searchParams }: { searchParams: Pr
           {blocos.map((b, i) => (
             <Fragment key={i}>{renderBloco(b, i, chave)}</Fragment>
           ))}
-          <p className="cv-fim">RedPro Academy</p>
+          <p className="cv-fim">RedPro AI Academy</p>
         </article>
       </div>
     </div>

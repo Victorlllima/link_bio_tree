@@ -97,9 +97,11 @@ curl -fsSL https://redpro.com.br/instalar -o instalar.sh && bash instalar.sh
 ```
 O comando já vem com a chave da sua turma. Ele só funciona copiado desta página: não mande para ninguém.
 
+**Atenção:** o teste da chave (item 2) é **no terminal do SEU computador, NÃO na tela do Console web**.
+
 O instalador mostra, em português, cada etapa, o que está fazendo e por quê. Ele vai te pedir, nesta ordem:
 1. **A sua chave:** se você cadastrou a chave no painel, ele pergunta "Usar essa mesma chave para o usuário hermes? [s/n]". Responda `s`. Só pede para colar a chave se não achou a do painel. [print 13]
-2. **O teste da chave:** no terminal do **seu computador** (não no Console web), entre com `ssh hermes@SEU_IP` (se você deu outro nome à chave no Passo 3, use `ssh -i ~/.ssh/NOME_DA_CHAVE hermes@SEU_IP`). Se entrou sem pedir senha, volte ao Console web e responda `s`. Só depois disso ele tranca a senha. O Console web continua funcionando depois disso: ele não usa senha nem SSH.
+2. **O teste da chave:** **no terminal do SEU computador, NÃO na tela do Console web**, entre com `ssh hermes@SEU_IP` (se você deu outro nome à chave no Passo 3, use `ssh -i ~/.ssh/NOME_DA_CHAVE hermes@SEU_IP`). Se entrou sem pedir senha, volte ao Console web e responda `s`. Só depois disso ele tranca a senha. O Console web continua funcionando depois disso: ele não usa senha nem SSH.
 3. **O cérebro:** `1` para Claude ou `2` para ChatGPT. Ele mostra um link. Selecione o link inteiro com o mouse, copie com **Ctrl+Shift+C** (ou botão direito → Copiar), abra numa aba nova do navegador e autorize. Se o link quebrar em várias linhas, copie todas, do `https` até o fim. No Claude, ele te dá um código: cole no Console web com Ctrl+Shift+V e aperte Enter. No ChatGPT, você digita no navegador o código curto que aparece no Console web.
 4. **Um bot por agente:** crie o bot no @BotFather, cole o token no Console web (ele não aparece na tela, é assim mesmo: cole uma vez só e aperte Enter) e mande `/start` para o bot. O instalador mostra o nome de quem mandou e pergunta se é você: só essa pessoa vai poder usar o agente. Ainda não criou os bots? Digite `pular` e faça depois com `sudo instalar-imersao --so telegram`.
 
@@ -367,7 +369,7 @@ sudo instalar-imersao --so onboarding
 ## Ficha da minha VPS
 Copie, cole num Google Docs ou nas suas notas e preencha. Aqui só vai o que **não é segredo**: senha do root e tokens dos bots ficam no gerenciador de senhas.
 ```ficha
-FICHA DA MINHA VPS (RedPro Academy)
+FICHA DA MINHA VPS (RedPro AI Academy)
 Painel da Hostinger [Passo 1]: https://hpanel.hostinger.com
 E-mail da conta Hostinger [Passo 1]:
 IP da VPS [Passo 2, painel]:

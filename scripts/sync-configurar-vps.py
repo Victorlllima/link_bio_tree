@@ -45,6 +45,14 @@ t = re.sub(r"^1\. \*\*A sua chave pública\*\* \(só se não achou a do painel\)
 # 4B: o link com a chave já vem pronto no pedido
 t = t.replace(", `COLE_AQUI_O_LINK_DO_PASSO_4.2` pelo endereço `https://redpro.com.br/instalar?k=...` do comando do 4.2, e", " e")
 
+# teste SSH: em destaque, no computador e não no Console web (Red, 23/11)
+t = t.replace("no terminal do **seu computador** (não no Console web)",
+              "**no terminal do SEU computador, NÃO na tela do Console web**", 1)
+if "NÃO na tela do Console web" in t and "**Atenção:** o teste da chave" not in t:
+    t = re.sub(r"^(O instalador mostra, em português[^\n]*)$",
+               "**Atenção:** o teste da chave (item 2) é **no terminal do SEU computador, NÃO na tela do Console web**.\n\n\\1",
+               t, count=1, flags=re.M)
+
 # ---- 📌 Guarde isto agora (Red, 23/11) ----
 G = "📌 Guarde isto agora: "
 t = depois(r"Deu certo se: o painel da Hostinger mostra a sua VPS",
@@ -62,7 +70,7 @@ t = depois(r"\*\*13\.1 Criar os bots\.\*\*",
 FICHA = """## Ficha da minha VPS
 Copie, cole num Google Docs ou nas suas notas e preencha. Aqui só vai o que **não é segredo**: senha do root e tokens dos bots ficam no gerenciador de senhas.
 ```ficha
-FICHA DA MINHA VPS (RedPro Academy)
+FICHA DA MINHA VPS (RedPro AI Academy)
 Painel da Hostinger [Passo 1]: https://hpanel.hostinger.com
 E-mail da conta Hostinger [Passo 1]:
 IP da VPS [Passo 2, painel]:
