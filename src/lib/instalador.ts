@@ -5,14 +5,14 @@ import path from "node:path";
 /* ------------------------------------------------------------------
  * INSTALADOR DA IMERSÃO, ROTA PROTEGIDA (Red, 23/11/2026, via Rigel; ION + IRIS)
  * O repositório do instalador é privado e o comando só aparece em /configurar-vps, depois da senha:
- *   curl -fsSL "https://redpro.com.br/instalar?k=CHAVE" -o instalar.sh && bash instalar.sh
+ *   curl -fsSL "https://redpro.com.br/instalar?k=CHAVE" -o configurar-vps.sh && bash configurar-vps.sh
  * CHAVE = HMAC da senha da aula: trocar a senha na Vercel troca a chave.
- * Este repositório é PÚBLICO: o instalar.sh e o pacote ficam em privado/instalador CIFRADOS
+ * Este repositório é PÚBLICO: o configurar-vps.sh e o pacote ficam em privado/instalador CIFRADOS
  * (AES-256-GCM: iv 12 + tag 16 + dados, igual aos guias do EA²) com INSTALADOR_CIFRA_KEY
  * (env da Vercel; hex de 32 bytes). Para atualizar: scripts/cifrar-instalador.sh. Nunca commitar aberto.
  * ---------------------------------------------------------------- */
 
-export const ARQUIVOS_INSTALADOR = ["instalar.sh", "pacote-squad.tar.gz"] as const;
+export const ARQUIVOS_INSTALADOR = ["configurar-vps.sh", "configurar-vps.tar.gz"] as const;
 export type ArquivoInstalador = (typeof ARQUIVOS_INSTALADOR)[number];
 export const MARCADOR_CHAVE = "__IMERSAO_CHAVE__";
 

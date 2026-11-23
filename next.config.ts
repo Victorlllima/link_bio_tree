@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   // Guias de bônus do EA² (22/11): PDFs privados que só saem anexados ao e-mail do webhook da Hotmart.
-  // Instalador da Imersão (23/11): instalar.sh e pacote cifrados, servidos só com a chave da aula.
+  // Instalador da Imersão (23/11): configurar-vps.sh e pacote cifrados, servidos só com a chave da aula.
   outputFileTracingIncludes: {
     "/api/webhooks/hotmart": ["./privado/guias-ea2/**"],
     "/instalar": ["./privado/instalador/**"],

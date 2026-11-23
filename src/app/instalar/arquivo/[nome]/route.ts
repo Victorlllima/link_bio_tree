@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { abrirArquivoInstalador, CABECALHOS_INSTALADOR, chaveValida, ehArquivoInstalador } from "@/lib/instalador";
 
 /* /instalar/arquivo/<nome>?k=CHAVE · arquivos do instalador (o pacote dos 3 agentes).
-   O instalar.sh confere o SHA256 depois de baixar. Nome fora da lista, sem chave ou chave errada: 404. */
+   O configurar-vps.sh confere o SHA256 depois de baixar. Nome fora da lista, sem chave ou chave errada: 404. */
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest, ctx: { params: Promise<{ nome: string }> }) {
