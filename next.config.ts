@@ -4,7 +4,16 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   // Guias de bônus do EA² (22/11): PDFs privados que só saem anexados ao e-mail do webhook da Hotmart.
-  outputFileTracingIncludes: { "/api/webhooks/hotmart": ["./privado/guias-ea2/**"] },
+  outputFileTracingIncludes: {
+    "/api/webhooks/hotmart": ["./privado/guias-ea2/**"],
+    // Manual da VPS (IRIS, 23/11): texto e prints só saem depois da senha
+    "/configurar-vps": ["./privado/configurar-vps/**"],
+    "/configurar-vps/print/[n]": ["./privado/configurar-vps/prints/**"],
+  },
+  async headers() {
+    return [{ source: "/configurar-vps/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
+            { source: "/configurar-vps", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] }];
+  },
   images: {
     remotePatterns: [
       {
