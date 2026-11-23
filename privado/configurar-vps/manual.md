@@ -93,15 +93,15 @@ Resultado: tudo dos passos 5 a 13 feito por você, com uma linha.
 
 > **Atenção: no Console web, Ctrl+C NÃO copia.** Ele interrompe o instalador na hora. Para copiar, use **Ctrl+Shift+C** ou o botão direito → Copiar. Se apertou Ctrl+C sem querer, nada se perde: rode `sudo instalar-imersao` que ele continua de onde parou.
 ```
-curl -fsSL https://redpro.com.br/instalar -o instalar.sh && bash instalar.sh
+curl -fsSL https://redpro.com.br/instalar -o configurar-vps.sh && bash configurar-vps.sh
 ```
 O comando já vem com a chave da sua turma. Ele só funciona copiado desta página: não mande para ninguém.
 
 **Atenção:** o teste da chave (item 2) é **no terminal do SEU computador, NÃO na tela do Console web**.
 
-O instalador mostra, em português, cada etapa, o que está fazendo e por quê. Ele vai te pedir, nesta ordem:
+O instalador mostra, em português, cada etapa, o que está fazendo e por quê. Antes de cada uma das 13 etapas ele para e mostra "aperte Enter para começar": leia o "Por quê" com calma e aperte Enter. Ele vai te pedir, nesta ordem:
 1. **A sua chave:** se você cadastrou a chave no painel, ele pergunta "Usar essa mesma chave para o usuário hermes? [s/n]". Responda `s`. Só pede para colar a chave se não achou a do painel. [print 13]
-2. **O teste da chave:** **no terminal do SEU computador, NÃO na tela do Console web**, entre com `ssh hermes@SEU_IP` (se você deu outro nome à chave no Passo 3, use `ssh -i ~/.ssh/NOME_DA_CHAVE hermes@SEU_IP`). Se entrou sem pedir senha, volte ao Console web e responda `s`. Só depois disso ele tranca a senha. O Console web continua funcionando depois disso: ele não usa senha nem SSH.
+2. **O teste da chave:** este passo é no terminal do **SEU COMPUTADOR, NÃO na tela do Console web** (Windows: PowerShell · Mac: Terminal). Deixe o Console web aberto, vá até o seu computador e entre com `ssh hermes@SEU_IP` (se você deu outro nome à chave no Passo 3, use `ssh -i ~/.ssh/NOME_DA_CHAVE hermes@SEU_IP`). Se entrou sem pedir senha, volte ao Console web e responda `s`. Só depois disso ele tranca a senha. O Console web continua funcionando depois disso: ele não usa senha nem SSH.
 3. **O cérebro:** `1` para Claude ou `2` para ChatGPT. Ele mostra um link. Selecione o link inteiro com o mouse, copie com **Ctrl+Shift+C** (ou botão direito → Copiar), abra numa aba nova do navegador e autorize. Se o link quebrar em várias linhas, copie todas, do `https` até o fim. No Claude, ele te dá um código: cole no Console web com Ctrl+Shift+V e aperte Enter. No ChatGPT, você digita no navegador o código curto que aparece no Console web.
 4. **Um bot por agente:** crie o bot no @BotFather, cole o token no Console web (ele não aparece na tela, é assim mesmo: cole uma vez só e aperte Enter) e mande `/start` para o bot. O instalador mostra o nome de quem mandou e pergunta se é você: só essa pessoa vai poder usar o agente. Ainda não criou os bots? Digite `pular` e faça depois com `sudo instalar-imersao --so telegram`.
 
@@ -133,7 +133,7 @@ Antes, faça o **Passo 3.5** (a primeira entrada na VPS) uma vez no seu terminal
 **2. Cole o pedido** (é o mesmo para os três). Troque `SEU_IP` pelo IP e `claude` por `chatgpt` se a sua assinatura for do ChatGPT:
 ```
 Entre na minha VPS com "ssh root@SEU_IP" e rode o instalador da Imersão em modo agente, em segundo plano, guardando a saída num arquivo:
-ssh root@SEU_IP 'curl -fsSL "COLE_AQUI_O_LINK_DO_PASSO_4.2" -o instalar.sh && nohup bash instalar.sh --agente --cerebro claude > instalar-agente.log 2>&1 &'
+ssh root@SEU_IP 'curl -fsSL "COLE_AQUI_O_LINK_DO_PASSO_4.2" -o configurar-vps.sh && nohup bash configurar-vps.sh --agente --cerebro claude > instalar-agente.log 2>&1 &'
 Ele leva de 15 a 25 minutos. Acompanhe com: ssh root@SEU_IP 'tail -n 40 instalar-agente.log'
 Pare de acompanhar quando aparecer a linha PENDENTES_DA_PESSOA. Se aparecer uma linha com ✖, me mostre o erro.
 Não me peça senha, token nem código de login no chat. No fim, me mostre os comandos que o instalador listou para eu rodar no meu terminal.
@@ -256,7 +256,7 @@ Por quê: cada agente é um perfil separado, com a sua alma (SOUL), habilidades 
 
 **12.1 Baixar o pacote do Squad e os modelos da sua marca**
 ```
-mkdir -p ~/pacote && curl -fsSL "https://redpro.com.br/instalar/arquivo/pacote-squad.tar.gz?k=CHAVE" | tar -xz -C ~/pacote
+mkdir -p ~/pacote && curl -fsSL "https://redpro.com.br/instalar/arquivo/configurar-vps.tar.gz?k=CHAVE" | tar -xz -C ~/pacote
 cp -rn ~/pacote/marca ~/marca
 ```
 A pasta `~/marca` tem os modelos em branco (voz, contexto, provas, base de atendimento). O onboarding preenche com você.
