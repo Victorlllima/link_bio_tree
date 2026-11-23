@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import { COOKIE, loginConfigurado, sessaoValida } from "@/lib/demo-cotacoes/auth";
 import { listar } from "@/lib/demo-cotacoes/store";
 import "./cotacoes.css";
@@ -10,7 +10,8 @@ import "./cotacoes.css";
    Sem o cookie, o servidor só devolve a tela de login. noindex, fora de menu e sitemap.
    Sem JavaScript no cliente: formulários HTML simples, fáceis para o agente preencher. */
 
-const sans = Space_Grotesk({ subsets: ["latin"], weight: ["400", "500", "700"], variable: "--dc-sans" });
+// mesma configuração da /quero-saber (o Space_Grotesk quebrou o next/font no build da Vercel)
+const sans = Instrument_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--dc-sans" });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--dc-mono" });
 
 export const dynamic = "force-dynamic";
