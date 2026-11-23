@@ -112,3 +112,8 @@
 /* 📌 Guarde isto agora (Red, 23/11) */
 .cv .cv-guarde{background:rgba(255,214,10,.09);border:1px dashed rgba(255,214,10,.55);border-radius:12px;padding:12px 16px;font-size:16px}
 .cv .cv-guarde span{display:block;font-family:var(--cv-mono),monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#FFD60A;margin-bottom:4px}
+.cv .cv-botao-wrap{margin:22px 0}
+.cv .cv-botao{display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:16px 22px;border-radius:12px;background:var(--blue);color:#fff;font-weight:700;font-size:18px;text-decoration:none;box-shadow:0 8px 28px rgba(68,88,255,.35);transition:background .15s}
+.cv .cv-botao:hover{background:var(--blue-hi)}
+@media(min-width:768px){.cv .cv-botao{display:inline-flex;min-width:360px}}
+.cv .cv-manual>.cv-divisor:first-child{margin-top:0;padding-top:0;border-top:0}

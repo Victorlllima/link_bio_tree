@@ -56,7 +56,7 @@ if "NÃO na tela do Console web" in t and "**Atenção:** o teste da chave" not 
 # ---- 📌 Guarde isto agora (Red, 23/11) ----
 G = "📌 Guarde isto agora: "
 t = depois(r"Deu certo se: o painel da Hostinger mostra a sua VPS",
-           G + "o link do painel da Hostinger (`https://hpanel.hostinger.com`) e o e-mail da conta. Anote na sua [ficha da VPS](#ficha-da-minha-vps).", t)
+           G + "o link do painel da Hostinger (`https://hpanel.hostinger.com`) e o e-mail da conta. Anote: na noite 2 ela entra na sua ficha da VPS.", t)
 t = depois(r"Deu certo se: aparece um IP",
            G + "o **IP** da VPS e o **nome do servidor** (começa com `srv`, aparece no painel). Pode ir num Google Docs: não é segredo. "
                "A **senha do root**, se você criou uma, vai só no gerenciador de senhas, nunca em documento.", t)
@@ -64,7 +64,7 @@ t = depois(r"Deu certo se: a última linha diz \*\*Tudo pronto\*\*",
            G + "o **nome e o @ de cada bot** e a **conta de IA** em que você fez o login (o e-mail do Claude ou do ChatGPT). "
                "O **token de cada bot** vai só no gerenciador de senhas.", t, todas=True)
 t = re.sub(r"\n(## Passo 12 · )", "\n" + G + "a **conta de IA** em que você fez o login (o e-mail do Claude ou do ChatGPT). Anote na sua ficha.\n\n\\1", t, count=1)
-t = depois(r"\*\*13\.1 Criar os bots\.\*\*",
+t = depois(r"\*\*13\.1 (?:Criar os bots|Os tokens)\.\*\*",
            G + "o **nome e o @ de cada bot** (na ficha) e o **token de cada um** (só no gerenciador de senhas, nunca em documento ou chat).", t)
 
 FICHA = """## Ficha da minha VPS
@@ -86,6 +86,29 @@ Senha do root e tokens guardados em [seu gerenciador de senhas]:
 """
 if "## Ficha da minha VPS" not in t:
     t = t.replace("## Comandos do dia a dia", FICHA + "## Comandos do dia a dia", 1)
+
+# ---- Noite 1: Hermes Desktop no computador do aluno (Red, 23/11) ----
+NOITE1 = """# Noite 1 · O Hermes no seu computador
+## Passo 0 · Instalar o Hermes Desktop
+Resultado: o Hermes instalado no seu computador.
+
+É **gratuito e oficial**: o app é da Nous Research, a empresa que criou o Hermes, com código aberto.
+
+[[botao: Baixar o Hermes Desktop|https://hermes-agent.nousresearch.com/desktop]]
+
+- Windows: precisa do Windows 10 ou 11. Na página, instale pela **Microsoft Store** ou clique em **Download .exe instead** e abra o arquivo baixado.
+- Mac: precisa do macOS 12 ou mais novo. Baixe o arquivo `.dmg`, abra e arraste o Hermes para a pasta Aplicativos.
+- Linux: não tem instalador. Na página, clique em **Install via terminal** e siga o comando que aparece lá.
+
+Deu certo se: o app do Hermes abre no seu computador.
+
+📌 Guarde isto agora: qual **conta de IA** você vai usar, a assinatura do **ChatGPT** ou a do **Claude**. É a mesma que você vai conectar na VPS na noite 2.
+
+# Noite 2 · A VPS: seus 3 agentes ligados 24 horas
+
+"""
+if "# Noite 1" not in t:
+    t = NOITE1 + t.lstrip()
 
 proibido = [w for w in ("CONFERIR", "Amanda", "ION", "Rigel", "Orion", "IRIS", "<!--") if w in t]
 if proibido:

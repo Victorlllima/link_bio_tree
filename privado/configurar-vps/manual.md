@@ -1,3 +1,21 @@
+# Noite 1 · O Hermes no seu computador
+## Passo 0 · Instalar o Hermes Desktop
+Resultado: o Hermes instalado no seu computador.
+
+É **gratuito e oficial**: o app é da Nous Research, a empresa que criou o Hermes, com código aberto.
+
+[[botao: Baixar o Hermes Desktop|https://hermes-agent.nousresearch.com/desktop]]
+
+- Windows: precisa do Windows 10 ou 11. Na página, instale pela **Microsoft Store** ou clique em **Download .exe instead** e abra o arquivo baixado.
+- Mac: precisa do macOS 12 ou mais novo. Baixe o arquivo `.dmg`, abra e arraste o Hermes para a pasta Aplicativos.
+- Linux: não tem instalador. Na página, clique em **Install via terminal** e siga o comando que aparece lá.
+
+Deu certo se: o app do Hermes abre no seu computador.
+
+📌 Guarde isto agora: qual **conta de IA** você vai usar, a assinatura do **ChatGPT** ou a do **Claude**. É a mesma que você vai conectar na VPS na noite 2.
+
+# Noite 2 · A VPS: seus 3 agentes ligados 24 horas
+
 ## O que você vai ter no fim
 - Uma VPS sua, protegida, ligada 24 horas.
 - O Hermes instalado nela, com o **Squad de 3 agentes**, cada um com o seu bot no Telegram:
@@ -28,7 +46,7 @@ Resultado: uma VPS paga e ativa na Hostinger.
 
 Deu certo se: o painel da Hostinger mostra a sua VPS.
 
-📌 Guarde isto agora: o link do painel da Hostinger (`https://hpanel.hostinger.com`) e o e-mail da conta. Anote na sua [ficha da VPS](#ficha-da-minha-vps).
+📌 Guarde isto agora: o link do painel da Hostinger (`https://hpanel.hostinger.com`) e o e-mail da conta. Anote: na noite 2 ela entra na sua ficha da VPS.
 
 ## Passo 2 · Configurar a VPS no painel
 Resultado: Ubuntu instalado, chave de acesso cadastrada e o IP anotado.
@@ -99,15 +117,15 @@ O comando já vem com a chave da sua turma. Ele só funciona copiado desta pági
 
 **Atenção:** o teste da chave (item 2) é **no terminal do SEU computador, NÃO na tela do Console web**.
 
-O instalador mostra, em português, cada etapa, o que está fazendo e por quê. Antes de cada uma das 13 etapas ele para e mostra "aperte Enter para começar": leia o "Por quê" com calma e aperte Enter. Ele vai te pedir, nesta ordem:
+O instalador mostra, em português, cada etapa, o que está fazendo e por quê. Antes de cada uma das 12 etapas ele para e mostra "aperte Enter para começar": leia o "Por quê" com calma e aperte Enter. Nas etapas que demoram (atualizar o sistema, instalar o Hermes e instalar os agentes) aparece uma barra com a porcentagem, por exemplo `⏳ [████████░░░░░░░░░░░░]  42% · instalando as dependências · 1 min 05 s`: enquanto o tempo andar, está tudo certo. Ele vai te pedir, nesta ordem:
 1. **A sua chave:** se você cadastrou a chave no painel, ele pergunta "Usar essa mesma chave para o usuário hermes? [s/n]". Responda `s`. Só pede para colar a chave se não achou a do painel. [print 13]
 2. **O teste da chave:** este passo é no terminal do **SEU COMPUTADOR, NÃO na tela do Console web** (Windows: PowerShell · Mac: Terminal). Deixe o Console web aberto, vá até o seu computador e entre com `ssh hermes@SEU_IP` (se você deu outro nome à chave no Passo 3, use `ssh -i ~/.ssh/NOME_DA_CHAVE hermes@SEU_IP`). Se entrou sem pedir senha, volte ao Console web e responda `s`. **Pediu senha? Não digite nada.** Volte ao Console web e responda `n`: nada é trancado, a senha continua ligada e você corrige com calma. Confira se a chave cadastrada na Hostinger é a deste computador e depois rode só esta etapa com `sudo instalar-imersao --so ssh`. (Se a linha onde você digita começa com `root@srv...`, você ainda está no Console web, não no seu computador.) Só depois disso ele tranca a senha. O Console web continua funcionando depois disso: ele não usa senha nem SSH.
-3. **O cérebro:** `1` para Claude ou `2` para ChatGPT. Ele mostra um link. Selecione o link inteiro com o mouse, copie com **Ctrl+Shift+C** (ou botão direito → Copiar), abra numa aba nova do navegador e autorize. Se o link quebrar em várias linhas, copie todas, do `https` até o fim. No Claude, ele te dá um código: cole no Console web com Ctrl+Shift+V e aperte Enter. No ChatGPT, você digita no navegador o código curto que aparece no Console web.
-4. **Um bot por agente:** crie o bot no @BotFather, cole o token no Console web (ele não aparece na tela, é assim mesmo: cole uma vez só e aperte Enter) e mande `/start` para o bot. O instalador mostra o nome de quem mandou e pergunta se é você: só essa pessoa vai poder usar o agente. Ainda não criou os bots? Digite `pular` e faça depois com `sudo instalar-imersao --so telegram`.
+3. **O cérebro:** `1` para Claude ou `2` para ChatGPT. Ele mostra um link. Selecione o link inteiro com o mouse, copie com **Ctrl+Shift+C** (ou botão direito → Copiar), abra numa aba nova do navegador e autorize. Se o link quebrar em várias linhas, copie todas, do `https` até o fim. No Claude, clique em Autorizar e depois em Copiar código; volte ao Console web e cole com o **botão direito → Colar** e aperte Enter. **Atenção: o código colado NÃO aparece na tela. É normal: aperte Enter e o Claude conecta.** As mensagens do login vêm do próprio Claude, em inglês ("Paste code here" = cole o código aqui). No ChatGPT, você digita no navegador o código curto que aparece no Console web.
+4. **Os tokens dos 3 bots** (você criou os bots na noite 1 e guardou os tokens no seu gerenciador de senhas). A ordem é Atendimento → Carrosséis → Landing pages: o instalador mostra "Bot 1 de 3 · agente de ATENDIMENTO · cole o token que você guardou", depois CARROSSÉIS e LANDING PAGES. O token colado não aparece na tela, é assim mesmo: cole uma vez só e aperte Enter. Se o token estiver errado, o instalador avisa e pede de novo. Depois mande `/start` para o bot: o instalador mostra o nome de quem mandou e pergunta se é você, e só essa pessoa vai poder usar o agente.
 
-Leva de 15 a 25 minutos. Deixe a aba do Console web aberta até o fim. No fim, cada agente te manda um "oi" no Telegram.
+Leva de 25 a 40 minutos, contando o login do cérebro e os tokens dos bots (só a parte automática fica em uns 15). Deixe a aba do Console web aberta até o fim. No fim, cada agente te manda um "oi" no Telegram e o instalador lista os 3 bots com o @ e o link t.me de cada um.
 
-Deu certo se: a última linha diz **Tudo pronto** e chegaram três mensagens no Telegram.
+Deu certo se: a última linha diz **Tudo pronto** e chegaram três mensagens no Telegram. Em seguida, mande um oi para qualquer um dos 3 agentes: é o onboarding (Passo 15).
 
 📌 Guarde isto agora: o **nome e o @ de cada bot** e a **conta de IA** em que você fez o login (o e-mail do Claude ou do ChatGPT). O **token de cada bot** vai só no gerenciador de senhas.
 
@@ -166,8 +184,10 @@ apt-get update && apt-get -y upgrade
 apt-get -y install curl git ufw fail2ban unattended-upgrades ca-certificates jq tar
 timedatectl set-timezone America/Sao_Paulo
 printf 'APT::Periodic::Update-Package-Lists "1";\nAPT::Periodic::Unattended-Upgrade "1";\n' > /etc/apt/apt.conf.d/20auto-upgrades
+printf 'Unattended-Upgrade::Automatic-Reboot "true";\nUnattended-Upgrade::Automatic-Reboot-Time "04:00";\n' > /etc/apt/apt.conf.d/52imersao-reinicio
 systemctl enable --now unattended-upgrades
 ```
+Quando uma atualização pedir reinício, a VPS reinicia sozinha às 4h da manhã e os agentes voltam sozinhos. Você não precisa fazer nada.
 
 ## Passo 6 · Criar o usuário hermes com a sua chave
 Por quê: os agentes não rodam como administrador, e você entra com chave em vez de senha.
@@ -231,7 +251,7 @@ curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/99fcd6944
 source ~/.bashrc
 hermes --version
 ```
-Leva de 5 a 10 minutos. Deu certo se: aparece `v0.22.5`.
+Leva cerca de 2 minutos (pode chegar a 10 se a internet da VPS estiver lenta). Deu certo se: aparece `v0.22.5`.
 
 ## Passo 11 · Conectar o cérebro
 Faça **só um**, o da sua assinatura.
@@ -241,7 +261,7 @@ Faça **só um**, o da sua assinatura.
 curl -fsSL https://claude.ai/install.sh | bash -s 2.1.312
 CLAUDE_CONFIG_DIR=~/.claude ~/.local/bin/claude auth login
 ```
-Abra o link no navegador do seu computador, autorize e cole o código na VPS.
+Abra o link no navegador do seu computador, autorize e cole o código na VPS. O código colado não aparece na tela: é normal, aperte Enter.
 
 **ChatGPT (Plus ou Pro):**
 ```
@@ -259,7 +279,7 @@ Por quê: cada agente é um perfil separado, com a sua alma (SOUL), habilidades 
 mkdir -p ~/pacote && curl -fsSL "https://redpro.com.br/instalar/arquivo/configurar-vps.tar.gz?k=CHAVE" | tar -xz -C ~/pacote
 cp -rn ~/pacote/marca ~/marca
 ```
-A pasta `~/marca` tem os modelos em branco (voz, contexto, provas, base de atendimento). O onboarding preenche com você.
+A pasta `~/marca` tem os modelos em branco (voz, contexto, regras, provas, base de atendimento). O onboarding (Passo 15) preenche com você.
 
 **12.2 Instalar os perfis**
 ```
@@ -293,7 +313,7 @@ done
 Deu certo se: `hermes profile list` mostra os três.
 
 ## Passo 13 · Um bot do Telegram para cada agente e ligado 24 horas
-**13.1 Criar os bots.** No Telegram, fale com o **@BotFather**, mande `/newbot` e crie **três bots** (ex.: "Atendimento do João", "Carrosséis do João", "Páginas do João"). Cada um te dá um token. **Nunca use o mesmo token em dois agentes.**
+**13.1 Os tokens.** Você criou os 3 bots na noite 1 (Atendimento, Carrosséis e Landing pages): pegue os 3 tokens no seu gerenciador de senhas. **Nunca use o mesmo token em dois agentes.**
 
 📌 Guarde isto agora: o **nome e o @ de cada bot** (na ficha) e o **token de cada um** (só no gerenciador de senhas, nunca em documento ou chat).
 
@@ -359,10 +379,11 @@ Deu certo se: os três aparecem `active (running)`.
 Deu certo se: os três respondem. Mande o print para o suporte da Imersão, no WhatsApp, e escreva NO AR na noite 2.
 
 ## Passo 15 · Onboarding dos agentes
-É a conversa em que cada agente aprende sobre o seu negócio e preenche a pasta `~/marca`. Será liberado na aula; quando sair:
-```
-sudo instalar-imersao --so onboarding
-```
+Abra o Telegram e mande um oi para **qualquer um** dos seus 3 agentes. Ele vai conversar com você e aprender sobre o seu negócio. Leva uns 10 minutos.
+
+São 10 perguntas, uma por vez, cada uma com um exemplo de resposta (pode responder por áudio). Ele grava tudo na pasta `~/marca` e os outros dois agentes já ficam sabendo: ninguém repete as perguntas. Não mande senha nem token nessa conversa.
+
+Deu certo se: ele termina com "Pronto! Os seus 3 agentes já sabem tudo do seu negócio." Quer refazer? Diga "refazer onboarding" para qualquer um deles.
 
 ---
 
@@ -398,7 +419,7 @@ Já protegido:
 - só a sua chave entra; senha e root direto estão desligados;
 - firewall fechado, só o SSH aberto;
 - vigia contra tentativa de invasão (fail2ban);
-- atualizações de segurança automáticas;
+- atualizações de segurança automáticas (com reinício sozinho às 4h, quando preciso);
 - os agentes rodam num usuário comum, não como administrador;
 - cada bot só obedece ao seu número do Telegram;
 - os tokens ficam em arquivos que só o usuário hermes lê.

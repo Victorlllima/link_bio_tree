@@ -111,8 +111,8 @@ function renderBloco(b: Bloco, i: number, chave: string): ReactNode {
   switch (b.t) {
     case "h1":
       return (
-        <div key={i} className="cv-divisor" id="caminho-manual">
-          <span>Opcional</span>
+        <div key={i} className="cv-divisor" id={b.id}>
+          <span>{b.rotulo}</span>
           <h2>{b.texto}</h2>
         </div>
       );
@@ -155,6 +155,14 @@ function renderBloco(b: Bloco, i: number, chave: string): ReactNode {
         <p key={i} className="cv-ok">
           <span>Deu certo se</span>
           {inline(b.texto, chave)}
+        </p>
+      );
+    case "botao":
+      return (
+        <p key={i} className="cv-botao-wrap">
+          <a className="cv-botao" href={b.href} target="_blank" rel="noopener noreferrer">
+            {b.texto} <span aria-hidden="true">↗</span>
+          </a>
         </p>
       );
     case "guarde":

@@ -7,7 +7,8 @@ import path from "node:path";
 export type Inline = string; // markdown curto: **negrito**, `código`, [link](url)
 
 export type Bloco =
-  | { t: "h1"; texto: string }
+  | { t: "h1"; id: string; texto: string; rotulo: string }
+  | { t: "botao"; texto: string; href: string }
   | { t: "passo"; id: string; num: string; texto: string }
   | { t: "h2"; id: string; texto: string }
   | { t: "h3"; id: string; texto: string }
@@ -109,8 +110,11 @@ export function lerManual(linkHostinger: string): { blocos: Bloco[]; indice: Ind
       const texto = h[2].trim();
       const passo = texto.match(/^Passo (\w+) · (.*)$/);
       if (h[1] === "#") {
-        blocos.push({ t: "h1", texto });
-        indice.push({ id: slug(texto), texto });
+        const noite = texto.match(/^Noite (\d+) · (.*)$/);
+        const rotulo = noite ? `Noite ${noite[1]}` : "Opcional";
+        const tit = noite ? noite[2] : texto;
+        blocos.push({ t: "h1", id: slug(texto), texto: tit, rotulo });
+        indice.push({ id: slug(texto), texto: noite ? `${rotulo} · ${tit}` : texto });
       } else if (passo) {
         const id = `passo-${passo[1].toLowerCase()}`;
         blocos.push({ t: "passo", id, num: passo[1], texto: passo[2] });
@@ -162,6 +166,14 @@ export function lerManual(linkHostinger: string): { blocos: Bloco[]; indice: Ind
         blocos.push({ t: "lista", ordenada, itens });
       }
       soltarPrints();
+      continue;
+    }
+
+    const bt = l.match(/^\[\[botao: (.+)\|(https?:\/\/[^\]]+)\]\]$/);
+    if (bt) {
+      soltarPrints();
+      blocos.push({ t: "botao", texto: bt[1].trim(), href: bt[2] });
+      i++;
       continue;
     }
 
