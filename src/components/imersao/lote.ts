@@ -43,7 +43,7 @@ export const PRECO_CHEIO = Math.max(...LOTES.map((l) => l.preco));
 export const EVENTO = {
     chip: "AO VIVO · 25 E 26 DE NOVEMBRO",
     extenso: "quarta 25 e quinta 26 de novembro",
-    horario: "19h às 22h",
+    horario: "a partir das 19h",
     noite1: "25/11",
     noite2: "26/11",
     noite1Inicio: "2026-11-25T19:00:00-03:00",

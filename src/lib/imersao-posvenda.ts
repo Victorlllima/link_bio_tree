@@ -67,8 +67,8 @@ export function emailConfirmacaoImersao(nome: string, cfg: Pick<ImersaoConfig, "
       <p style="${P}">Deu certo: sua vaga na Imersão Arquiteto de Agentes está garantida.</p>
       <p style="${P};margin-bottom:6px"><strong style="color:#fff">Quando:</strong></p>
       <ul style="${P};padding-left:20px">
-        <li>Quarta, 25/11, das 19h às 22h</li>
-        <li>Quinta, 26/11, das 19h às 22h</li>
+        <li>Quarta, 25/11, a partir das 19h</li>
+        <li>Quinta, 26/11, a partir das 19h</li>
         <li>Horário de Brasília. A sala abre 15 minutos antes, às 18h45.</li>
       </ul>
       <p style="${P}"><strong style="color:#fff">Faça agora, em 2 passos (leva uns 2 minutos):</strong></p>
