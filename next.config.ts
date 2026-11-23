@@ -4,7 +4,12 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   // Guias de bônus do EA² (22/11): PDFs privados que só saem anexados ao e-mail do webhook da Hotmart.
-  outputFileTracingIncludes: { "/api/webhooks/hotmart": ["./privado/guias-ea2/**"] },
+  // Instalador da Imersão (23/11): instalar.sh e pacote cifrados, servidos só com a chave da aula.
+  outputFileTracingIncludes: {
+    "/api/webhooks/hotmart": ["./privado/guias-ea2/**"],
+    "/instalar": ["./privado/instalador/**"],
+    "/instalar/arquivo/[nome]": ["./privado/instalador/**"],
+  },
   images: {
     remotePatterns: [
       {
@@ -43,14 +48,7 @@ const nextConfig: NextConfig = {
         destination: "/hermes-week/g",
         permanent: false,
       })),
-      // Instalador da Imersão (ION, 22/11/2026, ok do Red via Rigel): "curl -fsSL redpro.com.br/instalar"
-      // segue para o instalar.sh da última release do repositório público.
-      {
-        source: "/instalar",
-        destination:
-          "https://github.com/RedPro-AI-Solutions/instalador-imersao/releases/latest/download/instalar.sh",
-        permanent: false,
-      },
+      // /instalar deixou de ser público (23/11): agora é a rota src/app/instalar (só com a chave da aula).
     ];
   },
 };
