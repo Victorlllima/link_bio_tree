@@ -20,7 +20,7 @@ export type Bloco =
   | { t: "lista"; ordenada: boolean; itens: Inline[] }
   | { t: "abas"; grupo: string; abas: { rotulo: string; texto: Inline }[] }
   | { t: "guarde"; texto: Inline } // 📌 Guarde isto agora
-  | { t: "codigo"; codigo: string; pedido: boolean; ficha?: boolean }
+  | { t: "codigo"; codigo: string; pedido: boolean; ficha?: boolean; soul?: boolean }
   | { t: "tabela"; cab: string[]; linhas: string[][] }
   | { t: "prints"; nums: string[] }
   | { t: "hr" };
@@ -87,7 +87,7 @@ export function lerManual(linkHostinger: string): { blocos: Bloco[]; indice: Ind
       const codigo = corpo.join("\n");
       // bloco de texto corrido (pedido ao agente) vs. comando
       const pedido = lang === "pedido" || /^(Entre|Leia|Quero|Crie|Faça)\b/.test(codigo);
-      blocos.push({ t: "codigo", codigo, pedido, ficha: lang === "ficha" });
+      blocos.push({ t: "codigo", codigo, pedido, ficha: lang === "ficha", soul: lang === "markdown" && codigo.startsWith("# SOUL") });
       continue;
     }
 

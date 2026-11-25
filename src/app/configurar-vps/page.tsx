@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Fragment, type ReactNode } from "react";
-import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import { COOKIE, chaveInstalar, cookieValido, senhaConfigurada } from "@/lib/configurar-vps/auth";
 import { LEGENDAS, lerManual, type Bloco } from "@/lib/configurar-vps/manual";
 import { Abas, BotaoCopiar } from "./cliente";
@@ -12,7 +12,8 @@ import "./configurar-vps.css";
    (o manual não vai no HTML). Prints saem por /configurar-vps/print/NN, também atrás do cookie.
    Texto: privado/configurar-vps/manual.md, gerado por scripts/sync-configurar-vps.py. */
 
-const sans = Space_Grotesk({ subsets: ["latin"], weight: ["400", "500", "700"], variable: "--cv-sans" });
+// Instrument Sans: o Space_Grotesk quebrou o next/font no build da Vercel (demo/cotacoes, 23/11)
+const sans = Instrument_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--cv-sans" });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"], variable: "--cv-mono" });
 
 export const dynamic = "force-dynamic";
@@ -59,14 +60,14 @@ function comChave(texto: string, chave: string): string {
     .replaceAll("?k=CHAVE", `?k=${chave}`);
 }
 
-function Codigo({ codigo, pedido, ficha, chave }: { codigo: string; pedido: boolean; ficha?: boolean; chave: string }) {
+function Codigo({ codigo, pedido, ficha, soul, chave }: { codigo: string; pedido: boolean; ficha?: boolean; soul?: boolean; chave: string }) {
   const c = comChave(codigo, chave);
-  const tipo = ficha ? "ficha" : pedido ? "pedido" : "cmd";
+  const tipo = soul ? "soul" : ficha ? "ficha" : pedido ? "pedido" : "cmd";
   return (
     <div className={tipo === "cmd" ? "cv-code" : "cv-code cv-pedido"}>
       <div className="cv-code-topo">
-        <span>{tipo === "ficha" ? "Ficha da minha VPS" : tipo === "pedido" ? "Pedido para o agente" : "Terminal"}</span>
-        <BotaoCopiar texto={c} rotulo={tipo === "ficha" ? "Copiar ficha" : tipo === "pedido" ? "Copiar pedido" : "Copiar"} />
+        <span>{tipo === "soul" ? "SOUL.md" : tipo === "ficha" ? "Ficha da minha VPS" : tipo === "pedido" ? "Pedido para o agente" : "Terminal"}</span>
+        <BotaoCopiar texto={c} rotulo={tipo === "soul" ? "Copiar modelo" : tipo === "ficha" ? "Copiar ficha" : tipo === "pedido" ? "Copiar pedido" : "Copiar"} />
       </div>
       <pre>
         <code>{c}</code>
@@ -200,7 +201,7 @@ function renderBloco(b: Bloco, i: number, chave: string): ReactNode {
         />
       );
     case "codigo":
-      return <Codigo key={i} codigo={b.codigo} pedido={b.pedido} ficha={b.ficha} chave={chave} />;
+      return <Codigo key={i} codigo={b.codigo} pedido={b.pedido} ficha={b.ficha} soul={b.soul} chave={chave} />;
     case "tabela":
       return (
         <div key={i} className="cv-tabela">

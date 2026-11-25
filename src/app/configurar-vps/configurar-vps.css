@@ -1,4 +1,4 @@
-/* /configurar-vps · identidade da Imersão (preto, azul #4458FF, Space Grotesk + JetBrains Mono) */
+/* /configurar-vps · identidade da Imersão (preto, azul #4458FF, Instrument Sans + JetBrains Mono) */
 .cv{--bg:#0A0A0A;--bg2:#0E0F11;--blue:#4458FF;--blue-hi:#6E7DFF;--blue-soft:rgba(68,88,255,.14);--text:#F5F5F5;--muted:#9A9AA0;--dim:#5C5C5F;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.14);--ok:#3DDC97;--warn:#FFB547;
   background:var(--bg);color:var(--text);min-height:100vh;font-family:var(--cv-sans),system-ui,sans-serif;font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
 .cv *{box-sizing:border-box}
@@ -15,7 +15,7 @@
 .cv-gate-form{display:flex;flex-direction:column;gap:12px}
 .cv-gate input{height:52px;border-radius:12px;border:1px solid var(--line2);background:#000;color:var(--text);padding:0 16px;font-size:17px;font-family:var(--cv-mono),monospace;outline:none}
 .cv-gate input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
-.cv-gate button{height:52px;border:0;border-radius:12px;background:var(--blue);color:#fff;font-weight:700;font-size:16px;font-family:inherit;cursor:pointer}
+.cv-gate button{height:52px;border:0;border-radius:12px;background:var(--blue);color:#fff;font-weight:600;font-size:16px;font-family:inherit;cursor:pointer}
 .cv-gate button:hover{background:var(--blue-hi)}
 .cv-gate-erro{margin:14px 0 0;color:#FF8A8A;font-size:15px}
 .cv-gate-rodape{margin:20px 0 0;color:var(--dim);font-size:13px;font-family:var(--cv-mono),monospace}
@@ -81,7 +81,7 @@
 .cv-abas{margin:0 0 18px}
 .cv-abas-barra{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
 .cv-aba{min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line2);background:transparent;color:var(--muted);font-family:inherit;font-size:15px;cursor:pointer}
-.cv-aba-on{background:var(--text);color:#000;border-color:var(--text);font-weight:700}
+.cv-aba-on{background:var(--text);color:#000;border-color:var(--text);font-weight:600}
 .cv-abas-painel{border-left:2px solid var(--blue);padding:4px 0 2px 14px}
 .cv-abas-painel p{margin:0 0 10px}
 
@@ -113,7 +113,7 @@
 .cv .cv-guarde{background:rgba(255,214,10,.09);border:1px dashed rgba(255,214,10,.55);border-radius:12px;padding:12px 16px;font-size:16px}
 .cv .cv-guarde span{display:block;font-family:var(--cv-mono),monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#FFD60A;margin-bottom:4px}
 .cv .cv-botao-wrap{margin:22px 0}
-.cv .cv-botao{display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:16px 22px;border-radius:12px;background:var(--blue);color:#fff;font-weight:700;font-size:18px;text-decoration:none;box-shadow:0 8px 28px rgba(68,88,255,.35);transition:background .15s}
+.cv .cv-botao{display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:16px 22px;border-radius:12px;background:var(--blue);color:#fff;font-weight:600;font-size:18px;text-decoration:none;box-shadow:0 8px 28px rgba(68,88,255,.35);transition:background .15s}
 .cv .cv-botao:hover{background:var(--blue-hi)}
 @media(min-width:768px){.cv .cv-botao{display:inline-flex;min-width:360px}}
 .cv .cv-manual>.cv-divisor:first-child{margin-top:0;padding-top:0;border-top:0}
