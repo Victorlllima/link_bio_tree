@@ -28,7 +28,7 @@ export type Bloco =
 export type Indice = { id: string; texto: string; num?: string }[];
 
 const ABAS_SO = ["Windows", "Mac", "Linux"];
-const ABAS_AGENTE = ["Claude Code", "Codex", "Gemini CLI"];
+const ABAS_AGENTE = ["Claude Code", "Codex"];
 
 const slug = (s: string) =>
   s

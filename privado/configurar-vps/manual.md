@@ -137,7 +137,7 @@ sudo instalar-imersao --refazer telegram   # refaz uma etapa (ex.: trocar o toke
 ```
 
 ### Passo 4B · O mesmo instalador, pedido a um agente de terminal (opcional, no lugar do 4)
-Se você usa um agente de IA no terminal do seu computador (Claude Code, Codex ou Gemini CLI), pode pedir a ele para rodar o instalador por você. Ele faz tudo o que não precisa de você e, no fim, te mostra os comandos dos passos que só você pode fazer.
+Se você usa um agente de IA no terminal do seu computador (Claude Code ou Codex), pode pedir a ele para rodar o instalador por você. Ele faz tudo o que não precisa de você e, no fim, te mostra os comandos dos passos que só você pode fazer.
 
 **O que fica com você, e por quê:** entrar com a sua assinatura (Claude ou ChatGPT), colar o token de cada bot do Telegram e testar a sua chave antes de trancar a senha. Login, token e senha nunca vão para o chat de um agente. Esses passos você roda no **seu** terminal, com o comando que o instalador te entrega.
 
@@ -146,9 +146,8 @@ Antes, faça o **Passo 3.5** (a primeira entrada na VPS) uma vez no seu terminal
 **1. Abra o agente no terminal do seu computador:**
 - Claude Code: digite `claude` e Enter.
 - Codex: digite `codex` e Enter.
-- Gemini CLI: digite `gemini` e Enter.
 
-**2. Cole o pedido** (é o mesmo para os três). Troque `SEU_IP` pelo IP e `claude` por `chatgpt` se a sua assinatura for do ChatGPT:
+**2. Cole o pedido** (é o mesmo para os dois). Troque `SEU_IP` pelo IP e `claude` por `chatgpt` se a sua assinatura for do ChatGPT:
 ```
 Entre na minha VPS com "ssh root@SEU_IP" e rode o instalador da Imersão em modo agente, em segundo plano, guardando a saída num arquivo:
 ssh root@SEU_IP 'curl -fsSL "COLE_AQUI_O_LINK_DO_PASSO_4.2" -o configurar-vps.sh && nohup bash configurar-vps.sh --agente --cerebro claude > instalar-agente.log 2>&1 &'
