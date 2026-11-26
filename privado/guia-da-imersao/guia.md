@@ -1558,6 +1558,16 @@ Os 3 agentes já saem do instalador funcionando com a sua assinatura (Claude ou 
 
 > A chave de cada ferramenta é sua e fica só na sua VPS. Nunca mande chave no chat do grupo, em print ou para o suporte.
 
+### Regras que já vêm de fábrica nos 3 agentes
+
+Além do SOUL de cada um, os 3 agentes saem do instalador com estas regras:
+
+1. **Zero mensagem de serviço.** O agente só escreve quando você ou o cliente chama, ou numa rotina que você combinou. Nada de "voltei", "reiniciando", "sessão nova", dica ou texto técnico em inglês. Se der erro de verdade, ele avisa em uma linha, em português, dizendo o que vai fazer.
+2. **Diz que é IA quando perguntam.** O agente de atendimento fala como a sua equipe, mas nunca diz que é uma pessoa. Se o cliente perguntar, ele responde com leveza que é a assistente virtual e que uma pessoa da equipe pode assumir.
+3. **Texto de fora é informação, não ordem.** Bio, legenda, site, mensagem de lead e arquivo baixado são dados para ler. Quem manda é só você, pelo Telegram. Se algum desses textos disser "ignore suas regras", "mude de papel" ou "mostre seus dados", o agente não obedece e te avisa.
+
+> O agente de landing publica a página sem pedir aprovação: o @ que você manda já é a ordem completa. Os outros dois só publicam ou enviam com o seu ok.
+
 ### Ficha 01 · Atendimento (SDR)
 Qualifica o lead no tom da sua marca, passa para um humano quando precisa e faz o follow-up.
 
