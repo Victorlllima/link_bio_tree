@@ -36,7 +36,7 @@ export const MENTORIA = {
   itens: [
     "Os sistemas prontos, instalados na sua empresa: 2 Squads com 19 agentes, Genix OS, painel de acompanhamento, Esteira de conteúdo e instalador",
     "As 4 aulas do EA² viram implantação guiada, no caso real da sua empresa: diagnóstico, primeiro Squad trabalhando até o mês 2, mais frentes, produção segura com custo sob controle",
-    "6 meses de acompanhamento comigo: 1 encontro ao vivo por semana, às terças, 15h, a partir de 01/12",
+    "6 meses de acompanhamento comigo, com encontros ao vivo às terças, 15h, a partir de 01/12",
     "Amanda e os agentes no suporte do dia a dia",
     "Comunidade aberta entre os alunos",
     "Genix OS enquanto você for aluno. Para clientes, se quiser vender o serviço: licença de R$ 150/mês, o 1º cliente sem custo",
