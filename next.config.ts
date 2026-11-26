@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
     // Manual da VPS (IRIS, 23/11): texto e prints só saem depois da senha
     "/configurar-vps": ["./privado/configurar-vps/**"],
     "/configurar-vps/print/[n]": ["./privado/configurar-vps/prints/**"],
+    // Instalador da Imersão (ION, 23/11): configurar-vps.sh e pacote cifrados, servidos só com a chave da aula
+    "/instalar": ["./privado/instalador/**"],
+    "/instalar/arquivo/[nome]": ["./privado/instalador/**"],
   },
   async headers() {
     return [{ source: "/configurar-vps/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
@@ -52,14 +55,7 @@ const nextConfig: NextConfig = {
         destination: "/hermes-week/g",
         permanent: false,
       })),
-      // Instalador da Imersão (ION, 22/11/2026, ok do Red via Rigel): "curl -fsSL redpro.com.br/instalar"
-      // segue para o instalar.sh da última release do repositório público.
-      {
-        source: "/instalar",
-        destination:
-          "https://github.com/RedPro-AI-Solutions/instalador-imersao/releases/latest/download/instalar.sh",
-        permanent: false,
-      },
+      // /instalar deixou de ser público (23/11): agora é a rota src/app/instalar (só com a chave da aula).
     ];
   },
 };
