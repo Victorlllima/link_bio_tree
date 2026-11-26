@@ -68,7 +68,7 @@ export function lerGuia(): { blocos: Bloco[]; dias: Dia[] } {
       // Bloco logo depois de "_O que o script roda ..._" é só para ler (sem botão Copiar).
       let ant = i - 1;
       while (ant >= 0 && !L[ant].trim()) ant--;
-      const leitura = ant >= 0 && /^_?O que o script roda/.test(L[ant].trim());
+      const leitura = ant >= 0 && /^[_*]*O que o script (roda|faz na sua VPS)/.test(L[ant].trim());
       const corpo: string[] = [];
       i++;
       while (i < L.length && !L[i].startsWith("```")) corpo.push(L[i++]);

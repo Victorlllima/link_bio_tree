@@ -45,7 +45,7 @@ function inline(s: string, chave: string): ReactNode[] {
     } else {
       const url = tok.replace(/[.,;:]+$/, "");
       partes.push(
-        <a key={k++} href={url} target="_blank" rel="noopener noreferrer">
+        <a key={k++} href={url} target="_blank" rel="noopener noreferrer" className={/REFERRALCODE=/.test(url) ? "gi-link-afiliado" : undefined}>
           {url}
         </a>,
       );
@@ -263,6 +263,9 @@ function renderBloco(b: Bloco, i: number, chave: string): ReactNode {
   }
 }
 
+// Texto curto dos botões do topo (Rigel, pedido do Red, 26/11). O título do dia no guia não muda.
+const BOTAO_DIA: Record<string, string> = { "1": "Raio-X do Hermes", "2": "VPS e Squad" };
+
 function Sumario({ dia }: { dia: Dia }) {
   return (
     <details className="gi-sumario">
@@ -341,8 +344,7 @@ export default async function GuiaDaImersao({ searchParams }: { searchParams: Pr
         <nav className="gi-dias" aria-label="Dias da Imersão">
           {dias.map((d) => (
             <a key={d.id} href={`#${d.id}`} className="gi-dia-botao">
-              <span>Dia {d.num}</span>
-              {d.texto}
+              Dia {d.num} · {BOTAO_DIA[d.num] ?? d.texto}
             </a>
           ))}
         </nav>

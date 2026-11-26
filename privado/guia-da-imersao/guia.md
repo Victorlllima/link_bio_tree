@@ -997,6 +997,7 @@ Cada agente é um processo que fica ligado o tempo todo. Parado, ele usa uns **2
 ## 1. Comprar a VPS
 
 > **Use o meu link: você ganha desconto.**
+>
 > **https://www.hostinger.com/br?REFERRALCODE=REDPRO**
 
 1. Abra o link acima e escolha o plano **KVM 2** (2 núcleos, 8 GB de memória). Ele segura os 3 agentes com folga.
@@ -1077,11 +1078,6 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExemploExemploExemploExemploExemplo12345 mi
 
 Confira antes de salvar: **começa com `ssh-ed25519`, termina com `minha-vps`, e é uma linha só**. Se estiver assim, está certo.
 
-> **Se não estiver assim:**
-> - Começa com `SHA256:`? Isso é só a identificação que o terminal mostra ao criar a chave. A Hostinger recusa. Rode o comando de copiar de novo.
-> - Apareceu um bloco grande com `BEGIN OPENSSH PRIVATE KEY`? **Pare.** Isso é a chave privada. Apague o campo e copie o arquivo que termina em **.pub**.
-
-[[print 07|ERRO comum: colou a linha SHA256 no lugar da chave .pub]]
 **Recursos adicionais:** deixe **Scanner Monarx** e **Gerenciador Docker** desmarcados e clique em **Finalizar configuração**.
 
 [[print 08|Monarx e Docker desmarcados]]
@@ -1128,19 +1124,19 @@ Pense na VPS como um escritório vazio na nuvem. O instalador é a equipe que mo
 
 ### Etapa 1 · Conferir a máquina
 
-É a vistoria do imóvel antes da mudança. O instalador confere se a máquina é Ubuntu 24.04 (ou 22.04), se tem memória, disco e internet. Melhor parar agora do que quebrar no meio.
+**Didático:** É a vistoria do imóvel antes da mudança. O instalador confere se a máquina é Ubuntu 24.04 (ou 22.04), se tem memória, disco e internet. Melhor parar agora do que quebrar no meio.
 
-No técnico: é uma pré-checagem do sistema. Ele lê o `/etc/os-release` para confirmar a distribuição e a versão, e confere RAM, espaço em disco e conexão de rede antes de instalar qualquer coisa.
+**Técnico:** é uma pré-checagem do sistema. Ele lê o `/etc/os-release` para confirmar a distribuição e a versão, e confere RAM, espaço em disco e conexão de rede antes de instalar qualquer coisa.
 
 O que você faz nesta etapa: se aparecerem os sinais verdes, aperte Enter.
 
-_O que o script roda (só para você ver, não precisa copiar):_
+**O que o script faz na sua VPS (só para você entender; você não precisa copiar nem digitar nada disso):**
 ```bash
 # precisa estar rodando como root
 id -u
 # qual é o sistema e a versão (tem que ser ubuntu 22.04 ou 24.04)
 . /etc/os-release
-# quanta memória a VPS tem (mínimo recomendado: 2 GB)
+# quanta memória a VPS tem (abaixo de 4 GB o instalador para e pede outro plano)
 awk '/MemTotal/{print int($2/1024)}' /proc/meminfo
 # quanto disco está livre (precisa de pelo menos 8 GB)
 df -Pm / | awk 'NR==2{print $4}'
@@ -1150,13 +1146,13 @@ curl -fsS --max-time 10 https://github.com
 
 ### Etapa 2 · Atualizar o sistema e as atualizações automáticas
 
-Aqui é a troca das fechaduras. O instalador atualiza o sistema inteiro, liga a atualização de segurança que roda sozinha toda noite e acerta o fuso de São Paulo. Sistema desatualizado é a porta de invasão mais comum.
+**Didático:** Aqui é a troca das fechaduras. O instalador atualiza o sistema inteiro, liga a atualização de segurança que roda sozinha toda noite e acerta o fuso de São Paulo. Sistema desatualizado é a porta de invasão mais comum.
 
-No técnico: ele roda `apt update` e `upgrade` dos pacotes, liga o `unattended-upgrades`, que aplica os patches de segurança automaticamente, com reinício programado para as 4 da manhã quando uma atualização pedir, e ajusta o fuso com o `timedatectl` para America/Sao_Paulo.
+**Técnico:** ele roda `apt update` e `upgrade` dos pacotes, liga o `unattended-upgrades`, que aplica os patches de segurança automaticamente, com reinício programado para as 4 da manhã quando uma atualização pedir, e ajusta o fuso com o `timedatectl` para America/Sao_Paulo.
 
 Esta etapa demora um pouco e mostra uma barra com a porcentagem. Enquanto o tempo andar, está tudo certo.
 
-_O que o script roda (só para você ver, não precisa copiar):_
+**O que o script faz na sua VPS (só para você entender; você não precisa copiar nem digitar nada disso):**
 ```bash
 # baixa a lista de atualizações
 apt-get update
@@ -1181,13 +1177,13 @@ systemctl enable --now unattended-upgrades
 
 ### Etapa 3 · Usuário hermes e a sua chave SSH
 
-É o crachá dos funcionários. O instalador cria um usuário chamado `hermes` e cadastra a sua chave nele. O root é o dono com a chave-mestra, e trabalhar como root é perigoso: qualquer erro vira desastre. Os agentes trabalham com crachá próprio.
+**Didático:** É o crachá dos funcionários. O instalador cria um usuário chamado `hermes` e cadastra a sua chave nele. O root é o dono com a chave-mestra, e trabalhar como root é perigoso: qualquer erro vira desastre. Os agentes trabalham com crachá próprio.
 
-No técnico: é o princípio do menor privilégio. Ele cria o usuário de sistema `hermes` com o `useradd`, coloca a sua chave pública no `authorized_keys` dele e libera o `sudo` só para administração. Os agentes nunca rodam como root.
+**Técnico:** é o princípio do menor privilégio. Ele cria o usuário de sistema `hermes` com o `useradd`, coloca a sua chave pública no `authorized_keys` dele e libera o `sudo` só para administração. Os agentes nunca rodam como root.
 
 O que você faz nesta etapa: ele pergunta se pode usar para o usuário hermes a mesma chave que você cadastrou no painel da Hostinger. Responda `s`.
 
-_O que o script roda (só para você ver, não precisa copiar):_
+**O que o script faz na sua VPS (só para você entender; você não precisa copiar nem digitar nada disso):**
 ```bash
 # cria o usuário hermes, com pasta própria
 useradd -m -s /bin/bash hermes
@@ -1218,11 +1214,11 @@ curl -fsS --max-time 8 https://api.ipify.org
 [[print 13|Instalador: etapas 1 a 3]]
 ### Etapa 4 · Firewall e fail2ban
 
-É a portaria. O instalador fecha todas as portas da VPS, menos a de entrada, que é a do SSH, e liga o fail2ban: quem erra a entrada várias vezes fica bloqueado. Uma VPS na internet recebe tentativa de invasão em minutos, por isso a portaria vem antes de qualquer funcionário.
+**Didático:** É a portaria. O instalador fecha todas as portas da VPS, menos a de entrada, que é a do SSH, e liga o fail2ban: quem erra a entrada várias vezes fica bloqueado. Uma VPS na internet recebe tentativa de invasão em minutos, por isso a portaria vem antes de qualquer funcionário.
 
-No técnico: é o firewall UFW com a política `deny incoming`, que nega toda conexão de entrada, e `allow` só na porta 22, a do SSH. A saída fica liberada, porque os agentes falam com o Telegram para fora. E o fail2ban: 5 erros em 10 minutos, e aquele IP fica banido por 1 hora.
+**Técnico:** é o firewall UFW com a política `deny incoming`, que nega toda conexão de entrada, e `allow` só na porta 22, a do SSH. A saída fica liberada, porque os agentes falam com o Telegram para fora. E o fail2ban: 5 erros em 10 minutos, e aquele IP fica banido por 1 hora.
 
-_O que o script roda (só para você ver, não precisa copiar):_
+**O que o script faz na sua VPS (só para você entender; você não precisa copiar nem digitar nada disso):**
 ```bash
 # nega tudo que tenta entrar
 ufw default deny incoming
@@ -1248,13 +1244,13 @@ systemctl restart fail2ban
 
 ### Etapa 5 · Fechar a entrada por senha e a do root
 
-A etapa mais importante: tirar a fechadura de senha e deixar só a chave. Senha se adivinha; chave, não. Só que o instalador só faz isso depois de você provar que a sua chave entra, para ninguém ficar trancado para fora.
+**Didático:** A etapa mais importante: tirar a fechadura de senha e deixar só a chave. Senha se adivinha; chave, não. Só que o instalador só faz isso depois de você provar que a sua chave entra, para ninguém ficar trancado para fora.
 
-No técnico: é o endurecimento (hardening) do SSH. Ele cria um arquivo de configuração com `PasswordAuthentication no`, que desliga o login por senha, e `PermitRootLogin no`, que proíbe o root de entrar direto. Testa a configuração com `sshd -t` antes de recarregar o serviço.
+**Técnico:** é o endurecimento (hardening) do SSH. Ele cria um arquivo de configuração com `PasswordAuthentication no`, que desliga o login por senha, e `PermitRootLogin no`, que proíbe o root de entrar direto. Testa a configuração com `sshd -t` antes de recarregar o serviço.
 
-O que você faz nesta etapa: o teste é no terminal do **seu computador**, fora do Console web. Deixe o Console aberto, abra o PowerShell (Windows) ou o Terminal (Mac) e entre com `ssh hermes@SEU_IP`. Entrou sem pedir senha: volte ao Console web e responda `s`. Pediu senha: não digite nada, volte e responda `n`. Nada é trancado, a senha continua ligada e você corrige com calma depois, com `sudo instalar-imersao --so ssh`. Dica: se a linha onde você digita começa com `root@srv...`, você ainda está no Console web, não no seu computador.
+O que você faz nesta etapa: o teste é no terminal do **seu computador**, fora do Console web. Deixe o Console aberto, abra o PowerShell (Windows) ou o Terminal (Mac) e entre com `ssh hermes@SEU_IP`. Entrou sem pedir senha: volte ao Console web e responda `s`. Pediu senha: não digite nada, volte e responda `n`. Nada é trancado, a senha continua ligada e você corrige com calma depois, com a ajuda do suporte. Dica: se a linha onde você digita começa com `root@srv...`, você ainda está no Console web, não no seu computador.
 
-_O que o script roda (só para você ver, não precisa copiar):_
+**O que o script faz na sua VPS (só para você entender; você não precisa copiar nem digitar nada disso):**
 ```bash
 # descobre o IP público e a porta do SSH, para mostrar o comando do teste
 curl -fsS --max-time 8 https://api.ipify.org
@@ -1276,13 +1272,13 @@ systemctl reload ssh
 
 ### Etapa 6 · Instalar o Hermes
 
-É o motor do escritório. O instalador coloca o Hermes na mesma versão usada nesta aula, para o seu funcionar igual ao do professor.
+**Didático:** É o motor do escritório. O instalador coloca o Hermes na mesma versão usada nesta aula, para o seu funcionar igual ao do professor.
 
-No técnico: ele clona o Hermes Agent travado num commit específico, a versão fixa que foi testada, e instala as dependências de Python e Node e o Chromium que os agentes usam para navegar.
+**Técnico:** ele clona o Hermes Agent travado num commit específico, a versão fixa que foi testada, e instala as dependências de Python e Node e o Chromium que os agentes usam para navegar.
 
 Leva de 5 a 10 minutos, e a tela fica um tempo parada. É normal: não feche a aba.
 
-_O que o script roda (só para você ver, não precisa copiar):_
+**O que o script faz na sua VPS (só para você entender; você não precisa copiar nem digitar nada disso):**
 ```bash
 # bibliotecas que o navegador dos agentes precisa para abrir, e fontes com acento
 # (no Ubuntu 24.04 alguns nomes levam o final t64; ele instala só as que faltam)
@@ -1303,13 +1299,13 @@ sudo -u hermes hermes --version
 [[print 14|Etapa 6: instalando o Hermes]]
 ### Etapa 7 · Conectar o cérebro
 
-Hora de ligar a inteligência. O agente pensa usando a sua assinatura, do Claude ou do ChatGPT: sem chave de API e sem custo por mensagem.
+**Didático:** Hora de ligar a inteligência. O agente pensa usando a sua assinatura, do Claude ou do ChatGPT: sem chave de API e sem custo por mensagem.
 
-No técnico: é autenticação OAuth. Em vez de colar uma API key, você autoriza a sua conta no site da Anthropic ou da OpenAI, e fica guardado na VPS um token de acesso que se renova sozinho.
+**Técnico:** é autenticação OAuth. Em vez de colar uma API key, você autoriza a sua conta no site da Anthropic ou da OpenAI, e fica guardado na VPS um token de acesso que se renova sozinho.
 
 O que você faz nesta etapa: digite `1` para Claude ou `2` para ChatGPT. Aparece um link: selecione o link inteiro com o mouse, copie com Ctrl+Shift+C, abra numa aba nova do navegador e autorize. No Claude, clique em Autorizar e depois em Copiar código; volte ao Console web, cole com o botão direito → Colar e aperte Enter. O código colado não aparece na tela: é normal, aperte Enter e ele conecta. No ChatGPT é o contrário: você digita no navegador o código curto que aparece no Console.
 
-_O que o script roda (só para você ver, não precisa copiar):_
+**O que o script faz na sua VPS (só para você entender; você não precisa copiar nem digitar nada disso):**
 ```bash
 # --- se você escolheu 1 (Claude) ---
 # instala o Claude Code na versão fixa: é por ele que o agente usa a sua assinatura
@@ -1331,13 +1327,13 @@ sudo -u hermes hermes auth status openai-codex
 [[print 15|Etapa 7: login do cérebro]]
 ### Etapa 8 · Instalar os 3 agentes
 
-Os funcionários chegam, cada um com a sua mesa. O instalador coloca os três agentes: Atendimento, Carrosséis e Landing pages, cada um com a sua SOUL, as suas habilidades e a sua memória. Um não mexe nas coisas do outro. Repare na linha "Pacote conferido": quer dizer que o pacote é o original da RedPro AI Academy e ninguém mexeu nele no caminho. Ele também cria a pasta `marca`, com os modelos da sua marca em branco; quem preenche é o onboarding, conversando com você.
+**Didático:** Os funcionários chegam, cada um com a sua mesa. O instalador coloca os três agentes: Atendimento, Carrosséis e Landing pages, cada um com a sua SOUL, as suas habilidades e a sua memória. Um não mexe nas coisas do outro. Repare na linha "Pacote conferido": quer dizer que o pacote é o original da RedPro AI Academy e ninguém mexeu nele no caminho. Ele também cria a pasta `marca`, com os modelos da sua marca em branco; quem preenche é o onboarding, conversando com você.
 
-No técnico: são três profiles do Hermes, isolados. Cada profile tem o próprio `SOUL.md`, as próprias skills, memória e arquivo `.env`. O pacote dos agentes é baixado e conferido pelo hash SHA-256 antes de ser instalado.
+**Técnico:** são três profiles do Hermes, isolados. Cada profile tem o próprio `SOUL.md`, as próprias skills, memória e arquivo `.env`. O pacote dos agentes é baixado e conferido pelo hash SHA-256 antes de ser instalado.
 
 Leva de 5 a 8 minutos. Não aperte nada até terminar.
 
-_O que o script roda (só para você ver, não precisa copiar):_
+**O que o script faz na sua VPS (só para você entender; você não precisa copiar nem digitar nada disso):**
 ```bash
 # baixa o pacote dos agentes pela rota protegida da aula
 curl -fsSL --max-time 120 "https://redpro.com.br/instalar/arquivo/configurar-vps.tar.gz?k=CHAVE_DA_TURMA" \
@@ -1376,9 +1372,9 @@ done
 [[print 16|Etapa 8: os 3 agentes instalados]]
 ### Etapa 9 · Criar os 3 bots no BotFather
 
-Cada funcionário precisa de um ramal, e quem dá o ramal no Telegram é o BotFather, o bot oficial que cria bots. O instalador mostra exatamente o que mandar para ele, um bot de cada vez.
+**Didático:** Cada funcionário precisa de um ramal, e quem dá o ramal no Telegram é o BotFather, o bot oficial que cria bots. O instalador mostra exatamente o que mandar para ele, um bot de cada vez.
 
-No técnico: o BotFather registra o seu bot na Bot API do Telegram e devolve um token, a credencial que deixa um programa falar como aquele bot.
+**Técnico:** o BotFather registra o seu bot na Bot API do Telegram e devolve um token, a credencial que deixa um programa falar como aquele bot.
 
 O que você faz nesta etapa: pegue o celular e abra o **BotFather** no Telegram (t.me/BotFather, com o selo azul). Para cada agente, nesta ordem: Atendimento, Carrosséis, Landing pages:
 1. Mande `/newbot`.
@@ -1389,7 +1385,7 @@ O que você faz nesta etapa: pegue o celular e abra o **BotFather** no Telegram 
 
 > O token é a chave do bot. Nunca no chat, nunca no print, nunca no grupo.
 
-_O que o script roda (só para você ver, não precisa copiar):_
+**O que o script faz na sua VPS (só para você entender; você não precisa copiar nem digitar nada disso):**
 ```bash
 # sorteia um final de 4 letras/números só desta VPS, para o @ sugerido quase nunca estar ocupado
 od -An -N2 -tx1 /dev/urandom
@@ -1405,13 +1401,13 @@ TELEGRAM_BOT_TOKEN=TOKEN_DO_BOT
 
 ### Etapa 10 · Ligar cada bot ao seu Telegram
 
-Agora cada ramal é ligado ao SEU Telegram. O token você já colou na etapa 9, então aqui é só o `/start`. Quem mandar o `/start` vira o dono do bot, por isso o instalador confere se foi você.
+**Didático:** Agora cada ramal é ligado ao SEU Telegram. O token você já colou na etapa 9, então aqui é só o `/start`. Quem mandar o `/start` vira o dono do bot, por isso o instalador confere se foi você.
 
-No técnico: o token é a credencial da Bot API. O instalador valida o token com o método `getMe`, grava no `.env` do profile e captura o seu ID de usuário do Telegram pelo `/start` para a allowlist, a lista de quem pode falar com o bot.
+**Técnico:** o token é a credencial da Bot API. O instalador valida o token com o método `getMe`, grava no `.env` do profile e captura o seu ID de usuário do Telegram pelo `/start` para a allowlist, a lista de quem pode falar com o bot.
 
 O que você faz nesta etapa: abra cada bot no Telegram e mande `/start`. O instalador mostra o nome de quem mandou e pergunta se é você: responda `s`. Só você vai conseguir falar com seus agentes.
 
-_O que o script roda (só para você ver, não precisa copiar):_
+**O que o script faz na sua VPS (só para você entender; você não precisa copiar nem digitar nada disso):**
 ```bash
 # para cada agente (exemplo: mkt-atendimento)
 # para o agente um instante, senão ele "come" a mensagem que vamos ler
@@ -1436,11 +1432,11 @@ systemctl restart imersao-mkt-atendimento
 
 ### Etapa 11 · Deixar os agentes ligados 24 h
 
-O escritório nunca fecha. Cada agente vira um serviço do sistema: liga sozinho se a VPS reiniciar e volta sozinho se cair. O seu computador pode desligar, o Hermes Desktop pode fechar: o squad continua.
+**Didático:** O escritório nunca fecha. Cada agente vira um serviço do sistema: liga sozinho se a VPS reiniciar e volta sozinho se cair. O seu computador pode desligar, o Hermes Desktop pode fechar: o squad continua.
 
-No técnico: é uma unidade systemd por agente, com `enable` para subir no boot, `Restart=on-failure` com 10 segundos de espera, teto de memória de 900 MB por agente e `NoNewPrivileges`, que impede o processo de ganhar mais poder.
+**Técnico:** é uma unidade systemd por agente, com `enable` para subir no boot, `Restart=on-failure` com 10 segundos de espera, teto de memória de 900 MB por agente e `NoNewPrivileges`, que impede o processo de ganhar mais poder.
 
-_O que o script roda (só para você ver, não precisa copiar):_
+**O que o script faz na sua VPS (só para você entender; você não precisa copiar nem digitar nada disso):**
 ```bash
 # um arquivo por agente; este é o /etc/systemd/system/imersao-mkt-atendimento.service
 [Unit]
@@ -1476,11 +1472,11 @@ sleep 6
 
 ### Etapa 12 · Conferência final
 
-É o teste antes de abrir as portas. O instalador manda uma pergunta para cada agente e espera resposta de verdade. A instalação só está pronta quando cada um responde. Quem respondeu já te manda um oi no Telegram.
+**Didático:** É o teste antes de abrir as portas. O instalador manda uma pergunta para cada agente e espera resposta de verdade. A instalação só está pronta quando cada um responde. Quem respondeu já te manda um oi no Telegram.
 
-No técnico: é um health check de ponta a ponta. Ele confere se cada serviço está ativo e estável e faz uma chamada real ao modelo em cada profile.
+**Técnico:** é um health check de ponta a ponta. Ele confere se cada serviço está ativo e estável e faz uma chamada real ao modelo em cada profile.
 
-_O que o script roda (só para você ver, não precisa copiar):_
+**O que o script faz na sua VPS (só para você entender; você não precisa copiar nem digitar nada disso):**
 ```bash
 # para cada agente (exemplo: mkt-atendimento)
 # o serviço está ligado e parou de reiniciar? (olha por até 60 s)
@@ -1499,23 +1495,19 @@ curl https://api.telegram.org/botTOKEN_DO_BOT/sendMessage \
 
 ### Etapa 13 · Onboarding
 
-É o primeiro dia de cada funcionário. Agente que não conhece o seu negócio é chatbot genérico. Ele grava tudo o que aprende na pasta da marca, e os outros dois já ficam sabendo: ninguém repete as perguntas. A conversa termina com: "Pronto! Os seus três agentes já sabem tudo do seu negócio."
+**Didático:** É o primeiro dia de cada funcionário. Agente que não conhece o seu negócio é chatbot genérico. Ele grava tudo o que aprende na pasta da marca, e os outros dois já ficam sabendo: ninguém repete as perguntas. A conversa termina com: "Pronto! Os seus três agentes já sabem tudo do seu negócio."
 
-No técnico: o onboarding acontece na conversa com o agente, não no script. O que você responde vai para os arquivos da pasta `/home/hermes/marca`, que os três agentes leem.
+**Técnico:** o onboarding acontece na conversa com o agente, não no script. O que você responde vai para os arquivos da pasta `/home/hermes/marca`, que os três agentes leem.
 
 O que você faz nesta etapa: mande um oi para qualquer um dos três agentes no Telegram. Ele faz 10 perguntas sobre o seu negócio (marca, tom de voz, clientes), uma por vez, cada uma com um exemplo de resposta. Pode responder por áudio. Senha e token nunca entram nessa conversa.
 
-_O que o script roda (só para você ver, não precisa copiar):_
+**O que o script faz na sua VPS (só para você entender; você não precisa copiar nem digitar nada disso):**
 ```bash
 # nesta etapa o script não roda nenhum comando:
 # ele só mostra o aviso para você abrir o Telegram e mandar um oi
 ```
 
-Parou no meio, caiu a internet ou fechou a aba? Abra o Console web de novo e rode:
-```
-sudo instalar-imersao
-```
-Ele continua de onde parou.
+Parou no meio, caiu a internet ou fechou a aba? Abra o Console web de novo, copie de novo o comando da seção 5 (o botão **Copiar**), cole no Console web e aperte Enter. O instalador pula o que já foi feito e continua de onde parou.
 
 ---
 
@@ -1533,26 +1525,9 @@ Deu certo se: a VPS aparece na lista de gateways e as conversas dos seus 3 agent
 
 ---
 
-## 8. Três avisos
+## 8. Deu erro?
 
-> **1. Não atualize o Hermes da VPS pelo Desktop.**
-> No Hermes Desktop existem dois botões que atualizam o Hermes da sua VPS. **Não clique em nenhum dos dois.** (O próprio agente já vem proibido de atualizar o Hermes sozinho; estes botões são o caminho que sobra, pelo Desktop.) A VPS está na versão que o instalador deixou testada, e o Desktop funciona com ela como está.
-> - **Settings → Gateways → Saved connections → "Update all instances"** (aparece quando você tem mais de uma conexão salva).
-> - **Settings → Gateways → Remote updates → "Update"**, ao lado da conexão SSH da sua VPS.
-
-[[print 18|Não clique em "Update all instances"]]
-[[print 18b|Não clique em "Update" em Remote updates]]
-> **2. Chave e senha nunca em tela compartilhada.**
-> Chave SSH, senha do root, token de bot e código de login nunca aparecem em print, em chat, no grupo ou para o suporte.
-
-> **3. No Console web, Ctrl+C interrompe o instalador.**
-> Para copiar, use **Ctrl+Shift+C** ou botão direito → Copiar. Apertou Ctrl+C sem querer? Rode `sudo instalar-imersao` e ele continua de onde parou.
-
----
-
-## 9. Deu erro?
-
-1. Rode `sudo instalar-imersao` no Console web. Na maioria dos casos ele continua sozinho.
+1. **Primeiro:** abra o Console web, copie de novo o comando da seção 5 (o botão **Copiar**), cole no Console web e aperte Enter. O instalador pula o que já foi feito e continua de onde parou.
 2. **Durante a aula:** escreva no chat **AJUDA** e o número da etapa. O Neto te responde.
 3. **Depois da aula:** chame a Amanda, o suporte da Imersão, no WhatsApp.
 
@@ -1560,13 +1535,12 @@ Na mensagem, conte a etapa e o que apareceu na tela. **Sem IP, senha, chave ou t
 
 Erros mais comuns:
 - **"Permission denied (publickey)":** a chave pública não foi cadastrada, ou você entrou com `root@` em vez de `hermes@`.
-- **"Connection refused" depois de errar o login:** o fail2ban bloqueou o seu IP por 1 hora. Espere, ou entre pelo Console web.
-- **O bot não responde:** token errado ou repetido em dois bots. Rode `sudo instalar-imersao --refazer bots`.
-- **O agente diz que não consegue pensar:** o login do cérebro caiu. Rode `sudo instalar-imersao --refazer cerebro`.
+- **"Connection refused" depois de errar o login:** a proteção da VPS bloqueou o seu acesso por 1 hora. Espere, ou entre pelo Console web, que continua funcionando.
+- **O bot não responde ou o agente diz que não consegue pensar:** chame o suporte (o Neto na aula, a Amanda depois). Ele te passa o passo exato para refazer só aquela parte.
 
 ---
 
-## 10. As fichas do Squad: o que cada agente usa
+## 9. As fichas do Squad: o que cada agente usa
 
 Os 3 agentes já saem do instalador funcionando com a sua assinatura (Claude ou ChatGPT) e com o seu Telegram. As outras ferramentas abaixo são **opcionais**. Cada uma destrava um poder a mais. Quando quiser ligar uma delas, crie a conta pelo link, gere a chave e peça ao próprio agente, no Telegram, para te guiar na configuração.
 
@@ -1629,290 +1603,19 @@ Do @ do Instagram à página: design, captura e conversão.
 
 ---
 
-## Para ir além: o caminho manual (os mesmos comandos do instalador)
+## Segurança: o que já vem protegido e o que fica com você
 
-Cole um bloco por vez, dentro da VPS, como root (o terminal que mostra `root@`), até o passo 9.
-
-### Passo 5 · Atualizar o sistema e ligar as atualizações automáticas
-Por quê: servidor desatualizado é a porta de entrada mais comum de invasão.
-```
-apt-get update && apt-get -y upgrade
-apt-get -y install curl git ufw fail2ban unattended-upgrades ca-certificates jq tar
-timedatectl set-timezone America/Sao_Paulo
-printf 'APT::Periodic::Update-Package-Lists "1";\nAPT::Periodic::Unattended-Upgrade "1";\n' > /etc/apt/apt.conf.d/20auto-upgrades
-printf 'Unattended-Upgrade::Automatic-Reboot "true";\nUnattended-Upgrade::Automatic-Reboot-Time "04:00";\n' > /etc/apt/apt.conf.d/52imersao-reinicio
-systemctl enable --now unattended-upgrades
-```
-Quando uma atualização pedir reinício, a VPS reinicia sozinha às 4h da manhã e os agentes voltam sozinhos. Você não precisa fazer nada.
-
-### Passo 6 · Criar o usuário hermes com a sua chave
-Por quê: os agentes não rodam como administrador, e você entra com chave em vez de senha.
-```
-useradd -m -s /bin/bash hermes
-usermod -aG sudo hermes
-echo 'hermes ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/90-imersao-hermes
-chmod 440 /etc/sudoers.d/90-imersao-hermes
-install -d -o hermes -g hermes -m 700 /home/hermes/.ssh
-```
-Agora a chave. **Se** você colou a chave no painel (3.4):
-```
-cp /root/.ssh/authorized_keys /home/hermes/.ssh/authorized_keys
-```
-**Se não**, troque o texto entre aspas pela sua chave pública inteira:
-```
-echo "ssh-ed25519 AAAA...sua-chave... minha-vps" > /home/hermes/.ssh/authorized_keys
-```
-E acerte as permissões:
-```
-chown hermes:hermes /home/hermes/.ssh/authorized_keys
-chmod 600 /home/hermes/.ssh/authorized_keys
-```
-O usuário hermes não tem senha: entra só pela chave e usa `sudo` sem senha.
-
-### Passo 7 · Firewall e fail2ban
-Por quê: só a porta do SSH fica aberta, e quem errar a entrada 5 vezes fica 1 hora bloqueado.
-```
-ufw default deny incoming
-ufw default allow outgoing
-ufw allow 22/tcp comment SSH
-ufw --force enable
-printf '[sshd]\nenabled = true\nport = 22\nmaxretry = 5\nfindtime = 10m\nbantime = 1h\n' > /etc/fail2ban/jail.d/imersao.local
-systemctl enable fail2ban && systemctl restart fail2ban
-```
-Os agentes falam com o Telegram por saída; não precisam de porta aberta.
-
-### Passo 8 · Testar a chave ANTES de trancar a senha
-Abra **outra janela** do terminal no seu computador (não feche a atual):
-```
-ssh hermes@SEU_IP
-```
-Só siga se entrou sem pedir senha. Se não entrou, pare e confira o passo 6: trancar agora deixaria você do lado de fora.
-
-### Passo 9 · Trancar: só chave, sem senha e sem root direto
-De volta à janela do root:
-```
-printf 'PasswordAuthentication no\nKbdInteractiveAuthentication no\nPermitRootLogin no\nPubkeyAuthentication yes\n' > /etc/ssh/sshd_config.d/00-imersao.conf
-sshd -t && systemctl reload ssh
-```
-Por que um arquivo `00-` em `sshd_config.d`: o Ubuntu da Hostinger traz um arquivo próprio que religa a senha. O SSH obedece a primeira regra que lê, e o `00-` é lido primeiro.
-
-Deu certo se: numa janela nova, `ssh root@SEU_IP` é recusado e `ssh hermes@SEU_IP` entra.
-
-**Daqui em diante, entre sempre com `ssh hermes@SEU_IP`.** Os próximos passos são como hermes.
-
-### Passo 10 · Instalar o Hermes (commit 99fcd69, base 0.22)
-Por quê: a mesma versão testada na aula, para o seu funcionar igual ao do professor.
-```
-curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/99fcd6944360925943688d30c39ec9a490ccdeb1/scripts/install.sh | bash -s -- --commit 99fcd6944360925943688d30c39ec9a490ccdeb1 --non-interactive --skip-computer-use
-source ~/.bashrc
-hermes --version
-```
-Leva cerca de 2 minutos (pode chegar a 10 se a internet da VPS estiver lenta). Deu certo se: a linha começa com `Hermes Agent v0.22.5` (é a base 0.22; o número completo depois do + muda e está tudo bem).
-
-### Passo 11 · Conectar o cérebro
-Faça **só um**, o da sua assinatura.
-
-**Claude (Pro ou Max):**
-```
-curl -fsSL https://claude.ai/install.sh | bash -s 2.1.312
-CLAUDE_CONFIG_DIR=~/.claude ~/.local/bin/claude auth login
-```
-Abra o link no navegador do seu computador, autorize e cole o código na VPS. O código colado não aparece na tela: é normal, aperte Enter.
-
-**ChatGPT (Plus ou Pro):**
-```
-hermes auth add openai-codex --type oauth --no-browser
-```
-Abra o link no navegador do seu computador e digite o código curto.
-
-### Passo 12 · Instalar os 3 agentes
-Por quê: cada agente é um perfil separado, com a sua alma (SOUL), habilidades e memória.
-
-**12.1 Baixar o pacote do Squad e os modelos da sua marca**
-```
-mkdir -p ~/pacote && curl -fsSL "https://redpro.com.br/instalar/arquivo/configurar-vps.tar.gz?k=CHAVE" | tar -xz -C ~/pacote
-cp -rn ~/pacote/marca ~/marca
-```
-A pasta `~/marca` tem os modelos em branco (voz, contexto, regras, provas, base de atendimento). O onboarding (Passo 15) preenche com você.
-
-**12.2 Instalar os perfis**
-```
-for p in mkt-atendimento mkt-conteudo mkt-landing; do hermes profile install ~/pacote/agentes/$p --name $p --force -y; done
-```
-
-**12.3 Apontar cada agente para o seu cérebro**
-Se for **Claude**:
-```
-for p in mkt-atendimento mkt-conteudo mkt-landing; do
-  hermes -p $p plugins install NousResearch/hermes-plugin-claude-subscription-directsdk --ref bfe6d9f0b76309f1731ba00c9fc0034f910e7aac --yes-deps --enable
-  hermes -p $p config set model.provider claude-subscription-directsdk-experimental
-  hermes -p $p config set model.default claude-sonnet-5-5
-  echo "CLAUDE_CONFIG_DIR=$HOME/.claude" >> ~/.hermes/profiles/$p/.env
-done
-```
-Se for **ChatGPT**:
-```
-for p in mkt-atendimento mkt-conteudo mkt-landing; do
-  hermes -p $p config set model.provider openai-codex
-  hermes -p $p config set model.default gpt-5.5
-done
-```
-Nos dois casos:
-```
-for p in mkt-atendimento mkt-conteudo mkt-landing; do
-  hermes -p $p config set gateway.standalone true
-  hermes -p $p config set timezone America/Sao_Paulo
-done
-```
-Deu certo se: `hermes profile list` mostra os três.
-
-### Passo 13 · Um bot do Telegram para cada agente e ligado 24 horas
-**13.1 Criar os bots.** No celular, abra o **@BotFather** no Telegram e, para cada agente (Atendimento, Carrosséis e Landing pages), mande `/newbot`, depois o nome, depois um @ que termine em `bot`. Guarde cada token no seu gerenciador de senhas. **Nunca use o mesmo token em dois agentes.**
-
-**13.2 Guardar o token de cada um** (o `read -s` não mostra o que você cola). Repita para os três, trocando `mkt-atendimento` por `mkt-conteudo` e `mkt-landing`:
-```
-p=mkt-atendimento
-read -s -p "Token do bot: " T; echo
-echo "TELEGRAM_BOT_TOKEN=$T" >> ~/.hermes/profiles/$p/.env; unset T
-chmod 600 ~/.hermes/profiles/$p/.env
-```
-
-**13.3 Descobrir o seu número no Telegram.** Mande `/start` para o bot e rode (troque `p=` como acima):
-```
-p=mkt-atendimento
-T=$(sed -n 's/^TELEGRAM_BOT_TOKEN=//p' ~/.hermes/profiles/$p/.env)
-printf 'url = "https://api.telegram.org/bot%s/getUpdates"\n' "$T" | curl -s -K - | jq '.result[-1].message.from | {id, first_name, username}'; unset T
-```
-Aparecem o seu nome e um número (`id`). **Confira se o nome é o seu**: quem estiver aqui vira o único dono do agente. O `printf ... | curl -K -` evita que o token apareça na lista de processos da máquina. Grave o número como o único usuário autorizado:
-```
-echo "TELEGRAM_ALLOWED_USERS=SEU_NUMERO" >> ~/.hermes/profiles/$p/.env
-echo "TELEGRAM_HOME_CHANNEL=SEU_NUMERO" >> ~/.hermes/profiles/$p/.env
-```
-
-**13.4 Ligar cada agente como serviço** (volta sozinho se a VPS reiniciar):
-```
-for p in mkt-atendimento mkt-conteudo mkt-landing; do
-sudo tee /etc/systemd/system/imersao-$p.service >/dev/null <<EOF
-[Unit]
-Description=Agente $p do Squad da Imersao
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-Type=simple
-User=hermes
-Group=hermes
-WorkingDirectory=/home/hermes
-Environment=HOME=/home/hermes
-Environment=PATH=/home/hermes/.local/bin:/usr/local/bin:/usr/bin:/bin
-ExecStart=/home/hermes/.local/bin/hermes -p $p gateway run
-Restart=on-failure
-RestartSec=10
-MemoryMax=900M
-NoNewPrivileges=true
-PrivateTmp=true
-
-[Install]
-WantedBy=multi-user.target
-EOF
-done
-sudo systemctl daemon-reload
-for p in mkt-atendimento mkt-conteudo mkt-landing; do sudo systemctl enable --now imersao-$p; done
-systemctl status 'imersao-*' --no-pager | grep -E 'imersao|Active'
-```
-Deu certo se: os três aparecem `active (running)`.
-
----
-
-### Passo 14 · O teste que importa
-1. **Feche o Hermes Desktop no seu computador** (sair de vez, não só minimizar).
-2. No celular, mande "oi" para cada um dos três bots.
-
-Deu certo se: os três respondem. Mande o print para o suporte da Imersão, no WhatsApp, e escreva NO AR no chat da aula.
-
-### Passo 15 · Onboarding dos agentes
-Abra o Telegram e mande um oi para **qualquer um** dos seus 3 agentes. Ele vai conversar com você e aprender sobre o seu negócio. Leva uns 10 minutos.
-
-São 10 perguntas, uma por vez, cada uma com um exemplo de resposta (pode responder por áudio). Ele grava tudo na pasta `~/marca` e os outros dois agentes já ficam sabendo: ninguém repete as perguntas. Não mande senha nem token nessa conversa.
-
-Deu certo se: ele termina com "Pronto! Os seus 3 agentes já sabem tudo do seu negócio." Quer refazer? Diga "refazer onboarding" para qualquer um deles.
-
-### Opcional: o mesmo instalador, pedido a um agente de terminal (no lugar da seção 5)
-Se você usa um agente de IA no terminal do seu computador (Claude Code ou Codex), pode pedir a ele para rodar o instalador por você. Ele faz tudo o que não precisa de você e, no fim, te mostra os comandos dos passos que só você pode fazer.
-
-**O que fica com você, e por quê:** entrar com a sua assinatura (Claude ou ChatGPT), criar os bots no BotFather e colar o token de cada um e testar a sua chave antes de trancar a senha. Login, token e senha nunca vão para o chat de um agente. Esses passos você roda no **seu** terminal, com o comando que o instalador te entrega.
-
-Antes, entre uma vez na VPS pelo seu terminal (`ssh root@SEU_IP`, responda `yes`) uma vez no seu terminal, para o seu computador já conhecer a VPS.
-
-**1. Abra o agente no terminal do seu computador:**
-- Claude Code: digite `claude` e Enter.
-- Codex: digite `codex` e Enter.
-
-**2. Cole o pedido** (é o mesmo para os dois). Troque `SEU_IP` pelo IP, `COLE_AQUI_O_LINK_DA_SECAO_5` pelo endereço `https://redpro.com.br/instalar?k=...` do comando da seção 5, e `claude` por `chatgpt` se a sua assinatura for do ChatGPT:
-```
-Entre na minha VPS com "ssh root@SEU_IP" e rode o instalador da Imersão em modo agente, em segundo plano, guardando a saída num arquivo:
-ssh root@SEU_IP 'curl -fsSL "COLE_AQUI_O_LINK_DA_SECAO_5" -o configurar-vps.sh && nohup bash configurar-vps.sh --agente --cerebro claude > instalar-agente.log 2>&1 &'
-Ele leva de 15 a 25 minutos. Acompanhe com: ssh root@SEU_IP 'tail -n 40 instalar-agente.log'
-Pare de acompanhar quando aparecer a linha PENDENTES_DA_PESSOA. Se aparecer uma linha com ✖, me mostre o erro.
-Não me peça senha, token nem código de login no chat. No fim, me mostre os comandos que o instalador listou para eu rodar no meu terminal.
-```
-
-**3. Aprove os comandos.** Os três agentes pedem a sua permissão antes de rodar um comando no seu computador: leia e aprove o `ssh`. No Codex, se ele disser que não tem acesso à rede, aprove o acesso quando ele pedir.
-
-**4. Rode no SEU terminal o que ele listar.** O instalador termina com um bloco "Para a pessoa fazer no PRÓPRIO terminal". O jeito mais simples é um comando só, que faz tudo em sequência e pula o que já está pronto:
-```
-ssh -t root@SEU_IP 'sudo instalar-imersao'
-```
-Rode isso numa janela do terminal **fora** do agente (abra uma janela nova). É ali que você faz o login, cola os tokens e testa a chave. O teste da chave vem por último: depois dele o root não entra mais, e você passa a usar `ssh -t hermes@SEU_IP 'sudo instalar-imersao'`.
-
-Deu certo se: a última linha diz **Tudo pronto** e chegaram três mensagens no Telegram.
-
-Se usou o instalador (pela seção 5 ou pelo agente de terminal), pule para o **Passo 14 · O teste que importa**. Os passos 5 a 13 são o mesmo trabalho, à mão, para quem quer entender cada peça.
-
----
-
----
-
-## Referência rápida
-
-### Navegador e cofre
-Navegador e cofre: veja o Manual do Dia 1, capítulo Ferramentas.
-
-### Comandos do dia a dia (dentro da VPS, como `hermes`)
-| Para quê | Comando |
-|---|---|
-| Ver se os agentes estão ligados | `systemctl status 'imersao-*'` |
-| Reiniciar um agente depois de mudar algo | `sudo systemctl restart imersao-mkt-atendimento` |
-| Ver o que aconteceu (erros) | `journalctl -u imersao-mkt-atendimento -n 50` |
-| **Parar tudo na hora (emergência)** | `sudo systemctl stop 'imersao-*'` |
-| Ligar de novo | `sudo systemctl start imersao-mkt-atendimento imersao-mkt-conteudo imersao-mkt-landing` |
-| Conversar com um agente no terminal | `hermes -p mkt-conteudo` |
-| Conferir o que o instalador já fez | `sudo instalar-imersao --listar` |
-
-### Segurança: o que já está protegido e o que é com você
-Já protegido:
-- só a sua chave entra; senha e root direto estão desligados;
+Já protegido pelo instalador:
+- só a sua chave entra; senha e root direto ficam desligados;
 - firewall fechado, só o SSH aberto;
-- vigia contra tentativa de invasão (fail2ban);
+- vigia contra tentativa de invasão;
 - atualizações de segurança automáticas (com reinício sozinho às 4h, quando preciso);
 - os agentes rodam num usuário comum, não como administrador;
-- cada bot só obedece ao seu número do Telegram;
+- cada bot só obedece ao seu Telegram;
 - os tokens ficam em arquivos que só o usuário hermes lê.
 
 Com você:
-- **Aprovação:** o agente pede o seu ok antes de publicar ou mandar algo em seu nome. Não desligue isso.
 - **Dinheiro:** cartão nunca com o agente. Se um dia precisar, cartão virtual com teto.
 - **Senha de banco e de e-mail principal:** nunca com o agente.
-- **Chave privada:** nunca sai do seu computador. Se vazar, gere outra e troque no painel.
-- **Token vazou?** No @BotFather, `/revoke`, e rode `sudo instalar-imersao --refazer bots`.
-- **Algo estranho?** `sudo systemctl stop 'imersao-*'` primeiro, pergunta depois.
-- **Hermes Desktop conectado à VPS:** não clique em "Atualizar o Hermes remoto". Ele atualiza o Hermes da VPS e tira a máquina da versão fixa que o instalador deixou.
-
-### Problemas comuns
-1. **"Permission denied (publickey)"**: a chave pública não foi cadastrada, ou você entrou com o usuário errado. Lembre: depois do instalador, é `hermes@`, não `root@`.
-2. **Fiquei trancado do lado de fora**: entre pelo navegador. No painel da Hostinger, na **Visão geral** da sua VPS, clique em **Console web** (canto superior direito, ao lado de **Reiniciar**).
-3. **"command not found: hermes"**: rode `source ~/.bashrc` ou saia e entre de novo.
-4. **O bot não responde**: token errado ou o mesmo token em dois agentes. `sudo instalar-imersao --refazer bots`.
-5. **O agente diz que não consegue pensar**: o login do cérebro caiu. `sudo instalar-imersao --refazer cerebro`.
-6. **A VPS reiniciou e os agentes não voltaram**: `sudo instalar-imersao --refazer servico`.
-7. **Colei IP, senha ou token no chat**: troque o que vazou e avise o suporte da Imersão, no WhatsApp.
+- **Chave privada:** nunca sai do seu computador.
+- **Token, IP ou senha vazou no chat?** Avise o suporte da Imersão na hora: ele te ajuda a trocar.
