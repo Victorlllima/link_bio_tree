@@ -14,7 +14,7 @@ import "./configurar-vps.css";
 
 // Instrument Sans: o Space_Grotesk quebrou o next/font no build da Vercel (demo/cotacoes, 23/11)
 const sans = Instrument_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--cv-sans" });
-const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"], variable: "--cv-mono" });
+const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--cv-mono" });
 
 export const dynamic = "force-dynamic";
 
