@@ -976,7 +976,21 @@ Hoje os seus agentes saem do seu computador e ganham casa própria: uma VPS liga
 
 ## Qual VPS escolher: KVM 2, KVM 4 ou KVM 8
 
-(tabela em preparação)
+Cada agente é um processo que fica ligado o tempo todo. Parado, ele usa uns **350 MB** de memória. Trabalhando, pode subir até **900 MB**, que é o teto que o instalador coloca em cada um. Quando o agente abre o navegador (para ler um site ou conferir uma página), soma mais uns **500 MB**. O sistema da VPS usa cerca de **1 GB**.
+
+| | **KVM 2** (recomendada) | **KVM 4** | **KVM 8** |
+|---|---|---|---|
+| Processador | 2 núcleos | 4 núcleos | 8 núcleos |
+| Memória | 8 GB | 16 GB | 32 GB |
+| Disco | 100 GB | 200 GB | 400 GB |
+| Agentes ligados 24 h | os 3 do Squad com folga, até uns **6** | até uns **15** | até uns **30** |
+| Tarefas pesadas ao mesmo tempo (landing, carrossel, navegador) | **2** | **4 a 5** | **8 a 10** |
+| Para quem | quem está começando e vai usar os 3 agentes da Imersão | quem já vai montar um segundo Squad ou atender clientes | agência, vários clientes, vídeo e muitos agentes |
+
+**Como ler a tabela:** quem limita quantos agentes cabem é a memória; quem limita quantas tarefas pesadas rodam juntas são os núcleos. Os números são estimativas a partir do consumo medido nos nossos agentes. Dá para começar na KVM 2 e subir de plano depois, no próprio painel da Hostinger, sem reinstalar nada.
+
+> **Não compre a KVM 1 nem VPS com menos de 8 GB.** No teste, o instalador quebrou na etapa 6 (instalar o Hermes) numa máquina de 2 GB, por falta de memória.
+
 
 ---
 

@@ -235,7 +235,7 @@ function renderBloco(b: Bloco, i: number, chave: string): ReactNode {
               {b.linhas.map((l, j) => (
                 <tr key={j}>
                   {l.map((c, k) => (
-                    <td key={k} data-rotulo={b.cab[k]}>
+                    <td key={k} data-rotulo={b.cab[k].replace(/\*\*/g, "").trim()}>
                       {inline(c, chave)}
                     </td>
                   ))}

@@ -31,7 +31,7 @@ html{scroll-behavior:smooth}
 .gi-tabela table{width:100%;border-collapse:collapse;font-size:15px;line-height:1.45}
 .gi-tabela th,.gi-tabela td{overflow-wrap:anywhere;padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
 .gi-tabela th{background:var(--bg2);color:var(--muted);font-weight:600}
-@media (max-width:600px){.gi-tabela{border:0}.gi-tabela thead{display:none}.gi-tabela tr{display:block;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;padding:6px 0}.gi-tabela td{display:block;border:0;padding:6px 14px}.gi-tabela td::before{content:attr(data-rotulo);display:block;font-family:var(--cv-mono),monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}}
+@media (max-width:600px){.gi-tabela{border:0}.gi-tabela thead{display:none}.gi-tabela tr{display:block;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;padding:6px 0}.gi-tabela td{display:block;border:0;padding:6px 14px}.gi-tabela td::before{content:attr(data-rotulo);display:block;font-family:var(--cv-mono),monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}.gi-tabela td[data-rotulo=""]{font-weight:600;font-size:16px;padding-top:8px}.gi-tabela td[data-rotulo=""]::before{display:none}}
 .gi-instalar{border-color:var(--blue)!important;box-shadow:0 0 0 3px var(--blue-soft)}
 .gi-topo{position:fixed;right:14px;bottom:14px;padding:10px 14px;border-radius:999px;background:var(--blue);color:#fff!important;text-decoration:none;font-weight:600;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.45);z-index:10}
 .cv pre{overflow-x:auto}
