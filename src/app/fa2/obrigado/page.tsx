@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Obrigado da Mentoria Empresa Agêntica (ex-FA²). Abaixo: a consultoria "Sua empresa no automático",
+// Obrigado da FA², Formação Arquiteto de Agentes. Abaixo: a consultoria "Sua empresa no automático",
 // SEM preço, só com o botão da agenda (FA2_LINK_AGENDA, link do Rigel). Sem tracking aqui:
 // a Purchase vem do webhook da Hotmart.
 export default function Page() {

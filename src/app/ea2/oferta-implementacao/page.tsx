@@ -18,7 +18,7 @@ export default function Page() {
       itens={[
         "Implantação dos 2 Squads, marketing e desenvolvimento, na sua empresa, feita por mim e pelo Genix Lab",
         "6 meses de operação acompanhada",
-        "EA² e Mentoria Empresa Agêntica inclusos",
+        "EA² e FA² (Formação Arquiteto de Agentes) inclusos",
         "Genix OS ativo durante todo o contrato",
       ]}
       precoLabel="Implantação"
