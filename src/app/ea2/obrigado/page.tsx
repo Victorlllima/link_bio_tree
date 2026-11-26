@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { mono, sans } from "@/components/upsell/fonts";
 import styles from "@/components/upsell/oferta.module.css";
-import { LINK_MENSALIDADE, MENTORIA, OFERTA_1, OFERTA_2, PRECOS_CONFIRMADOS, linkCheckoutMentoria } from "@/components/upsell/config";
+import { LINK_MENSALIDADE, OFERTA_2, PRECOS_CONFIRMADOS, linkCheckoutMentoria } from "@/components/upsell/config";
+import OfertaFA2 from "@/components/upsell/OfertaFA2";
 
 
 export const metadata: Metadata = {
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 // Obrigado do EA². Também é o destino final de quem aceita o upsell 2:
 // a ION encaminha com ?aceitou=consultoria (só leitura, sem tracking aqui).
 // Purchase NÃO sai do navegador: vem do webhook da Hotmart.
-// Abaixo da confirmação: oferta da Mentoria Empresa Agêntica (R$ 4.750) para quem acabou de comprar o EA².
+// Abaixo da confirmação: upgrade para a FA² (R$ 4.750, one-time offer) para quem acabou de comprar o EA² (OfertaFA2).
 // Some para quem chega com qualquer ?aceitou= (mentoria ou consultoria: já aceitou um upsell).
 // O bloco serve a quem pagou no Pix ou boleto ou recusou o upsell de 1 clique (Rigel, 26/11).
 export default async function Page({ searchParams }: { searchParams: Promise<{ aceitou?: string }> }) {
@@ -45,33 +46,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ a
         <p className={styles.lead}>O acesso chega no e-mail usado na compra. Se não aparecer em alguns minutos, olhe a caixa de spam.</p>
         <p className={styles.datas}>Aulas ao vivo às quintas, 15h. 1º ciclo: 03/12, 10/12, 17/12 e 07/01 (sem aula em 24/12 e 31/12). A gravação de cada aula sai em até 48 horas na área de membros.</p>
 
-        {!aceitou && (
-          <section className={styles.oferta} aria-labelledby="oferta-mentoria">
-            <span className={`${styles.tag} ${mono.className}`}>
-              <i className={styles.led} />
-              Oferta exclusiva para quem acabou de entrar
-            </span>
-            <h2 id="oferta-mentoria" className={styles.ofertaTitulo}>Upgrade para a Mentoria Semestral Empresa Agêntica</h2>
-            <p className={styles.ofertaLead}>{MENTORIA.promessa} Esta condição aparece só aqui, para quem acabou de comprar o EA². Se não for para você, sua vaga no EA² continua garantida.</p>
-            <ul className={styles.itens}>
-              {MENTORIA.itens.map((t) => (
-                <li key={t}>{t}</li>
-              ))}
-            </ul>
-            <div className={styles.preco}>
-              <span className={`${styles.pl} ${mono.className}`}>Para você, agora</span>
-              <strong className={styles.pv}>R$ 4.750</strong>
-              <span className={styles.pd}>EA² + Mentoria por {OFERTA_1.preco} no total. Você já pagou R$ 1.250 no EA².</span>
-              <span className={styles.ancora}>{OFERTA_1.ancora}</span>
-            </div>
-            <div className={styles.garantia}>
-              <span className={`${styles.pl} ${mono.className}`}>Garantia</span>
-              <p>{MENTORIA.garantia}</p>
-            </div>
-            <a className={styles.btn} href={linkCheckoutMentoria()}>Sim, quero a Mentoria</a>
-            <p className={styles.aviso}>O resultado depende da sua execução e da sua aplicação.</p>
-          </section>
-        )}
+        {!aceitou && <OfertaFA2 checkout={linkCheckoutMentoria()} />}
 
         <div className={`${styles.sig} ${mono.className}`}>@redpro.ia</div>
       </div>

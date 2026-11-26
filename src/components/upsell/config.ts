@@ -6,7 +6,7 @@ export const PRECOS_CONFIRMADOS = true;
 
 // ONE TIME OFFER: só é verdade se a Hotmart estiver configurada como upsell de uma
 // oferta só, sem esta página linkada em outro lugar. Conferir com a MIRA e a ION.
-export const LINK_ACEITAR_1 = "https://pay.hotmart.com/N108608837C?off=ioehae1s"; // Mentoria Empresa Agêntica (ex-FA²), upsell EA²+Mentoria, R$ 4.750 (MIRA, 22/11)
+export const LINK_ACEITAR_1 = "https://pay.hotmart.com/N108608837C?off=ioehae1s"; // FA² (Formação Arquiteto de Agentes), upsell EA²+Mentoria, R$ 4.750 (MIRA, 22/11)
 export const LINK_ACEITAR_2 = "https://pay.hotmart.com/R108608890P?off=gig2ersp"; // Sua empresa no automático (6 meses), entrada R$ 12.500 (MIRA). Mensal à parte (LINK_MENSALIDADE)
 // Mensalidade da consultoria: assinatura separada (MIRA, produto 9041032, aprovado pelo Red 22/11).
 // A Hotmart não junta entrada e assinatura: o passo 2 aparece no obrigado com ?aceitou=consultoria.
@@ -17,9 +17,12 @@ export const URL_UPSELL_2 = "/ea2/oferta-implementacao"; // destino de quem acei
 // Mentoria anual de R$ 20.000 NÃO existe (Red, 21/11): sem ancoragem nela.
 
 export const OFERTA_1 = {
-  preco: "R$ 6.000", // total EA² + Mentoria (Red, 21/11)
+  preco: "R$ 6.000", // total EA² + FA² (Red, 21/11)
   detalhe: "no total. Você já pagou R$ 1.250 no EA²: falta R$ 4.750.",
-  ancora: "Separado seria R$ 9.250: EA² R$ 1.250 + Mentoria avulsa R$ 8.000.",
+  upgrade: "R$ 4.750", // o que falta pagar no upgrade (oferta Hotmart ioehae1s)
+  avulsa: "R$ 8.000", // FA² sozinha, fora do upgrade (QG, 22/11)
+  economia: "R$ 3.250", // 8.000 - 4.750
+  ancora: "Separado seria R$ 9.250: EA² R$ 1.250 + FA² avulsa R$ 8.000.",
 };
 
 export const OFERTA_2 = {
@@ -28,11 +31,14 @@ export const OFERTA_2 = {
   meses: 6,
 };
 
-// Mentoria Empresa Agêntica (ex-FA²): texto aprovado pelo Red em 22/11 (d82c07f).
+// FA², Formação Arquiteto de Agentes. Nome de volta por decisão do Red em 26/11
+// (de 22/11 a 26/11 se chamou "Mentoria Empresa Agêntica"). Itens e garantia: texto aprovado em 22/11 (d82c07f).
+// Promessa nova (26/11): a antiga ("Um time inteiro...") não diferenciava do EA². Rascunho até o ok do Red.
 // Usado no upsell 1 (/ea2/oferta-formacao) e na oferta do obrigado do EA² (/ea2/obrigado).
 export const MENTORIA = {
-  nome: "Mentoria Empresa Agêntica",
-  promessa: "Um time inteiro trabalhando para você, sem contratar ninguém.",
+  nome: "Formação Arquiteto de Agentes",
+  sigla: "FA²",
+  promessa: "Seis meses comigo, ao vivo, até cada área da sua empresa rodar com agentes.",
   itens: [
     "Os sistemas prontos, instalados na sua empresa: 2 Squads com 19 agentes, Genix OS, painel de acompanhamento, Esteira de conteúdo e instalador",
     "As 4 aulas do EA² viram implantação guiada, no caso real da sua empresa: diagnóstico, primeiro Squad trabalhando até o mês 2, mais frentes, produção segura com custo sob controle",
