@@ -976,7 +976,7 @@ Hoje os seus agentes saem do seu computador e ganham casa própria: uma VPS liga
 
 ## Qual VPS escolher: KVM 2, KVM 4 ou KVM 8
 
-Cada agente é um processo que fica ligado o tempo todo. Parado, ele usa uns **350 MB** de memória. Trabalhando, pode subir até **900 MB**, que é o teto que o instalador coloca em cada um. Quando o agente abre o navegador (para ler um site ou conferir uma página), soma mais uns **500 MB**. O sistema da VPS usa cerca de **1 GB**.
+Cada agente é um processo que fica ligado o tempo todo. Parado, ele usa uns **260 MB** de memória (medido). Trabalhando, pode subir até **900 MB**, que é o teto que o instalador coloca em cada um. Quando o agente abre o navegador (para ler um site ou conferir uma página), soma mais uns **500 MB**. Com os 3 agentes parados, a VPS inteira usa cerca de **1,2 GB** (medido).
 
 | | **KVM 2** (recomendada) | **KVM 4** | **KVM 8** |
 |---|---|---|---|
