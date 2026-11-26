@@ -20,7 +20,7 @@ export type Bloco =
   | { t: "resultado"; texto: Inline }
   | { t: "ok"; texto: Inline }
   | { t: "alerta"; texto: Inline }
-  | { t: "lista"; ordenada: boolean; itens: Item[] }
+  | { t: "lista"; ordenada: boolean; itens: Item[]; inicio?: number }
   | { t: "abas"; grupo: string; abas: { rotulo: string; texto: Inline }[] }
   | { t: "guarde"; texto: Inline }
   | { t: "codigo"; codigo: string; soul: boolean; leitura?: boolean }
@@ -175,7 +175,9 @@ export function lerGuia(): { blocos: Bloco[]; dias: Dia[] } {
       if (ehSO || ehAgente) {
         blocos.push({ t: "abas", grupo: ehSO ? "so" : "agente", abas: rot.map((r) => ({ rotulo: r![1].trim(), texto: r![2] })) });
       } else {
-        blocos.push({ t: "lista", ordenada, itens });
+        // Lista cortada por print continua do número que está no markdown ("6." vira <ol start=6>). Rigel, 26/11.
+        const n0 = ordenada ? parseInt(li[1], 10) : 1;
+        blocos.push({ t: "lista", ordenada, itens, ...(n0 > 1 ? { inicio: n0 } : {}) });
       }
       continue;
     }

@@ -173,7 +173,7 @@ function renderBloco(b: Bloco, i: number, chave: string): ReactNode {
       const Tag = b.ordenada ? "ol" : "ul";
       const caixas = b.itens.every((it) => it.marcar);
       return (
-        <Tag key={i} className={caixas ? "gi-caixas" : undefined}>
+        <Tag key={i} className={caixas ? "gi-caixas" : undefined} start={b.ordenada ? b.inicio : undefined}>
           {b.itens.map((it, j) => (
             <li key={j}>
               {inline(it.texto, chave)}
