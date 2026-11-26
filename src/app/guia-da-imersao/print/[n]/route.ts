@@ -11,7 +11,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ n: stri
   const { n } = await params;
   const jar = await cookies();
   if (!cookieValido(jar.get(COOKIE)?.value)) return new Response("Não autorizado", { status: 401 });
-  if (!/^\d{2}$/.test(n)) return new Response("Não encontrado", { status: 404 });
+  if (!/^\d{2}[a-z]?$/.test(n)) return new Response("Não encontrado", { status: 404 });
   try {
     const arq = await readFile(path.join(process.cwd(), "privado", "guia-da-imersao", "prints", `${n}.webp`));
     return new Response(new Uint8Array(arq), {

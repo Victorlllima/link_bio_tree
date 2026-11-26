@@ -1509,8 +1509,12 @@ Deu certo se: a VPS aparece na lista de gateways e as conversas dos seus 3 agent
 ## 8. Três avisos
 
 > **1. Não atualize o Hermes da VPS pelo Desktop.**
-> Não clique em "Update remote Hermes" nem em "Update all instances". A VPS está na versão que o instalador deixou testada. O Desktop funciona com ela como está.
+> No Hermes Desktop existem dois botões que atualizam o Hermes da sua VPS. **Não clique em nenhum dos dois.** A VPS está na versão que o instalador deixou testada, e o Desktop funciona com ela como está.
+> - **Settings → Gateways → Saved connections → "Update all instances"** (aparece quando você tem mais de uma conexão salva).
+> - **Settings → Gateways → Remote updates → "Update"**, ao lado da conexão SSH da sua VPS.
 
+[[print 18|Não clique em "Update all instances"]]
+[[print 18b|Não clique em "Update" em Remote updates]]
 > **2. Chave e senha nunca em tela compartilhada.**
 > Chave SSH, senha do root, token de bot e código de login nunca aparecem em print, em chat, no grupo ou para o suporte.
 

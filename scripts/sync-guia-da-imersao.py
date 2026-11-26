@@ -24,7 +24,7 @@ def img(m):
     alt, src = m.group(1), m.group(2)
     if not src.startswith("guia-prints/"):
         sys.exit(f"ERRO: imagem fora de guia-prints/: {src}")
-    n = re.match(r"guia-prints/(\d{2})", src)
+    n = re.match(r"guia-prints/(\d{2}[a-z]?)", src)
     if not n:
         sys.exit(f"ERRO: print sem número: {src}")
     origem = FONTE.parent / src

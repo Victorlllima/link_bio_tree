@@ -89,7 +89,7 @@ export function lerGuia(): { blocos: Bloco[]; dias: Dia[] } {
       continue;
     }
 
-    const pr = l.match(/^\[\[print (\d{2})\|(.*)\]\]\s*$/);
+    const pr = l.match(/^\[\[print (\d{2}[a-z]?)\|(.*)\]\]\s*$/);
     if (pr) {
       blocos.push({ t: "print", num: pr[1], legenda: pr[2] });
       i++;
