@@ -1051,14 +1051,14 @@ A chave SSH funciona como um **cadeado com uma única chave**, fabricados juntos
 
 Quando você entra, a VPS faz um desafio que só a chave certa responde. O seu computador responde com a chave privada e a VPS confere com o cadeado. **A chave nunca viaja: ela só prova que é ela.** (No técnico: criptografia assimétrica.)
 
-**Por que criar no seu computador, e não na Hostinger?** Porque a chave privada tem que nascer onde vai morar. Se nascesse fora, teria que viajar até você. O comando `ssh-keygen` é a fábrica do par: `-t ed25519` é o modelo do cadeado (o mais moderno) e `-C minha-vps` é só uma etiqueta. Ele cria dois arquivos na pasta `.ssh`: `id_ed25519` (a chave privada, não copie nem mande) e `id_ed25519.pub` (o cadeado, é esse que vai para a Hostinger).
+**Por que criar no seu computador, e não na Hostinger?** Porque a chave privada tem que nascer onde vai morar. Se nascesse fora, teria que viajar até você. O comando `ssh-keygen` é a fábrica do par: `-t ed25519` é o modelo do cadeado (o mais moderno) e `-C minha-vps` é o **nome que você dá para a sua VPS**: pode trocar `minha-vps` por qualquer nome que você quiser (ex.: `-C vps-da-clinica`). Ele cria dois arquivos na pasta `.ssh`: `id_ed25519` (a chave privada, não copie nem mande) e `id_ed25519.pub` (o cadeado, é esse que vai para a Hostinger).
 
 **Abra o terminal:**
 - Windows: tecla Windows, digite **PowerShell**, Enter.
 - Mac: Cmd + Espaço, digite **Terminal**, Enter.
 - Linux: abra o Terminal.
 
-**Crie a chave** (igual nos três; nas perguntas, só Enter):
+**Crie a chave** (igual nos três; nas perguntas, só Enter). Onde está `minha-vps`, você pode colocar o nome que quiser para a sua VPS:
 ```
 ssh-keygen -t ed25519 -C minha-vps
 ```
@@ -1088,14 +1088,14 @@ cat ~/.ssh/id_ed25519.pub
 |---|---|---|
 | 1 | `ssh-ed25519` | o modelo do cadeado |
 | 2 | `AAAAC3NzaC1lZDI1NTE5AAAA...` (uns 68 caracteres, sempre começa com `AAAA`) | o cadeado em si |
-| 3 | `minha-vps` | a etiqueta que você deu no comando |
+| 3 | `minha-vps` (ou o nome que você escolheu) | o nome que você deu à sua VPS no comando |
 
 Exemplo do formato (a parte do meio da sua vai ser outra):
 ```
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExemploExemploExemploExemploExemplo12345 minha-vps
 ```
 
-Confira antes de salvar: **começa com `ssh-ed25519`, termina com `minha-vps`, e é uma linha só**. Se estiver assim, está certo.
+Confira antes de salvar: **começa com `ssh-ed25519`, termina com o nome que você deu à VPS (ex.: `minha-vps`), e é uma linha só**. Se estiver assim, está certo.
 
 **Recursos adicionais:** deixe **Scanner Monarx** e **Gerenciador Docker** desmarcados e clique em **Finalizar configuração**.
 
