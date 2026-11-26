@@ -27,3 +27,30 @@ export const OFERTA_2 = {
   mensal: "R$ 1.500",
   meses: 6,
 };
+
+// Mentoria Empresa Agêntica (ex-FA²): texto aprovado pelo Red em 22/11 (d82c07f).
+// Usado no upsell 1 (/ea2/oferta-formacao) e na oferta do obrigado do EA² (/ea2/obrigado).
+export const MENTORIA = {
+  nome: "Mentoria Empresa Agêntica",
+  promessa: "Um time inteiro trabalhando para você, sem contratar ninguém.",
+  itens: [
+    "Os sistemas prontos, instalados na sua empresa: 2 Squads com 19 agentes, Genix OS, painel de acompanhamento, Esteira de conteúdo e instalador",
+    "As 4 aulas do EA² viram implantação guiada, no caso real da sua empresa: diagnóstico, primeiro Squad trabalhando até o mês 2, mais frentes, produção segura com custo sob controle",
+    "6 meses de acompanhamento comigo: 1 encontro ao vivo por semana, às terças, 15h, a partir de 01/12",
+    "Amanda e os agentes no suporte do dia a dia",
+    "Comunidade aberta entre os alunos",
+    "Genix OS enquanto você for aluno. Para clientes, se quiser vender o serviço: licença de R$ 150/mês, o 1º cliente sem custo",
+    "Modelos de proposta e contrato, como extra para quem quiser vender implementação",
+    "10 vagas novas por mês",
+  ],
+  garantia:
+    "Se você fizer todos os passos da jornada até o fim do mês 2 e não tiver o primeiro Squad trabalhando na sua empresa, nós fazemos uma call de alinhamento e ações para os próximos 2 meses. Se ainda assim não tiver, eu devolvo seu dinheiro + R$ 500 do meu bolso.",
+};
+
+// Checkout da oferta no obrigado do EA² (oferta Hotmart ioehae1s, R$ 4.750).
+// A MIRA confirma o link exato; até lá vale a variável EA2_OBRIGADO_CHECKOUT_MENTORIA ou o link do upsell 1.
+export const linkCheckoutMentoria = () => process.env.EA2_OBRIGADO_CHECKOUT_MENTORIA || LINK_ACEITAR_1;
+
+// Agenda da call da consultoria (obrigado da Mentoria, /fa2/obrigado). O link vem do Rigel.
+// Sem a variável FA2_LINK_AGENDA a página mostra a faixa de rascunho.
+export const linkAgendaCall = () => process.env.FA2_LINK_AGENDA || "";
