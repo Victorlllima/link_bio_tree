@@ -997,7 +997,14 @@ Hoje os seus agentes saem do seu computador e ganham casa própria: uma VPS liga
 
 ## 3. Criar a sua chave SSH
 
-A chave tem duas partes. A **pública** vai para a VPS. A **privada** fica só no seu computador e nunca sai dele.
+A chave SSH funciona como um **cadeado com uma única chave**, fabricados juntos:
+
+- **Chave pública = o cadeado.** Pode copiar e mostrar à vontade: sozinho, ele não abre nada. Você entrega uma cópia para a VPS.
+- **Chave privada = a chave.** Existe uma só, fica no seu computador e nunca sai dele.
+
+Quando você entra, a VPS faz um desafio que só a chave certa responde. O seu computador responde com a chave privada e a VPS confere com o cadeado. **A chave nunca viaja: ela só prova que é ela.** (No técnico: criptografia assimétrica.)
+
+**Por que criar no seu computador, e não na Hostinger?** Porque a chave privada tem que nascer onde vai morar. Se nascesse fora, teria que viajar até você. O comando `ssh-keygen` é a fábrica do par: `-t ed25519` é o modelo do cadeado (o mais moderno) e `-C minha-vps` é só uma etiqueta. Ele cria dois arquivos na pasta `.ssh`: `id_ed25519` (a chave privada, não copie nem mande) e `id_ed25519.pub` (o cadeado, é esse que vai para a Hostinger).
 
 **Abra o terminal:**
 - Windows: tecla Windows, digite **PowerShell**, Enter.
@@ -1011,7 +1018,7 @@ ssh-keygen -t ed25519 -C minha-vps
 Se aparecer "Overwrite (y/n)?", responda `n`: você já tem uma chave e pode usar essa.
 
 [[print 06|ssh-keygen no terminal]]
-**Copie a parte pública:**
+**Copie o cadeado (a chave pública).** Rode o comando do seu sistema. Ele copia o conteúdo do arquivo `id_ed25519.pub` para a área de transferência. No Windows e no Mac não aparece nada na tela: é normal, já está copiado.
 
 Windows:
 ```
@@ -1021,17 +1028,31 @@ Mac:
 ```
 pbcopy < ~/.ssh/id_ed25519.pub
 ```
-Linux (selecione a linha e copie com Ctrl+Shift+C):
+Linux (o comando mostra a linha; selecione e copie com Ctrl+Shift+C):
 ```
 cat ~/.ssh/id_ed25519.pub
 ```
 
-Cole a linha no campo **Conteúdo da chave SSH** da Hostinger, dê um nome (ex.: meu-computador) e salve.
+**Cole na Hostinger.** No campo **Conteúdo da chave SSH**, aperte **Ctrl+V** (no Mac, **Cmd+V**). Dê um nome (ex.: meu-computador) e salve.
 
-> **Não faça assim: o erro mais comum**
-> - A linha `SHA256:...` que o terminal mostra ao criar a chave é só a identificação. A Hostinger recusa essa linha.
-> - Copie sempre o arquivo que termina em **.pub**. É a linha que começa com `ssh-ed25519`.
-> - O arquivo sem .pub é a chave privada: ela nunca vai para lugar nenhum.
+**O que tem de aparecer no campo: uma linha só, com três partes separadas por espaço.**
+
+| Parte | Como é | O que é |
+|---|---|---|
+| 1 | `ssh-ed25519` | o modelo do cadeado |
+| 2 | `AAAAC3NzaC1lZDI1NTE5AAAA...` (uns 68 caracteres, sempre começa com `AAAA`) | o cadeado em si |
+| 3 | `minha-vps` | a etiqueta que você deu no comando |
+
+Exemplo do formato (a parte do meio da sua vai ser outra):
+```
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExemploExemploExemploExemploExemplo12345 minha-vps
+```
+
+Confira antes de salvar: **começa com `ssh-ed25519`, termina com `minha-vps`, e é uma linha só**. Se estiver assim, está certo.
+
+> **Se não estiver assim:**
+> - Começa com `SHA256:`? Isso é só a identificação que o terminal mostra ao criar a chave. A Hostinger recusa. Rode o comando de copiar de novo.
+> - Apareceu um bloco grande com `BEGIN OPENSSH PRIVATE KEY`? **Pare.** Isso é a chave privada. Apague o campo e copie o arquivo que termina em **.pub**.
 
 [[print 07|ERRO comum: colou a linha SHA256 no lugar da chave .pub]]
 **Recursos adicionais:** deixe **Scanner Monarx** e **Gerenciador Docker** desmarcados e clique em **Finalizar configuração**.
@@ -1063,7 +1084,7 @@ Cole a linha no campo **Conteúdo da chave SSH** da Hostinger, dê um nome (ex.:
 3. Volte ao Console web, cole com **Ctrl+Shift+V** (ou botão direito → Colar) e aperte Enter.
 
 ```
-curl -fsSL https://redpro.com.br/instalar -o configurar-vps.sh && bash configurar-vps.sh
+curl -fsSL "https://redpro.com.br/instalar?k=CHAVE_DA_TURMA" -o configurar-vps.sh && bash configurar-vps.sh
 ```
 
 O comando já vem com a chave da sua turma. Copie sempre daqui e nunca mande esse comando no chat, no grupo ou para ninguém.

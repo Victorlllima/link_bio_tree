@@ -60,7 +60,7 @@ function inline(s: string, chave: string): ReactNode[] {
 // O comando de instalação ganha a chave da turma (só depois da senha). COLE_AQUI_O_LINK_DA_SECAO_5 fica como está.
 function comChave(texto: string, chave: string): string {
   if (!chave) return texto;
-  return texto.replaceAll(`${URL_INSTALAR} `, `"${URL_INSTALAR}?k=${chave}" `).replaceAll("?k=CHAVE", `?k=${chave}`);
+  return texto.replaceAll(`${URL_INSTALAR} `, `"${URL_INSTALAR}?k=${chave}" `).replaceAll("?k=CHAVE_DA_TURMA", `?k=${chave}`).replaceAll("?k=CHAVE\"", `?k=${chave}"`);
 }
 
 function Codigo({ codigo, soul, chave }: { codigo: string; soul: boolean; chave: string }) {
