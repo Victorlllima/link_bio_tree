@@ -41,3 +41,25 @@ html{scroll-behavior:smooth}
 .cv pre{overflow-x:auto}
 .gi-caixas li::marker{content:"";color:transparent}.gi-caixas li{list-style:none}
 .gi-leitura{opacity:.85;border-style:dashed!important}
+
+/* Tema claro (Rigel/Red, 26/11): capa escura, corpo em papel branco com texto escuro.
+   Blocos de comando seguem escuros (terminal); "Só para ler" fica em papel com borda tracejada. */
+.cv.gi-claro{background:#FBFAF7}
+.gi-claro .gi-capa{background:#0A0A0A}
+.gi-claro .gi-hero{border-bottom:0}
+.gi-claro .gi-manual{--bg:#FBFAF7;--bg2:#F1EFE8;--text:#18181C;--muted:#52525A;--dim:#6E6E76;--line:rgba(0,0,0,.1);--line2:rgba(0,0,0,.2);--blue-hi:#2B3FD6;--blue-soft:rgba(68,88,255,.08);--ok:#0F7A4A;--warn:#C27A00;color:var(--text);padding-top:28px}
+.gi-claro .gi-manual code{background:rgba(0,0,0,.05)}
+.gi-claro .gi-manual .cv-code{--text:#F5F5F5;--muted:#9A9AA0;--dim:#8A8A90;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.14);--blue-hi:#8E9BFF;color:var(--text);border-color:#1F1F24}
+.gi-claro .gi-manual .cv-code code{background:rgba(255,255,255,.06)}
+.gi-claro .gi-manual .gi-leitura{--text:#18181C;--muted:#52525A;--dim:#5E5E66;--line:rgba(0,0,0,.1);--line2:rgba(0,0,0,.28);--blue-hi:#2B3FD6;background:#F1EFE8;color:var(--text);border-color:rgba(0,0,0,.28);opacity:1}
+.gi-claro .gi-manual .gi-leitura code{background:rgba(0,0,0,.05)}
+.gi-claro .gi-manual .cv-copiar{background:rgba(255,255,255,.08)}
+.gi-claro .gi-manual .cv-aba-on{color:#fff;background:#18181C;border-color:#18181C}
+.gi-claro .gi-manual .cv-ok{background:rgba(15,122,74,.07);border-color:rgba(15,122,74,.35)}
+.gi-claro .gi-manual .cv-alerta{background:rgba(194,122,0,.08)}
+.gi-claro .gi-manual .cv-resultado{border-color:rgba(68,88,255,.35)}
+.gi-claro .cv-guarde{background:rgba(255,200,0,.12)!important;border-color:rgba(176,130,0,.6)!important}
+.gi-claro .cv-guarde span{color:#7A5A00!important}
+.gi-claro .gi-print img{border-color:rgba(0,0,0,.14)}
+.gi-claro .gi-topo{box-shadow:0 6px 18px rgba(0,0,0,.22)}
+.gi-claro .gi-manual .cv-code pre code{background:none;border:0;padding:0}

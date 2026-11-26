@@ -334,8 +334,9 @@ export default async function GuiaDaImersao({ searchParams }: { searchParams: Pr
   const sumarioDe = new Map(dias.map((d) => [d.id, d]));
 
   return (
-    <div className={`cv ${sans.variable} ${mono.variable}`}>
+    <div className={`cv gi-claro ${sans.variable} ${mono.variable}`}>
       <IrParaAncora />
+      <div className="gi-capa">
       <header className="cv-hero gi-hero" id="topo">
         <p className="cv-rotulo">RedPro AI Academy</p>
         <h1>
@@ -349,6 +350,7 @@ export default async function GuiaDaImersao({ searchParams }: { searchParams: Pr
           ))}
         </nav>
       </header>
+      </div>
 
       <article className="cv-manual gi-manual">
         {blocos.map((b, i) => (
