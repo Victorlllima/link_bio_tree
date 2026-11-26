@@ -29,7 +29,7 @@ html{scroll-behavior:smooth}
 .gi-print figcaption span{font-family:var(--cv-mono),monospace;font-size:12px;color:var(--blue-hi);margin-right:6px}
 .gi-tabela{overflow-x:auto;margin:18px 0;border:1px solid var(--line);border-radius:12px}
 .gi-tabela table{width:100%;border-collapse:collapse;font-size:15px;line-height:1.45}
-.gi-tabela th,.gi-tabela td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+.gi-tabela th,.gi-tabela td{overflow-wrap:anywhere;padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
 .gi-tabela th{background:var(--bg2);color:var(--muted);font-weight:600}
 @media (max-width:600px){.gi-tabela{border:0}.gi-tabela thead{display:none}.gi-tabela tr{display:block;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;padding:6px 0}.gi-tabela td{display:block;border:0;padding:6px 14px}.gi-tabela td::before{content:attr(data-rotulo);display:block;font-family:var(--cv-mono),monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}}
 .gi-instalar{border-color:var(--blue)!important;box-shadow:0 0 0 3px var(--blue-soft)}

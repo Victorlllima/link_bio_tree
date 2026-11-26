@@ -1178,6 +1178,58 @@ Erros mais comuns:
 
 ---
 
+## 10. As fichas do Squad: o que cada agente usa
+
+Os 3 agentes já saem do instalador funcionando com a sua assinatura (Claude ou ChatGPT) e com o seu Telegram. As outras ferramentas abaixo são **opcionais**. Cada uma destrava um poder a mais. Quando quiser ligar uma delas, crie a conta pelo link, gere a chave e peça ao próprio agente, no Telegram, para te guiar na configuração.
+
+> A chave de cada ferramenta é sua e fica só na sua VPS. Nunca mande chave no chat do grupo, em print ou para o suporte.
+
+### Ficha 01 · Atendimento (SDR)
+Qualifica o lead no tom da sua marca, passa para um humano quando precisa e faz o follow-up.
+
+| Para quê | Ferramenta | Link |
+|---|---|---|
+| Cérebro | Claude ou ChatGPT (a sua assinatura) | https://claude.ai · https://chatgpt.com |
+| Conversar com você | Telegram | https://telegram.org |
+| WhatsApp com chip próprio | Salvy (chip e plano para empresa) | https://salvy.com.br |
+| WhatsApp com número virtual | BR DID | https://www.brdid.com.br |
+| Caixa de entrada da equipe | Chatwoot | https://www.chatwoot.com |
+| CRM simples | Google Planilhas | https://sheets.google.com |
+| Marcar horário | Google Agenda | https://calendar.google.com |
+| Aprender o negócio pelo @ | Apify (US$ 5 grátis por mês) | https://console.apify.com/sign-up |
+
+### Ficha 02 · Carrosséis
+Cria carrossel a partir de um vídeo, artigo ou link, nos 3 estilos, com a voz, as cores e as fontes da sua marca.
+
+| Para quê | Ferramenta | Link |
+|---|---|---|
+| Cérebro | Claude ou ChatGPT (a sua assinatura) | https://claude.ai · https://chatgpt.com |
+| Gerar imagem | ChatGPT Imagem (API da OpenAI) | https://platform.openai.com |
+| Gerar imagem | Nano Banana (Google AI Studio) | https://aistudio.google.com |
+| Imagem e vídeo com IA | Higgsfield | https://higgsfield.ai |
+| Vários modelos com uma chave só | OpenRouter | https://openrouter.ai |
+| Fotos e vídeos livres | Pexels | https://www.pexels.com/api |
+| Imagens livres | Openverse | https://openverse.org |
+| Ler perfis e posts | Apify (US$ 5 grátis por mês) | https://console.apify.com/sign-up |
+| Publicar no Instagram e no LinkedIn | Zernio | https://zernio.com |
+
+### Ficha 03 · Landing pages
+Do @ do Instagram à página: design, captura e conversão.
+
+| Para quê | Ferramenta | Link |
+|---|---|---|
+| Cérebro | Claude ou ChatGPT (a sua assinatura) | https://claude.ai · https://chatgpt.com |
+| Ler fotos, vídeos e o link da bio | Apify (US$ 5 grátis por mês) | https://console.apify.com/sign-up |
+| Guardar o código | GitHub | https://github.com/signup |
+| Colocar o site no ar | Vercel | https://vercel.com/signup |
+| Domínio próprio | Hostinger (com o meu link de desconto) | https://www.hostinger.com/br?REFERRALCODE=REDPRO |
+| DNS e proteção | Cloudflare | https://dash.cloudflare.com/sign-up |
+| Medir visitas | Google Analytics | https://analytics.google.com |
+| Medir anúncios | Pixel da Meta | https://business.facebook.com/events_manager2 |
+| Levar a página às redes | Zernio | https://zernio.com |
+
+---
+
 ## Para ir além: o caminho manual (os mesmos comandos do instalador)
 
 Cole um bloco por vez, dentro da VPS, como root (o terminal que mostra `root@`), até o passo 9.
