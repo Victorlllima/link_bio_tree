@@ -995,7 +995,7 @@ Hoje os seus agentes saem do seu computador e ganham casa própria: uma VPS liga
 
 ## Qual VPS escolher: KVM 2, KVM 4 ou KVM 8
 
-Cada agente é um processo que fica ligado o tempo todo. Parado, ele usa uns **260 MB** de memória (medido). Trabalhando, pode subir até **900 MB**, que é o teto que o instalador coloca em cada um. Quando o agente abre o navegador (para ler um site ou conferir uma página), soma mais uns **500 MB**. Com os 3 agentes parados, a VPS inteira usa cerca de **1,2 GB** (medido).
+Cada agente é um processo que fica ligado o tempo todo. Parado, ele usa uns **260 MB** de memória (medido). Trabalhando, pode subir até **1,6 GB**, que é o teto que o instalador coloca em cada um. Quando o agente abre o navegador (para ler um site ou conferir uma página), soma mais uns **500 MB**. Com os 3 agentes parados, a VPS inteira usa cerca de **1,2 GB** (medido).
 
 | | **KVM 2** (recomendada) | **KVM 4** | **KVM 8** |
 |---|---|---|---|
@@ -1453,7 +1453,7 @@ systemctl restart imersao-mkt-atendimento
 
 **Didático:** O escritório nunca fecha. Cada agente vira um serviço do sistema: liga sozinho se a VPS reiniciar e volta sozinho se cair. O seu computador pode desligar, o Hermes Desktop pode fechar: o squad continua.
 
-**Técnico:** é uma unidade systemd por agente, com `enable` para subir no boot, `Restart=on-failure` com 10 segundos de espera, teto de memória de 900 MB por agente e `NoNewPrivileges`, que impede o processo de ganhar mais poder.
+**Técnico:** é uma unidade systemd por agente, com `enable` para subir no boot, `Restart=on-failure` com 10 segundos de espera, teto de memória de 1,6 GB por agente e `NoNewPrivileges`, que impede o processo de ganhar mais poder.
 
 **O que o script faz na sua VPS (só para você entender; você não precisa copiar nem digitar nada disso):**
 ```bash
@@ -1473,7 +1473,8 @@ Environment=PATH=/home/hermes/.local/bin:/usr/local/bin:/usr/bin:/bin
 ExecStart=/home/hermes/.local/bin/hermes -p mkt-atendimento gateway run
 Restart=on-failure
 RestartSec=10
-MemoryMax=900M
+MemoryHigh=1200M
+MemoryMax=1600M
 NoNewPrivileges=true
 PrivateTmp=true
 
