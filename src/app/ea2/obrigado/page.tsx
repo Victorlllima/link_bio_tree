@@ -30,7 +30,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ a
           <i className={styles.led} />
           Confirmado
         </span>
-        <h1 className={styles.h1}>Sua vaga no Grupo de Estudos Avançados em Agentes - EA² está garantida.</h1>
+        <h1 className={styles.h1}>Sua vaga no EA² · Estudos Avançados em Agentes está garantida.</h1>
         {consultoria && (
           <section className={styles.passo2}>
             <span className={`${styles.tag} ${mono.className}`}>
