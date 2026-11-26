@@ -1,10 +1,8 @@
-import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
+import { mono, sans } from "@/components/upsell/fonts";
 import styles from "./oferta.module.css";
 import { PRECOS_CONFIRMADOS } from "./config";
 import { Recusar, ViewOferta } from "./Track";
 
-const sans = Instrument_Sans({ subsets: ["latin"], weight: ["400", "500", "600"] });
-const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"] });
 
 type Props = {
   nome: "formacao" | "implementacao";

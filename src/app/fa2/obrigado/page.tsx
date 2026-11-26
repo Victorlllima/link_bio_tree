@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
+import { mono, sans } from "@/components/upsell/fonts";
 import styles from "@/components/upsell/oferta.module.css";
 import { MENTORIA, linkAgendaCall } from "@/components/upsell/config";
 
-const sans = Instrument_Sans({ subsets: ["latin"], weight: ["400", "500", "600"] });
-const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"] });
 
 export const dynamic = "force-dynamic";
 
