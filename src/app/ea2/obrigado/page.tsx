@@ -30,7 +30,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ a
           <i className={styles.led} />
           Confirmado
         </span>
-        <h1 className={styles.h1}>Sua vaga no EA² está garantida.</h1>
+        <h1 className={styles.h1}>Sua vaga no Grupo de Estudos Avançados em Agentes - EA² está garantida.</h1>
         {consultoria && (
           <section className={styles.passo2}>
             <span className={`${styles.tag} ${mono.className}`}>
@@ -43,8 +43,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ a
             <p className={styles.passo2Nota}>Depois disso, nossa equipe fala com você para combinar os próximos passos.</p>
           </section>
         )}
-        <p className={styles.lead}>O acesso chega no e-mail usado na compra. Se não aparecer em alguns minutos, olhe a caixa de spam.</p>
-        <p className={styles.datas}>Aulas ao vivo às quintas, 15h. 1º ciclo: 03/12, 10/12, 17/12 e 07/01 (sem aula em 24/12 e 31/12). A gravação de cada aula sai em até 48 horas na área de membros.</p>
+        <p className={styles.lead}>O acesso vai chegar no e-mail usado na compra. Se não aparecer em alguns minutos, dá uma olhada na caixa de spam.</p>
+        <p className={styles.datas}>Nossas aulas serão ao vivo às quintas, 15h.<br />1º ciclo: 03/12, 10/12, 17/12 e 07/01 (sem aula em 24/12 e 31/12).</p>
 
         {!aceitou && <OfertaFA2 checkout={linkCheckoutMentoria()} />}
 

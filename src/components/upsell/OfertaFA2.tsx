@@ -26,9 +26,11 @@ export default function OfertaFA2({ checkout, recusar }: { checkout: string; rec
         <h2 id="oferta-fa2" className={s.titulo}>
           Upgrade para a <em>Formação Arquiteto de Agentes</em>
         </h2>
-        <p className={s.lead}>{MENTORIA.promessa}</p>
+        <p className={s.lead}>
+          Atenção! Essa é uma oportunidade única de um upgrade para a mentoria semestral Formação Arquiteto de Agentes. São seis meses comigo, ao vivo, até cada área da sua empresa rodar com agentes.
+        </p>
         <p className={s.ponte}>
-          No EA² você recebe os agentes. Na FA² eu acompanho você colocando esses agentes para trabalhar em cada área da sua empresa, uma por mês, até a operação inteira rodar.
+          No EA², que você já adquiriu, você recebe os agentes. Na Formação Arquiteto de Agentes - FA² eu acompanho você colocando esses agentes para trabalhar em cada área da sua empresa, uma por mês, até a operação inteira rodar.
         </p>
 
         <PainelMeses areas={JORNADA.map(({ mes, curto }) => ({ mes, curto }))} />
