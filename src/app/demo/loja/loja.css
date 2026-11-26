@@ -1,0 +1,71 @@
+/* /demo/loja · RedPro Commerce (identidade RedPro: preto, azul #4458FF), fontes grandes para o Zoom */
+.rc{--bg:#0A0A0A;--card:#111214;--blue:#4458FF;--blue-hi:#6E7DFF;--blue-soft:rgba(68,88,255,.16);--text:#F5F5F5;--muted:#A3A3AA;--line:rgba(255,255,255,.12);--ok:#3DDC97;--err:#FF8A8A;
+  background:var(--bg);color:var(--text);min-height:100vh;font-family:var(--rc-sans),system-ui,sans-serif;font-size:19px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.rc *{box-sizing:border-box}
+.rc h1{font-size:clamp(30px,5vw,46px);line-height:1.08;letter-spacing:-.02em;margin:0 0 20px}
+.rc a{color:inherit}
+.rc-faixa{margin:0;padding:8px 16px;text-align:center;font-size:14px;background:var(--blue-soft);color:var(--blue-hi);font-family:var(--rc-mono),monospace}
+.rc-topo{max-width:1080px;margin:0 auto;padding:20px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line)}
+.rc-marca{display:flex;align-items:center;gap:10px;text-decoration:none;font-size:22px;letter-spacing:-.01em}
+.rc-marca b{color:var(--blue-hi);font-weight:600}
+.rc-marca-ico{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:var(--blue);color:#fff;font-weight:600}
+.rc-carrinho-link{text-decoration:none;font-weight:600;border:2px solid var(--line);border-radius:12px;padding:8px 14px}
+.rc-badge{display:inline-grid;place-items:center;min-width:30px;height:30px;border-radius:15px;background:var(--blue-soft);color:var(--blue-hi);font-size:17px;padding:0 8px;margin-left:6px;vertical-align:middle}
+.rc-rotulo{font-family:var(--rc-mono),monospace;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue-hi);margin:0 0 10px}
+.rc-muted{color:var(--muted);margin:6px 0}
+
+.rc-produto{max-width:1080px;margin:0 auto;padding:32px 16px 48px;display:grid;gap:32px}
+@media(min-width:860px){.rc-produto{grid-template-columns:1fr 1fr;align-items:start}}
+.rc-ilus{width:100%;height:auto;border-radius:24px;border:1px solid var(--line)}
+.rc-precos{margin:22px 0;padding:20px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.rc-de{margin:0;color:var(--muted)}
+.rc-off{color:var(--ok);font-weight:600;margin-left:6px}
+.rc-por{margin:4px 0;font-family:var(--rc-mono),monospace;font-size:44px;font-weight:500;color:var(--ok);letter-spacing:-.02em}
+.rc-acoes{display:flex;flex-direction:column;gap:12px}
+.rc-lista{color:var(--muted);padding-left:20px;margin:22px 0 0}
+
+.rc button,.rc-botao{display:inline-flex;align-items:center;justify-content:center;min-height:56px;border:0;border-radius:12px;background:var(--blue);color:#fff!important;font-weight:600;font-size:19px;font-family:inherit;cursor:pointer;padding:0 26px;text-decoration:none}
+.rc button:hover,.rc-botao:hover{background:var(--blue-hi)}
+.rc .rc-btn-sec{background:transparent;border:2px solid var(--line);color:var(--text)!important;min-height:46px;font-size:16px;padding:0 18px}
+.rc .rc-btn-sec:hover{border-color:var(--blue-hi);background:transparent}
+
+.rc-corpo{max-width:1080px;margin:0 auto;padding:32px 16px 48px}
+.rc-estreito{max-width:520px}
+.rc-card{border:1px solid var(--line);border-radius:20px;padding:24px 20px;background:var(--card)}
+.rc-linha{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.rc-qtd{display:flex;align-items:center;gap:8px}
+.rc select{min-height:46px;border-radius:10px;border:2px solid var(--line);background:#000;color:var(--text);font-size:18px;padding:0 10px;font-family:inherit}
+.rc-total,.rc-resumo{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:20px 0;font-size:22px}
+.rc-total strong,.rc-resumo strong{font-family:var(--rc-mono),monospace;color:var(--ok);font-size:30px}
+.rc-resumo{border:1px solid var(--line);border-radius:16px;padding:16px 20px;margin-top:0}
+.rc-link{color:var(--blue-hi)!important;font-weight:600}
+.rc-vazio{color:var(--muted);border:2px dashed var(--line);border-radius:16px;padding:24px;text-align:center}
+
+.rc-form{display:flex;flex-direction:column;gap:8px}
+.rc fieldset{border:0;padding:0;margin:0 0 18px}
+.rc legend{font-size:24px;font-weight:600;margin-bottom:8px}
+.rc-grade{display:grid;grid-template-columns:1fr;gap:4px 18px}
+.rc-grade>div{display:flex;flex-direction:column;gap:6px}
+@media(min-width:760px){.rc-grade{grid-template-columns:1fr 1fr}.rc-largo{grid-column:1/-1}.rc-card{padding:32px}}
+.rc label{font-weight:600;font-size:17px;margin-top:8px}
+.rc input{width:100%;min-height:54px;border-radius:12px;border:2px solid var(--line);background:#000;color:var(--text);padding:10px 14px;font-size:19px;font-family:inherit;outline:none}
+.rc input::placeholder{color:#55555c}
+.rc input:focus{border-color:var(--blue);box-shadow:0 0 0 4px var(--blue-soft)}
+.rc-erro{color:var(--err);margin:12px 0;font-weight:600}
+.rc-ok{color:var(--ok);font-weight:600}
+
+.rc-confirmado{border-color:var(--ok)}
+.rc-ok-selo{display:inline-block;margin:0 0 12px;padding:4px 12px;border-radius:20px;background:rgba(61,220,151,.15);color:var(--ok);font-weight:600;font-size:16px}
+.rc-dl{display:grid;grid-template-columns:max-content 1fr;gap:8px 20px;margin:12px 0 16px}
+.rc-dl dt{color:var(--muted)}
+.rc-dl dd{margin:0;font-weight:500}
+
+.rc-lista-topo{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.rc-lista-topo h1{margin:0}
+.rc-botoes{display:flex;gap:10px}
+.rc-itens{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.rc-item{border:1px solid var(--line);border-radius:16px;padding:18px 20px;background:var(--card)}
+.rc-item p{margin:6px 0 0}
+.rc-valor{font-family:var(--rc-mono),monospace;color:var(--ok);font-size:24px}
+.rc-data{display:block;margin-top:8px;font-family:var(--rc-mono),monospace;font-size:15px;color:var(--muted)}
+.rc-rodape{max-width:1080px;margin:0 auto;padding:24px 16px 40px;color:#5c5c5f;font-size:15px;border-top:1px solid var(--line)}
