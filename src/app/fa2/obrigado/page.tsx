@@ -29,7 +29,7 @@ export default function Page() {
         </span>
         <h1 className={styles.h1}>Sua vaga na {MENTORIA.nome} está garantida.</h1>
         <p className={styles.lead}>O acesso chega no e-mail usado na compra. Se não aparecer em alguns minutos, olhe a caixa de spam.</p>
-        <p className={styles.datas}>Os encontros ao vivo comigo são às terças, 15h, a partir de 01/12. A gravação de cada encontro sai no mesmo dia.</p>
+        <p className={styles.datas}>Os encontros ao vivo comigo são às terças, 15h, a partir de 01/12. A gravação de cada encontro sai em até 48 horas na área de membros.</p>
 
         <section className={styles.agenda} aria-labelledby="consultoria">
           <span className={`${styles.tag} ${mono.className}`}>

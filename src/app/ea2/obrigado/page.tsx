@@ -43,7 +43,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ a
           </section>
         )}
         <p className={styles.lead}>O acesso chega no e-mail usado na compra. Se não aparecer em alguns minutos, olhe a caixa de spam.</p>
-        <p className={styles.datas}>Datas do 1º ciclo: Aula 3 em 17/12 e Aula 4 em 07/01 (pausa de fim de ano). A gravação de cada aula sai no mesmo dia.</p>
+        <p className={styles.datas}>Aulas ao vivo às quintas, 15h. 1º ciclo: 03/12, 10/12, 17/12 e 07/01 (sem aula em 24/12 e 31/12). A gravação de cada aula sai em até 48 horas na área de membros.</p>
 
         {!aceitou && (
           <section className={styles.oferta} aria-labelledby="oferta-mentoria">
@@ -51,7 +51,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ a
               <i className={styles.led} />
               Oferta exclusiva para quem acabou de entrar
             </span>
-            <h2 id="oferta-mentoria" className={styles.ofertaTitulo}>Quer continuar com a {MENTORIA.nome}?</h2>
+            <h2 id="oferta-mentoria" className={styles.ofertaTitulo}>Upgrade para a Mentoria Semestral Empresa Agêntica</h2>
             <p className={styles.ofertaLead}>{MENTORIA.promessa} Esta condição aparece só aqui, para quem acabou de comprar o EA². Se não for para você, sua vaga no EA² continua garantida.</p>
             <ul className={styles.itens}>
               {MENTORIA.itens.map((t) => (
