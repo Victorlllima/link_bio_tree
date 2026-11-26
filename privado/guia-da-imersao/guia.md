@@ -225,6 +225,19 @@ O cérebro é o modelo de IA (a LLM) que o seu agente usa para pensar. Ele não 
 
 ---
 
+### Um terceiro caminho: o hub de modelos (Ollama)
+
+Além da assinatura (mensalidade com limite) e da API (paga pelo uso, sem teto), existe o **hub de modelos**. Ele reúne vários modelos de IA na nuvem, muitos chineses (DeepSeek, GLM, Kimi, MiniMax), e você usa todos com uma chave só.
+
+- **Como funciona:** é uma assinatura com crédito. No **Pro**, US$ 20 por mês viram US$ 60 de uso. No **Max**, US$ 100 viram US$ 300.
+- **Preço:** os modelos rápidos são muito baratos. O GLM 5.3 Flash custa US$ 0,50 por milhão de tokens gerados, de 20 a 30 vezes menos que um modelo de ponta.
+- **Qualidade:** Claude e GPT ficam perto de 9,5. Os chineses rápidos ficam perto de 8.
+- **A regra:** tarefa crítica no Claude ou no GPT, tarefa de volume (responder dúvida, resumir, classificar) no hub. Dá para usar os dois no mesmo agente, um como principal e o outro como reserva.
+
+Planos e preços: **https://ollama.com/pricing** · Criar conta: **https://ollama.com/signup**
+
+(Valores conferidos em 26/11/2026. Confira no site antes de assinar.)
+
 ## Conectar a sua assinatura (ChatGPT ou Claude)
 
 Use a assinatura de IA que você já paga, sem chave de API. Escolha **um** caminho. Não precisa conectar os dois. Depois, se quiser, você conecta quantos quiser.
