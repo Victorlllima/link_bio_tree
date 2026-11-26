@@ -152,6 +152,7 @@ Respondeu? O seu agente está de pé.
 
 ---
 
+[[print d1-01|Primeira abertura: "Let's get you setup with Hermes Agent". Para usar a sua assinatura, clique em Other providers]]
 ## Conhecendo a tela do Hermes
 
 - **Barra lateral (esquerda):** o histórico das conversas, o menu **Capabilities**, **Messaging**, **Cron Jobs** (tarefas agendadas) e, embaixo, **Profiles**. Ela pode ser recolhida.
@@ -168,6 +169,8 @@ O Hermes **conversa** com você em português sem problema. Só a interface est�
 
 ---
 
+[[print d1-03|A tela inicial: menu lateral, o campo "What's on your mind?", o seletor de modelo e a pílula de esforço]]
+[[print d1-04|O seletor de modelo]]
 ## Profiles: cada agente é um funcionário
 
 **Profile é um funcionário novo na sua empresa.** Cada um tem a própria mesa, o próprio crachá, as próprias gavetas (a memória dele) e o próprio jeito de trabalhar. No Hermes, **cada profile é um agente separado**. O de atendimento não mexe nas gavetas do de carrossel.
@@ -197,6 +200,7 @@ O jeito de trabalhar do funcionário tem nome: **SOUL**. É quem ele é. Ela vem
 
 ---
 
+[[print d1-08|New profile: Name, Clone from, SOUL.md e Create profile (abre pelo + no canto de baixo à esquerda)]]
 ## Camada 1 · O cérebro
 
 ### O cérebro é alugado
@@ -247,13 +251,13 @@ Use a assinatura de IA que você já paga, sem chave de API. Escolha **um** cami
 
 **Onde clicar, na primeira abertura do Hermes:**
 1. Na tela **"Let's get you setup with Hermes Agent"**, clique em **Other providers**.
-2. Escolha **OpenAI Codex**. É o login da assinatura do ChatGPT.
+2. Escolha **ChatGPT or Codex Subscription**. É o login da assinatura do ChatGPT.
 3. O Hermes abre uma página da OpenAI no navegador e mostra um **código** na tela dele. Entre com a sua conta do ChatGPT e digite o código. O Hermes conecta sozinho.
 4. Em **Default model**, deixe o modelo sugerido (ou o primeiro **GPT** da lista) e clique em **Begin**.
 
 **Onde clicar, se você já passou da primeira abertura:**
 1. **Settings** (engrenagem) → **Providers** → aba **Accounts**.
-2. Clique em **OpenAI Codex** e faça o mesmo login do passo 3 acima.
+2. Clique em **Connect another provider** → **ChatGPT or Codex Subscription** e faça o mesmo login do passo 3 acima.
 3. **Settings** → **Model** → **Main model**. Em **Provider**, escolha **OpenAI Codex**, escolha o modelo e clique em **Apply**.
 
 **Deu certo se:** o seletor de modelo, ao lado do microfone, mostra um modelo GPT e o agente responde quando você escreve "oi".
@@ -305,6 +309,9 @@ Em **Settings → Providers**, no alto, aparecem os seus profiles. Dá para esco
 
 ---
 
+[[print d1-02|Other providers: "ChatGPT or Codex Subscription" e as outras opções]]
+[[print d1-05|Settings → Providers → Accounts → Connect another provider]]
+[[print d1-06|Other providers → ChatGPT or Codex Subscription]]
 ## Escolher o modelo principal e o reserva
 
 ### Main model: qual modelo usar
@@ -327,6 +334,7 @@ Agente que trabalha sozinho, de madrugada, pelo Telegram, precisa de reserva. Op
 
 ---
 
+[[print d1-07|Settings → Model → Main model: Provider, Model, Reasoning e Apply. No menu ao lado: Fallback models, Auxiliary models, Subagents, Mixture of Agents]]
 ## Modelos auxiliares, subagentes e mistura de agentes
 
 ### Os 11 modelos auxiliares
@@ -600,6 +608,7 @@ Quer uma memória mais robusta? Existem **plugins de memória**. O mais conhecid
 
 ---
 
+[[print d1-09|Settings → Memory & Context → Persistent memory: Memory Budget e Profile Budget]]
 ## Adiante 2 meses de conversa
 
 O agente vai te conhecendo conversa a conversa. Em vez de esperar meses, você adianta isso em dez minutos.
@@ -634,6 +643,8 @@ No app, os quatro moram numa tela só: na barra lateral, **Capabilities**, com a
 
 ---
 
+[[print d1-10|Capabilities: as abas Skills, Plugins, Connectors e Tools]]
+[[print d1-13|Tools: cada ferramenta com o seu liga/desliga]]
 ## Skills: a receita do bolo
 
 Se você pede um bolo para alguém que nunca fez, ele improvisa. Pode até acertar, mas dez bolos sem receita saem dez bolos diferentes. Com a receita, sai o mesmo bolo todas as vezes.
@@ -700,6 +711,7 @@ Na Noite 2, o agente de atendimento liga essas pontas no WhatsApp.
 
 ---
 
+[[print d1-11|Plugins: o plugin oficial claude-subscription-directsdk]]
 ## Connectors (MCP): a tomada
 
 MCP é a tomada. Você tem um aparelho, e a tomada é o padrão que faz ele funcionar em qualquer parede. Alguém publica o conector de uma ferramenta, você liga no seu agente, e ele passa a ler e escrever ali.
@@ -724,6 +736,7 @@ Entre as capacidades do Hermes está o **computer use**, que deixa ele mexer no 
 
 ---
 
+[[print d1-12|Connectors: Search 103 apps e Add your own]]
 ## Na prática: o agente navega, faz login e compra
 
 O Red deu ao agente uma tarefa de ponta a ponta: pesquisar o preço do PlayStation 5 em várias lojas, registrar as cotações num painel com login e comprar na melhor oferta, numa loja de teste. Tudo com as cinco camadas juntas. Adapte para o seu negócio.
@@ -787,6 +800,9 @@ Na aula foi passo a passo, para você acompanhar. Mas a mesma tarefa pode rodar 
 
 ---
 
+[[print d1-16|Ctrl+Shift+L abre o navegador interno (aba BROWSER)]]
+[[print d1-17|Settings → Browser → Browser profile]]
+[[print d1-18|Settings → Passwords & Logins → Saved credentials → + Add]]
 ## Camada 4 · Os canais
 
 Até agora o agente mora na tela do seu computador. Agente bom é agente que você chama de qualquer lugar: na fila do banco, no carro, no meio de uma reunião. Você manda um áudio no meio da rua, ele recebe, executa e responde ali mesmo.
@@ -871,6 +887,8 @@ Ele só mexe no que você deixou. Não deu acesso ao e-mail? Ele não lê o e-ma
 
 ---
 
+[[print d1-14|Settings → Safety → Approvals: Approval Mode]]
+[[print d1-15|O raio na barra de status: Manual, Smart ou Off (Off = sem aprovações, o modo YOLO)]]
 ## Conectar o seu agente ao Telegram
 
 Agora o agente sai da tela e vai para o seu bolso. Escolha um dos dois jeitos.
@@ -905,6 +923,7 @@ Mexeu na configuração do Telegram e ele não responde? Lembre a regra: **Ctrl/
 
 ---
 
+[[print d1-19|Messaging → Telegram: Create with QR, Bot token e Allowed Telegram user IDs]]
 ## Dúvidas da noite
 
 **Posso levar um susto na fatura?**
@@ -1515,13 +1534,29 @@ Parou no meio, caiu a internet ou fechou a aba? Abra o Console web de novo, copi
 
 Faça só depois do **Tudo pronto**.
 
-1. No Hermes Desktop, abra **Settings** (engrenagem) → **Gateways**.
-2. Clique em **Add connection** e escolha **SSH**.
-3. Em **Host**, digite `hermes@SEU_IP` (troque pelo IP da sua VPS).
-4. Se a sua chave tem outro nome (não é `id_ed25519`), informe o caminho dela em **Identity file**. Se é a padrão, deixe em branco.
-5. Clique em **Test**. Deu **Reachable**: salve e conecte.
+1. No Hermes Desktop, clique em **Settings** (a engrenagem no canto de cima, à direita) → **Gateways** → **Primary gateway**.
+2. Em **Connection mode**, clique em **Connect via SSH**.
 
-Deu certo se: a VPS aparece na lista de gateways e as conversas dos seus 3 agentes abrem no Desktop.
+[[print d2-01|Gateways → Primary gateway → Connection mode → Connect via SSH]]
+3. Em **Host**, abra a lista **Select a host…** e escolha **Custom (enter manually)…**.
+
+[[print d2-02|Host → Custom (enter manually)…]]
+4. Preencha:
+   - **Host:** o IP da sua VPS.
+   - **User:** `hermes`
+   - **Port:** deixe em branco.
+   - **Identity file:** o caminho da sua chave, só se ela não tiver o nome padrão.
+   - **Hermes path (optional):** deixe em branco.
+5. Clique em **Test SSH**.
+
+[[print d2-03|Preencha Host, User e Identity file e clique em Test SSH]]
+6. Quando aparecer **Reachable: hermes@… — Hermes found**, clique em **Save and reconnect**.
+
+[[print d2-04|Reachable … Hermes found → Save and reconnect]]
+7. Pronto: o Desktop abre na VPS. Embaixo, à esquerda, aparece o gateway **hermes**, e o trilho de perfis mostra os seus 3 agentes.
+
+[[print d2-05|Conectado: os perfis da VPS aparecem no Desktop]]
+> Se aparecer **Update ready** ou **(update)**, não clique. A sua VPS fica na versão testada.
 
 ---
 

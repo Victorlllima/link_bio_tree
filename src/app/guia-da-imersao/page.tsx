@@ -254,7 +254,7 @@ function renderBloco(b: Bloco, i: number, chave: string): ReactNode {
             <img src={`/guia-da-imersao/print/${b.num}`} alt={b.legenda} loading="lazy" />
           </a>
           <figcaption>
-            <span>Print {b.num}</span> {b.legenda}
+            <span>{b.rotulo}</span> {b.legenda}<em className="gi-print-ampliar"> · toque para ampliar</em>
           </figcaption>
         </figure>
       );

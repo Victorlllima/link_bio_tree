@@ -24,14 +24,16 @@ def img(m):
     alt, src = m.group(1), m.group(2)
     if not src.startswith("guia-prints/"):
         sys.exit(f"ERRO: imagem fora de guia-prints/: {src}")
-    n = re.match(r"guia-prints/(\d{2}[a-z]?)", src)
+    # NN-x.png -> "NN"; diaD-NN-x.png e diaD-desktop-NN-x.png -> "dD-NN" (Rigel, v10, 26/11)
+    n = re.match(r"guia-prints/(?:dia(\d)-(?:desktop-)?)?(\d{2}[a-z]?)", src)
     if not n:
         sys.exit(f"ERRO: print sem número: {src}")
+    num = f"d{n.group(1)}-{n.group(2)}" if n.group(1) else n.group(2)
     origem = FONTE.parent / src
-    destino = PRINTS / f"{n.group(1)}.webp"
+    destino = PRINTS / f"{num}.webp"
     subprocess.run(["magick", str(origem), "-resize", "1600x1600>", "-quality", "82", str(destino)], check=True)
     usados.add(destino.name)
-    return f"[[print {n.group(1)}|{alt}]]"
+    return f"[[print {num}|{alt}]]"
 
 t = re.sub(r"^!\[([^\]]*)\]\(([^)]+)\)\s*$", img, t, flags=re.M)
 for velho in PRINTS.glob("*.webp"):

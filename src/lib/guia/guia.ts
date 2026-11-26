@@ -25,7 +25,7 @@ export type Bloco =
   | { t: "guarde"; texto: Inline }
   | { t: "codigo"; codigo: string; soul: boolean; leitura?: boolean }
   | { t: "tabela"; cab: string[]; linhas: string[][] }
-  | { t: "print"; num: string; legenda: string }
+  | { t: "print"; num: string; legenda: string; rotulo: string }
   | { t: "hr" };
 
 export type Dia = { id: string; num: string; texto: string; secoes: { id: string; texto: string }[] };
@@ -59,6 +59,17 @@ export function lerGuia(): { blocos: Bloco[]; dias: Dia[] } {
     return id;
   };
 
+  // Rótulo do print: os da VPS (01-16) mantêm o número; os do Hermes Desktop (d1-NN, d2-NN)
+  // são numerados na ordem em que aparecem, para não sair "Print 01, 03, 08, 02" (Rigel, v10).
+  const contaPrint: Record<string, number> = {};
+  const rotuloPrint = (num: string) => {
+    const m = num.match(/^d(\d)-/);
+    if (!m) return `Print ${num}`;
+    contaPrint[m[1]] = (contaPrint[m[1]] ?? 0) + 1;
+    const nn = String(contaPrint[m[1]]).padStart(2, "0");
+    return m[1] === "2" ? `Desktop ${nn}` : `Print ${nn}`;
+  };
+
   let i = 0;
   while (i < L.length) {
     const l = L[i];
@@ -89,9 +100,9 @@ export function lerGuia(): { blocos: Bloco[]; dias: Dia[] } {
       continue;
     }
 
-    const pr = l.match(/^\[\[print (\d{2}[a-z]?)\|(.*)\]\]\s*$/);
+    const pr = l.match(/^\[\[print ((?:d\d-)?\d{2}[a-z]?)\|(.*)\]\]\s*$/);
     if (pr) {
-      blocos.push({ t: "print", num: pr[1], legenda: pr[2] });
+      blocos.push({ t: "print", num: pr[1], legenda: pr[2], rotulo: rotuloPrint(pr[1]) });
       i++;
       continue;
     }

@@ -28,6 +28,8 @@ html{scroll-behavior:smooth}
 .gi-print{margin:20px 0}
 .gi-print img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line2);background:#fff}
 .gi-print figcaption{margin-top:8px;color:var(--muted);font-size:14px}
+.gi-print-ampliar{font-style:normal;display:none}@media (max-width:520px){.gi-print-ampliar{display:inline}}
+.gi-print a{display:block;cursor:zoom-in}
 .gi-print figcaption span{font-family:var(--cv-mono),monospace;font-size:12px;color:var(--blue-hi);margin-right:6px}
 .gi-tabela{overflow-x:auto;margin:18px 0;border:1px solid var(--line);border-radius:12px}
 .gi-tabela table{width:100%;border-collapse:collapse;font-size:15px;line-height:1.45}
