@@ -63,8 +63,19 @@ function comChave(texto: string, chave: string): string {
   return texto.replaceAll(`${URL_INSTALAR} `, `"${URL_INSTALAR}?k=${chave}" `).replaceAll("?k=CHAVE_DA_TURMA", `?k=${chave}`).replaceAll("?k=CHAVE\"", `?k=${chave}"`);
 }
 
-function Codigo({ codigo, soul, chave }: { codigo: string; soul: boolean; chave: string }) {
+function Codigo({ codigo, soul, chave, leitura }: { codigo: string; soul: boolean; chave: string; leitura?: boolean }) {
   const c = comChave(codigo, chave);
+  if (leitura)
+    return (
+      <div className="cv-code gi-leitura">
+        <div className="cv-code-topo">
+          <span>Só para ler</span>
+        </div>
+        <pre>
+          <code>{c}</code>
+        </pre>
+      </div>
+    );
   const pedido = !soul && /^(Entre|Leia|Quero|Crie|Faça|Você|Me )/.test(codigo);
   const instalar = c.includes(`${URL_INSTALAR}?k=`) && !pedido;
   const rotulo = soul ? "SOUL.md" : pedido ? "Pedido para o agente" : instalar ? "Comando de instalação da sua turma" : "Copie e cole";
@@ -190,7 +201,7 @@ function renderBloco(b: Bloco, i: number, chave: string): ReactNode {
         />
       );
     case "codigo":
-      return <Codigo key={i} codigo={b.codigo} soul={b.soul} chave={chave} />;
+      return <Codigo key={i} codigo={b.codigo} soul={b.soul} leitura={b.leitura} chave={chave} />;
     case "tabela": {
       const doisComCmd = b.cab.length === 2 && b.linhas.every((l) => /^`[^`]+`$/.test(l[1] ?? ""));
       if (doisComCmd)

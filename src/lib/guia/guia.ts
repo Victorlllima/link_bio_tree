@@ -23,7 +23,7 @@ export type Bloco =
   | { t: "lista"; ordenada: boolean; itens: Item[] }
   | { t: "abas"; grupo: string; abas: { rotulo: string; texto: Inline }[] }
   | { t: "guarde"; texto: Inline }
-  | { t: "codigo"; codigo: string; soul: boolean }
+  | { t: "codigo"; codigo: string; soul: boolean; leitura?: boolean }
   | { t: "tabela"; cab: string[]; linhas: string[][] }
   | { t: "print"; num: string; legenda: string }
   | { t: "hr" };
@@ -65,12 +65,16 @@ export function lerGuia(): { blocos: Bloco[]; dias: Dia[] } {
 
     if (l.startsWith("```")) {
       const lang = l.slice(3).trim();
+      // Bloco logo depois de "_O que o script roda ..._" é só para ler (sem botão Copiar).
+      let ant = i - 1;
+      while (ant >= 0 && !L[ant].trim()) ant--;
+      const leitura = ant >= 0 && /^_?O que o script roda/.test(L[ant].trim());
       const corpo: string[] = [];
       i++;
       while (i < L.length && !L[i].startsWith("```")) corpo.push(L[i++]);
       i++;
       const codigo = corpo.join("\n");
-      blocos.push({ t: "codigo", codigo, soul: lang === "markdown" && codigo.startsWith("# SOUL") });
+      blocos.push({ t: "codigo", codigo, soul: lang === "markdown" && codigo.startsWith("# SOUL"), leitura });
       continue;
     }
 

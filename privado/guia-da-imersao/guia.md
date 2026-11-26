@@ -1097,35 +1097,392 @@ Leva de 25 a 40 minutos no total. Deixe a aba aberta até aparecer **Tudo pronto
 
 ## 6. As 13 etapas do instalador
 
-1. **Sistema:** confere se a VPS está pronta para a instalação.
-2. **Atualizar:** atualiza o sistema e liga as atualizações de segurança automáticas.
-3. **Usuário:** cria o usuário `hermes`, que roda os agentes sem poder de administrador. Ele pergunta se usa a mesma chave para o usuário hermes: responda `s`.
+Pense na VPS como um escritório vazio na nuvem. O instalador é a equipe que monta esse escritório antes de os funcionários chegarem, e os funcionários são os seus agentes. Cada etapa abaixo traz a explicação do que acontece e, logo depois, os comandos que o script roda naquela hora. Esses blocos servem só para você ver o que está acontecendo por baixo: não precisa copiar nada, o instalador faz tudo sozinho.
+
+### Etapa 1 · Conferir a máquina
+
+É a vistoria do imóvel antes da mudança. O instalador confere se a máquina é Ubuntu 24.04 (ou 22.04), se tem memória, disco e internet. Melhor parar agora do que quebrar no meio.
+
+No técnico: é uma pré-checagem do sistema. Ele lê o `/etc/os-release` para confirmar a distribuição e a versão, e confere RAM, espaço em disco e conexão de rede antes de instalar qualquer coisa.
+
+O que você faz nesta etapa: se aparecerem os sinais verdes, aperte Enter.
+
+_O que o script roda (só para você ver, não precisa copiar):_
+```bash
+# precisa estar rodando como root
+id -u
+# qual é o sistema e a versão (tem que ser ubuntu 22.04 ou 24.04)
+. /etc/os-release
+# quanta memória a VPS tem (mínimo recomendado: 2 GB)
+awk '/MemTotal/{print int($2/1024)}' /proc/meminfo
+# quanto disco está livre (precisa de pelo menos 8 GB)
+df -Pm / | awk 'NR==2{print $4}'
+# a VPS chega na internet?
+curl -fsS --max-time 10 https://github.com
+```
+
+### Etapa 2 · Atualizar o sistema e as atualizações automáticas
+
+Aqui é a troca das fechaduras. O instalador atualiza o sistema inteiro, liga a atualização de segurança que roda sozinha toda noite e acerta o fuso de São Paulo. Sistema desatualizado é a porta de invasão mais comum.
+
+No técnico: ele roda `apt update` e `upgrade` dos pacotes, liga o `unattended-upgrades`, que aplica os patches de segurança automaticamente, com reinício programado para as 4 da manhã quando uma atualização pedir, e ajusta o fuso com o `timedatectl` para America/Sao_Paulo.
+
+Esta etapa demora um pouco e mostra uma barra com a porcentagem. Enquanto o tempo andar, está tudo certo.
+
+_O que o script roda (só para você ver, não precisa copiar):_
+```bash
+# baixa a lista de atualizações
+apt-get update
+# instala as atualizações, mantendo as configurações que já existem
+apt-get -y -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold upgrade
+# instala as ferramentas que o resto da instalação usa
+apt-get -y install curl git ufw fail2ban unattended-upgrades ca-certificates jq tar
+# fuso horário de São Paulo
+timedatectl set-timezone America/Sao_Paulo
+
+# liga a atualização automática (arquivo /etc/apt/apt.conf.d/20auto-upgrades)
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+
+# reinicia sozinha às 4h quando uma atualização pedir (arquivo /etc/apt/apt.conf.d/52imersao-reinicio)
+Unattended-Upgrade::Automatic-Reboot "true";
+Unattended-Upgrade::Automatic-Reboot-Time "04:00";
+
+# liga o serviço das atualizações automáticas
+systemctl enable --now unattended-upgrades
+```
+
+### Etapa 3 · Usuário hermes e a sua chave SSH
+
+É o crachá dos funcionários. O instalador cria um usuário chamado `hermes` e cadastra a sua chave nele. O root é o dono com a chave-mestra, e trabalhar como root é perigoso: qualquer erro vira desastre. Os agentes trabalham com crachá próprio.
+
+No técnico: é o princípio do menor privilégio. Ele cria o usuário de sistema `hermes` com o `useradd`, coloca a sua chave pública no `authorized_keys` dele e libera o `sudo` só para administração. Os agentes nunca rodam como root.
+
+O que você faz nesta etapa: ele pergunta se pode usar para o usuário hermes a mesma chave que você cadastrou no painel da Hostinger. Responda `s`.
+
+_O que o script roda (só para você ver, não precisa copiar):_
+```bash
+# cria o usuário hermes, com pasta própria
+useradd -m -s /bin/bash hermes
+# o hermes pode administrar com sudo (ele não tem senha: o acesso é só pela chave)
+usermod -aG sudo hermes
+
+# arquivo /etc/sudoers.d/90-imersao-hermes
+hermes ALL=(ALL) NOPASSWD:ALL
+
+chmod 440 /etc/sudoers.d/90-imersao-hermes
+# confere se a regra do sudo está escrita certo
+visudo -cf /etc/sudoers.d/90-imersao-hermes
+
+# cria a pasta das chaves do hermes, fechada só para ele
+install -d -o hermes -g hermes -m 700 /home/hermes/.ssh
+touch /home/hermes/.ssh/authorized_keys
+chown hermes:hermes /home/hermes/.ssh/authorized_keys
+chmod 600 /home/hermes/.ssh/authorized_keys
+# mostra a "impressão digital" da chave que você cadastrou na Hostinger
+ssh-keygen -lf /root/.ssh/authorized_keys
+# você respondeu s: copia a mesma chave para o hermes
+cat /root/.ssh/authorized_keys >> /home/hermes/.ssh/authorized_keys
+# (se não houver chave na Hostinger, ele pede para você colar a sua chave pública)
+# descobre o IP público da VPS, para você anotar
+curl -fsS --max-time 8 https://api.ipify.org
+```
 
 [[print 13|Instalador: etapas 1 a 3]]
-4. **Firewall:** fecha todas as portas, menos a do SSH, e liga o vigia contra invasão (fail2ban).
-5. **SSH:** teste da chave no **seu computador**, com `ssh hermes@SEU_IP`. Entrou sem senha: volte ao Console web e responda `s`. Pediu senha: não digite nada, volte e responda `n`.
-6. **Hermes:** instala o Hermes na versão usada na aula. Leva de 5 a 10 minutos e a tela fica um tempo parada: não feche a aba.
+### Etapa 4 · Firewall e fail2ban
+
+É a portaria. O instalador fecha todas as portas da VPS, menos a de entrada, que é a do SSH, e liga o fail2ban: quem erra a entrada várias vezes fica bloqueado. Uma VPS na internet recebe tentativa de invasão em minutos, por isso a portaria vem antes de qualquer funcionário.
+
+No técnico: é o firewall UFW com a política `deny incoming`, que nega toda conexão de entrada, e `allow` só na porta 22, a do SSH. A saída fica liberada, porque os agentes falam com o Telegram para fora. E o fail2ban: 5 erros em 10 minutos, e aquele IP fica banido por 1 hora.
+
+_O que o script roda (só para você ver, não precisa copiar):_
+```bash
+# nega tudo que tenta entrar
+ufw default deny incoming
+# libera tudo que sai (é assim que os agentes falam com o Telegram)
+ufw default allow outgoing
+# abre só a porta do SSH
+ufw allow 22/tcp comment 'SSH'
+# liga o firewall
+ufw --force enable
+
+# regra do fail2ban (arquivo /etc/fail2ban/jail.d/imersao.local)
+[sshd]
+enabled  = true
+port     = 22
+maxretry = 5
+findtime = 10m
+bantime  = 1h
+
+# liga o fail2ban e aplica a regra
+systemctl enable fail2ban
+systemctl restart fail2ban
+```
+
+### Etapa 5 · Fechar a entrada por senha e a do root
+
+A etapa mais importante: tirar a fechadura de senha e deixar só a chave. Senha se adivinha; chave, não. Só que o instalador só faz isso depois de você provar que a sua chave entra, para ninguém ficar trancado para fora.
+
+No técnico: é o endurecimento (hardening) do SSH. Ele cria um arquivo de configuração com `PasswordAuthentication no`, que desliga o login por senha, e `PermitRootLogin no`, que proíbe o root de entrar direto. Testa a configuração com `sshd -t` antes de recarregar o serviço.
+
+O que você faz nesta etapa: o teste é no terminal do **seu computador**, fora do Console web. Deixe o Console aberto, abra o PowerShell (Windows) ou o Terminal (Mac) e entre com `ssh hermes@SEU_IP`. Entrou sem pedir senha: volte ao Console web e responda `s`. Pediu senha: não digite nada, volte e responda `n`. Nada é trancado, a senha continua ligada e você corrige com calma depois, com `sudo instalar-imersao --so ssh`. Dica: se a linha onde você digita começa com `root@srv...`, você ainda está no Console web, não no seu computador.
+
+_O que o script roda (só para você ver, não precisa copiar):_
+```bash
+# descobre o IP público e a porta do SSH, para mostrar o comando do teste
+curl -fsS --max-time 8 https://api.ipify.org
+sshd -T
+# (aqui ele espera você testar ssh hermes@SEU_IP no seu computador e responder s)
+
+# arquivo /etc/ssh/sshd_config.d/00-imersao.conf
+# Imersão Arquiteto de Agentes: entrada só por chave, root fechado.
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PermitRootLogin no
+PubkeyAuthentication yes
+
+# testa a configuração; se der erro, apaga o arquivo e não muda nada
+sshd -t
+# aplica sem derrubar quem já está conectado
+systemctl reload ssh
+```
+
+### Etapa 6 · Instalar o Hermes
+
+É o motor do escritório. O instalador coloca o Hermes na mesma versão usada nesta aula, para o seu funcionar igual ao do professor.
+
+No técnico: ele clona o Hermes Agent travado num commit específico, a versão fixa que foi testada, e instala as dependências de Python e Node e o Chromium que os agentes usam para navegar.
+
+Leva de 5 a 10 minutos, e a tela fica um tempo parada. É normal: não feche a aba.
+
+_O que o script roda (só para você ver, não precisa copiar):_
+```bash
+# bibliotecas que o navegador dos agentes precisa para abrir, e fontes com acento
+# (no Ubuntu 24.04 alguns nomes levam o final t64; ele instala só as que faltam)
+apt-get -y install libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
+  libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libpango-1.0-0 \
+  libcairo2 libasound2 libatspi2.0-0 libxshmfence1 fonts-liberation fonts-dejavu-core \
+  fonts-noto-color-emoji
+
+# instala o Hermes como usuário hermes, travado no commit testado na aula
+sudo -u hermes bash -c "curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/99fcd6944360925943688d30c39ec9a490ccdeb1/scripts/install.sh \
+  | bash -s -- --commit 99fcd6944360925943688d30c39ec9a490ccdeb1 --non-interactive --skip-computer-use"
+
+# confere se instalou exatamente essa versão
+sudo -u hermes git -C /home/hermes/.hermes/hermes-agent rev-parse HEAD
+sudo -u hermes hermes --version
+```
 
 [[print 14|Etapa 6: instalando o Hermes]]
-7. **Cérebro:** `1` para Claude ou `2` para ChatGPT. Copie o link com Ctrl+Shift+C, autorize no navegador e cole o código de volta. O código colado não aparece na tela: aperte Enter.
+### Etapa 7 · Conectar o cérebro
+
+Hora de ligar a inteligência. O agente pensa usando a sua assinatura, do Claude ou do ChatGPT: sem chave de API e sem custo por mensagem.
+
+No técnico: é autenticação OAuth. Em vez de colar uma API key, você autoriza a sua conta no site da Anthropic ou da OpenAI, e fica guardado na VPS um token de acesso que se renova sozinho.
+
+O que você faz nesta etapa: digite `1` para Claude ou `2` para ChatGPT. Aparece um link: selecione o link inteiro com o mouse, copie com Ctrl+Shift+C, abra numa aba nova do navegador e autorize. No Claude, clique em Autorizar e depois em Copiar código; volte ao Console web, cole com o botão direito → Colar e aperte Enter. O código colado não aparece na tela: é normal, aperte Enter e ele conecta. No ChatGPT é o contrário: você digita no navegador o código curto que aparece no Console.
+
+_O que o script roda (só para você ver, não precisa copiar):_
+```bash
+# --- se você escolheu 1 (Claude) ---
+# instala o Claude Code na versão fixa: é por ele que o agente usa a sua assinatura
+sudo -u hermes bash -c "curl -fsSL https://claude.ai/install.sh | bash -s 2.1.312"
+# pasta onde fica o login do Claude, fechada só para o hermes
+install -d -o hermes -g hermes -m 700 /home/hermes/.claude
+# abre o login: mostra o link e espera você colar o código
+sudo -u hermes env CLAUDE_CONFIG_DIR=/home/hermes/.claude claude auth login
+# confere se o login deu certo
+sudo -u hermes env CLAUDE_CONFIG_DIR=/home/hermes/.claude claude auth status
+
+# --- se você escolheu 2 (ChatGPT) ---
+# abre o login: mostra o link e o código curto
+sudo -u hermes hermes auth add openai-codex --type oauth --no-browser
+# confere se o login deu certo
+sudo -u hermes hermes auth status openai-codex
+```
 
 [[print 15|Etapa 7: login do cérebro]]
-8. **Agentes:** instala os 3 agentes do squad (Atendimento, Carrosséis e Landing pages).
+### Etapa 8 · Instalar os 3 agentes
+
+Os funcionários chegam, cada um com a sua mesa. O instalador coloca os três agentes: Atendimento, Carrosséis e Landing pages, cada um com a sua SOUL, as suas habilidades e a sua memória. Um não mexe nas coisas do outro. Repare na linha "Pacote conferido": quer dizer que o pacote é o original da RedPro AI Academy e ninguém mexeu nele no caminho. Ele também cria a pasta `marca`, com os modelos da sua marca em branco; quem preenche é o onboarding, conversando com você.
+
+No técnico: são três profiles do Hermes, isolados. Cada profile tem o próprio `SOUL.md`, as próprias skills, memória e arquivo `.env`. O pacote dos agentes é baixado e conferido pelo hash SHA-256 antes de ser instalado.
+
+Leva de 5 a 8 minutos. Não aperte nada até terminar.
+
+_O que o script roda (só para você ver, não precisa copiar):_
+```bash
+# baixa o pacote dos agentes pela rota protegida da aula
+curl -fsSL --max-time 120 "https://redpro.com.br/instalar/arquivo/configurar-vps.tar.gz?k=CHAVE_DA_TURMA" \
+  -o /tmp/imersao-pacote.tar.gz
+# confere a assinatura: se não bater, não instala nada
+echo "<sha256 conferido>  /tmp/imersao-pacote.tar.gz" | sha256sum -c --quiet -
+# abre o pacote
+tar -xzf /tmp/imersao-pacote.tar.gz -C /opt/imersao/pacote --no-same-owner
+
+# cria a pasta da sua marca (se já existir, só acrescenta o que falta, sem apagar nada seu)
+cp -r /opt/imersao/pacote/marca /home/hermes/marca
+chown -R hermes:hermes /home/hermes/marca
+
+# para cada agente: mkt-atendimento, mkt-conteudo (Carrosséis) e mkt-landing
+for agente in mkt-atendimento mkt-conteudo mkt-landing; do
+  # instala o perfil do agente (preserva memória, sessões e .env se já existir)
+  sudo -u hermes hermes profile install /opt/imersao/pacote/agentes/$agente --name $agente --force -y
+
+  # se o cérebro é o Claude: liga o plugin da assinatura e escolhe o modelo
+  sudo -u hermes hermes -p $agente plugins install NousResearch/hermes-plugin-claude-subscription-directsdk \
+    --ref bfe6d9f0b76309f1731ba00c9fc0034f910e7aac --yes-deps --enable
+  sudo -u hermes hermes -p $agente config set model.provider claude-subscription-directsdk-experimental
+  sudo -u hermes hermes -p $agente config set model.default claude-sonnet-5-5
+  # no .env do agente: CLAUDE_CONFIG_DIR=/home/hermes/.claude
+
+  # se o cérebro é o ChatGPT, no lugar das linhas acima:
+  sudo -u hermes hermes -p $agente config set model.provider openai-codex
+  sudo -u hermes hermes -p $agente config set model.default gpt-5.5
+
+  # vale para os dois
+  sudo -u hermes hermes -p $agente config set gateway.standalone true
+  sudo -u hermes hermes -p $agente config set timezone America/Sao_Paulo
+done
+```
 
 [[print 16|Etapa 8: os 3 agentes instalados]]
-9. **Criar os bots:** pegue o celular e abra o **BotFather** no Telegram (t.me/BotFather), o bot oficial que cria bots. Para cada agente, nesta ordem: Atendimento, Carrosséis, Landing pages:
-   1. Mande `/newbot`.
-   2. Mande o **nome** que o instalador mostra (ex.: Agente de Atendimento).
-   3. Mande o **@** que o instalador sugere. Ele tem que terminar em `bot`. Se o BotFather disser que já existe, troque só o final e mande de novo.
-   4. O BotFather devolve o **token**. Guarde direto no seu gerenciador de senhas.
-   5. Volte ao Console web, aperte Enter e cole o token. Ele não aparece na tela: é normal. O instalador confere na hora.
+### Etapa 9 · Criar os 3 bots no BotFather
+
+Cada funcionário precisa de um ramal, e quem dá o ramal no Telegram é o BotFather, o bot oficial que cria bots. O instalador mostra exatamente o que mandar para ele, um bot de cada vez.
+
+No técnico: o BotFather registra o seu bot na Bot API do Telegram e devolve um token, a credencial que deixa um programa falar como aquele bot.
+
+O que você faz nesta etapa: pegue o celular e abra o **BotFather** no Telegram (t.me/BotFather, com o selo azul). Para cada agente, nesta ordem: Atendimento, Carrosséis, Landing pages:
+1. Mande `/newbot`.
+2. Mande o **nome** que o instalador mostra (ex.: Agente de Atendimento).
+3. Mande o **@** que o instalador sugere, com um final só seu. Ele tem que terminar em `bot`. Se o BotFather disser que já existe, troque só o final e mande de novo.
+4. O BotFather devolve o **token**. Guarde direto no seu gerenciador de senhas.
+5. Volte ao Console web, aperte Enter e cole o token. Ele não aparece na tela: é normal. O instalador confere na hora se funciona.
 
 > O token é a chave do bot. Nunca no chat, nunca no print, nunca no grupo.
 
-10. **Telegram:** abra cada bot e mande `/start`. O instalador mostra o nome de quem mandou e pergunta se é você: responda `s`. Só você vai conseguir falar com seus agentes.
-11. **Serviço:** cada agente vira um serviço que liga sozinho e volta sozinho se a VPS reiniciar.
-12. **Conferir:** o instalador manda uma pergunta para cada agente e espera a resposta.
-13. **Onboarding:** mande um oi para qualquer agente no Telegram e responda às 10 perguntas sobre o seu negócio.
+_O que o script roda (só para você ver, não precisa copiar):_
+```bash
+# sorteia um final de 4 letras/números só desta VPS, para o @ sugerido quase nunca estar ocupado
+od -An -N2 -tx1 /dev/urandom
+
+# para cada bot: espera você colar o token (escondido, não aparece na tela nem no registro)
+# e pergunta ao Telegram de quem é esse token
+curl https://api.telegram.org/botTOKEN_DO_BOT/getMe
+
+# token válido: guarda no .env do agente, num arquivo que só o hermes lê (permissão 600)
+# arquivo /home/hermes/.hermes/profiles/mkt-atendimento/.env
+TELEGRAM_BOT_TOKEN=TOKEN_DO_BOT
+```
+
+### Etapa 10 · Ligar cada bot ao seu Telegram
+
+Agora cada ramal é ligado ao SEU Telegram. O token você já colou na etapa 9, então aqui é só o `/start`. Quem mandar o `/start` vira o dono do bot, por isso o instalador confere se foi você.
+
+No técnico: o token é a credencial da Bot API. O instalador valida o token com o método `getMe`, grava no `.env` do profile e captura o seu ID de usuário do Telegram pelo `/start` para a allowlist, a lista de quem pode falar com o bot.
+
+O que você faz nesta etapa: abra cada bot no Telegram e mande `/start`. O instalador mostra o nome de quem mandou e pergunta se é você: responda `s`. Só você vai conseguir falar com seus agentes.
+
+_O que o script roda (só para você ver, não precisa copiar):_
+```bash
+# para cada agente (exemplo: mkt-atendimento)
+# para o agente um instante, senão ele "come" a mensagem que vamos ler
+systemctl stop imersao-mkt-atendimento
+# garante que o bot recebe mensagens pelo jeito simples (sem webhook)
+curl https://api.telegram.org/botTOKEN_DO_BOT/deleteWebhook
+# joga fora mensagens antigas: só vale o /start mandado agora
+curl https://api.telegram.org/botTOKEN_DO_BOT/getUpdates
+# (espera você mandar /start e apertar Enter)
+# lê o /start e pega o seu ID e o seu nome no Telegram
+curl https://api.telegram.org/botTOKEN_DO_BOT/getUpdates
+
+# você confirmou que é você: grava no .env do agente
+# arquivo /home/hermes/.hermes/profiles/mkt-atendimento/.env
+TELEGRAM_BOT_TOKEN=TOKEN_DO_BOT
+TELEGRAM_ALLOWED_USERS=SEU_ID_DO_TELEGRAM
+TELEGRAM_HOME_CHANNEL=SEU_ID_DO_TELEGRAM
+
+# se o agente já era um serviço, religa com o bot novo
+systemctl restart imersao-mkt-atendimento
+```
+
+### Etapa 11 · Deixar os agentes ligados 24 h
+
+O escritório nunca fecha. Cada agente vira um serviço do sistema: liga sozinho se a VPS reiniciar e volta sozinho se cair. O seu computador pode desligar, o Hermes Desktop pode fechar: o squad continua.
+
+No técnico: é uma unidade systemd por agente, com `enable` para subir no boot, `Restart=on-failure` com 10 segundos de espera, teto de memória de 900 MB por agente e `NoNewPrivileges`, que impede o processo de ganhar mais poder.
+
+_O que o script roda (só para você ver, não precisa copiar):_
+```bash
+# um arquivo por agente; este é o /etc/systemd/system/imersao-mkt-atendimento.service
+[Unit]
+Description=Agente Atendimento (mkt-atendimento) do Squad da Imersão
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=hermes
+Group=hermes
+WorkingDirectory=/home/hermes
+Environment=HOME=/home/hermes
+Environment=PATH=/home/hermes/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/home/hermes/.local/bin/hermes -p mkt-atendimento gateway run
+Restart=on-failure
+RestartSec=10
+MemoryMax=900M
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+
+# avisa o sistema que tem serviço novo
+systemctl daemon-reload
+# para cada agente, um de cada vez (juntos, eles disputam a mesma trava ao ligar)
+systemctl enable imersao-mkt-atendimento
+systemctl restart imersao-mkt-atendimento
+sleep 6
+# ...e o mesmo para imersao-mkt-conteudo e imersao-mkt-landing
+```
+
+### Etapa 12 · Conferência final
+
+É o teste antes de abrir as portas. O instalador manda uma pergunta para cada agente e espera resposta de verdade. A instalação só está pronta quando cada um responde. Quem respondeu já te manda um oi no Telegram.
+
+No técnico: é um health check de ponta a ponta. Ele confere se cada serviço está ativo e estável e faz uma chamada real ao modelo em cada profile.
+
+_O que o script roda (só para você ver, não precisa copiar):_
+```bash
+# para cada agente (exemplo: mkt-atendimento)
+# o serviço está ligado e parou de reiniciar? (olha por até 60 s)
+systemctl show imersao-mkt-atendimento -p NRestarts --value
+systemctl is-active imersao-mkt-atendimento
+
+# faz uma pergunta de verdade ao agente (espera até 3 minutos)
+timeout 180 sudo -u hermes hermes -p mkt-atendimento \
+  -z "Responda em uma frase curta, em português, quem você é e o que faz."
+
+# respondeu: manda a mensagem de boas-vindas no seu Telegram
+curl https://api.telegram.org/botTOKEN_DO_BOT/sendMessage \
+  -H 'Content-Type: application/json' \
+  -d '{"chat_id":"SEU_ID_DO_TELEGRAM","text":"Oi! Sou o agente de Atendimento e já estou no ar. Pode me chamar por aqui."}'
+```
+
+### Etapa 13 · Onboarding
+
+É o primeiro dia de cada funcionário. Agente que não conhece o seu negócio é chatbot genérico. Ele grava tudo o que aprende na pasta da marca, e os outros dois já ficam sabendo: ninguém repete as perguntas. A conversa termina com: "Pronto! Os seus três agentes já sabem tudo do seu negócio."
+
+No técnico: o onboarding acontece na conversa com o agente, não no script. O que você responde vai para os arquivos da pasta `/home/hermes/marca`, que os três agentes leem.
+
+O que você faz nesta etapa: mande um oi para qualquer um dos três agentes no Telegram. Ele faz 10 perguntas sobre o seu negócio (marca, tom de voz, clientes), uma por vez, cada uma com um exemplo de resposta. Pode responder por áudio. Senha e token nunca entram nessa conversa.
+
+_O que o script roda (só para você ver, não precisa copiar):_
+```bash
+# nesta etapa o script não roda nenhum comando:
+# ele só mostra o aviso para você abrir o Telegram e mandar um oi
+```
 
 Parou no meio, caiu a internet ou fechou a aba? Abra o Console web de novo e rode:
 ```
