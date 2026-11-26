@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 // a ION encaminha com ?aceitou=consultoria (só leitura, sem tracking aqui).
 // Purchase NÃO sai do navegador: vem do webhook da Hotmart.
 // Abaixo da confirmação: oferta da Mentoria Empresa Agêntica (R$ 4.750) para quem acabou de comprar o EA².
-// Some para quem chega com ?aceitou= (já aceitou um upsell).
+// Some para quem chega com qualquer ?aceitou= (mentoria ou consultoria: já aceitou um upsell).
+// O bloco serve a quem pagou no Pix ou boleto ou recusou o upsell de 1 clique (Rigel, 26/11).
 export default async function Page({ searchParams }: { searchParams: Promise<{ aceitou?: string }> }) {
   const { aceitou } = await searchParams;
   const consultoria = aceitou === "consultoria";
