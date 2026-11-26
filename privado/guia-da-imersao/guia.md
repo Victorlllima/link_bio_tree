@@ -959,7 +959,7 @@ Você tem um agente que entende, lembra, age, fala com você e pede permissão.
 
 ---
 
-# Dia 2 · Casa própria na VPS
+# Dia 2 · VPS e Squad
 
 Hoje os seus agentes saem do seu computador e ganham casa própria: uma VPS ligada 24 horas, com três agentes do Squad (Atendimento, Carrosséis e Landing pages) respondendo no seu Telegram.
 
