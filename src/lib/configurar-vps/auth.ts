@@ -7,6 +7,17 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 export const COOKIE = "cvps";
 export const COOKIE_MAX_AGE = 60 * 60 * 24 * 60; // 60 dias
 
+/* ION, 26/11/2026: a senha agora abre a /guia-da-imersao (a /configurar-vps virou redirect).
+   Cookie novo vale para o site todo (path "/"); o antigo (path /configurar-vps) é migrado
+   pela própria /configurar-vps quando o aluno passa por ela, para não pedir a senha de novo. */
+export const COOKIE_OPCOES = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: COOKIE_MAX_AGE,
+};
+
 function senha(): string {
   return (process.env.CONFIGURAR_VPS_SENHA ?? "").trim();
 }

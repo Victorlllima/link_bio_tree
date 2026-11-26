@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 
-/* Peças com clique da /configurar-vps: copiar comando e abas por sistema/agente.
+/* Peças com clique do Guia da Imersão (vieram da /configurar-vps): copiar comando e abas por sistema/agente.
    A aba escolhida vale para a página inteira (escolheu Mac uma vez, todas as abas viram Mac). */
 
 async function copiarTexto(texto: string) {
@@ -103,4 +103,36 @@ export function Abas({ grupo, rotulos, paineis }: { grupo: string; rotulos: stri
       ))}
     </div>
   );
+}
+
+// Abriu com #dia-2 (ou outra âncora): rola até lá depois que a página assentar (fontes e prints mexem no layout)
+export function IrParaAncora() {
+  useEffect(() => {
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (!id) return;
+    const ir = () => document.getElementById(id)?.scrollIntoView({ block: "start" });
+    ir();
+    const t = setTimeout(ir, 350);
+    document.fonts?.ready.then(ir).catch(() => {});
+    return () => clearTimeout(t);
+  }, []);
+  return null;
+}
+
+// Tela de senha: leva a âncora do link (#dia-2) junto com a senha, porque o navegador não manda o # ao servidor
+export function AncoraNoForm() {
+  useEffect(() => {
+    const campo = document.getElementById("gi-ancora") as HTMLInputElement | null;
+    const por = () => {
+      if (campo) campo.value = location.hash.slice(1).replace(/[^a-z0-9-]/gi, "");
+    };
+    por();
+    campo?.form?.addEventListener("submit", por);
+    window.addEventListener("hashchange", por);
+    return () => {
+      campo?.form?.removeEventListener("submit", por);
+      window.removeEventListener("hashchange", por);
+    };
+  }, []);
+  return null;
 }

@@ -6,16 +6,18 @@ const nextConfig: NextConfig = {
   // Guias de bônus do EA² (22/11): PDFs privados que só saem anexados ao e-mail do webhook da Hotmart.
   outputFileTracingIncludes: {
     "/api/webhooks/hotmart": ["./privado/guias-ea2/**"],
-    // Manual da VPS (IRIS, 23/11): texto e prints só saem depois da senha
-    "/configurar-vps": ["./privado/configurar-vps/**"],
-    "/configurar-vps/print/[n]": ["./privado/configurar-vps/prints/**"],
+    // Guia da Imersão (ION, 26/11; substitui o Manual da VPS da /configurar-vps): texto e prints só depois da senha
+    "/guia-da-imersao": ["./privado/guia-da-imersao/guia.md"],
+    "/guia-da-imersao/print/[n]": ["./privado/guia-da-imersao/prints/**"],
     // Instalador da Imersão (ION, 23/11): configurar-vps.sh e pacote cifrados, servidos só com a chave da aula
     "/instalar": ["./privado/instalador/**"],
     "/instalar/arquivo/[nome]": ["./privado/instalador/**"],
   },
   async headers() {
     return [{ source: "/configurar-vps/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
-            { source: "/configurar-vps", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] }];
+            { source: "/configurar-vps", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
+            { source: "/guia-da-imersao/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
+            { source: "/guia-da-imersao", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] }];
   },
   images: {
     remotePatterns: [
@@ -55,6 +57,9 @@ const nextConfig: NextConfig = {
         destination: "/hermes-week/g",
         permanent: false,
       })),
+      // Guia da Imersão (ION, 26/11): o endereço com acento cai no sem acento
+      { source: "/guia-da-imers%C3%A3o", destination: "/guia-da-imersao", permanent: true },
+      { source: "/guia-da-imersão", destination: "/guia-da-imersao", permanent: true },
       // /instalar deixou de ser público (23/11): agora é a rota src/app/instalar (só com a chave da aula).
     ];
   },
