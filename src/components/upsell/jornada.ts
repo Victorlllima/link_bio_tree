@@ -69,14 +69,14 @@ export const JORNADA: Mes[] = [
   },
   {
     mes: 4,
-    area: "Bastidores",
-    curto: "Bastidores",
+    area: "Administrativo",
+    curto: "Administrativo",
     entrega: "Financeiro, administrativo e pessoas rodando com agente e aprovação humana.",
     aulas: [
       { n: 13, titulo: "Financeiro", texto: "Contas a pagar e a receber, conciliação, cobrança e fluxo de caixa no painel." },
       { n: 14, titulo: "Administrativo e fiscal", texto: "Notas, documentos, e-mails, agenda e compras." },
       { n: 15, titulo: "Pessoas", texto: "Recrutamento, integração de funcionário e rotina da equipe." },
-      { n: 16, titulo: "Entrega e hot seat", texto: "Os bastidores no seu painel." },
+      { n: 16, titulo: "Entrega e hot seat", texto: "O administrativo no seu painel." },
     ],
   },
   {
