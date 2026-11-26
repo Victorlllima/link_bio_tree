@@ -3,6 +3,7 @@ import base from "./oferta.module.css";
 import s from "./jornada.module.css";
 import PainelMeses from "./PainelMeses";
 import Revela from "./Revela";
+import { Recusar } from "./Track";
 import { ENTRADA, FORMATO, JORNADA } from "./jornada";
 import { MENTORIA, OFERTA_1 } from "./config";
 
@@ -11,7 +12,8 @@ import { MENTORIA, OFERTA_1 } from "./config";
 // o que entra · preço com âncora · garantia · botão.
 const nb = (v: string) => v.replace(/ /g, "\u00a0");
 
-export default function OfertaFA2({ checkout }: { checkout: string }) {
+// Usada no obrigado do EA² (sem recusar) e no upsell 1 /ea2/oferta-formacao (com recusar, que leva ao obrigado).
+export default function OfertaFA2({ checkout, recusar }: { checkout: string; recusar?: { href: string; texto: string } }) {
   return (
     <section className={s.oferta} aria-labelledby="oferta-fa2">
       <div className={`${s.oto} ${mono.className}`}>
@@ -113,6 +115,11 @@ export default function OfertaFA2({ checkout }: { checkout: string }) {
         </div>
 
         <a className={base.btn} href={checkout}>Sim, quero o upgrade para a FA²</a>
+        {recusar && (
+          <Recusar nome="formacao" className={base.recusar} href={recusar.href}>
+            {recusar.texto}
+          </Recusar>
+        )}
         <p className={base.aviso}>Se não for para você, sua vaga no EA² continua garantida. O resultado depende da sua execução e da sua aplicação.</p>
       </div>
     </section>
