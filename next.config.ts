@@ -60,6 +60,16 @@ const nextConfig: NextConfig = {
       // Guia da Imersão (ION, 26/11): o endereço com acento cai no sem acento
       { source: "/guia-da-imers%C3%A3o", destination: "/guia-da-imersao", permanent: true },
       { source: "/guia-da-imersão", destination: "/guia-da-imersao", permanent: true },
+      // Botões dos templates do EA² no WhatsApp oficial (ION, 27/11, pedido do Rigel).
+      // A Meta não aceita link wa.me em botão: /amanda redireciona para o WhatsApp da Amanda.
+      // O número fica na variável AMANDA_WA_URL da Vercel, fora do código.
+      ...(process.env.AMANDA_WA_URL
+        ? [{ source: "/amanda", destination: process.env.AMANDA_WA_URL, permanent: false }]
+        : []),
+      // /ea2/credito é rota própria (src/app/ea2/credito/route.ts): vira sozinha depois de 30/11 23h59.
+      { source: "/ea2/inscricao", destination: "https://pay.hotmart.com/J107893534P?off=24mnfz2e&checkoutMode=10", permanent: false },
+      { source: "/ea2/prazo", destination: "https://pay.hotmart.com/J107893534P?off=24mnfz2e&checkoutMode=10", permanent: false },
+      { source: "/imersao/material", destination: "https://hotmart.com/pt-br/club/redpro-ai-academy", permanent: false },
       // /instalar deixou de ser público (23/11): agora é a rota src/app/instalar (só com a chave da aula).
     ];
   },
