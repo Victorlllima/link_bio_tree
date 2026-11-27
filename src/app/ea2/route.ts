@@ -3,8 +3,8 @@ import { LP_EA2_HTML } from "@/components/ea2/lp-ea2-html";
 /* ============================================================================
  *  /ea2  ·  EA² · Estudos Avançados em Agentes (4 aulas ao vivo, dezembro)
  * ----------------------------------------------------------------------------
- *  Mesma técnica da /imersao: o HTML pronto é servido por route.ts, porque
- *  traz Three.js, GSAP e Lenis de CDN e não deve passar pelo layout raiz do Next.
+ *  O HTML pronto (design próprio, sem vídeo, parallax em JS puro) é servido
+ *  por route.ts para não passar pelo layout raiz do Next. Fotos em /public/ea2.
  *  A condição de quem comprou a gravação (R$ 1.303) sai da página sozinha
  *  depois de 30/11 às 23h59 (Brasília): tudo entre <!--GRAV--> e <!--/GRAV-->.
  *  Sem Purchase no navegador: a compra sai do servidor (CAPI).
@@ -52,7 +52,7 @@ const HEAD_META = `<title>${esc(TITULO)}</title>
 <meta name="twitter:title" content="${esc(TITULO)}">
 <meta name="twitter:description" content="${esc(DESCRICAO)}">
 <meta name="twitter:image" content="https://redpro.com.br/imersao/og.jpg">
-<meta name="theme-color" content="#0A0A0A">
+<meta name="theme-color" content="#ECE6DD">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌀</text></svg>">`;
 
 const PIXEL_BASE = `<script>
